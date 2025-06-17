@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "226088591149",
+    "project_id": "openpay-a967c",
+    "storage_bucket": "openpay-a967c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226088591149:android:334ac3c03113d9cbc2fda4",
+        "android_client_info": {
+          "package_name": "vn.vinnet.openpay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "226088591149-am0hu3rg5mcmjtcokvfia493vjsqor09.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vn.vinnet.openpay",
+            "certificate_hash": "3da22c46d18a6d2df19f8bf155904297e54adaaf"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBOxQOo8DLu9lEDHHCjJsw6RdbBxGOE88"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

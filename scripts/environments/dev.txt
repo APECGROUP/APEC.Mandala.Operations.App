@@ -1,0 +1,7 @@
+export const ENV = 'development';
+export const BASE_URL = 'https://api-gateway.dev.vinnet.vn/ewallet/api/';
+export const DOMAIN_IMAGE =
+  'https://api-gateway.dev.vinnet.vn/ewallet/api/user/commons/files/view?path=';
+
+export const BUILD_NAME = '-dev';
+export const BUILD_VERSION = '1.0.0';

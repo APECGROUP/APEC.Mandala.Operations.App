@@ -1,0 +1,111 @@
+# macOS
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# node.js
+node_modules/
+
+# React Native
+*.bundle
+*.map
+.expo/
+.expo-shared/
+
+# Metro
+.metro-cache/
+.metro-health-check*
+
+# Android
+android/.gradle/
+android/app/build/
+android/.idea/
+android/local.properties
+*.iml
+*.keystore
+!debug.keystore
+android/.cxx/
+android/.externalNativeBuild/
+android/.DS_Store
+build/
+.idea
+.gradle
+local.properties
+*.hprof
+.cxx/
+
+# iOS
+ios/build/
+ios/Pods/
+ios/DerivedData/
+ios/.DS_Store
+ios/*.xcodeproj/project.xcworkspace/
+ios/*.xcodeproj/xcuserdata/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.xcuserstate
+**/.xcode.env.local
+
+# Bundle artifact
+*.jsbundle
+*.pack
+*.map
+
+# CocoaPods
+Pods/
+vendor/
+
+# Fastlane
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
+
+# Testing
+/coverage/
+*.lcov
+
+# Editor settings
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+.yarnrc.yml
+.cache/
+
+# Misc
+*.swp
+*.lock
+.env
+.env.*
+.env.local
+.env.production
+.env.test
+
+# Watchman
+.watchmanconfig

@@ -1,0 +1,38 @@
+# frozen_string_literal: true
+
+# Resolve react_native_pods.rb with node to allow for hoisting
+react_native_pods_path = Pod::Executable.execute_command('node', ['-p',
+  'require.resolve("react-native/scripts/react_native_pods.rb", {paths: [process.argv[1]]})',
+  __dir__
+]).strip
+
+require react_native_pods_path
+
+platform :ios, '16.0' # hoặc 12.0 tùy project của bạn
+
+# ✅ Bắt buộc cho React Native Firebase v15+ (dùng static frameworks)
+use_frameworks! :linkage => :static
+$RNFirebaseAsStaticFramework = true
+
+prepare_react_native_project!
+
+# (Optional) Nếu bạn cần modular headers cho pod không có module map
+use_modular_headers!
+
+target 'TuanOs' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+    # ❌ Không thêm :flipper_configuration vì Flipper không tương thích
+  )
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+    )
+  end
+end

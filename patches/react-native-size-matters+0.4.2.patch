@@ -1,0 +1,30 @@
+diff --git a/node_modules/react-native-size-matters/lib/extend/scaling-utils.extend.js b/node_modules/react-native-size-matters/lib/extend/scaling-utils.extend.js
+index f8edcb9..96a58a6 100644
+--- a/node_modules/react-native-size-matters/lib/extend/scaling-utils.extend.js
++++ b/node_modules/react-native-size-matters/lib/extend/scaling-utils.extend.js
+@@ -5,8 +5,8 @@ const { width, height } = Dimensions.get('window');
+ const [shortDimension, longDimension] = width < height ? [width, height] : [height, width];
+ 
+ //Default guideline sizes are based on standard ~5" screen mobile device
+-const guidelineBaseWidth = SIZE_MATTERS_BASE_WIDTH || 350;
+-const guidelineBaseHeight = SIZE_MATTERS_BASE_HEIGHT || 680;
++const guidelineBaseWidth = SIZE_MATTERS_BASE_WIDTH || 375;
++const guidelineBaseHeight = SIZE_MATTERS_BASE_HEIGHT || 812;
+ 
+ export const scale = size => shortDimension / guidelineBaseWidth * size;
+ export const verticalScale = size => longDimension / guidelineBaseHeight * size;
+diff --git a/node_modules/react-native-size-matters/lib/scaling-utils.js b/node_modules/react-native-size-matters/lib/scaling-utils.js
+index e89372a..1f6b2ee 100644
+--- a/node_modules/react-native-size-matters/lib/scaling-utils.js
++++ b/node_modules/react-native-size-matters/lib/scaling-utils.js
+@@ -4,8 +4,8 @@ const { width, height } = Dimensions.get('window');
+ const [shortDimension, longDimension] = width < height ? [width, height] : [height, width];
+ 
+ //Default guideline sizes are based on standard ~5" screen mobile device
+-const guidelineBaseWidth = 350;
+-const guidelineBaseHeight = 680;
++const guidelineBaseWidth = 375;
++const guidelineBaseHeight = 812;
+ 
+ export const scale = size => shortDimension / guidelineBaseWidth * size;
+ export const verticalScale = size => longDimension / guidelineBaseHeight * size;

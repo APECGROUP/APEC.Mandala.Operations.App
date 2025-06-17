@@ -1,0 +1,215 @@
+{
+  "translation": {
+    "auth": {
+      "login": {
+        "title": "Xin chào",
+        "subtitle": "Đăng nhập tài khoản để làm việc",
+        "userName": "Tên người dùng",
+        "password": "Mật khẩu",
+        "login": "Đăng nhập",
+        "inputUserName": "Nhập tên người dùng",
+        "inputPassword": "Nhập mật khẩu",
+        "loginError": "Tên người dùng hoặc mật khẩu không đúng. Vui lòng kiểm tra lại ",
+        "hotel": "Khách sạn",
+        "pickHotel": "Chọn khách sạn",
+        "saveInfoLogin": "Lưu thông tin đăng nhập",
+        "forgotPassword": "Quên mật khẩu?"
+      },
+      "forgotPassword": {
+        "title": "Quên mật khẩu",
+        "subtitle": "Nhập thông tin email của bạn để khôi phục mật khẩu",
+        "userName": "Tên nguời dùng",
+        "inputUserName": "Nhập tên người dùng",
+        "hotel": "Khách sạn",
+        "pickHotel": "Chọn khách sạn",
+        "confirm": "Xác nhận",
+        "error": "Tên người dùng hoặc mật khẩu không đúng. Vui lòng kiểm tra lại ",
+        "success": "Mật khẩu của bạn đã được gửi ",
+        "subSuccess": "Vui lòng check email đã đăng ký",
+        "close": "Đóng"
+      },
+      "home": {
+        "title": "Xin chào",
+        "header": "Danh sách báo giá NCC",
+        "empty": "Không có kết quả phù hợp",
+
+        "searchPlaceholder": "Tìm kiếm PR NO, bộ phận"
+      }
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "seeAll": "Đọc tất cả",
+      "status": {
+        "waitingAssignPrice": "Chờ gán giá",
+        "waitingGMOMApproval": "Chờ GM/OM duyệt",
+        "waitingDeptHeadApproval": "Chờ trưởng bộ phận duyệt",
+        "waitingChiefAccountantApproval": "Chờ kế toán trưởng duyệt"
+      },
+      "viewDetail": "Xem chi tiết"
+    },
+
+    "orderInfo": {
+      "title": "Thông tin đơn hàng",
+      "prNo": "prNo",
+      "createDate": "Ngày tạo đơn",
+      "estimateDate": "Ngày dự kiến",
+      "department": "Bộ phận",
+      "location": "Kho",
+      "requester": "Người yêu cầu",
+      "note": "Ghi chú"
+    },
+    "calendar": {
+      "selectTime": "Chọn thời gian"
+    },
+    "orderDetail": {
+      "title": "Thông tin các mặt hàng",
+      "itemName": "Tên mặt hàng",
+      "price": "Giá",
+      "quantity": "Số lượng",
+      "numberOfApproval": "Số lượng duyệt",
+      "moneyOfApproval": "Số tiền duyệt",
+      "supplier": "NCC",
+      "reason": "Ghi chú",
+      "autoAssignPrice": "Tự động gắn giá",
+      "AssignPrice": "Gắn giá",
+      "cancel": "Từ chối",
+      "saveDraft": "Lưu nháp",
+      "titleSearch": "Thông tin nhà cung cấp",
+      "empty": "Chưa có thông tin nhà cung cấp",
+      "searchPlaceholder": "Tìm NCC",
+      "approveSuccess": "Bạn đã duyệt đơn thành công",
+      "rejectSuccess": "Bạn đã từ chối đơn thành công",
+      "back": "Trở về",
+      "autoAssignPriceSuccess": "Tự động gắn giá thành công",
+      "saveSuccess": "Lưu nháp thông tin gắn giá thành công"
+    },
+    "filter": {
+      "title": "Bộ lọc",
+      "reset": "Thiết lập lại",
+      "confirm": "Xác nhận",
+      "prNo": "PR NO",
+      "fromDate": "Ngày tạo đơn",
+      "toDate": "Ngày dự kiến",
+      "department": "Bộ phận",
+      "requester": "Người yêu cầu",
+      "selectRequester": "Thông tin người yêu cầu",
+      "selectDepartment": "Thông tin bộ phận",
+      "emptyRequester": "Chưa có thông tin người yêu cầu",
+      "emptyDepartment": "Chưa có thông tin bộ phận",
+      "search": "Tìm kiếm",
+      "supplier": "Nhà cung cấp",
+      "pick": "Chọn",
+      "nameItem": "Tên mặt hàng",
+      "status": "Trạng thái",
+      "statusFilter": {
+        "approved": "Đã duyệt",
+        "rejected": "Đã từ chối",
+        "waiting": "Chờ duyệt"
+      },
+      "infoSupplier": "Thông tin nhà cung cấp",
+      "emptySupplier": "Chưa có thông tin nhà cung cấp",
+      "infoGroupItem": "Thông tin nhóm mặt hàng",
+      "emptyGroupItem": "Chưa có thông tin nhóm mặt hàng",
+      "groupItem": "Nhóm mặt hàng"
+    },
+    "createPrice": {
+      "title": "Xin chào",
+      "searchPlaceholder": "Tìm kiếm PR NO, tên mặt hàng",
+      "supplierPriceList": "Bảng giá NCC",
+      "empty": "Hiện chưa có bảng giá nhà cung cấp",
+      "create": "Tạo bảng giá NCC",
+      "pickAll": "Chọn tất cả",
+      "orderSelected": "đơn đã chọn",
+      "time": "Thời gian",
+      "ncc": "NCC",
+      "price": "Giá",
+      "createPrice": "Tạo giá",
+      "warningRemove": "Mặt hàng đã được duyệt không được xoá",
+      "close": "Đóng",
+      "cancel": "Hủy",
+      "agree": "Đồng ý",
+      "reject": "Từ chối",
+      "approvedOrder": "Duyệt đơn",
+      "approvedSuccess": "Duyệt đơn thành công",
+      "approvedFail": "Duyệt đơn thất bại",
+      "listPrice": "Danh sách giá",
+      "vat": "VAT",
+      "validateVat": "VAT không được bỏ trống",
+      "timeFromTo": "Từ ngày - đến ngày",
+      "pickTime": "Chọn ngày",
+      "notInputeInfo": "Chưa nhập thông tin",
+      "createMoreItem": "Tạo thêm mặt hàng",
+      "saveInfo": "Lưu thông tin",
+      "remove": {
+        "title": "Bạn có muốn xóa mặt hàng",
+        "subtitle": "Nếu bạn xóa thông tin mặt hàng của bạn sẽ không được lưu",
+        "agree": "Đồng ý",
+        "cancel": "Hủy"
+      }
+    },
+    "approve": {
+      "title": "Xin chào",
+      "searchPlaceholder": "Tìm kiếm PR NO",
+      "listOfPurchaseOrder": "Danh sách phiếu yêu cầu mua hàng",
+      "selectAll": "Chọn tất cả",
+      "orderSelected": "đơn đã chọn",
+      "agree": "Đồng ý",
+      "reject": "Từ chối",
+      "cancel": "Hủy",
+      "approvePr": "Duyệt PR",
+      "waitApproval": "Chờ KTT duyệt",
+      "approveOrder": "Duyệt đơn",
+      "detail": {
+        "title": "Thông tin các mặt hàng",
+        "price": "Giá",
+        "numberOfApproval": "Số lượng duyệt",
+        "number": "số lượng",
+        "ncc": "NCC",
+        "moneyOfApproval": "Số tiền duyệt",
+        "note": "Ghi chú"
+      }
+    },
+    "account": {
+      "title": "Tài khoản",
+      "language": "Ngôn ngữ",
+      "allowNotification": "Cho phép gửi thông báo",
+      "changePasswordTitle": "Đổi mật khẩu",
+      "logout": "Đăng xuất",
+      "VietNam": "Tiếng việt",
+      "confirm": "Xác nhận",
+      "profile": {
+        "title": "Thông tin tài khoản",
+        "userName": "Tên đăng nhập",
+        "fullName": "Họ và tên",
+        "rank": "Cấp bậc",
+        "email": "Email",
+        "department": "Bộ phận",
+        "takePhoto": "Chụp ảnh",
+        "updatePhoto": "Tải ảnh lên",
+        "cancel": "Hủy",
+        "changePhoto": "Thay đổi ảnh"
+      },
+      "changePassword": {
+        "title": "Đổi mật khẩu",
+        "currentPassword": "Mật khẩu hiện tại",
+        "newPassword": "Mật khẩu mới",
+        "confirmPassword": "Xác nhận mật khẩu mới",
+        "confirm": "Xác nhận",
+        "inputCurrentPassword": "Nhập mật khẩu hiện tại",
+        "inputNewPassword": "Nhập mật khẩu mới",
+        "inputConfirmPassword": "Nhập lại mật khẩu mới",
+        "changePasswordSuccess": "Đổi mật khẩu thành công",
+        "changePasswordFail": "Đổi mật khẩu thất bại",
+        "newPasswordNotMatch": "Mật khẩu mới không khớp"
+      },
+      "warningLogout": "Bạn có chắc chắn muốn đổi từ đăng xuất tài khoản này?"
+    },
+    "myTabs": {
+      "tab1": "Gán giá",
+      "tab2": "Tạo giá ",
+      "tab3": "Tạo PO ",
+      "tab4": "PC PR",
+      "tab5": "PC Log"
+    }
+  }
+}

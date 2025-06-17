@@ -1,0 +1,193 @@
+import React, {useEffect} from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {MainParams} from './params';
+import {s, vs} from 'react-native-size-matters';
+import NotificationScreen from '../screens/notificationScreen/view/NotificationScreen';
+
+import Utilities from '../utils/Utilities';
+import {useAlert} from '../elements/alert/AlertProvider';
+import ModalPhotoOrCamera from '../views/modal/ModalPhotoOrCamera';
+import ProfileScreen from '../screens/profileScreen/ProfileScreen';
+import light from '../theme/light';
+import {useTranslation} from 'react-i18next';
+import {getFontSize} from '../constants';
+import ImageViewScreen from '../modules/social/views/screens/ImageViewScreen';
+import MyTabs from './MyTabs';
+import {HeaderLeft, HeaderLeftWhite} from './AuthNavigator';
+import {PaddingHorizontal} from '@/utils/Constans';
+import ModalPickCalendar from '@/elements/calendar/ModalPickCalendar';
+import AccountScreen from '@/screens/accountScreen/AccountScreen';
+import {Colors} from '@/theme/Config';
+import ChangePasswordScreen from '@/screens/changePasswordScreen/ChangePasswordScreen';
+import InformationItemsScreen from '@/screens/InformationItemScreen/view/InformationItemsScreen';
+import IconInfomation from '@assets/icon/IconInfomation';
+import AppBlockButton from '@/elements/button/AppBlockButton';
+import {navigate} from './RootNavigation';
+import DetailAssignPriceCardScreen from '@/screens/assignPriceScreen/view/component/DetailAssignPriceCardScreen';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import PickNccScreen from '@/views/modal/modalPickNcc/view/PickNccScreen';
+import FilterScreen from '@/screens/filterScreen/view/FilterScreen';
+import PickDepartmentScreen from '@/views/modal/modalPickDepartment/view/PickDepartmentScreen';
+import PickRequesterScreen from '@/views/modal/modalPickRequester/view/PickRequesterScreen';
+export default function MainNavigator() {
+  const {Navigator, Group, Screen} = createNativeStackNavigator<MainParams>();
+  const {t} = useTranslation();
+  const {showAlert} = useAlert();
+
+  // console.log('mainNavigation: ', infoUser, infoUser.profile?.fullName);
+  const getPermission = async () => {
+    await Utilities.requestNotificationPermission(showAlert);
+  };
+
+  useEffect(() => {
+    // fetData();
+    getPermission();
+  }, []);
+
+  return (
+    <Navigator
+      initialRouteName="MyTabs"
+      screenOptions={{
+        // animation: 'simple_push',
+        headerShown: false,
+        headerTransparent: false,
+        headerBackButtonDisplayMode: 'minimal',
+        headerLeft: HeaderLeft,
+
+        headerTitleStyle: {
+          fontSize: getFontSize(18),
+          color: light.text,
+          fontWeight: '700',
+        },
+
+        headerShadowVisible: false,
+
+        contentStyle: {
+          backgroundColor: '#fff',
+          paddingHorizontal: PaddingHorizontal,
+        },
+        headerTitleAlign: 'center',
+      }}>
+      <Group>
+        <Screen
+          options={{
+            headerShown: false,
+            contentStyle: {paddingHorizontal: s(0)},
+            animation: 'fade',
+          }}
+          name="ImageViewScreen"
+          component={ImageViewScreen}
+        />
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: t('orderInfo.title'),
+          }}
+          name="DetailAssignPriceCardScreen"
+          component={DetailAssignPriceCardScreen}
+        />
+        <Screen
+          name="InformationItemsScreen"
+          component={InformationItemsScreen}
+          options={({route, navigation}) => ({
+            headerShown: true,
+            contentStyle: {
+              paddingHorizontal: 0,
+              // backgroundColor: Colors.WHITE,
+              backgroundColor: '#F2F3F5',
+            },
+            headerStyle: {backgroundColor: Colors.PRIMARY},
+            headerTitle: route.params?.item?.content,
+            headerRight: () => (
+              <AppBlockButton
+                style={{
+                  backgroundColor: 'red',
+                  width: vs(40),
+                  height: vs(40),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() =>
+                  navigation.navigate('DetailAssignPriceCardScreen', {
+                    item: route.params?.item,
+                  })
+                }>
+                <IconInfomation fill={Colors.WHITE} />
+              </AppBlockButton>
+            ),
+            headerLeft: HeaderLeftWhite,
+            headerTitleStyle: {color: Colors.WHITE},
+          })}
+        />
+
+        <Screen
+          options={{
+            headerShown: false,
+            contentStyle: {paddingHorizontal: s(0)},
+          }}
+          name="MyTabs"
+          component={MyTabs}
+        />
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: t('filter.title'),
+            contentStyle: {
+              paddingHorizontal: 0,
+              backgroundColor: Colors.WHITE,
+            },
+          }}
+          name="FilterScreen"
+          component={FilterScreen}
+        />
+
+        <Screen
+          options={{headerShown: true, headerTitle: t('account.profile.title')}}
+          name="ProfileScreen"
+          component={ProfileScreen}
+        />
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: t('account.title'),
+          }}
+          name="AccountScreen"
+          component={AccountScreen}
+        />
+
+        <Screen
+          options={{
+            headerShown: false,
+            contentStyle: {
+              paddingHorizontal: s(0),
+              backgroundColor: light.white,
+            },
+          }}
+          name="NotificationScreen"
+          component={NotificationScreen}
+        />
+      </Group>
+
+      {/* modal */}
+      <Group
+        screenOptions={{
+          presentation: 'transparentModal',
+          animation: 'fade',
+          contentStyle: {backgroundColor: '#0000001A'},
+        }}>
+        <Screen name={'ModalPhotoOrCamera'} component={ModalPhotoOrCamera} />
+        <Screen name={'ModalPickCalendar'} component={ModalPickCalendar} />
+        <Screen name={'PickNccScreen'} component={PickNccScreen} />
+        <Screen
+          name={'PickDepartmentScreen'}
+          component={PickDepartmentScreen}
+        />
+        <Screen name={'PickRequesterScreen'} component={PickRequesterScreen} />
+        <Screen
+          name={'ChangePasswordScreen'}
+          component={ChangePasswordScreen}
+        />
+      </Group>
+    </Navigator>
+  );
+}
