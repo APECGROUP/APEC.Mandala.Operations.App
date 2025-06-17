@@ -30,7 +30,7 @@ export default EmptyDataAnimation;
 const styles = StyleSheet.create({
   size: {
     width: '100%',
-    aspectRatio: 1,
+    aspectRatio: 1.4,
     // height: '100%',
   },
 });

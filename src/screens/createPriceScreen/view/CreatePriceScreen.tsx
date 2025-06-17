@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, {useState, useRef, useCallback} from 'react';
+import React, {useState, useRef, useCallback, useMemo} from 'react';
 import {
   StyleSheet,
   View,
@@ -32,16 +32,22 @@ import IconSearch from '../../../../assets/icon/IconSearch';
 import IconFilter from '../../../../assets/icon/IconFillter';
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
-import {DataAssignPrice} from '../modal/AssignPriceModal';
+import {TypeCreatePrice} from '../modal/CreatePriceModal';
 import Images from '../../../../assets/image/Images';
 import {navigate} from '../../../navigation/RootNavigation';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import {AppText} from '@/elements/text/AppText';
-import {useAssignPriceViewModel} from '../viewmodal/useAssignPriceViewModel';
+import {useCreatePriceViewModel} from '../viewmodal/useCreatePriceViewModal';
 import ToastContainer from '@/elements/toast/ToastContainer';
-import AssignPriceCard from './component/AssignPriceCard';
+import CreatePriceCard from './component/CreatePriceCard';
+import IconCheckBox from '@assets/icon/IconCheckBox';
+import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
+import {useAlert} from '@/elements/alert/AlertProvider';
+import {Colors} from '@/theme/Config';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler'; // Thêm dòng này
+import IconCreatePrice from '@assets/icon/IconCreatePrice';
 
-const AssignPriceScreen: React.FC = () => {
+const CreatePriceScreen: React.FC = () => {
   const {top} = useSafeAreaInsets();
   const {t} = useTranslation();
 
@@ -56,11 +62,12 @@ const AssignPriceScreen: React.FC = () => {
     onRefresh,
     onLoadMore,
     onSearch,
+    handleDelete,
     searchKey,
-  } = useAssignPriceViewModel();
+  } = useCreatePriceViewModel();
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
-  const flashListRef = useRef<FlashList<DataAssignPrice> | null>(null);
+  const flashListRef = useRef<FlashList<TypeCreatePrice> | null>(null);
   const lastOffsetY = useRef<number>(0);
 
   // show Scroll‐to‐Top khi scroll lên (swipe xuống), 0 = hidden, 1 = visible
@@ -129,7 +136,26 @@ const AssignPriceScreen: React.FC = () => {
     return (
       <View style={styles.emptyContainer}>
         <EmptyDataAnimation autoPlay />
-        <AppText style={styles.emptyText}>{t('assignPrice.empty')}</AppText>
+        <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
+        <AppBlockButton
+          onPress={onCreatePrice}
+          style={{
+            padding: vs(16),
+            backgroundColor: Colors.PRIMARY,
+            borderRadius: 8,
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: vs(12),
+          }}>
+          <AppText
+            style={{
+              fontSize: getFontSize(16),
+              color: Colors.WHITE,
+              fontWeight: '500',
+            }}>
+            {t('createPrice.create')}
+          </AppText>
+        </AppBlockButton>
       </View>
     );
   };
@@ -146,14 +172,52 @@ const AssignPriceScreen: React.FC = () => {
 
   const goToNotification = () => navigate('NotificationScreen');
 
-  const renderItem = useCallback(
-    ({item, index}: {item: DataAssignPrice; index: number}) => (
-      <AssignPriceCard item={item} index={index} />
-    ),
-    [],
-  );
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
+
+  const handleSelect = useCallback((id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id],
+    );
+  }, []);
 
   const goToAccount = () => navigate('AccountScreen');
+
+  const toggleSelectAll = () => {
+    const allIds = flatData.map(item => item.id);
+    if (selectedIds.length === flatData.length) {
+      setSelectedIds([]); // Bỏ chọn tất cả
+    } else {
+      setSelectedIds(allIds); // Chọn tất cả
+    }
+  };
+
+  const onCreatePrice = () => {
+    navigate('CreatePriceNccScreen');
+  };
+
+  const renderItem = useCallback(
+    ({item}: {item: TypeCreatePrice}) => {
+      const isSelected = selectedIds.includes(item.id);
+      return (
+        <CreatePriceCard
+          item={item}
+          handleDelete={handleDelete}
+          handleSelect={handleSelect}
+          isSelected={isSelected}
+          simultaneousGesture={flashListNativeGesture}
+        />
+      );
+    },
+    [selectedIds, handleDelete, handleSelect, flashListNativeGesture],
+  );
+
+  const selectedAll = useMemo(
+    () => selectedIds.length === flatData.length && flatData.length > 0,
+    [selectedIds, flatData],
+  );
+
   return (
     <View style={styles.container}>
       {/* ─── Background Image ─────────────────────────────────────────────── */}
@@ -176,7 +240,7 @@ const AssignPriceScreen: React.FC = () => {
 
           <View style={styles.greetingContainer}>
             <AppText color="#FFFFFF" style={styles.greetingText}>
-              {t('assignPrice.title')}
+              {t('createPrice.title')}
             </AppText>
             <AppText color="#FFFFFF" style={styles.greetingText}>
               {t(' Vũ Linh')}
@@ -200,7 +264,7 @@ const AssignPriceScreen: React.FC = () => {
         <TextInput
           value={searchKey}
           onChangeText={onSearch}
-          placeholder={t('assignPrice.searchPlaceholder')}
+          placeholder={t('createPrice.searchPlaceholder')}
           placeholderTextColor={light.placeholderTextColor}
           style={styles.searchInput}
           returnKeyType="search"
@@ -215,35 +279,60 @@ const AssignPriceScreen: React.FC = () => {
 
       {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
       <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>{t('Danh sách gán giá NCC')}</AppText>
+        <AppText style={styles.titleText}>
+          {t('createPrice.supplierPriceList')}
+        </AppText>
         <View style={styles.countBadge}>
           <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
         </View>
       </View>
+      <View style={styles.header}>
+        <AppBlockButton
+          onPress={toggleSelectAll}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
+          <AppText style={{marginLeft: s(7)}}>Chọn tất cả</AppText>
+        </AppBlockButton>
+        <AppText>{selectedIds.length} đơn đã chọn</AppText>
+      </View>
       {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
-
-      <FlashList
-        ref={flashListRef}
-        // data={[]}
-        data={flatData || []}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        onEndReached={onLoadMore}
-        showsVerticalScrollIndicator={false}
-        onEndReachedThreshold={0.5}
-        removeClippedSubviews
-        refreshing={isRefetching}
-        onRefresh={onRefresh}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        ListEmptyComponent={listEmptyComponent}
-        ListFooterComponent={listFooterComponent}
-        estimatedItemSize={100}
-        contentContainerStyle={styles.listContent}
-      />
+      {isLoading && flatData.length === 0 ? (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size="large" color={light.primary} />
+        </View>
+      ) : (
+        <FlashList
+          ref={flashListRef}
+          data={flatData || []}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          onEndReached={onLoadMore}
+          showsVerticalScrollIndicator={false}
+          onEndReachedThreshold={0.5}
+          removeClippedSubviews
+          refreshing={isRefetching}
+          nestedScrollEnabled={true}
+          onRefresh={onRefresh}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          ListEmptyComponent={listEmptyComponent}
+          ListFooterComponent={listFooterComponent}
+          estimatedItemSize={100}
+          contentContainerStyle={styles.listContent}
+        />
+      )}
 
       <ToastContainer ref={refToast} />
-
+      {flatData.length > 0 && (
+        <AppBlockButton
+          onPress={onCreatePrice}
+          style={{position: 'absolute', bottom: vs(20), right: s(16)}}>
+          <IconCreatePrice />
+        </AppBlockButton>
+      )}
       {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
       <AnimatedButton
         onPress={scrollToTop}
@@ -262,18 +351,26 @@ const AssignPriceScreen: React.FC = () => {
   );
 };
 
-export default AssignPriceScreen;
+export default CreatePriceScreen;
 export const AnimatedButton =
   Animated.createAnimatedComponent(TouchableOpacity);
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: vs(16),
+    paddingHorizontal: s(16),
+    // borderBottomWidth: 1,
+  },
   container: {
+    backgroundColor: Colors.WHITE,
     flex: 1,
   },
   backgroundImage: {
     width: SCREEN_WIDTH,
     aspectRatio: 2.66,
     position: 'absolute',
-    zIndex: -1,
+    zIndex: 0,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -365,8 +462,8 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: s(16),
-    marginBottom: vs(16),
+    marginHorizontal: PaddingHorizontal,
+    marginBottom: vs(12),
   },
   titleText: {
     fontSize: getFontSize(18),
@@ -389,16 +486,18 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: PaddingHorizontal,
     paddingBottom: vs(16),
+    // backgroundColor: '#F2F3F5',
+    // flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
-    marginTop: vs(40),
     justifyContent: 'center',
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: getFontSize(14),
-    color: '#666666',
+    fontSize: getFontSize(18),
+    fontWeight: '700',
+    textAlign: 'center',
   },
   footerLoading: {
     marginVertical: vs(12),

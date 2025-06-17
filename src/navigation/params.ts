@@ -12,7 +12,7 @@ import {TypePickRequester} from '@/views/modal/modalPickRequester/modal/PickRequ
 
 export type TabBarParams = {
   AssignPriceScreen: undefined;
-  tab2: undefined;
+  CreatePriceScreen: undefined;
   tab3: undefined;
   tab4: undefined;
   tab5: undefined;
@@ -29,6 +29,7 @@ export type MainParams = {
     onRequestClose?: () => void;
   };
   ProfileScreen: undefined;
+  CreatePriceNccScreen: undefined;
   AccountScreen: undefined;
   FilterScreen: undefined;
   DetailAssignPriceCardScreen: {item: DataAssignPrice};

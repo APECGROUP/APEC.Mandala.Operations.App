@@ -93,6 +93,7 @@ export enum COLORS_DEFAULT {
   YELLOW_950 = '#f0ff32',
 
   //Black
+
   BLACK_100 = '#F1F1F1',
   BLACK_200 = '#E0E0E0',
   BLACK_300 = '#BDBDBD',

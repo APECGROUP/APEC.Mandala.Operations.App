@@ -1,31 +1,71 @@
+import React, {useState, useCallback} from 'react';
 import {StyleSheet, View} from 'react-native';
-import React, {useState} from 'react';
-import AppBlockButton from '@/elements/button/AppBlockButton';
+import {useTranslation} from 'react-i18next';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import Animated, {FadeInDown} from 'react-native-reanimated';
+import {s, vs} from 'react-native-size-matters';
+
+import {Colors} from '@/theme/Config';
+import {PaddingHorizontal} from '@/utils/Constans';
+import {useAlert} from '@/elements/alert/AlertProvider';
 import {AppButton} from '@/elements/button/AppButton';
 import {AppText} from '@/elements/text/AppText';
-import IconAutoAssign from '@assets/icon/IconAutoAssign';
-import IconSaveTmp from '@assets/icon/IconSaveTmp';
-import {useTranslation} from 'react-i18next';
-import Animated, {FadeInDown} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {s, vs} from 'react-native-size-matters';
-import {PaddingHorizontal} from '@/utils/Constans';
-import {Colors} from '@/theme/Config';
-import {useAlert} from '@/elements/alert/AlertProvider';
 import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
-import {TYPE_TOAST} from '@/elements/toast/Message';
 
-const FooterFilter = () => {
+// --- Type Definition for Props ---
+type ScreenActionFooterProps = {
+  /**
+   * Callback for the left (secondary) action button.
+   * Can be an async function. Defaults to showing a rejection success alert.
+   */
+  onLeftAction?: () => Promise<void> | void;
+  /**
+   * Callback for the right (primary) action button.
+   * Can be an async function. Defaults to showing an approval success alert.
+   */
+  onRightAction?: () => Promise<void> | void;
+  /**
+   * Title text for the left action button.
+   * Defaults to 'filter.reset' (translated).
+   */
+  leftButtonTitle?: string;
+  /**
+   * Title text for the right action button.
+   * Defaults to 'filter.confirm' (translated).
+   */
+  rightButtonTitle?: string;
+  /**
+   * Boolean to control the visibility of the left button.
+   * Defaults to true.
+   */
+  showLeftButton?: boolean;
+  /**
+   * Boolean to control the visibility of the right button.
+   * Defaults to true.
+   */
+  showRightButton?: boolean;
+};
+
+// --- ScreenActionFooter Component ---
+const ScreenActionFooter = ({
+  onLeftAction,
+  onRightAction,
+  leftButtonTitle, // New prop for left button title
+  rightButtonTitle, // New prop for right button title
+  showLeftButton = true, // New prop to control left button visibility
+  showRightButton = true, // New prop to control right button visibility
+}: ScreenActionFooterProps) => {
   const {t} = useTranslation();
-  const [isLoadingReject, setIsLoadingReject] = useState(false);
-  const [isLoadingAssign, setIsLoadingAssign] = useState(false);
   const {bottom} = useSafeAreaInsets();
-  const {showAlert, showToast} = useAlert();
-  const onReject = async () => {
-    setIsLoadingReject(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
-    setIsLoadingReject(false);
+  const {showAlert} = useAlert();
+
+  const [isLeftActionLoading, setIsLeftActionLoading] = useState(false);
+  const [isRightActionLoading, setIsRightActionLoading] = useState(false);
+
+  // Default alert handlers, now more generic
+  const showDefaultRejectedAlert = useCallback(async () => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
     showAlert(
       t('Bạn đã từ chối đơn thành công'),
       '',
@@ -37,14 +77,14 @@ const FooterFilter = () => {
       ],
       <FastImage
         source={Images.ModalApprovedError}
-        style={{width: s(285), aspectRatio: 285 / 187}}
+        style={styles.modalImage}
       />,
     );
-  };
-  const onAssign = async () => {
-    setIsLoadingAssign(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
-    setIsLoadingAssign(false);
+  }, [showAlert, t]);
+
+  const showDefaultApprovedAlert = useCallback(async () => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     showAlert(
       t('Bạn đã duyệt đơn thành công'),
       '',
@@ -56,101 +96,87 @@ const FooterFilter = () => {
       ],
       <FastImage
         source={Images.ModalApprovedSuccess}
-        style={{width: s(285), aspectRatio: 285 / 187}}
+        style={styles.modalImage}
       />,
-      // <ConfettiAnimation
-      //   autoPlay={true}
-      //   loop={false}
-      //   style={{
-      //     position: 'absolute',
-      //     top: 0,
-      //     left: 0,
-      //   }}
-      // />,
     );
-  };
+  }, [showAlert, t]);
 
-  const onAutoAssign = () => {
-    showToast(t('Tự động gán giá thành công'), TYPE_TOAST.SUCCESS);
-  };
+  // Unified action handlers
+  const handleLeftAction = useCallback(async () => {
+    setIsLeftActionLoading(true);
+    try {
+      if (onLeftAction) {
+        await onLeftAction();
+      } else {
+        await showDefaultRejectedAlert();
+      }
+    } catch (error) {
+      console.error('Error during left action:', error);
+      // TODO: Add error toast/alert if needed
+    } finally {
+      setIsLeftActionLoading(false);
+    }
+  }, [onLeftAction, showDefaultRejectedAlert]);
 
-  const onSave = () => {
-    showToast(t('Lưu nháp thông tin gắn giá thành công'), TYPE_TOAST.SUCCESS);
-  };
+  const handleRightAction = useCallback(async () => {
+    setIsRightActionLoading(true);
+    try {
+      if (onRightAction) {
+        await onRightAction();
+      } else {
+        await showDefaultApprovedAlert();
+      }
+    } catch (error) {
+      console.error('Error during right action:', error);
+      // TODO: Add error toast/alert if needed
+    } finally {
+      setIsRightActionLoading(false);
+    }
+  }, [onRightAction, showDefaultApprovedAlert]);
+
   return (
     <Animated.View
       entering={FadeInDown.delay(200).duration(1000).springify()}
-      style={[styles.bottomContainer, {paddingBlock: bottom}]}>
-      <View style={styles.actionButtonsContainer}>
-        <View style={styles.blockButton}>
-          <AppButton
-            width={s(162)}
-            onPress={onReject}
-            processing={isLoadingReject}
-            style={styles.rejectButton}>
-            <AppText size={14} weight="700">
-              {t('filter.reset')}
-            </AppText>
-          </AppButton>
-        </View>
-        <View style={styles.blockButton}>
-          <AppButton
-            width={s(162)}
-            onPress={onAssign}
-            processing={isLoadingAssign}
-            style={styles.buttonAssign}>
-            <AppText size={14} weight="700" color={Colors.WHITE}>
-              {t('filter.confirm')}
-            </AppText>
-          </AppButton>
-        </View>
+      style={[styles.container, {paddingBottom: bottom + vs(8)}]}>
+      <View style={styles.buttonGroup}>
+        {showLeftButton && (
+          <View style={{width: s(162)}}>
+            <AppButton
+              width={s(162)} // Consider making button width configurable if needed
+              onPress={handleLeftAction}
+              processing={isLeftActionLoading}
+              style={styles.leftButton}>
+              <AppText size={14} weight="700">
+                {leftButtonTitle || t('filter.reset')}{' '}
+                {/* Use prop title or default */}
+              </AppText>
+            </AppButton>
+          </View>
+        )}
+        {showRightButton && (
+          <View style={{width: s(162)}}>
+            <AppButton
+              width={s(162)} // Consider making button width configurable if needed
+              onPress={handleRightAction}
+              processing={isRightActionLoading}
+              style={styles.rightButton}>
+              <AppText size={14} weight="700" color={Colors.WHITE}>
+                {rightButtonTitle || t('filter.confirm')}{' '}
+                {/* Use prop title or default */}
+              </AppText>
+            </AppButton>
+          </View>
+        )}
       </View>
     </Animated.View>
   );
 };
 
-export default FooterFilter;
+export default ScreenActionFooter;
 
+// --- Stylesheet ---
 const styles = StyleSheet.create({
-  buttonAssign: {
-    width: s(162),
-    height: vs(45),
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.PRIMARY,
-    borderRadius: s(8),
-  },
-  blockButton: {width: s(162), alignItems: 'center'},
-
-  actionButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: vs(12),
-  },
-  rejectButton: {
-    width: s(162),
-    height: vs(45),
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.PRIMARY_600,
-    borderRadius: s(8),
-  },
-  footerContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  footerButton: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footerDivider: {
-    width: s(2),
-    height: vs(29),
-    backgroundColor: Colors.BLACK_100,
-  },
-  bottomContainer: {
+  container: {
     width: '100%',
     backgroundColor: Colors.WHITE,
     paddingTop: vs(8),
@@ -164,8 +190,29 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
     elevation: 2,
   },
-  footerWrapper: {
+  buttonGroup: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: vs(12),
+  },
+  leftButton: {
+    width: s(162),
+    height: vs(45),
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: Colors.PRIMARY_600, // Typically a secondary action color
+    borderRadius: s(8),
+  },
+  rightButton: {
+    width: s(162),
+    height: vs(45),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.PRIMARY, // Typically a primary action color
+    borderRadius: s(8),
+  },
+  modalImage: {
+    width: s(285),
+    aspectRatio: 285 / 187,
   },
 });

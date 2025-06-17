@@ -10,40 +10,42 @@ import {getFontSize, SCREEN_WIDTH} from '../../../../constants';
 import {PaddingHorizontal} from '../../../../utils/Constans';
 import AppBlockButton from '../../../../elements/button/AppBlockButton';
 import light from '../../../../theme/light';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
+import {Colors} from '@/theme/Config';
+const ICON_SECTION_WIDTH = s(130);
 
 interface HeaderProps {
-  onPressRight: () => void;
+  title?: string;
+  rightComponent?: React.ReactNode;
+  primary?: boolean;
+  iconWidth?: number;
 }
 
-const ICON_SECTION_WIDTH = s(130);
-const totalNotification = 100; // Hoặc truyền từ props nếu dynamic
-
-const formatNotificationCount = (count: number) => {
-  if (!count || count <= 0) return '';
-  if (count > 99) return '99+';
-  return count < 10 ? `0${count}` : `${count}`;
-};
-
-const Header = ({onPressRight}: HeaderProps) => {
+const Header = ({
+  title = '',
+  rightComponent,
+  primary = false,
+  iconWidth = s(40),
+}: HeaderProps) => {
   const {top} = useSafeAreaInsets();
-  const notificationLabel = formatNotificationCount(totalNotification);
-
+  const {t} = useTranslation();
   return (
-    <View style={[styles.container, {paddingTop: top}]}>
-      <AppBlockButton onPress={goBack} style={styles.buttonBack}>
-        <IconBack />
+    <View
+      style={[
+        styles.container,
+        {paddingTop: top},
+        primary && {backgroundColor: Colors.PRIMARY},
+      ]}>
+      <AppBlockButton
+        onPress={goBack}
+        style={[styles.buttonBack, {width: iconWidth}]}>
+        <IconBack color={primary ? Colors.WHITE : Colors.BLACK_900} />
       </AppBlockButton>
 
-      <AppText style={styles.title}>{t('Thông báo')}</AppText>
-
-      <TouchableOpacity style={styles.rightButton} onPress={onPressRight}>
-        <IconSeeAll />
-        <AppText numberOfLines={1} style={styles.rightText}>
-          {t('Đọc tất cả')}
-          {notificationLabel ? ` (${notificationLabel})` : ''}
-        </AppText>
-      </TouchableOpacity>
+      <AppText style={[styles.title, primary && {color: Colors.WHITE}]}>
+        {title || t('Thông báo')}
+      </AppText>
+      <View style={{width: iconWidth}}>{rightComponent}</View>
     </View>
   );
 };
@@ -65,7 +67,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   rightButton: {
-    width: ICON_SECTION_WIDTH,
     height: vs(40),
     flexDirection: 'row',
     paddingRight: PaddingHorizontal,
@@ -79,7 +80,6 @@ const styles = StyleSheet.create({
     color: light.primary,
   },
   buttonBack: {
-    width: ICON_SECTION_WIDTH,
     paddingLeft: PaddingHorizontal,
     height: vs(40),
     justifyContent: 'center',

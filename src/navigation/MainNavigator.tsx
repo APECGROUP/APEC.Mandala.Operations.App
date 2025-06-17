@@ -29,6 +29,7 @@ import PickNccScreen from '@/views/modal/modalPickNcc/view/PickNccScreen';
 import FilterScreen from '@/screens/filterScreen/view/FilterScreen';
 import PickDepartmentScreen from '@/views/modal/modalPickDepartment/view/PickDepartmentScreen';
 import PickRequesterScreen from '@/views/modal/modalPickRequester/view/PickRequesterScreen';
+import CreatePriceNccScreen from '@/screens/createPriceScreen/view/component/CreatePriceNccScreen';
 export default function MainNavigator() {
   const {Navigator, Group, Screen} = createNativeStackNavigator<MainParams>();
   const {t} = useTranslation();
@@ -87,37 +88,23 @@ export default function MainNavigator() {
           component={DetailAssignPriceCardScreen}
         />
         <Screen
-          name="InformationItemsScreen"
-          component={InformationItemsScreen}
-          options={({route, navigation}) => ({
-            headerShown: true,
+          options={{
             contentStyle: {
               paddingHorizontal: 0,
-              // backgroundColor: Colors.WHITE,
-              backgroundColor: '#F2F3F5',
             },
-            headerStyle: {backgroundColor: Colors.PRIMARY},
-            headerTitle: route.params?.item?.content,
-            headerRight: () => (
-              <AppBlockButton
-                style={{
-                  backgroundColor: 'red',
-                  width: vs(40),
-                  height: vs(40),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-                onPress={() =>
-                  navigation.navigate('DetailAssignPriceCardScreen', {
-                    item: route.params?.item,
-                  })
-                }>
-                <IconInfomation fill={Colors.WHITE} />
-              </AppBlockButton>
-            ),
-            headerLeft: HeaderLeftWhite,
-            headerTitleStyle: {color: Colors.WHITE},
-          })}
+          }}
+          name="CreatePriceNccScreen"
+          component={CreatePriceNccScreen}
+        />
+        <Screen
+          name="InformationItemsScreen"
+          component={InformationItemsScreen}
+          options={{
+            headerShown: false,
+            contentStyle: {
+              paddingHorizontal: 0,
+            },
+          }}
         />
 
         <Screen

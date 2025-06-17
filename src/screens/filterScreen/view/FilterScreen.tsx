@@ -14,7 +14,7 @@ import moment from 'moment';
 import AppDropDown from '../../../elements/appDropdown/AppDropdown';
 import {useFilterViewModel} from '../viewmodal/useFilterViewModel';
 import {navigate} from '@/navigation/RootNavigation';
-import FooterFilter from './component/FooterFilter';
+import FooterDefault from './component/FooterFilter';
 import {PaddingHorizontal} from '@/utils/Constans';
 import {ResponseNcc} from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import {TypePickDepartment} from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
@@ -141,7 +141,7 @@ const FilterScreen = ({
           }
         />
       </View>
-      <FooterFilter />
+      <FooterDefault />
     </AppBlock>
   );
 };

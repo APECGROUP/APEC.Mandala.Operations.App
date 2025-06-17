@@ -34,11 +34,19 @@ import {useInformationItemsViewModel} from '../viewmodal/useInformationItemsView
 import InformationItemsCard from './component/InformationItemsCard';
 import {Colors} from '@/theme/Config';
 import FooterInformationItem from './FooterInformationItem';
+import Header from '@/screens/notificationScreen/view/component/Header';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {MainParams} from '@/navigation/params';
+import {navigate} from '@/navigation/RootNavigation';
+import AppBlockButton from '@/elements/button/AppBlockButton';
+import IconInfomation from '@assets/icon/IconInfomation';
 
-const InformationItemsScreen: React.FC = () => {
+const InformationItemsScreen = ({
+  route,
+}: NativeStackScreenProps<MainParams, 'InformationItemsScreen'>) => {
   const {t} = useTranslation();
   const refToast = useRef<any>(null);
-
+  const {content} = route.params.item;
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
     flatData,
@@ -159,8 +167,27 @@ const InformationItemsScreen: React.FC = () => {
     [],
   );
 
+  const rightComponent = () => {
+    return (
+      <AppBlockButton
+        style={{
+          width: vs(40),
+          height: vs(40),
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}
+        onPress={() =>
+          navigate('DetailAssignPriceCardScreen', {
+            item: route.params?.item,
+          })
+        }>
+        <IconInfomation fill={Colors.WHITE} />
+      </AppBlockButton>
+    );
+  };
   return (
     <View style={styles.container}>
+      <Header primary title={content} rightComponent={rightComponent()} />
       <View style={styles.titleContainer}>
         <AppText style={styles.titleText}>
           {t('Thông tin các mặt hàng')}

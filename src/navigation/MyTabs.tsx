@@ -11,6 +11,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import AccountScreen from '../screens/accountScreen/AccountScreen';
 import MyTabBar from './MyTabBar';
 import AssignPriceScreen from '../screens/assignPriceScreen/view/AssignPriceScreen';
+import CreatePriceScreen from '@/screens/createPriceScreen/view/CreatePriceScreen';
 
 const MyTabs = ({navigation}: NativeStackScreenProps<MainParams, 'MyTabs'>) => {
   const Tab = createBottomTabNavigator<TabBarParams>();
@@ -39,7 +40,7 @@ const MyTabs = ({navigation}: NativeStackScreenProps<MainParams, 'MyTabs'>) => {
         //   }
         // }
       />
-      <Tab.Screen name="tab2" component={AssignPriceScreen} />
+      <Tab.Screen name="CreatePriceScreen" component={CreatePriceScreen} />
       <Tab.Screen name="tab3" component={AssignPriceScreen} />
       <Tab.Screen name="tab4" component={AssignPriceScreen} />
       <Tab.Screen name="tab5" component={AssignPriceScreen} />

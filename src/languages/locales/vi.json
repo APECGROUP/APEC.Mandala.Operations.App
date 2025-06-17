@@ -27,14 +27,14 @@
         "success": "Mật khẩu của bạn đã được gửi ",
         "subSuccess": "Vui lòng check email đã đăng ký",
         "close": "Đóng"
-      },
-      "home": {
-        "title": "Xin chào",
-        "header": "Danh sách báo giá NCC",
-        "empty": "Không có kết quả phù hợp",
-
-        "searchPlaceholder": "Tìm kiếm PR NO, bộ phận"
       }
+    },
+    "assignPrice": {
+      "title": "Xin chào",
+      "header": "Danh sách báo giá NCC",
+      "empty": "Không có kết quả phù hợp",
+
+      "searchPlaceholder": "Tìm kiếm PR NO, bộ phận"
     },
     "notifications": {
       "title": "Thông báo",
@@ -116,7 +116,7 @@
       "title": "Xin chào",
       "searchPlaceholder": "Tìm kiếm PR NO, tên mặt hàng",
       "supplierPriceList": "Bảng giá NCC",
-      "empty": "Hiện chưa có bảng giá nhà cung cấp",
+      "empty": "Hiện chưa có bảng giá \n nhà cung cấp",
       "create": "Tạo bảng giá NCC",
       "pickAll": "Chọn tất cả",
       "orderSelected": "đơn đã chọn",
@@ -141,11 +141,12 @@
       "createMoreItem": "Tạo thêm mặt hàng",
       "saveInfo": "Lưu thông tin",
       "remove": {
-        "title": "Bạn có muốn xóa mặt hàng",
+        "title": "Bạn có muốn xóa mặt \n hàng này không",
         "subtitle": "Nếu bạn xóa thông tin mặt hàng của bạn sẽ không được lưu",
         "agree": "Đồng ý",
         "cancel": "Hủy"
-      }
+      },
+      "createNcc": "Tạo bảng giá NCC"
     },
     "approve": {
       "title": "Xin chào",

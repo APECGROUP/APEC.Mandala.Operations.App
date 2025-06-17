@@ -8,6 +8,7 @@ import {
   View,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  TouchableOpacity,
 } from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Animated, {
@@ -32,8 +33,13 @@ import ItemNotification from './component/ItemNotification';
 import Header from './component/Header';
 import {AppText} from '@/elements/text/AppText';
 import {FlashList} from '@shopify/flash-list';
+import IconSeeAll from '@assets/icon/IconSeeAll';
+import {getFontSize} from '@/constants';
+import {PaddingHorizontal} from '@/utils/Constans';
 
 type Props = NativeStackScreenProps<MainParams, 'NotificationScreen'>;
+const totalNotification = 100; // Hoặc truyền từ props nếu dynamic
+const ICON_SECTION_WIDTH = s(130);
 
 const NotificationScreen: React.FC<Props> = ({navigation}) => {
   const {t} = useTranslation();
@@ -140,10 +146,28 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
     );
   };
 
+  const formatNotificationCount = (count: number) => {
+    if (!count || count <= 0) return '';
+    if (count > 99) return '99+';
+    return count < 10 ? `0${count}` : `${count}`;
+  };
+  const notificationLabel = formatNotificationCount(totalNotification);
+
+  const rightComponent = () => {
+    return (
+      <TouchableOpacity style={styles.rightButton} onPress={() => {}}>
+        <IconSeeAll />
+        <AppText numberOfLines={1} style={styles.rightText}>
+          {t('Đọc tất cả')}
+          {notificationLabel ? ` (${notificationLabel})` : ''}
+        </AppText>
+      </TouchableOpacity>
+    );
+  };
   console.log('render màn notification: ', isLoading);
   return (
     <AppBlock flex>
-      <Header onPressRight={() => {}} />
+      <Header rightComponent={rightComponent()} iconWidth={s(130)} />
       {isLoading && !flatData ? (
         <ActivityIndicator
           size="large"
@@ -193,6 +217,20 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
 export default NotificationScreen;
 
 const styles = StyleSheet.create({
+  rightButton: {
+    width: ICON_SECTION_WIDTH,
+    height: vs(40),
+    flexDirection: 'row',
+    paddingRight: PaddingHorizontal,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  rightText: {
+    fontSize: getFontSize(12),
+    marginLeft: s(4),
+    fontWeight: '500',
+    color: light.primary,
+  },
   footerLoading: {
     marginVertical: vs(12),
     alignItems: 'center',
