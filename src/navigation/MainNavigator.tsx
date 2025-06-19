@@ -1,53 +1,57 @@
-import React, {useEffect} from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {MainParams} from './params';
-import {s, vs} from 'react-native-size-matters';
+import React, { useEffect } from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { MainParams } from './params';
+import { s, vs } from 'react-native-size-matters';
 import NotificationScreen from '../screens/notificationScreen/view/NotificationScreen';
 
 import Utilities from '../utils/Utilities';
-import {useAlert} from '../elements/alert/AlertProvider';
+import { useAlert } from '../elements/alert/AlertProvider';
 import ModalPhotoOrCamera from '../views/modal/ModalPhotoOrCamera';
 import ProfileScreen from '../screens/profileScreen/ProfileScreen';
 import light from '../theme/light';
-import {useTranslation} from 'react-i18next';
-import {getFontSize} from '../constants';
+import { useTranslation } from 'react-i18next';
+import { getFontSize } from '../constants';
 import ImageViewScreen from '../modules/social/views/screens/ImageViewScreen';
 import MyTabs from './MyTabs';
-import {HeaderLeft, HeaderLeftWhite} from './AuthNavigator';
-import {PaddingHorizontal} from '@/utils/Constans';
+import { HeaderLeft, HeaderLeftWhite } from './AuthNavigator';
+import { PaddingHorizontal } from '@/utils/Constans';
 import ModalPickCalendar from '@/elements/calendar/ModalPickCalendar';
 import AccountScreen from '@/screens/accountScreen/AccountScreen';
-import {Colors} from '@/theme/Config';
+import { Colors } from '@/theme/Config';
 import ChangePasswordScreen from '@/screens/changePasswordScreen/ChangePasswordScreen';
 import InformationItemsScreen from '@/screens/InformationItemScreen/view/InformationItemsScreen';
 import IconInfomation from '@assets/icon/IconInfomation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
-import {navigate} from './RootNavigation';
+import { navigate } from './RootNavigation';
 import DetailAssignPriceCardScreen from '@/screens/assignPriceScreen/view/component/DetailAssignPriceCardScreen';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PickNccScreen from '@/views/modal/modalPickNcc/view/PickNccScreen';
 import FilterScreen from '@/screens/filterScreen/view/FilterScreen';
 import PickDepartmentScreen from '@/views/modal/modalPickDepartment/view/PickDepartmentScreen';
 import PickRequesterScreen from '@/views/modal/modalPickRequester/view/PickRequesterScreen';
 import CreatePriceNccScreen from '@/screens/createPriceScreen/view/component/CreatePriceNccScreen';
+import ApprovePrScreen from '@/screens/approvePrScreen/view/ApprovePrScreen';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import DetailApproveCardScreen from '@/screens/approvePrScreen/view/component/DetailApproveCardScreen';
 export default function MainNavigator() {
-  const {Navigator, Group, Screen} = createNativeStackNavigator<MainParams>();
-  const {t} = useTranslation();
-  const {showAlert} = useAlert();
+  const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
+  const { t } = useTranslation();
+  const { showAlert } = useAlert();
 
   // console.log('mainNavigation: ', infoUser, infoUser.profile?.fullName);
   const getPermission = async () => {
     await Utilities.requestNotificationPermission(showAlert);
   };
 
+  const { infoUser } = useInfoUser();
+
   useEffect(() => {
     // fetData();
     getPermission();
   }, []);
-
   return (
     <Navigator
-      initialRouteName="MyTabs"
+      initialRouteName={!infoUser?.isApprove ? 'MyTabs' : 'ApprovePrScreen'}
       screenOptions={{
         // animation: 'simple_push',
         headerShown: false,
@@ -73,7 +77,7 @@ export default function MainNavigator() {
         <Screen
           options={{
             headerShown: false,
-            contentStyle: {paddingHorizontal: s(0)},
+            contentStyle: { paddingHorizontal: s(0) },
             animation: 'fade',
           }}
           name="ImageViewScreen"
@@ -86,6 +90,14 @@ export default function MainNavigator() {
           }}
           name="DetailAssignPriceCardScreen"
           component={DetailAssignPriceCardScreen}
+        />
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: t('orderInfo.title'),
+          }}
+          name="DetailApproveCardScreen"
+          component={DetailApproveCardScreen}
         />
         <Screen
           options={{
@@ -106,11 +118,21 @@ export default function MainNavigator() {
             },
           }}
         />
+        <Screen
+          name="ApprovePrScreen"
+          component={ApprovePrScreen}
+          options={{
+            headerShown: false,
+            contentStyle: {
+              paddingHorizontal: 0,
+            },
+          }}
+        />
 
         <Screen
           options={{
             headerShown: false,
-            contentStyle: {paddingHorizontal: s(0)},
+            contentStyle: { paddingHorizontal: s(0) },
           }}
           name="MyTabs"
           component={MyTabs}
@@ -129,7 +151,7 @@ export default function MainNavigator() {
         />
 
         <Screen
-          options={{headerShown: true, headerTitle: t('account.profile.title')}}
+          options={{ headerShown: true, headerTitle: t('account.profile.title') }}
           name="ProfileScreen"
           component={ProfileScreen}
         />
@@ -160,20 +182,14 @@ export default function MainNavigator() {
         screenOptions={{
           presentation: 'transparentModal',
           animation: 'fade',
-          contentStyle: {backgroundColor: '#0000001A'},
+          contentStyle: { backgroundColor: '#0000001A' },
         }}>
         <Screen name={'ModalPhotoOrCamera'} component={ModalPhotoOrCamera} />
         <Screen name={'ModalPickCalendar'} component={ModalPickCalendar} />
         <Screen name={'PickNccScreen'} component={PickNccScreen} />
-        <Screen
-          name={'PickDepartmentScreen'}
-          component={PickDepartmentScreen}
-        />
+        <Screen name={'PickDepartmentScreen'} component={PickDepartmentScreen} />
         <Screen name={'PickRequesterScreen'} component={PickRequesterScreen} />
-        <Screen
-          name={'ChangePasswordScreen'}
-          component={ChangePasswordScreen}
-        />
+        <Screen name={'ChangePasswordScreen'} component={ChangePasswordScreen} />
       </Group>
     </Navigator>
   );

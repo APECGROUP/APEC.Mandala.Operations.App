@@ -1,22 +1,22 @@
-import {useState, useEffect, useCallback} from 'react';
-import {Animated, LogBox, StyleSheet, View} from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { Animated, LogBox, StyleSheet, View } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
-import {useIsLogin} from '../zustand/store/useIsLogin/useIsLogin';
+import { useIsLogin } from '../zustand/store/useIsLogin/useIsLogin';
 import MainNavigator from './MainNavigator';
-import {s, vs} from 'react-native-size-matters';
+import { s, vs } from 'react-native-size-matters';
 import DataLocal from '../data/DataLocal';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {AppBlock} from '../elements/block/Block';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AppBlock } from '../elements/block/Block';
 import AuthNavigator from './AuthNavigator';
 import FastImage from 'react-native-fast-image';
-import {AppText} from '@/elements/text/AppText';
+import { AppText } from '@/elements/text/AppText';
 // BootSplash.hide();
 LogBox.ignoreAllLogs();
 const AppNavigation = () => {
-  const {isLogin} = useIsLogin();
+  const { isLogin } = useIsLogin();
   const [splashVisible, setSplashVisible] = useState(true);
   const opacity = useState(new Animated.Value(1))[0]; // Khởi tạo animation opacity
-  const {bottom} = useSafeAreaInsets();
+  const { bottom } = useSafeAreaInsets();
   const init = useCallback(async () => {
     await DataLocal.checkAuthStatus();
   }, []);
@@ -30,7 +30,7 @@ const AppNavigation = () => {
           useNativeDriver: true,
         }).start(() => {
           setSplashVisible(false);
-          BootSplash.hide({fade: true});
+          BootSplash.hide({ fade: true });
         });
       }, 1000);
     });
@@ -41,14 +41,11 @@ const AppNavigation = () => {
     <AppBlock style={styles.flex}>
       <View style={[styles.flex]}>
         {/* <View style={[styles.flex, {paddingBottom: bottom || vs(5)}]}> */}
-        {!isLogin ? <MainNavigator /> : <AuthNavigator />}
+        {isLogin ? <MainNavigator /> : <AuthNavigator />}
       </View>
       {splashVisible && (
-        <Animated.View style={[styles.splashContainer, {opacity}]}>
-          <FastImage
-            source={require('../../assets/bootsplash/logo.png')}
-            style={styles.logo}
-          />
+        <Animated.View style={[styles.splashContainer, { opacity }]}>
+          <FastImage source={require('../../assets/bootsplash/logo.png')} style={styles.logo} />
         </Animated.View>
       )}
     </AppBlock>

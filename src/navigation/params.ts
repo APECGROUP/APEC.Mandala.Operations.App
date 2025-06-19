@@ -1,10 +1,11 @@
-import {Dispatch, SetStateAction} from 'react';
-import {ResponseImageElement} from '../interface/Verify.interface';
-import {typeHotel, typeNcc} from '../screens/authScreen/LoginScreen';
-import {DataAssignPrice} from '@/screens/assignPriceScreen/modal/AssignPriceModal';
-import {ResponseNcc} from '@/views/modal/modalPickNcc/modal/PickNccModal';
-import {TypePickDepartment} from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
-import {TypePickRequester} from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import { Dispatch, SetStateAction } from 'react';
+import { ResponseImageElement } from '../interface/Verify.interface';
+import { typeHotel, typeNcc } from '../screens/authScreen/LoginScreen';
+import { DataAssignPrice } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
+import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { TypePickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import { TypeApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
 
 // ─────────────────────────────────────────────────────────────
 // Bottom Tab Navigation
@@ -13,9 +14,9 @@ import {TypePickRequester} from '@/views/modal/modalPickRequester/modal/PickRequ
 export type TabBarParams = {
   AssignPriceScreen: undefined;
   CreatePriceScreen: undefined;
-  tab3: undefined;
-  tab4: undefined;
-  tab5: undefined;
+  CreatePoScreen: undefined;
+  PcLogScreen: undefined;
+  PcPrScreen: undefined;
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -24,16 +25,18 @@ export type TabBarParams = {
 
 export type MainParams = {
   ImageViewScreen: {
-    images: {uri: string}[];
+    images: { uri: string }[];
     imageIndex: number;
     onRequestClose?: () => void;
   };
   ProfileScreen: undefined;
+  ApprovePrScreen: undefined;
   CreatePriceNccScreen: undefined;
   AccountScreen: undefined;
   FilterScreen: undefined;
-  DetailAssignPriceCardScreen: {item: DataAssignPrice};
-  InformationItemsScreen: {item: DataAssignPrice};
+  DetailAssignPriceCardScreen: { item: DataAssignPrice };
+  DetailApproveCardScreen: { item: TypeApprove };
+  InformationItemsScreen: { item: DataAssignPrice };
   MyTabs: undefined;
   NotificationScreen: undefined;
 
@@ -83,19 +86,11 @@ export type AuthParams = {
   };
   OTPScreen: {
     phone: string;
-    type:
-      | 'forgotPassword'
-      | 'register'
-      | 'confirm'
-      | 'unLinkBank'
-      | 'verifyEmail';
+    type: 'forgotPassword' | 'register' | 'confirm' | 'unLinkBank' | 'verifyEmail';
   };
   ModalPickHotel: {
     setHotel: Dispatch<SetStateAction<typeHotel>>;
-    hotel: {
-      id: number | undefined;
-      name: string | undefined;
-    };
+    hotel: typeHotel;
   };
 };
 

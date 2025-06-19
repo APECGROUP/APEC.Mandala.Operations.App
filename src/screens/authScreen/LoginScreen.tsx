@@ -1,59 +1,60 @@
-import {Keyboard, StyleSheet, TextInput, View} from 'react-native';
-import React, {useRef, useState} from 'react';
-import {s, vs} from 'react-native-size-matters';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import { Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { s, vs } from 'react-native-size-matters';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ToastContainer from '@/elements/toast/ToastContainer';
-import {Colors} from '@/theme/Config';
-import {SCREEN_WIDTH, getFontSize} from '@/constants';
+import { Colors } from '@/theme/Config';
+import { SCREEN_WIDTH, getFontSize } from '@/constants';
 import AppBlockButton from '@/elements/button/AppBlockButton';
-import {AppButton} from '@/elements/button/AppButton';
-import {AppText} from '@/elements/text/AppText';
+import { AppButton } from '@/elements/button/AppButton';
+import { AppText } from '@/elements/text/AppText';
 import AppTextInput from '@/elements/textInput/AppTextInput';
-import {AuthParams} from '@/navigation/params';
+import { AuthParams } from '@/navigation/params';
 import light from '@/theme/light';
-import {PaddingHorizontal} from '@/utils/Constans';
-import {useIsLogin} from '@/zustand/store/useIsLogin/useIsLogin';
+import { PaddingHorizontal } from '@/utils/Constans';
+import { useIsLogin } from '@/zustand/store/useIsLogin/useIsLogin';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import Images from '@assets/image/Images';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
-import {TYPE_TOAST} from '@/elements/toast/Message';
+import { TYPE_TOAST } from '@/elements/toast/Message';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export type typeHotel = {
-  id: number | undefined;
-  name: string | undefined;
+  id: number | string | undefined;
+  name: number | string | undefined;
 };
 export type typeNcc = {
   id: string | undefined;
   name: string | undefined;
 };
 
-const LoginScreen = ({
-  navigation,
-}: NativeStackScreenProps<AuthParams, 'LoginScreen'>) => {
-  const {t} = useTranslation();
-  const {setIsLogin} = useIsLogin();
-
+const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginScreen'>) => {
+  const { t } = useTranslation();
+  const { setIsLogin } = useIsLogin();
+  const { saveInfoUser, infoUser } = useInfoUser();
   const refToast = useRef<any>(null);
   const refPassword = useRef<TextInput>(null);
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [hotel, setHotel] = useState<typeHotel>({} as typeHotel);
-  const {isRememberLogin, setIsRememberLogin} = useIsLogin();
+  const { isRememberLogin, setIsRememberLogin } = useIsLogin();
   const [processing, setProcessing] = useState<boolean | undefined>(false);
 
   const disabled = !userName || !password || !hotel.id;
-
+  const { bottom } = useSafeAreaInsets();
   const onSubmit = async () => {
     setProcessing(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
     setProcessing(false);
-    if (userName.toLocaleLowerCase() !== 'tuan') {
-      return refToast.current?.show(
-        t('auth.login.loginError'),
-        TYPE_TOAST.ERROR,
-      );
+    if (userName.toLocaleLowerCase() === 'approve') {
+      saveInfoUser({ ...infoUser, isApprove: true });
+      setIsLogin(true);
+    }
+    if (userName.toLocaleLowerCase() !== 'dung') {
+      return refToast.current?.show(t('auth.login.loginError'), TYPE_TOAST.ERROR);
     } else {
       setIsLogin(true);
     }
@@ -89,7 +90,7 @@ const LoginScreen = ({
 
   const onPickHotel = () => {
     Keyboard.dismiss();
-    navigation.navigate('ModalPickHotel', {hotel, setHotel});
+    navigation.navigate('ModalPickHotel', { hotel, setHotel });
   };
 
   const onSave = () => {
@@ -101,7 +102,7 @@ const LoginScreen = ({
   };
 
   return (
-    <View style={[styles.container]}>
+    <View style={[styles.container, { paddingBottom: bottom }]}>
       <View style={styles.center}>
         <FastImage
           style={{
@@ -129,6 +130,9 @@ const LoginScreen = ({
         />
 
         <AppTextInput
+          onPress={() => {
+            console.log('11111');
+          }}
           refName={refPassword}
           required
           labelStyle={styles.labelPassword}
@@ -144,28 +148,27 @@ const LoginScreen = ({
             width: SCREEN_WIDTH - PaddingHorizontal * 2,
           }}
         />
-        <AppTextInput
-          required
-          editable={false}
-          labelStyle={styles.labelPassword}
-          label={t('auth.login.hotel')}
-          placeholderTextColor={light.placeholderTextColor}
-          noBorder
-          maxLength={10}
-          value={hotel?.name}
-          placeholder={t('auth.login.pickHotel')}
-          rightIcon={
-            <IconArrowRight
-              stroke="#D8D8D8"
-              style={{transform: [{rotate: '90deg'}]}}
-            />
-          }
-          onPress={onPickHotel}
-          inputStyle={styles.inputStyle}
-          containerStyle={{
-            width: SCREEN_WIDTH - PaddingHorizontal * 2,
-          }}
-        />
+        <AppBlockButton onPress={onPickHotel}>
+          <AppTextInput
+            required
+            editable={false}
+            labelStyle={styles.labelPassword}
+            label={t('auth.login.hotel')}
+            placeholderTextColor={light.placeholderTextColor}
+            noBorder
+            maxLength={10}
+            value={hotel?.name}
+            placeholder={t('auth.login.pickHotel')}
+            rightIcon={
+              <IconArrowRight stroke="#D8D8D8" style={{ transform: [{ rotate: '90deg' }] }} />
+            }
+            // onPress={onPickHotel}
+            inputStyle={styles.inputStyle}
+            containerStyle={{
+              width: SCREEN_WIDTH - PaddingHorizontal * 2,
+            }}
+          />
+        </AppBlockButton>
         <AppBlockButton onPress={onSave} style={styles.buttonSave}>
           {isRememberLogin ? <IconCheckBox /> : <IconUnCheckBox />}
 
@@ -180,7 +183,7 @@ const LoginScreen = ({
           width={SCREEN_WIDTH - s(32)}
           height={vs(45)}
           onPress={onSubmit}
-          disabledStyle={{backgroundColor: Colors.BUTTON_DISABLED}}
+          disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
           disabled={disabled}
           primary
           textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
@@ -188,9 +191,7 @@ const LoginScreen = ({
           textStyle={styles.textStyleButton}
           text={t('auth.login.login')}
         />
-        <AppBlockButton
-          onPress={onForgotPassword}
-          style={styles.buttonForgotPassword}>
+        <AppBlockButton onPress={onForgotPassword} style={styles.buttonForgotPassword}>
           <AppText size={12} weight="500">
             {t('auth.login.forgotPassword')}
           </AppText>
@@ -203,7 +204,7 @@ const LoginScreen = ({
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  textStyleButton: {fontWeight: '700', fontSize: getFontSize(14)},
+  textStyleButton: { fontWeight: '700', fontSize: getFontSize(14) },
   buttonForgotPassword: {
     padding: vs(12),
     justifyContent: 'center',
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  labelUser: {fontSize: getFontSize(14), fontWeight: '700'},
+  labelUser: { fontSize: getFontSize(14), fontWeight: '700' },
   labelPassword: {
     fontSize: getFontSize(14),
     fontWeight: '700',

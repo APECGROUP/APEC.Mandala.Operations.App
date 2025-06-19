@@ -1,13 +1,14 @@
-import {create} from 'zustand';
-import {TypeUser} from '../../../interface/Authen.interface';
+import { create } from 'zustand';
+import { TypeUser } from '../../../interface/Authen.interface';
 import api from '../../../utils/setup-axios';
 import Toast from 'react-native-toast-message';
-import {t} from 'i18next';
-import {LanguageType} from '../../../languages/locales/type';
-import {USER_KEY} from '../../../data/DataLocal';
-import {storage} from '../../../views/appProvider/AppProvider';
+import { t } from 'i18next';
+import { LanguageType } from '../../../languages/locales/type';
+import { USER_KEY } from '../../../data/DataLocal';
+import { storage } from '../../../views/appProvider/AppProvider';
 
 const fakeUser: TypeUser = {
+  isApprove: false,
   id: 1,
   userName: 'Tuan',
   authId: 'auth_abc123xyz',
@@ -58,7 +59,7 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
     console.log('saveInfoUser', val);
     // TODO:bỏ check điều kiện đi
     if (val.id) {
-      set({infoUser: val});
+      set({ infoUser: val });
     }
     // try {
     //   storage.set(USER_KEY, JSON.stringify(val));
@@ -78,7 +79,7 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
       },
     };
 
-    set({infoUser: updatedUser});
+    set({ infoUser: updatedUser });
     try {
       storage.set(USER_KEY, JSON.stringify(updatedUser));
     } catch (error) {
@@ -93,7 +94,7 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
       if (response.status === 200 && response.data.status === 0) {
         const userData: TypeUser = response.data.data;
         if (userData) {
-          set({infoUser: userData});
+          set({ infoUser: userData });
           storage.set(USER_KEY, JSON.stringify(userData));
         }
       } else {

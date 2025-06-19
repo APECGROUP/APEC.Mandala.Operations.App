@@ -15,6 +15,7 @@ export interface Data {
 }
 
 export interface TypeUser {
+  isApprove: boolean;
   id: number;
   userName: string;
   authId: string;
