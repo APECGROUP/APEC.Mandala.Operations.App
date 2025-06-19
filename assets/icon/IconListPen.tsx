@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {s, vs} from 'react-native-size-matters';
+import {s} from 'react-native-size-matters';
 import Svg, {SvgProps, Rect, Defs, Pattern, Use, Image} from 'react-native-svg';
 const IconListPen = (props: SvgProps) => (
   <Svg

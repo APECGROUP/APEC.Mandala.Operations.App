@@ -1,4 +1,5 @@
 export const validateEmail = (mail: string) => {
+  // eslint-disable-next-line no-useless-escape
   if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
     return true;
   }
@@ -12,8 +13,7 @@ export const validateFullName = (value: string) => {
 export const validateDob = (dob: string) => /^\d{2}\/\d{2}\/\d{4}$/.test(dob);
 
 export const isValidPassword = (password: string) => {
-  const passwordRegex =
-    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   return passwordRegex.test(password);
 };
 

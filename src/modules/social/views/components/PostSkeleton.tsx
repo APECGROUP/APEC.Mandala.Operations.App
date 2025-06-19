@@ -3,8 +3,7 @@ import {View, StyleSheet} from 'react-native';
 import {AutoSkeletonView} from 'react-native-auto-skeleton';
 // import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
-const PostSkeleton: React.FC = () => {
-  return (
+const PostSkeleton: React.FC = () => (
     <AutoSkeletonView
       shimmerSpeed={1.0}
       // defaultRadius={20}
@@ -22,7 +21,6 @@ const PostSkeleton: React.FC = () => {
       </View>
     </AutoSkeletonView>
   );
-};
 
 const styles = StyleSheet.create({
   container: {

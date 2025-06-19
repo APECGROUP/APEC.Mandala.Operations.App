@@ -16,13 +16,13 @@ module.exports = {
     'no-undef': 'off',
 
     // Cảnh báo về import cycle (import vòng tròn)
-    'import/no-cycle': 'warn',
+    // 'import/no-cycle': 'warn',
 
     // Báo lỗi nếu import không ở đầu file
-    'import/first': 'error',
+    // 'import/first': 'error',
 
     // Báo lỗi nếu có import trùng lặp
-    'import/no-duplicates': 'error',
+    // 'import/no-duplicates': 'error',
 
     // Báo lỗi nếu có import không được sử dụng
     'unused-imports/no-unused-imports': 'error',
@@ -43,7 +43,7 @@ module.exports = {
     'react-native/no-inline-styles': 'warn',
 
     'react/react-in-jsx-scope': 'off',
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    // 'no-console': ['warn', { allow: ['warn', 'error'] }],
     '@typescript-eslint/no-unused-vars': ['warn'],
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',

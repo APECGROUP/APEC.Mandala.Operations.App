@@ -1,4 +1,4 @@
-import {useState, useMemo, useCallback} from 'react';
+import { useMemo, useCallback} from 'react';
 import {
   InfiniteData,
   useInfiniteQuery,
@@ -31,11 +31,9 @@ export function useInformationItemsViewModel() {
       const page = typeof pageParam === 'number' ? pageParam : 1;
       return fetchInformationItemsData(page, ITEMS_PER_PAGE);
     },
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length === ITEMS_PER_PAGE
+    getNextPageParam: (lastPage, allPages) => lastPage.length === ITEMS_PER_PAGE
         ? allPages.length + 1
-        : undefined;
-    },
+        : undefined,
     initialPageParam: 1,
     staleTime: 60 * 1000,
     gcTime: 300000,

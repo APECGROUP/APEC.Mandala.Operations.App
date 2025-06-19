@@ -50,11 +50,9 @@ const ModalDatePicker = forwardRef(({data}: {data: PropsPickTime}, ref) => {
     onCloseModal: onClose,
   }));
 
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       setOpen(false); // Đảm bảo đóng modal khi component bị unmount
-    };
-  }, []);
+    }, []);
 
   return (
     <DatePicker

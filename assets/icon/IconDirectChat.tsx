@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {s} from 'react-native-size-matters';
 import Svg, {SvgProps, G, Path, Defs, ClipPath, Rect} from 'react-native-svg';
 const IconDirectChat = (props: SvgProps) => (
   <Svg

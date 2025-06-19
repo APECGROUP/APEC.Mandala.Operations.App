@@ -23,12 +23,10 @@ export const fetchDepartmentData = async (
   key: string = '',
 ): Promise<TypePickDepartment[]> => {
   const url = buildNccUrl(page, limit, key);
-  const {data} = await axios.get(url);
+  const { data } = await axios.get(url);
 
-  return data.map((item: any, index: number) => {
-    return {
-      id: item.id,
-      name: 'Bộ phận Công Nghiệp',
-    };
-  });
+  return data.map((item: any) => ({
+    id: item.id,
+    name: 'Bộ phận Công Nghiệp',
+  }));
 };

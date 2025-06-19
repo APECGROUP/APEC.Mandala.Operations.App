@@ -8,12 +8,12 @@ import {
   TextStyle,
   View,
 } from 'react-native';
-import React, {memo, useRef} from 'react';
-import ModalDatePicker, {ModalPickTimeRef} from './ModalDatePicker';
-import {getFontSize} from '../../constants';
-import {s, vs} from 'react-native-size-matters';
+import React, { memo, useRef } from 'react';
+import ModalDatePicker, { ModalPickTimeRef } from './ModalDatePicker';
+import { getFontSize } from '../../constants';
+import { s, vs } from 'react-native-size-matters';
 import light from '../../theme/light';
-import {AppInputLabel} from '../textInput/AppTextInput';
+import { AppInputLabel } from '../textInput/AppTextInput';
 
 export type PropsPickTime = {
   placeholder?: string;
@@ -48,7 +48,7 @@ const InputPickTime = (props: PropsPickTime) => {
   } = props;
 
   return (
-    <View style={{width: '100%'}}>
+    <View style={styles.w100}>
       {label ? <AppInputLabel label={label} /> : null}
       <TouchableOpacity
         disabled={disabled}
@@ -60,6 +60,7 @@ const InputPickTime = (props: PropsPickTime) => {
         }}
         style={[
           styles.input,
+          // eslint-disable-next-line react-native/no-inline-styles
           {
             borderColor: isError ? light.danger : light.inputBorder,
             width: width ? width : '60%',
@@ -82,6 +83,7 @@ const InputPickTime = (props: PropsPickTime) => {
 export default memo(InputPickTime);
 
 const styles = StyleSheet.create({
+  w100: { width: '100%' },
   text: {
     fontSize: getFontSize(16),
     fontWeight: '500',

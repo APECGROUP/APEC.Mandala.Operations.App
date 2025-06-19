@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, {useState, useRef, useCallback, useMemo} from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import {
   StyleSheet,
   View,
@@ -11,19 +11,15 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {FlashList} from '@shopify/flash-list';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
-import {s, vs} from 'react-native-size-matters';
-import {useTranslation} from 'react-i18next';
+import { FlashList } from '@shopify/flash-list';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { s, vs } from 'react-native-size-matters';
+import { useTranslation } from 'react-i18next';
 
-import {getFontSize, SCREEN_WIDTH} from '../../../constants';
+import { getFontSize, SCREEN_WIDTH } from '../../../constants';
 // import {AppText} from '../../elements/text/AppText';
-import {PaddingHorizontal} from '../../../utils/Constans';
+import { PaddingHorizontal } from '../../../utils/Constans';
 import light from '../../../theme/light';
 import AppBlockButton from '../../../elements/button/AppBlockButton';
 
@@ -32,24 +28,23 @@ import IconSearch from '../../../../assets/icon/IconSearch';
 import IconFilter from '../../../../assets/icon/IconFillter';
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
-import {TypeCreatePrice} from '../modal/CreatePriceModal';
+import { TypeCreatePrice } from '../modal/CreatePriceModal';
 import Images from '../../../../assets/image/Images';
-import {navigate} from '../../../navigation/RootNavigation';
+import { navigate } from '../../../navigation/RootNavigation';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
-import {AppText} from '@/elements/text/AppText';
-import {useCreatePriceViewModel} from '../viewmodal/useCreatePriceViewModal';
+import { AppText } from '@/elements/text/AppText';
+import { useCreatePriceViewModel } from '../viewmodal/useCreatePriceViewModal';
 import ToastContainer from '@/elements/toast/ToastContainer';
 import CreatePriceCard from './component/CreatePriceCard';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
-import {useAlert} from '@/elements/alert/AlertProvider';
-import {Colors} from '@/theme/Config';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler'; // Thêm dòng này
+import { Colors } from '@/theme/Config';
+import { Gesture } from 'react-native-gesture-handler'; // Thêm dòng này
 import IconCreatePrice from '@assets/icon/IconCreatePrice';
 
 const CreatePriceScreen: React.FC = () => {
-  const {top} = useSafeAreaInsets();
-  const {t} = useTranslation();
+  const { top } = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const refToast = useRef<any>(null);
 
@@ -77,19 +72,19 @@ const CreatePriceScreen: React.FC = () => {
 
   // Animated styles
   const opacityScrollTopStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToTop.value, {duration: 200}),
+    opacity: withTiming(showScrollToTop.value, { duration: 200 }),
   }));
   const opacityScrollBottomStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToBottom.value, {duration: 200}),
+    opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
   }));
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = () => {
-    flashListRef.current?.scrollToOffset({offset: 0, animated: true});
+    flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
   };
   const scrollToBottom = () => {
-    flashListRef.current?.scrollToEnd({animated: true});
+    flashListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
   };
 
@@ -137,24 +132,8 @@ const CreatePriceScreen: React.FC = () => {
       <View style={styles.emptyContainer}>
         <EmptyDataAnimation autoPlay />
         <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
-        <AppBlockButton
-          onPress={onCreatePrice}
-          style={{
-            padding: vs(16),
-            backgroundColor: Colors.PRIMARY,
-            borderRadius: 8,
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: vs(12),
-          }}>
-          <AppText
-            style={{
-              fontSize: getFontSize(16),
-              color: Colors.WHITE,
-              fontWeight: '500',
-            }}>
-            {t('createPrice.create')}
-          </AppText>
+        <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice}>
+          <AppText style={styles.textCreatePrice}>{t('createPrice.create')}</AppText>
         </AppBlockButton>
       </View>
     );
@@ -177,9 +156,7 @@ const CreatePriceScreen: React.FC = () => {
   const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
 
   const handleSelect = useCallback((id: string) => {
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id],
-    );
+    setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
   }, []);
 
   const goToAccount = () => navigate('AccountScreen');
@@ -198,7 +175,7 @@ const CreatePriceScreen: React.FC = () => {
   };
 
   const renderItem = useCallback(
-    ({item}: {item: TypeCreatePrice}) => {
+    ({ item }: { item: TypeCreatePrice }) => {
       const isSelected = selectedIds.includes(item.id);
       return (
         <CreatePriceCard
@@ -227,7 +204,7 @@ const CreatePriceScreen: React.FC = () => {
         resizeMode={FastImage.resizeMode.cover}
       />
       {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-      <View style={[styles.headerContainer, {marginTop: top}]}>
+      <View style={[styles.headerContainer, { marginTop: top }]}>
         <View style={styles.headerLeft}>
           <AppBlockButton onPress={goToAccount}>
             <FastImage
@@ -248,9 +225,7 @@ const CreatePriceScreen: React.FC = () => {
           </View>
         </View>
         <View style={styles.headerRight}>
-          <AppBlockButton
-            onPress={goToNotification}
-            style={styles.notificationWrapper}>
+          <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
             <IconNotification />
             <View style={styles.notificationBadge}>
               <AppText style={styles.notificationBadgeText}>3</AppText>
@@ -270,37 +245,28 @@ const CreatePriceScreen: React.FC = () => {
           returnKeyType="search"
           onSubmitEditing={handleSubmitSearch}
         />
-        <AppBlockButton
-          style={styles.filterButton}
-          onPress={handleSubmitSearch}>
+        <AppBlockButton style={styles.filterButton} onPress={handleSubmitSearch}>
           <IconFilter />
         </AppBlockButton>
       </View>
 
       {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
       <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>
-          {t('createPrice.supplierPriceList')}
-        </AppText>
+        <AppText style={styles.titleText}>{t('createPrice.supplierPriceList')}</AppText>
         <View style={styles.countBadge}>
           <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
         </View>
       </View>
       <View style={styles.header}>
-        <AppBlockButton
-          onPress={toggleSelectAll}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
+        <AppBlockButton onPress={toggleSelectAll} style={styles.buttonCenter}>
           {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
-          <AppText style={{marginLeft: s(7)}}>Chọn tất cả</AppText>
+          <AppText style={styles.ml7}>Chọn tất cả</AppText>
         </AppBlockButton>
         <AppText>{selectedIds.length} đơn đã chọn</AppText>
       </View>
       {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
       {isLoading && flatData.length === 0 ? (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={styles.flexCenter}>
           <ActivityIndicator size="large" color={light.primary} />
         </View>
       ) : (
@@ -327,9 +293,7 @@ const CreatePriceScreen: React.FC = () => {
 
       <ToastContainer ref={refToast} />
       {flatData.length > 0 && (
-        <AppBlockButton
-          onPress={onCreatePrice}
-          style={{position: 'absolute', bottom: vs(20), right: s(16)}}>
+        <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice2}>
           <IconCreatePrice />
         </AppBlockButton>
       )}
@@ -337,7 +301,7 @@ const CreatePriceScreen: React.FC = () => {
       <AnimatedButton
         onPress={scrollToTop}
         style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-        <IconScrollBottom style={{transform: [{rotate: '180deg'}]}} />
+        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
       </AnimatedButton>
       {!isFetchingNextPage && (
         <AnimatedButton
@@ -352,9 +316,28 @@ const CreatePriceScreen: React.FC = () => {
 };
 
 export default CreatePriceScreen;
-export const AnimatedButton =
-  Animated.createAnimatedComponent(TouchableOpacity);
+export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
 const styles = StyleSheet.create({
+  buttonCreatePrice: {
+    padding: vs(16),
+    backgroundColor: Colors.PRIMARY,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: vs(12),
+  },
+  textCreatePrice: {
+    fontSize: getFontSize(16),
+    color: Colors.WHITE,
+    fontWeight: '500',
+  },
+  ml7: { marginLeft: s(7) },
+  buttonCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  flexCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  buttonCreatePrice2: { position: 'absolute', bottom: vs(20), right: s(16) },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -438,7 +421,7 @@ const styles = StyleSheet.create({
     paddingLeft: s(12),
     height: vs(46),
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
@@ -504,19 +487,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  noteBadge: {
-    marginLeft: s(8),
-    backgroundColor: '#FFE2CE',
-    borderRadius: s(4),
-    paddingHorizontal: s(6),
-    paddingVertical: vs(2),
-  },
-  noteBadgeText: {
-    fontSize: getFontSize(12),
-    color: '#FF7009',
-    fontWeight: '600',
-  },
-
   scrollBottomContainer: {
     position: 'absolute',
     alignSelf: 'center',
@@ -544,14 +514,5 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
 
     elevation: 2,
-  },
-  scrollButton: {
-    backgroundColor: light.primary,
-    borderRadius: s(25),
-    width: s(50),
-    height: s(50),
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
   },
 });

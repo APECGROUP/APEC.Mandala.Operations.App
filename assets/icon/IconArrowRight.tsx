@@ -1,4 +1,3 @@
-import {getSvgSize} from '@smileTech/helpers/sizeHelper';
 import * as React from 'react';
 import {vs} from 'react-native-size-matters';
 import Svg, {SvgProps, Path} from 'react-native-svg';

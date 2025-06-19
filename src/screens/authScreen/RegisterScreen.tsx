@@ -1,27 +1,24 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {s, vs} from 'react-native-size-matters';
-import {SCREEN_WIDTH, getFontSize} from '../../constants';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthParams} from '../../navigation/params';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { s, vs } from 'react-native-size-matters';
+import { SCREEN_WIDTH, getFontSize } from '../../constants';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthParams } from '../../navigation/params';
 import light from '../../theme/light';
 import AppTextInput from '../../elements/textInput/AppTextInput';
-import {AppButton} from '../../elements/button/AppButton';
-import {AppText} from '../../elements/text/AppText';
-import {useAlert} from '../../elements/alert/AlertProvider';
-import {AppBlock} from '../../elements/block/Block';
+import { AppButton } from '../../elements/button/AppButton';
+import { AppText } from '../../elements/text/AppText';
+import { useAlert } from '../../elements/alert/AlertProvider';
+import { AppBlock } from '../../elements/block/Block';
 import api from '../../utils/setup-axios';
 import DeviceInfo from 'react-native-device-info';
-import {isValidPassword} from '../../utils/validate';
+import { isValidPassword } from '../../utils/validate';
 import Toast from 'react-native-toast-message';
-import {LanguageType} from '../../languages/locales/type';
-import {useTranslation} from 'react-i18next';
+import { LanguageType } from '../../languages/locales/type';
+import { useTranslation } from 'react-i18next';
 import DataLocal from '../../data/DataLocal';
-import {
-  ERegisterStatus,
-  ResponseAPILogin,
-} from '../../interface/Authen.interface';
-import {getFCMTokenAndSendToServer} from '../../../firebase/fcmService';
+import { ERegisterStatus, ResponseAPILogin } from '../../interface/Authen.interface';
+import { getFCMTokenAndSendToServer } from '../../../firebase/fcmService';
 import IconCheckBox from '../../../assets/icon/IconCheckBox';
 import IconUnCheckBox from '../../../assets/icon/IconUnCheckBox';
 
@@ -34,16 +31,14 @@ const RegisterScreen = ({
   navigation,
   route,
 }: NativeStackScreenProps<AuthParams, 'RegisterScreen'>) => {
-  const {t} = useTranslation();
-  const {phone, type} = route.params;
-  const {showAlert} = useAlert();
+  const { t } = useTranslation();
+  const { phone, type } = route.params;
+  const { showAlert } = useAlert();
   const [password, setPassword] = useState('');
   const [rePassword, setRePassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [rePasswordError, setRePasswordError] = useState('');
-  const [isSelected, setIsSelected] = useState(
-    type === 'forgotPassword' ? true : false,
-  );
+  const [isSelected, setIsSelected] = useState(type === 'forgotPassword' ? true : false);
   const [processing, setProcessing] = useState<boolean | undefined>(false);
   const handlePasswordChange = (text: string) => {
     setPassword(text);
@@ -116,9 +111,7 @@ const RegisterScreen = ({
         password,
         deviceId: DeviceInfo.getDeviceId(),
         deviceName:
-          typeof DeviceInfo.getDeviceName() === 'string'
-            ? DeviceInfo.getDeviceName()
-            : 'simulator',
+          typeof DeviceInfo.getDeviceName() === 'string' ? DeviceInfo.getDeviceName() : 'simulator',
         deviceInfo: DeviceInfo.getSystemVersion(),
       };
       const resp = await api.post(endpointSubmit[type], body);
@@ -160,8 +153,8 @@ const RegisterScreen = ({
       <View style={styles.center}>
         <AppText style={styles.title}>Tạo mật khẩu</AppText>
         <AppText style={styles.bottom10}>
-          Để đảm bảo tính bảo mật, vui lòng tạo mật khẩu có ít nhất 8 ký tự,
-          trong đó có chữ hoa, chữ thường, số và ký tự đặc biệt.
+          Để đảm bảo tính bảo mật, vui lòng tạo mật khẩu có ít nhất 8 ký tự, trong đó có chữ hoa,
+          chữ thường, số và ký tự đặc biệt.
         </AppText>
         <AppTextInput
           label="Nhập mật khẩu"
@@ -174,7 +167,7 @@ const RegisterScreen = ({
           onBlur={handleBlurPassword}
           onFocus={handleFocusPassword}
           inputStyle={styles.inputStyle}
-          containerStyle={{width: SCREEN_WIDTH - s(32), marginTop: vs(20)}}
+          containerStyle={{ width: SCREEN_WIDTH - s(32), marginTop: vs(20) }}
         />
         <AppTextInput
           label="Xác nhận lại mật khẩu"
@@ -187,13 +180,10 @@ const RegisterScreen = ({
           onBlur={handleBlurRePassword}
           onFocus={handleFocusRePassword}
           inputStyle={styles.inputStyle}
-          containerStyle={{width: SCREEN_WIDTH - s(32), marginTop: vs(20)}}
+          containerStyle={{ width: SCREEN_WIDTH - s(32), marginTop: vs(20) }}
         />
         {type !== 'forgotPassword' && (
-          <TouchableOpacity
-            onPress={handleSelect}
-            activeOpacity={1}
-            style={styles.button}>
+          <TouchableOpacity onPress={handleSelect} activeOpacity={1} style={styles.button}>
             {isSelected ? (
               <IconCheckBox style={styles.mr3} />
             ) : (
@@ -201,11 +191,11 @@ const RegisterScreen = ({
             )}
             <AppText>
               Tôi đồng ý với{' '}
-              <AppText onPress={() => {}} style={{color: light.primary}}>
+              <AppText onPress={() => {}} style={{ color: light.primary }}>
                 Điều khoản sử dụng
               </AppText>{' '}
               và{' '}
-              <AppText onPress={() => {}} style={{color: light.primary}}>
+              <AppText onPress={() => {}} style={{ color: light.primary }}>
                 Chính sách{'\n'} bảo mật
               </AppText>{' '}
               của app
@@ -217,9 +207,7 @@ const RegisterScreen = ({
       <AppButton
         width={SCREEN_WIDTH - s(32)}
         onPress={onSubmit}
-        disabled={
-          !isValidPassword(password) || rePassword !== password || !isSelected
-        }
+        disabled={!isValidPassword(password) || rePassword !== password || !isSelected}
         primary
         processing={processing}
         text="Tiếp tục"
@@ -239,13 +227,6 @@ const styles = StyleSheet.create({
   },
   mr3: {
     marginRight: s(3),
-  },
-  agreement: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: vs(32),
-    paddingBottom: vs(40),
   },
 
   center: {

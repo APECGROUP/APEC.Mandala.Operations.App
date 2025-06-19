@@ -1,25 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {s, ScaledSheet, vs} from 'react-native-size-matters';
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import { s, ScaledSheet, vs } from 'react-native-size-matters';
 import IconListPen from '@assets/icon/IconListPen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {TypeCreatePrice} from '../../modal/CreatePriceModal';
-import {getFontSize} from '@/constants';
+import { TypeCreatePrice } from '../../modal/CreatePriceModal';
+import { getFontSize } from '@/constants';
 import AppBlockButton from '@/elements/button/AppBlockButton';
-import {AppText} from '@/elements/text/AppText';
+import { AppText } from '@/elements/text/AppText';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconTrashPrice from '@assets/icon/IconTrashPrice';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import ReanimatedSwipeable from './ReanimatedSwipeable';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
-import {AnimatedButton} from '../CreatePriceScreen';
-import {Colors} from '@/theme/Config';
-import {moneyFormat} from '@/utils/Utilities';
-import {Gesture} from 'react-native-gesture-handler';
+import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { AnimatedButton } from '../CreatePriceScreen';
+import { Colors } from '@/theme/Config';
+import { moneyFormat } from '@/utils/Utilities';
 
 const CreatePriceCard = ({
   item,
@@ -47,7 +42,7 @@ const CreatePriceCard = ({
   // onLayout gọi mỗi khi layout thay đổi (do expand/collapse)
   const onItemLayout = (e: any) => {
     const height = e.nativeEvent.layout.height - vs(1);
-    heightAction.value = withTiming(height, {duration: 0});
+    heightAction.value = withTiming(height, { duration: 0 });
   };
 
   // Xử lý expand/collapse
@@ -71,16 +66,11 @@ const CreatePriceCard = ({
       simultaneousGesture={simultaneousGesture}
       onSwipe={() => {}}>
       <View
-        style={[
-          styles.itemContainer,
-          expanded ? styles.itemExpanded : styles.itemCollapsed,
-        ]}
+        style={[styles.itemContainer, expanded ? styles.itemExpanded : styles.itemCollapsed]}
         onLayout={onItemLayout} // Ghi nhận chiều cao để animate nút xóa
       >
         <View style={styles.headerItem}>
-          <AppBlockButton
-            onPress={() => handleSelect(item.id)}
-            style={styles.left}>
+          <AppBlockButton onPress={() => handleSelect(item.id)} style={styles.left}>
             {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
           </AppBlockButton>
 
@@ -93,7 +83,7 @@ const CreatePriceCard = ({
               </View>
               <View style={styles.nameWrapper}>
                 <AppText style={styles.name}>{item.name}</AppText>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <View style={styles.row}>
                   <AppText style={styles.titlePrice}>Giá: </AppText>
                   <AppText style={styles.price}>
                     {moneyFormat(item.price, '.', '')}/{item.end}/{item.vat}
@@ -104,20 +94,16 @@ const CreatePriceCard = ({
           </AppBlockButton>
 
           <AppBlockButton style={styles.right} onPress={handleExpand}>
-            <Icon
-              name={expanded ? 'expand-less' : 'expand-more'}
-              size={vs(20)}
-              color="#999"
-            />
+            <Icon name={expanded ? 'expand-less' : 'expand-more'} size={vs(20)} color="#999" />
           </AppBlockButton>
         </View>
 
         {expanded && (
           <View style={styles.expandedContent}>
             {[
-              {label: 'Thời gian', value: item.time},
-              {label: 'NCC', value: item.ncc},
-            ].map(({label, value}, idx) => (
+              { label: 'Thời gian', value: item.time },
+              { label: 'NCC', value: item.ncc },
+            ].map(({ label, value }, idx) => (
               <View key={idx} style={styles.detailRow}>
                 <AppText style={styles.detailLabel}>{label}</AppText>
                 <AppText style={styles.detailValue}>{value}</AppText>
@@ -138,7 +124,7 @@ const styles = ScaledSheet.create({
     borderRadius: s(8),
     marginVertical: vs(6),
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
@@ -230,4 +216,8 @@ const styles = ScaledSheet.create({
     width: s(50),
     borderRadius: '8@s',
   },
+});
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center' },
 });

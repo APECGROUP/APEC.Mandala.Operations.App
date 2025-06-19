@@ -1,4 +1,4 @@
-import {TypeUser} from './Authen.interface';
+import { TypeUser } from './Authen.interface';
 
 export interface ResponseImageElement {
   originalPath: string;
@@ -63,4 +63,5 @@ export interface Metadata {
   is_sdk: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Result {}

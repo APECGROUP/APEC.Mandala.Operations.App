@@ -1,29 +1,23 @@
-import React, {ReactNode, useEffect} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {AlertProvider} from '../../elements/alert/AlertProvider';
+import React, { ReactNode, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AlertProvider } from '../../elements/alert/AlertProvider';
 import '../../languages/i18n';
-import {I18nextProvider} from 'react-i18next';
+import { I18nextProvider } from 'react-i18next';
 import i18n from '../../languages/i18n';
-import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
-import {Platform, StatusBar, StyleSheet} from 'react-native';
-import {SCREEN_WIDTH} from '../../constants';
-import {s, vs} from 'react-native-size-matters';
-import {PaperProvider} from 'react-native-paper';
-import {MenuProvider} from 'react-native-popup-menu';
-import {navigationRef} from '../../navigation/RootNavigation';
-import {setupFCM} from '../../../firebase/fcmService';
+import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
+import { Platform, StatusBar, StyleSheet } from 'react-native';
+import { SCREEN_WIDTH } from '../../constants';
+import { s, vs } from 'react-native-size-matters';
+import { PaperProvider } from 'react-native-paper';
+import { MenuProvider } from 'react-native-popup-menu';
+import { navigationRef } from '../../navigation/RootNavigation';
+import { setupFCM } from '../../../firebase/fcmService';
 import NameScreen from '../../navigation/nameScreen/NameScreen';
-import {useNameScreen} from '../../zustand/store/useNameScreen/useNameScreen';
-import {MMKV} from 'react-native-mmkv';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { useNameScreen } from '../../zustand/store/useNameScreen/useNameScreen';
+import { MMKV } from 'react-native-mmkv';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 type Props = {
   children: ReactNode;
   onReady?: () => void;
@@ -35,7 +29,7 @@ const toastConfig = {
 
 export const storage = new MMKV();
 export default function AppProvider(props: Props) {
-  const {setNameScreen} = useNameScreen();
+  const { setNameScreen } = useNameScreen();
 
   const statusBarConfig = () => {
     if (Platform.OS !== 'ios') {
@@ -59,7 +53,7 @@ export default function AppProvider(props: Props) {
     setNameScreen(currentRouteName);
   };
 
-  const queryClient = new QueryClient();
+  const [queryClient] = React.useState(() => new QueryClient());
 
   useEffect(() => {
     statusBarConfig();
@@ -69,16 +63,12 @@ export default function AppProvider(props: Props) {
   return (
     <SafeAreaProvider>
       <AlertProvider>
-        <NavigationContainer
-          onStateChange={handleNavigationChange}
-          ref={navigationRef}>
+        <NavigationContainer onStateChange={handleNavigationChange} ref={navigationRef}>
           <MenuProvider>
-            <GestureHandlerRootView style={{flex: 1}}>
+            <GestureHandlerRootView style={styles.flex1}>
               <PaperProvider>
                 <QueryClientProvider client={queryClient}>
-                  <I18nextProvider i18n={i18n}>
-                    {props.children}
-                  </I18nextProvider>
+                  <I18nextProvider i18n={i18n}>{props.children}</I18nextProvider>
                 </QueryClientProvider>
                 {__DEV__ && <NameScreen />}
                 <Toast config={toastConfig} />
@@ -92,6 +82,7 @@ export default function AppProvider(props: Props) {
 }
 
 const styles = StyleSheet.create({
+  flex1: { flex: 1 },
   styleSuccess: {
     marginTop: vs(20),
     width: SCREEN_WIDTH - s(32),

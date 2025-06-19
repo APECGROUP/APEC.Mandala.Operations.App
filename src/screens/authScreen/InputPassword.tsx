@@ -1,37 +1,37 @@
-import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
-import React, {useCallback, useState} from 'react';
-import {s, vs} from 'react-native-size-matters';
-import {SCREEN_WIDTH, getFontSize} from '../../constants';
+import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { s, vs } from 'react-native-size-matters';
+import { SCREEN_WIDTH, getFontSize } from '../../constants';
 
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthParams} from '../../navigation/params';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthParams } from '../../navigation/params';
 import light from '../../theme/light';
 import AppTextInput from '../../elements/textInput/AppTextInput';
-import {AppText} from '../../elements/text/AppText';
-import {useAlert} from '../../elements/alert/AlertProvider';
-import {AppBlock} from '../../elements/block/Block';
-import {AppButton} from '../../elements/button/AppButton';
-import {useFocusEffect} from '@react-navigation/native';
-import {isValidPassword} from '../../utils/validate';
+import { AppText } from '../../elements/text/AppText';
+import { useAlert } from '../../elements/alert/AlertProvider';
+import { AppBlock } from '../../elements/block/Block';
+import { AppButton } from '../../elements/button/AppButton';
+import { useFocusEffect } from '@react-navigation/native';
+import { isValidPassword } from '../../utils/validate';
 import api from '../../utils/setup-axios';
 import DeviceInfo from 'react-native-device-info';
-import {useTranslation} from 'react-i18next';
-import {LanguageType} from '../../languages/locales/type';
+import { useTranslation } from 'react-i18next';
+import { LanguageType } from '../../languages/locales/type';
 import Toast from 'react-native-toast-message';
-import {useInfoUser} from '../../zustand/store/useInfoUser/useInfoUser';
-import {ELoginStatus, ResponseAPILogin} from '../../interface/Authen.interface';
+import { useInfoUser } from '../../zustand/store/useInfoUser/useInfoUser';
+import { ELoginStatus, ResponseAPILogin } from '../../interface/Authen.interface';
 import DataLocal from '../../data/DataLocal';
-import {getFCMTokenAndSendToServer} from '../../../firebase/fcmService';
+import { getFCMTokenAndSendToServer } from '../../../firebase/fcmService';
 
 const InputPassword = ({
   navigation,
   route,
 }: NativeStackScreenProps<AuthParams, 'InputPassword'>) => {
-  const {phone} = route.params;
-  const {t} = useTranslation();
-  const {showAlert} = useAlert();
+  const { phone } = route.params;
+  const { t } = useTranslation();
+  const { showAlert } = useAlert();
   const [password, setPassword] = useState('');
-  const {infoUser} = useInfoUser();
+  const { infoUser } = useInfoUser();
 
   const [passwordError, setPasswordError] = useState('');
   const [processing, setProcessing] = useState<boolean | undefined>(false);
@@ -87,9 +87,7 @@ const InputPassword = ({
         password,
         deviceId: DeviceInfo.getDeviceId(),
         deviceName:
-          typeof DeviceInfo.getDeviceName() === 'string'
-            ? DeviceInfo.getDeviceName()
-            : 'simulator',
+          typeof DeviceInfo.getDeviceName() === 'string' ? DeviceInfo.getDeviceName() : 'simulator',
         deviceInfo: DeviceInfo.getSystemVersion(),
       };
       const resp = await api.post<ResponseAPILogin>('user/login', body, {
@@ -100,9 +98,7 @@ const InputPassword = ({
         throw new Error();
       } else if (resp.data.status === ELoginStatus.SUCCESS) {
         onSuccess(resp.data);
-      } else if (
-        resp.data.status === ELoginStatus.INVALID_USERNAME_OR_PASSWORD
-      ) {
+      } else if (resp.data.status === ELoginStatus.INVALID_USERNAME_OR_PASSWORD) {
         // Toast.show({
         //   type: 'error',
         //   text2: t('Mật khẩu không chính xác, vui lòng kiểm tra lại'),
@@ -144,7 +140,7 @@ const InputPassword = ({
           text: 'Tiếp tục',
           onPress: () => {
             setProcessing(false);
-            navigation.navigate('OTPScreen', {phone, type: 'forgotPassword'});
+            navigation.navigate('OTPScreen', { phone, type: 'forgotPassword' });
           },
         },
       ],
@@ -156,7 +152,7 @@ const InputPassword = ({
 
     navigation.reset({
       index: 0,
-      routes: [{name: 'LoginScreen'}],
+      routes: [{ name: 'LoginScreen' }],
     });
   };
 
@@ -173,9 +169,7 @@ const InputPassword = ({
     <AppBlock style={styles.container}>
       <AppBlock>
         <View style={styles.center}>
-          <AppText style={styles.title}>
-            Xin chào {infoUser?.profile?.fullName || ''}
-          </AppText>
+          <AppText style={styles.title}>Xin chào {infoUser?.profile?.fullName || ''}</AppText>
           <AppText style={styles.title}>{phone}</AppText>
 
           <AppTextInput
@@ -189,7 +183,7 @@ const InputPassword = ({
             onBlur={handleBlurPassword}
             onFocus={handleFocusPassword}
             inputStyle={styles.inputStyle}
-            containerStyle={{width: SCREEN_WIDTH - s(32), marginTop: vs(20)}}
+            containerStyle={{ width: SCREEN_WIDTH - s(32), marginTop: vs(20) }}
           />
           <AppBlock width={'100%'} mt={10} row justifyContent="space-between">
             <TouchableWithoutFeedback onPress={onForgotPassword}>
@@ -225,9 +219,6 @@ const styles = StyleSheet.create({
     height: vs(40),
     backgroundColor: light.white,
   },
-  bottom10: {
-    marginBottom: 10,
-  },
   title: {
     fontSize: getFontSize(18),
     fontWeight: 'bold',
@@ -238,10 +229,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: vs(30),
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 5,
-    fontSize: getFontSize(12),
   },
 });

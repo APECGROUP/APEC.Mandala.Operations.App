@@ -1,19 +1,13 @@
-import React, {useState, useRef, useEffect, useCallback} from 'react';
-import {
-  TextInput,
-  TouchableOpacity,
-  AppStateStatus,
-  AppState,
-  StyleSheet,
-} from 'react-native';
-import {getFontSize} from '../../../constants';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { TextInput, TouchableOpacity, AppStateStatus, AppState, StyleSheet } from 'react-native';
+import { getFontSize } from '../../../constants';
 import moment from 'moment';
 import light from '../../../theme/light';
-import {AppText} from '../../../elements/text/AppText';
+import { AppText } from '../../../elements/text/AppText';
 
 const COUNTDOWN_TIME = 60000; // 5 giây
 
-const ButtonResend = ({onPress}: {onPress: () => void}) => {
+const ButtonResend = ({ onPress }: { onPress: () => void }) => {
   const refText = useRef<TextInput | null>(null);
   const isCountingDown = useRef(false);
   const animationFrameId = useRef<number | null>(null);
@@ -25,13 +19,10 @@ const ButtonResend = ({onPress}: {onPress: () => void}) => {
     if (!isCountingDown.current) return;
 
     const now = Date.now();
-    const remainingSeconds = Math.max(
-      0,
-      Math.floor((endTime.current - now) / 1000),
-    );
+    const remainingSeconds = Math.max(0, Math.floor((endTime.current - now) / 1000));
 
     if (refText.current) {
-      refText.current.setNativeProps({text: `${remainingSeconds}s`});
+      refText.current.setNativeProps({ text: `${remainingSeconds}s` });
     }
 
     if (remainingSeconds <= 0) {
@@ -83,29 +74,15 @@ const ButtonResend = ({onPress}: {onPress: () => void}) => {
       }
     };
 
-    const subscription = AppState.addEventListener(
-      'change',
-      handleAppStateChange,
-    );
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
     return () => subscription.remove();
   }, [updateCountdown]);
 
   return (
-    <TouchableOpacity
-      style={{flexDirection: 'row', alignItems: 'center'}}
-      disabled={isDisabled}
-      activeOpacity={0}
-      onPress={onResend}>
-      <AppText style={[isDisabled ? styles.textDisable : styles.text]}>
-        Gửi lại OTP
-      </AppText>
+    <TouchableOpacity style={styles.row} disabled={isDisabled} activeOpacity={0} onPress={onResend}>
+      <AppText style={[isDisabled ? styles.textDisable : styles.text]}>Gửi lại OTP</AppText>
       <AppText style={styles.textDefault}> (</AppText>
-      <TextInput
-        style={styles.textDefault}
-        ref={refText}
-        defaultValue="60s"
-        editable={false}
-      />
+      <TextInput style={styles.textDefault} ref={refText} defaultValue="60s" editable={false} />
       <AppText style={styles.textDefault}>)</AppText>
     </TouchableOpacity>
   );
@@ -125,5 +102,9 @@ const styles = StyleSheet.create({
   text: {
     fontSize: getFontSize(15),
     color: light.primary,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

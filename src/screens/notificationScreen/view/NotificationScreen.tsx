@@ -1,58 +1,51 @@
 // views/NotificationScreen.tsx
 
-import React, {useRef} from 'react';
+import React, { useRef } from 'react';
 import {
   ActivityIndicator,
-  FlatList,
   StyleSheet,
   View,
   NativeSyntheticEvent,
   NativeScrollEvent,
   TouchableOpacity,
 } from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   FadeInLeft,
 } from 'react-native-reanimated';
-import {useTranslation} from 'react-i18next';
-import {s, vs} from 'react-native-size-matters';
+import { useTranslation } from 'react-i18next';
+import { s, vs } from 'react-native-size-matters';
 
-import {MainParams} from '../../../navigation/params';
-import {AppBlock} from '../../../elements/block/Block';
+import { MainParams } from '../../../navigation/params';
+import { AppBlock } from '../../../elements/block/Block';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
 import light from '../../../theme/light';
-import {AnimatedButton} from '../../assignPriceScreen/view/AssignPriceScreen';
-import {ContentNotification} from '../../../interface/Notification.interface';
-import {useNotificationViewModel} from '../viewmodal/useNotificationViewModel';
+import { AnimatedButton } from '../../assignPriceScreen/view/AssignPriceScreen';
+import { ContentNotification } from '../../../interface/Notification.interface';
+import { useNotificationViewModel } from '../viewmodal/useNotificationViewModel';
 import ItemNotification from './component/ItemNotification';
 import Header from './component/Header';
-import {AppText} from '@/elements/text/AppText';
-import {FlashList} from '@shopify/flash-list';
+import { AppText } from '@/elements/text/AppText';
+import { FlashList } from '@shopify/flash-list';
 import IconSeeAll from '@assets/icon/IconSeeAll';
-import {getFontSize} from '@/constants';
-import {PaddingHorizontal} from '@/utils/Constans';
+import { getFontSize } from '@/constants';
+import { PaddingHorizontal } from '@/utils/Constans';
 
 type Props = NativeStackScreenProps<MainParams, 'NotificationScreen'>;
 const totalNotification = 100; // Hoặc truyền từ props nếu dynamic
 const ICON_SECTION_WIDTH = s(130);
 
-const NotificationScreen: React.FC<Props> = ({navigation}) => {
-  const {t} = useTranslation();
+const NotificationScreen: React.FC<Props> = () => {
+  const { t } = useTranslation();
 
   // ─── ViewModel (MVVM) ────────────────────────────────────────────────
-  const {
-    flatData,
-    isLoading,
-    isRefetching,
-    isFetchingNextPage,
-    onRefresh,
-    onLoadMore,
-  } = useNotificationViewModel();
+  const { flatData, isLoading, isRefetching, isFetchingNextPage, onRefresh, onLoadMore } =
+    useNotificationViewModel();
 
   // ─── Refs & shared values để show/hide nút cuộn ─────────────────────
   const lastOffsetY = useRef(0);
@@ -60,10 +53,10 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
   const showScrollToBottom = useSharedValue(0);
 
   const opacityScrollTopStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToTop.value, {duration: 200}),
+    opacity: withTiming(showScrollToTop.value, { duration: 200 }),
   }));
   const opacityScrollBottomStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToBottom.value, {duration: 200}),
+    opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
   }));
 
   const flatListRef = useRef<FlashList<ContentNotification> | null>(null);
@@ -71,12 +64,12 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
 
-    // Scroll xuống (y tăng) → show “scroll-to-bottom”, ẩn “scroll-to-top”
+    // Scroll xuống (y tăng) → show "scroll-to-bottom", ẩn "scroll-to-top"
     if (y > lastOffsetY.current && y > 100) {
       showScrollToBottom.value = 1;
       showScrollToTop.value = 0;
     }
-    // Scroll lên (y giảm) → show “scroll-to-top”, ẩn “scroll-to-bottom”
+    // Scroll lên (y giảm) → show "scroll-to-top", ẩn "scroll-to-bottom"
     else if (y < lastOffsetY.current && y > 100) {
       showScrollToTop.value = 1;
       showScrollToBottom.value = 0;
@@ -90,33 +83,29 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
   };
 
   const scrollToTop = () => {
-    flatListRef.current?.scrollToOffset({offset: 0, animated: true});
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
   };
 
   const scrollToBottom = () => {
-    flatListRef.current?.scrollToEnd({animated: true});
+    flatListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
   };
 
   // ─── Khi user nhấn vào 1 item, chuyển sang detail hoặc đánh dấu đã đọc ─────────────────
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onDetail = (id: number) => {
     // TODO: navigation.navigate('NotificationDetail', { id })
-    // hoặc gọi API đánh dấu item “id” thành read = true
+    // hoặc gọi API đánh dấu item "id" thành read = true
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDelete = async (id: number) => {
     // TODO: gọi API xóa notification, rồi update listNotification
   };
 
   // ─── Render mỗi item, với animation FadeInLeft.delay(index * 50) ─────────────────
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: ContentNotification;
-    index: number;
-  }) => (
+  const renderItem = ({ item, index }: { item: ContentNotification; index: number }) => (
     <Animated.View entering={FadeInLeft.delay(index * 50)}>
       <ItemNotification
         item={item}
@@ -141,7 +130,7 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
     return (
       <AppBlock flex center>
         <EmptyDataAnimation autoPlay />
-        <AppText style={{marginTop: vs(8)}}>{t('Không có thông báo')}</AppText>
+        <AppText style={{ marginTop: vs(8) }}>{t('Không có thông báo')}</AppText>
       </AppBlock>
     );
   };
@@ -153,27 +142,21 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
   };
   const notificationLabel = formatNotificationCount(totalNotification);
 
-  const rightComponent = () => {
-    return (
-      <TouchableOpacity style={styles.rightButton} onPress={() => {}}>
-        <IconSeeAll />
-        <AppText numberOfLines={1} style={styles.rightText}>
-          {t('Đọc tất cả')}
-          {notificationLabel ? ` (${notificationLabel})` : ''}
-        </AppText>
-      </TouchableOpacity>
-    );
-  };
+  const rightComponent = () => (
+    <TouchableOpacity style={styles.rightButton} onPress={() => {}}>
+      <IconSeeAll />
+      <AppText numberOfLines={1} style={styles.rightText}>
+        {t('Đọc tất cả')}
+        {notificationLabel ? ` (${notificationLabel})` : ''}
+      </AppText>
+    </TouchableOpacity>
+  );
   console.log('render màn notification: ', isLoading);
   return (
     <AppBlock flex>
       <Header rightComponent={rightComponent()} iconWidth={s(130)} />
       {isLoading && !flatData ? (
-        <ActivityIndicator
-          size="large"
-          color={light.primary}
-          style={{flex: 1}}
-        />
+        <ActivityIndicator size="large" color={light.primary} style={styles.flex} />
       ) : (
         <FlashList
           ref={flatListRef}
@@ -194,7 +177,7 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
               </View>
             ) : null
           }
-          contentContainerStyle={{flexGrow: 1, paddingBottom: vs(50)}}
+          contentContainerStyle={styles.fg1Content}
           onScroll={handleScroll}
           scrollEventThrottle={16}
         />
@@ -203,7 +186,7 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
       <AnimatedButton
         onPress={scrollToTop}
         style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-        <IconScrollBottom style={{transform: [{rotate: '180deg'}]}} />
+        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
       </AnimatedButton>
       <AnimatedButton
         onPress={scrollToBottom}
@@ -217,6 +200,8 @@ const NotificationScreen: React.FC<Props> = ({navigation}) => {
 export default NotificationScreen;
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  fg1Content: { flexGrow: 1, paddingBottom: vs(50) },
   rightButton: {
     width: ICON_SECTION_WIDTH,
     height: vs(40),
@@ -235,34 +220,6 @@ const styles = StyleSheet.create({
     marginVertical: vs(12),
     alignItems: 'center',
   },
-  scrollButtonContainerTop: {
-    position: 'absolute',
-    bottom: vs(80),
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  scrollButtonContainerBottom: {
-    position: 'absolute',
-    bottom: vs(20),
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-
-  emptyContainer: {
-    flex: 1,
-    marginTop: vs(40),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
   scrollBottomContainer: {
     position: 'absolute',
     alignSelf: 'center',
@@ -291,13 +248,10 @@ const styles = StyleSheet.create({
 
     elevation: 2,
   },
-  scrollButton: {
-    backgroundColor: light.primary,
-    borderRadius: s(25),
-    width: s(50),
-    height: s(50),
+  emptyContainer: {
+    flex: 1,
+    marginTop: vs(40),
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
   },
 });

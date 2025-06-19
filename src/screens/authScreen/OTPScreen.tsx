@@ -1,20 +1,19 @@
-import {Alert, Keyboard, StyleSheet, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {s, vs} from 'react-native-size-matters';
-import {SCREEN_WIDTH, getFontSize} from '../../constants';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthParams} from '../../navigation/params';
+import { StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { vs } from 'react-native-size-matters';
+import { getFontSize } from '../../constants';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthParams } from '../../navigation/params';
 import AppOTP from '../../elements/otp/AppOTP';
 import ButtonResend from './component/ButtonResend';
-import {AppText} from '../../elements/text/AppText';
-import {useAlert} from '../../elements/alert/AlertProvider';
-import {AppButton} from '../../elements/button/AppButton';
-import {AppBlock} from '../../elements/block/Block';
-import {useTranslation} from 'react-i18next';
-import {LanguageType} from '../../languages/locales/type';
+import { AppText } from '../../elements/text/AppText';
+import { useAlert } from '../../elements/alert/AlertProvider';
+import { AppBlock } from '../../elements/block/Block';
+import { useTranslation } from 'react-i18next';
+import { LanguageType } from '../../languages/locales/type';
 import api from '../../utils/setup-axios';
 import Toast from 'react-native-toast-message';
-import {ECheckOtpStatus} from '../../interface/Authen.interface';
+import { ECheckOtpStatus } from '../../interface/Authen.interface';
 const endpointGetOtp = {
   register: 'user/gen-otp',
   forgotPassword: 'user/password-reset/gen-otp',
@@ -25,13 +24,10 @@ const endpointVerifyOtp = {
   forgotPassword: 'user/password-reset/verify-otp',
   confirm: 'user/check-otp',
 };
-const OTPScreen = ({
-  route,
-  navigation,
-}: NativeStackScreenProps<AuthParams, 'OTPScreen'>) => {
-  const {t} = useTranslation();
-  const {phone, type} = route.params;
-  const {showAlert} = useAlert();
+const OTPScreen = ({ route, navigation }: NativeStackScreenProps<AuthParams, 'OTPScreen'>) => {
+  const { t } = useTranslation();
+  const { phone, type } = route.params;
+  const { showAlert } = useAlert();
   const [isShowAlert, setIsShowAlert] = useState(false);
   const [sessionId, setSessionId] = useState('');
   const onError = () => {
@@ -49,19 +45,17 @@ const OTPScreen = ({
 
   const onSuccess = (code: string) => {
     if (type === 'confirm') {
-      navigation.replace('InputPassword', {phone});
+      navigation.replace('InputPassword', { phone });
       return;
     }
-    navigation.replace('RegisterScreen', {phone: phone, code, type});
+    navigation.replace('RegisterScreen', { phone: phone, code, type });
   };
 
   const onBand = () => {
     setIsShowAlert(true);
 
     showAlert(
-      type === 'register'
-        ? t('Đăng ký tài khoản thất bại')
-        : t('Tạo mật khẩu không thành công'),
+      type === 'register' ? t('Đăng ký tài khoản thất bại') : t('Tạo mật khẩu không thành công'),
       type === 'register'
         ? t(
             'Bạn đã nhập sai mã OTP tối đa số lần quy định. Đăng ký tài khoản ví không thành công. Bạn vui lòng thực hiện lại sau 30s',
@@ -107,6 +101,7 @@ const OTPScreen = ({
       navigation.goBack();
     }
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getOtp = async () => {
     try {
       if (!phone) {
@@ -138,7 +133,7 @@ const OTPScreen = ({
     // });
     getOtp();
     return () => {};
-  }, []);
+  }, [getOtp]);
 
   return (
     <View style={styles.container}>
@@ -150,7 +145,7 @@ const OTPScreen = ({
           </AppText>
           {!isShowAlert && (
             <AppOTP
-              containerStyle={{marginVertical: vs(20)}}
+              containerStyle={{ marginVertical: vs(20) }}
               otpCount={6}
               autoFocus={true}
               // onCodeFilled={onBand}
@@ -170,10 +165,7 @@ const styles = StyleSheet.create({
   center: {
     alignItems: 'center',
   },
-  inputStyle: {
-    width: '100%',
-    height: vs(32),
-  },
+
   bottom10: {
     marginBottom: 10,
     textAlign: 'center',

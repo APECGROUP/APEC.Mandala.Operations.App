@@ -5,7 +5,6 @@ import { s, vs } from 'react-native-size-matters';
 import IconInfomation from '../../../../../assets/icon/IconInfomation';
 import IconNote from '../../../../../assets/icon/IconNote';
 import Images from '../../../../../assets/image/Images';
-import { memo } from 'react';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
@@ -35,15 +34,7 @@ const ApproveCard = ({ item, index }: { item: TypeApprove; index: number }) => {
         </View>
         <AppText style={styles.dateText}>{item.user.name}</AppText>
         {index % 3 === 0 && (
-          <View
-            style={{
-              paddingVertical: vs(2),
-              paddingHorizontal: s(4),
-              borderRadius: s(4),
-              backgroundColor: '#FFE2CE',
-              alignSelf: 'flex-start',
-              marginTop: vs(6),
-            }}>
+          <View style={styles.noAssign}>
             <AppText size={12} color={'#FF7009'} weight="500">
               {t('Chờ gắn giá')}
             </AppText>
@@ -57,6 +48,14 @@ const ApproveCard = ({ item, index }: { item: TypeApprove; index: number }) => {
 export default ApproveCard;
 
 const styles = StyleSheet.create({
+  noAssign: {
+    paddingVertical: vs(2),
+    paddingHorizontal: s(4),
+    borderRadius: s(4),
+    backgroundColor: '#FFE2CE',
+    alignSelf: 'flex-start',
+    marginTop: vs(6),
+  },
   dateText: {
     fontSize: getFontSize(12),
     fontWeight: '400',

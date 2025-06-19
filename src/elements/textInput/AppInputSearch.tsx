@@ -8,8 +8,8 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import React, {useEffect} from 'react';
-import {ms, s, vs} from 'react-native-size-matters';
+import React, { useEffect } from 'react';
+import { ms, s, vs } from 'react-native-size-matters';
 import IconSearch from '../../../assets/icon/IconSearch';
 import IconClose from '../../../assets/icon/IconClose';
 type Props = {
@@ -56,32 +56,26 @@ export default function AppInputSearch({
   //         clearTimeout(mSetTimeout);
   //     };
   // }, [value1]);
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (value) {
         onChangeText('');
       }
-    };
-  }, []);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   if (right) {
     return (
       <View
-        style={[
-          styles.containerStyle,
-          containerStyle,
-          (width && {width: width}) || undefined,
-        ]}>
+        style={[styles.containerStyle, containerStyle, (width && { width: width }) || undefined]}>
         <TextInput
           value={value}
           onPressIn={onPressIn ?? onFocusDefault}
           placeholder={placeholder ?? 'Tìm kiếm sản phẩm'}
           placeholderTextColor="#949494"
-          style={[
-            styles.TextInput,
-            inputStyle,
-            (width && {width: width * 0.9}) || undefined,
-          ]}
+          style={[styles.TextInput, inputStyle, (width && { width: width * 0.9 }) || undefined]}
           onChangeText={onChangeText}
           editable={editable}
           maxLength={255}
@@ -95,12 +89,7 @@ export default function AppInputSearch({
     );
   }
   return (
-    <View
-      style={[
-        styles.containerStyle,
-        containerStyle,
-        (width && {width: width}) || undefined,
-      ]}>
+    <View style={[styles.containerStyle, containerStyle, (width && { width: width }) || undefined]}>
       <IconSearch stroke={stroke} fill={fill} />
       <TextInput
         keyboardType={keyboardType}
@@ -111,8 +100,8 @@ export default function AppInputSearch({
         placeholderTextColor="#949494"
         style={[
           styles.TextInput,
-          {marginRight: s(12)},
-          (width && {width: width * 0.9}) || undefined,
+          { marginRight: s(12) },
+          (width && { width: width * 0.9 }) || undefined,
           inputStyle,
         ]}
         onChangeText={onChangeText}

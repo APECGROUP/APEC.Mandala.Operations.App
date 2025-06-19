@@ -26,8 +26,7 @@ export const fetchInformationItemsData = async (
     `https://picsum.photos/v2/list?page=${page}&limit=${limit}`,
   );
 
-  return data.map((item: any, index: number) => {
-    return {
+  return data.map((item: any, index: number) => ({
       id: item.id,
       name: `Táo đỏ khô${(page - 1) * limit + index + 1}`,
       price: null,
@@ -42,6 +41,5 @@ export const fetchInformationItemsData = async (
       },
       note: 'Lorem Ipsum is simply dummy text of the printing and typese tting industry',
       approvedAmount: 100000,
-    };
-  });
+    }));
 };

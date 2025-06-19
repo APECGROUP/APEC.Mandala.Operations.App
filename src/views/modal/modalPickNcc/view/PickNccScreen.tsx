@@ -1,37 +1,31 @@
-import React, {useCallback} from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthParams, MainParams} from '../../../../navigation/params';
-import {AppBlock} from '../../../../elements/block/Block';
-import {AppText} from '../../../../elements/text/AppText';
+import React, { useCallback } from 'react';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { MainParams } from '../../../../navigation/params';
+import { AppBlock } from '../../../../elements/block/Block';
+import { AppText } from '../../../../elements/text/AppText';
 import light from '../../../../theme/light';
-import {s, vs} from 'react-native-size-matters';
-import {useTranslation} from 'react-i18next';
+import { s, vs } from 'react-native-size-matters';
+import { useTranslation } from 'react-i18next';
 import IconClose from '../../../../../assets/icon/IconClose';
-import {PaddingHorizontal} from '../../../../utils/Constans';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { PaddingHorizontal } from '../../../../utils/Constans';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBlockButton from '../../../../elements/button/AppBlockButton';
 import IconSelectHotel from '../../../../../assets/icon/IconSelectHotel';
-import Animated, {FadeInDown, FadeInLeft} from 'react-native-reanimated';
-import {usePickNCCViewModel} from '../viewmodal/usePickNCCViewModel';
-import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
-import {getFontSize, SCREEN_HEIGHT, SCREEN_WIDTH} from '@/constants';
-import {FlashList} from '@shopify/flash-list';
-import {ResponseNcc} from '../modal/PickNccModal';
+import Animated, { FadeInDown, FadeInLeft } from 'react-native-reanimated';
+import { usePickNCCViewModel } from '../viewmodal/usePickNCCViewModel';
+import { SCREEN_HEIGHT } from '@/constants';
+import { FlashList } from '@shopify/flash-list';
+import { ResponseNcc } from '../modal/PickNccModal';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
-import {Colors} from '@/theme/Config';
+import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
 
 type Props = NativeStackScreenProps<MainParams, 'PickNccScreen'>;
-const PickNccScreen = ({navigation, route}: Props) => {
-  const {t} = useTranslation();
-  const {setNcc, ncc} = route.params;
-  const {bottom} = useSafeAreaInsets();
+const PickNccScreen = ({ navigation, route }: Props) => {
+  const { t } = useTranslation();
+  const { setNcc, ncc } = route.params;
+  const { bottom } = useSafeAreaInsets();
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -74,7 +68,7 @@ const PickNccScreen = ({navigation, route}: Props) => {
   };
 
   const renderItem = useCallback(
-    ({item, index}: {item: ResponseNcc; index: number}) => {
+    ({ item, index }: { item: ResponseNcc; index: number }) => {
       const isFocus = item?.id === ncc?.id;
       const onSelect = () => {
         setNcc(item);
@@ -88,14 +82,14 @@ const PickNccScreen = ({navigation, route}: Props) => {
           <AppBlockButton
             key={index}
             onPress={onSelect}
-            style={[isFocus ? styles.itemFocus : {padding: vs(10)}]}>
+            style={[isFocus ? styles.itemFocus : { padding: vs(10) }]}>
             <AppText weight="500">{item.name}</AppText>
             {isFocus && <IconSelectHotel />}
           </AppBlockButton>
         </Animated.View>
       );
     },
-    [],
+    [navigation, ncc?.id, setNcc],
   );
 
   const goBack = useCallback(() => {
@@ -107,36 +101,30 @@ const PickNccScreen = ({navigation, route}: Props) => {
         entering={FadeInDown.delay(0).duration(0).springify()}
         style={[
           styles.container,
-          {paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7},
+          { paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7 },
         ]}>
         <AppBlock
           pl={PaddingHorizontal}
           row
           justifyContent="space-between"
           alignItems="center"
-          style={{borderBottomWidth: 1, borderBottomColor: light.border}}>
+          style={styles.width1}>
           <AppText size={20} weight="bold">
             {t('Thông tin nhà cung cấp')}
           </AppText>
-          <TouchableOpacity
-            onPress={goBack}
-            style={{padding: PaddingHorizontal}}>
+          <TouchableOpacity onPress={goBack} style={{ padding: PaddingHorizontal }}>
             <IconClose />
           </TouchableOpacity>
         </AppBlock>
 
-        <View style={{paddingHorizontal: PaddingHorizontal}}>
+        <View style={{ paddingHorizontal: PaddingHorizontal }}>
           <AppText mt={10} mb={6} weight="700">
             {t('Nhà cung cấp')}
           </AppText>
           <AppInputSearch
             fill={searchKey ? Colors.PRIMARY : '#BABABA'}
             showIconRemove
-            containerStyle={{
-              borderRadius: 6,
-              borderWidth: 0,
-              backgroundColor: Colors.BLACK_100,
-            }}
+            containerStyle={styles.conatinerInputSearch}
             value={searchKey}
             onChangeText={onSearch}
             placeholder={t('Tìm kiếm')}
@@ -159,7 +147,6 @@ const PickNccScreen = ({navigation, route}: Props) => {
           contentContainerStyle={{
             paddingHorizontal: PaddingHorizontal,
             paddingBottom: bottom || vs(10),
-            flexGrow: 1,
             paddingTop: vs(10),
           }}
         />
@@ -171,6 +158,12 @@ const PickNccScreen = ({navigation, route}: Props) => {
 export default PickNccScreen;
 
 const styles = StyleSheet.create({
+  width1: { borderBottomWidth: 1, borderBottomColor: light.border },
+  conatinerInputSearch: {
+    borderRadius: 6,
+    borderWidth: 0,
+    backgroundColor: Colors.BLACK_100,
+  },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -196,11 +189,5 @@ const styles = StyleSheet.create({
     borderTopRightRadius: s(8),
     borderTopLeftRadius: s(8),
     backgroundColor: light.white,
-  },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
   },
 });

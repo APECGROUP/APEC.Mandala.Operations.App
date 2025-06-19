@@ -10,8 +10,7 @@ interface DevelopingAnimationProps {
 }
 
 const DevelopingAnimation = forwardRef<LottieView, DevelopingAnimationProps>(
-  ({ source, style, autoPlay = false, loop = true }, ref) => {
-    return (
+  ({ source, style, autoPlay = false, loop = true }, ref) => (
       <LottieView
         ref={ref}
         source={source || require('../animation/source/DevelopingAnimation.json')}
@@ -19,8 +18,7 @@ const DevelopingAnimation = forwardRef<LottieView, DevelopingAnimationProps>(
         autoPlay={autoPlay}
         loop={loop}
       />
-    );
-  },
+    ),
 );
 
 export default DevelopingAnimation;

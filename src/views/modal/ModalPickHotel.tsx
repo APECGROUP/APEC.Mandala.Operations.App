@@ -1,18 +1,18 @@
-import React, {useCallback} from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthParams} from '../../navigation/params';
-import {AppBlock} from '../../elements/block/Block';
-import {AppText} from '../../elements/text/AppText';
+import React, { useCallback } from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthParams } from '../../navigation/params';
+import { AppBlock } from '../../elements/block/Block';
+import { AppText } from '../../elements/text/AppText';
 import light from '../../theme/light';
-import {s, vs} from 'react-native-size-matters';
-import {useTranslation} from 'react-i18next';
+import { s, vs } from 'react-native-size-matters';
+import { useTranslation } from 'react-i18next';
 import IconClose from '../../../assets/icon/IconClose';
-import {PaddingHorizontal} from '../../utils/Constans';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { PaddingHorizontal } from '../../utils/Constans';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBlockButton from '../../elements/button/AppBlockButton';
 import IconSelectHotel from '../../../assets/icon/IconSelectHotel';
-import Animated, {FadeInDown, SlideInDown} from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 type Props = NativeStackScreenProps<AuthParams, 'ModalPickHotel'>;
 const fakeData = [
@@ -41,10 +41,10 @@ const fakeData = [
     id: 6,
   },
 ];
-const ModalPickHotel = ({navigation, route}: Props) => {
-  const {t} = useTranslation();
-  const {setHotel, hotel} = route.params;
-  const {bottom} = useSafeAreaInsets();
+const ModalPickHotel = ({ navigation, route }: Props) => {
+  const { t } = useTranslation();
+  const { setHotel, hotel } = route.params;
+  const { bottom } = useSafeAreaInsets();
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
@@ -59,13 +59,11 @@ const ModalPickHotel = ({navigation, route}: Props) => {
           row
           justifyContent="space-between"
           alignItems="center"
-          style={{borderBottomWidth: 1, borderBottomColor: light.border}}>
+          style={styles.borderWidth1}>
           <AppText size={20} weight="bold">
             {t('Khách sạn')}
           </AppText>
-          <TouchableOpacity
-            onPress={goBack}
-            style={{padding: PaddingHorizontal}}>
+          <TouchableOpacity onPress={goBack} style={{ padding: PaddingHorizontal }}>
             <IconClose />
           </TouchableOpacity>
         </AppBlock>
@@ -81,7 +79,7 @@ const ModalPickHotel = ({navigation, route}: Props) => {
               <AppBlockButton
                 key={index}
                 onPress={onSelect}
-                style={[isFocus ? styles.itemFocus : {padding: vs(10)}]}>
+                style={[isFocus ? styles.itemFocus : { padding: vs(10) }]}>
                 <AppText weight="500">{item.name}</AppText>
                 {isFocus && <IconSelectHotel />}
               </AppBlockButton>
@@ -112,10 +110,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: s(8),
     backgroundColor: light.white,
   },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+  borderWidth1: {
+    borderBottomWidth: 1,
+    borderBottomColor: light.border,
   },
 });

@@ -21,5 +21,5 @@ const reactotron = Reactotron.configure({
   })
   .connect();
 
-console.tron = reactotron;
+// console.tron = reactotron;
 export default reactotron;

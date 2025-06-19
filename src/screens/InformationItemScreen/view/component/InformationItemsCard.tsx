@@ -1,32 +1,22 @@
-import {AppText} from '@/elements/text/AppText';
-import {
-  LayoutAnimation,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { AppText } from '@/elements/text/AppText';
+import { LayoutAnimation, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {s, vs} from 'react-native-size-matters';
+import { s, vs } from 'react-native-size-matters';
 import Images from '../../../../../assets/image/Images';
-import {memo, useState} from 'react';
-import {getFontSize} from '@/constants';
-import {useTranslation} from 'react-i18next';
-import {DataInformationItems} from '../../modal/InformationItemsModal';
-import {Colors} from '@/theme/Config';
+import { useState } from 'react';
+import { getFontSize } from '@/constants';
+import { useTranslation } from 'react-i18next';
+import { DataInformationItems } from '../../modal/InformationItemsModal';
+import { Colors } from '@/theme/Config';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconSub from '@assets/icon/IconSub';
 import IconPlus from '@assets/icon/IconPlus';
-import {moneyFormat} from '@/utils/Utilities';
-import AppBlockButton from '@/elements/button/AppBlockButton';
-import {navigate} from '@/navigation/RootNavigation';
-import {typeNcc} from '@/screens/authScreen/LoginScreen';
-import {ResponseNcc} from '@/views/modal/modalPickNcc/modal/PickNccModal';
-import AppTextInput from '@/elements/textInput/AppTextInput';
+import { moneyFormat } from '@/utils/Utilities';
+import { navigate } from '@/navigation/RootNavigation';
+import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 
 const InformationItemsCard = ({
   item,
-  index,
   onFocusComment,
   onUpdatePrice,
 }: {
@@ -35,7 +25,7 @@ const InformationItemsCard = ({
   onFocusComment: () => void;
   onUpdatePrice?: (id: string | number, price: number) => void;
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
   const [count, setCount] = useState(item.approvedQty);
   const [ncc, setNcc] = useState<ResponseNcc>(item.supplier);
@@ -68,10 +58,7 @@ const InformationItemsCard = ({
 
   return (
     <View style={styles.card}>
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={handleShowDetail}
-        style={styles.header}>
+      <TouchableOpacity activeOpacity={1} onPress={handleShowDetail} style={styles.header}>
         <View style={styles.leftSection}>
           <FastImage source={Images.IconBox} style={styles.itemIcon} />
           <View style={styles.itemInfo}>
@@ -81,27 +68,22 @@ const InformationItemsCard = ({
               </AppText>
             </View>
             {item.price ? (
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={styles.itemInfoRow}>
                 <AppText style={styles.dateText}>{t('Giá')}: </AppText>
                 <AppText style={styles.dateTextEnd}>
                   {item.price}/{item.end}
                 </AppText>
               </View>
             ) : (
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={styles.itemInfoRow}>
                 <AppText style={styles.dateText}>{t('Giá')}: </AppText>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <View style={styles.itemInfoRow}>
                   <TextInput
                     onFocus={onFocusComment}
                     onBlur={onBlur}
                     onChangeText={text => setPrice(Number(text))}
                     keyboardType="numeric"
-                    style={{
-                      minWidth: vs(50),
-                      borderBottomWidth: 1,
-                      borderBottomColor: '#BABABA',
-                      height: vs(20),
-                    }}
+                    style={styles.inputPrice}
                   />
                   <AppText style={styles.dateTextEnd}>/{item.end}</AppText>
                 </View>
@@ -111,7 +93,7 @@ const InformationItemsCard = ({
         </View>
         <IconArrowRight
           style={{
-            transform: [{rotate: isShow ? '270deg' : '90deg'}],
+            transform: [{ rotate: isShow ? '270deg' : '90deg' }],
           }}
         />
       </TouchableOpacity>
@@ -133,9 +115,7 @@ const InformationItemsCard = ({
               <TouchableOpacity activeOpacity={1} disabled>
                 <AppText style={styles.qtyValue}>{count}</AppText>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setCount(i => i + 1)}
-                style={styles.buttonPlus}>
+              <TouchableOpacity onPress={() => setCount(i => i + 1)} style={styles.buttonPlus}>
                 <IconPlus />
               </TouchableOpacity>
             </View>
@@ -143,12 +123,10 @@ const InformationItemsCard = ({
           <View style={styles.row}>
             <AppText style={styles.label}>{t('NCC')}</AppText>
             <TouchableOpacity onPress={onPickNcc} style={styles.nccContainer}>
-              <AppText
-                style={[styles.nccText, {marginRight: s(6)}]}
-                numberOfLines={1}>
+              <AppText style={[styles.nccText, { marginRight: s(6) }]} numberOfLines={1}>
                 {ncc.name}
               </AppText>
-              <IconArrowRight style={{transform: [{rotate: '90deg'}]}} />
+              <IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />
             </TouchableOpacity>
           </View>
           <View style={styles.row}>
@@ -181,7 +159,7 @@ const styles = StyleSheet.create({
     paddingTop: s(0),
     marginBottom: vs(12),
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
@@ -296,5 +274,11 @@ const styles = StyleSheet.create({
   noteText: {
     fontSize: getFontSize(12),
     color: '#333',
+  },
+  inputPrice: {
+    minWidth: vs(50),
+    borderBottomWidth: 1,
+    borderBottomColor: '#BABABA',
+    height: vs(20),
   },
 });

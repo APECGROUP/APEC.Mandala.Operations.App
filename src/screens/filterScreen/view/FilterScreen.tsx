@@ -1,31 +1,23 @@
-import {StyleSheet, TextInput, View} from 'react-native';
-import React, {useRef, useState} from 'react';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainParams} from '../../../navigation/params';
-import {s, vs} from 'react-native-size-matters';
-import {SCREEN_WIDTH, getFontSize} from '../../../constants';
-import {AppBlock} from '../../../elements/block/Block';
-import AppTextInput, {
-  AppInputLabel,
-} from '../../../elements/textInput/AppTextInput';
+import { StyleSheet, TextInput, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { getFontSize } from '../../../constants';
+import { AppBlock } from '../../../elements/block/Block';
+import AppTextInput from '../../../elements/textInput/AppTextInput';
 import light from '../../../theme/light';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import moment from 'moment';
-import AppDropDown from '../../../elements/appDropdown/AppDropdown';
-import {useFilterViewModel} from '../viewmodal/useFilterViewModel';
-import {navigate} from '@/navigation/RootNavigation';
+import { navigate } from '@/navigation/RootNavigation';
 import FooterDefault from './component/FooterFilter';
-import {PaddingHorizontal} from '@/utils/Constans';
-import {ResponseNcc} from '@/views/modal/modalPickNcc/modal/PickNccModal';
-import {TypePickDepartment} from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { PaddingHorizontal } from '@/utils/Constans';
+import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconCalendar from '@assets/icon/IconCalendar';
+import { vs } from 'react-native-size-matters';
 
-const FilterScreen = ({
-  navigation,
-}: NativeStackScreenProps<MainParams, 'FilterScreen'>) => {
-  const {listDepartment, listRequester} = useFilterViewModel();
-  const {t} = useTranslation();
+const FilterScreen = () => {
+  //  const { listDepartment, listRequester } = useFilterViewModel();
+  const { t } = useTranslation();
 
   const [prNo, setPrNo] = useState('');
   const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
@@ -121,9 +113,7 @@ const FilterScreen = ({
           placeholderTextColor={light.placeholderTextColor}
           value={department?.name}
           inputStyle={styles.input}
-          rightIcon={
-            <IconArrowRight style={{transform: [{rotate: '90deg'}]}} />
-          }
+          rightIcon={<IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />}
         />
         <AppTextInput
           onPress={onPressRequester}
@@ -136,9 +126,7 @@ const FilterScreen = ({
           placeholderTextColor={light.placeholderTextColor}
           value={requester?.name}
           inputStyle={styles.input}
-          rightIcon={
-            <IconArrowRight style={{transform: [{rotate: '90deg'}]}} />
-          }
+          rightIcon={<IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />}
         />
       </View>
       <FooterDefault />
@@ -149,7 +137,6 @@ const FilterScreen = ({
 export default FilterScreen;
 
 const styles = StyleSheet.create({
-  itemTextStyle: {fontSize: getFontSize(14), fontWeight: '500'},
   container: {
     flex: 1,
     justifyContent: 'space-between',
@@ -173,18 +160,5 @@ const styles = StyleSheet.create({
     borderRadius: vs(6),
     backgroundColor: light.backgroundTextInput,
     marginBottom: vs(16),
-  },
-  dropdown: {
-    paddingHorizontal: s(10),
-  },
-  placeholder: {
-    color: light.placeholderTextColor,
-    fontSize: getFontSize(14),
-    fontWeight: '500',
-  },
-  searchInput: {
-    fontSize: getFontSize(20),
-    borderRadius: 4,
-    height: vs(36),
   },
 });

@@ -1,4 +1,4 @@
-import { Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
 import React, { useRef, useState } from 'react';
 import { s, vs } from 'react-native-size-matters';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -231,30 +231,9 @@ const styles = StyleSheet.create({
     borderRadius: vs(6),
     backgroundColor: light.backgroundTextInput,
   },
-  inputErrorStyle: {
-    borderWidth: 1,
-    borderColor: light.danger,
-    width: '100%',
-    height: vs(40),
-    borderRadius: vs(6),
-    backgroundColor: light.inputDanger,
-  },
-  bottom10: {
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: getFontSize(18),
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
   container: {
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 5,
-    fontSize: getFontSize(12),
   },
 });

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {s, vs} from 'react-native-size-matters';
-import Svg, {SvgProps, Path, Rect} from 'react-native-svg';
+import {s} from 'react-native-size-matters';
+import Svg, {SvgProps, Path} from 'react-native-svg';
 const IconRejected = (props: SvgProps) => (
   <Svg
     viewBox="0 0 10 10"

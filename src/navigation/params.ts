@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { ResponseImageElement } from '../interface/Verify.interface';
-import { typeHotel, typeNcc } from '../screens/authScreen/LoginScreen';
+import { typeHotel } from '../screens/authScreen/LoginScreen';
 import { DataAssignPrice } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';

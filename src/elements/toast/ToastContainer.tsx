@@ -12,7 +12,7 @@ export type ToastAction = {
   show: (msg: string, type: string) => any;
 };
 
-// eslint-disable-next-line no-empty-pattern
+ 
 const ToastContainer = forwardRef<ToastAction>(({}, ref) => {
   const {top} = useSafeAreaInsets();
   const [messages, setMessages] = useState<string>('');

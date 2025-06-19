@@ -1,17 +1,17 @@
-import React, {useState} from 'react';
-import {StyleSheet, Switch, View} from 'react-native';
-import {Colors} from '@/theme/Config';
+import React, { useState } from 'react';
+import { StyleSheet, Switch, View } from 'react-native';
+import { Colors } from '@/theme/Config';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import AppImage from '@/elements/appImage/AppImage';
-import {useInfoUser} from '@/zustand/store/useInfoUser/useInfoUser';
-import {s, vs} from 'react-native-size-matters';
-import {AppText} from '@/elements/text/AppText';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { s, vs } from 'react-native-size-matters';
+import { AppText } from '@/elements/text/AppText';
 
-import {useTranslation} from 'react-i18next';
-import {useAlert} from '@/elements/alert/AlertProvider';
+import { useTranslation } from 'react-i18next';
+import { useAlert } from '@/elements/alert/AlertProvider';
 import DataLocal from '@/data/DataLocal';
-import {navigate} from '@/navigation/RootNavigation';
-import Animated, {FadeInDown} from 'react-native-reanimated';
+import { navigate } from '@/navigation/RootNavigation';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import IconAllowNotification from '@assets/icon/IconAllowNotification';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconChangePassword from '@assets/icon/IconChangePassword';
@@ -20,13 +20,12 @@ import IconLanguage from '@assets/icon/IconLanguage';
 import IconLogout from '@assets/icon/IconLogout';
 import IconVietNam from '@assets/icon/IconVietNam';
 
-const animatedDelay = (index: number) =>
-  FadeInDown.delay(150 * index).springify();
+const animatedDelay = (index: number) => FadeInDown.delay(150 * index).springify();
 
 const AccountScreen = () => {
-  const {t} = useTranslation();
-  const {infoUser} = useInfoUser();
-  const {showAlert} = useAlert();
+  const { t } = useTranslation();
+  const { infoUser } = useInfoUser();
+  const { showAlert } = useAlert();
   const [allowNotification, setAllowNotification] = useState(false);
 
   const toggleAllowNotification = () => setAllowNotification(prev => !prev);
@@ -35,8 +34,8 @@ const AccountScreen = () => {
 
   const onLogout = () => {
     showAlert(t('account.logout'), t('account.warningLogout'), [
-      {text: t('account.profile.cancel'), style: 'cancel', onPress: () => {}},
-      {text: t('account.confirm'), onPress: () => DataLocal.removeAll()},
+      { text: t('account.profile.cancel'), style: 'cancel', onPress: () => {} },
+      { text: t('account.confirm'), onPress: () => DataLocal.removeAll() },
     ]);
   };
 
@@ -47,10 +46,7 @@ const AccountScreen = () => {
       <Animated.View entering={animatedDelay(0)}>
         <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>
           <View>
-            <AppImage
-              style={styles.avatar}
-              source={{uri: infoUser?.profile?.avatar}}
-            />
+            <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
             <IconEditAvatar style={styles.editIcon} />
           </View>
           <AppText weight="700" size={18} mb={2}>
@@ -108,7 +104,7 @@ const AccountScreen = () => {
         <Animated.View key={item.key} entering={animatedDelay(index + 1)}>
           <AppBlockButton
             onPress={item.onPress}
-            style={[styles.itemContainer, index === 0 && {borderTopWidth: 0}]}>
+            style={[styles.itemContainer, index === 0 && styles.border0]}>
             <View style={styles.row}>
               {item.icon}
               <AppText weight="700" size={14} ml={6}>
@@ -126,6 +122,7 @@ const AccountScreen = () => {
 export default AccountScreen;
 
 const styles = StyleSheet.create({
+  border0: { borderTopWidth: 0 },
   container: {
     flex: 1,
     backgroundColor: Colors.WHITE,

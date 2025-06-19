@@ -1,31 +1,26 @@
-import React, {useCallback, useRef, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-} from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainParams} from '../../navigation/params';
-import {useTranslation} from 'react-i18next';
-import {s, vs} from 'react-native-size-matters';
-import {Colors} from '@/theme/Config';
-import {PaddingHorizontal} from '@/utils/Constans';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Animated, {FadeInDown, SlideInDown} from 'react-native-reanimated';
-import {AppText} from '@/elements/text/AppText';
+import React, { useCallback, useRef, useState } from 'react';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { MainParams } from '../../navigation/params';
+import { useTranslation } from 'react-i18next';
+import { s, vs } from 'react-native-size-matters';
+import { Colors } from '@/theme/Config';
+import { PaddingHorizontal } from '@/utils/Constans';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { AppText } from '@/elements/text/AppText';
 import AppTextInput from '@/elements/textInput/AppTextInput';
-import {AppButton} from '@/elements/button/AppButton';
-import {getFontSize, SCREEN_WIDTH} from '@/constants';
+import { AppButton } from '@/elements/button/AppButton';
+import { getFontSize, SCREEN_WIDTH } from '@/constants';
 import IconClose from '@assets/icon/IconClose';
-import {useKeyboard} from '@/hook/keyboardHook';
+import { useKeyboard } from '@/hook/keyboardHook';
 
 type Props = NativeStackScreenProps<MainParams, 'ChangePasswordScreen'>;
 
-const ChangePasswordScreen = ({navigation}: Props) => {
-  const {t} = useTranslation();
-  const {bottom} = useSafeAreaInsets();
-  const {keyboardHeight, keyboardVisible} = useKeyboard();
+const ChangePasswordScreen = ({ navigation }: Props) => {
+  const { t } = useTranslation();
+  const { bottom } = useSafeAreaInsets();
+  const { keyboardHeight, keyboardVisible } = useKeyboard();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,8 +30,7 @@ const ChangePasswordScreen = ({navigation}: Props) => {
   const refNew = useRef(null);
   const refConfirm = useRef(null);
 
-  const disabled =
-    !currentPassword || !confirmPassword || newPassword !== confirmPassword;
+  const disabled = !currentPassword || !confirmPassword || newPassword !== confirmPassword;
 
   const goBack = useCallback(() => {
     navigation.goBack();
@@ -64,18 +58,18 @@ const ChangePasswordScreen = ({navigation}: Props) => {
         entering={FadeInDown.delay(0).duration(0).springify()}
         style={[
           styles.container,
-          {paddingBottom: bottom},
-          keyboardVisible && {marginBottom: keyboardHeight},
+          { paddingBottom: bottom },
+          keyboardVisible && { marginBottom: keyboardHeight },
         ]}>
         <View style={styles.header}>
           <AppText size={16} weight="700">
             {t('account.changePassword.title')}
           </AppText>
-          <TouchableOpacity style={{padding: s(20)}} onPress={goBack}>
+          <TouchableOpacity style={{ padding: s(20) }} onPress={goBack}>
             <IconClose />
           </TouchableOpacity>
         </View>
-        <View style={{paddingHorizontal: PaddingHorizontal}}>
+        <View style={{ paddingHorizontal: PaddingHorizontal }}>
           <AppTextInput
             refName={refCurrent}
             label={t('account.changePassword.currentPassword')}
@@ -122,7 +116,7 @@ const ChangePasswordScreen = ({navigation}: Props) => {
             width={SCREEN_WIDTH - s(32)}
             height={vs(45)}
             onPress={onSubmit}
-            disabledStyle={{backgroundColor: Colors.BUTTON_DISABLED}}
+            disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
             disabled={disabled}
             primary
             textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
@@ -139,7 +133,7 @@ const ChangePasswordScreen = ({navigation}: Props) => {
 export default ChangePasswordScreen;
 
 const styles = StyleSheet.create({
-  textStyleButton: {fontWeight: '700', fontSize: getFontSize(14)},
+  textStyleButton: { fontWeight: '700', fontSize: getFontSize(14) },
 
   labelPassword: {
     fontSize: getFontSize(14),
@@ -171,13 +165,5 @@ const styles = StyleSheet.create({
     borderRadius: vs(6),
     backgroundColor: Colors.BLACK_100,
     marginBottom: vs(16),
-  },
-  confirmButton: {
-    marginTop: vs(8),
-    backgroundColor: Colors.GRAY_100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-    paddingVertical: vs(14),
   },
 });

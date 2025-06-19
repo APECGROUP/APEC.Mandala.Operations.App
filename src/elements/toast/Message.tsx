@@ -59,8 +59,7 @@ const Message = ({onHide, message, type}: MessageProps) => {
     return color;
   };
 
-  const stylesView = () => {
-    return {
+  const stylesView = () => ({
       opacity,
       transform: [
         {
@@ -71,8 +70,7 @@ const Message = ({onHide, message, type}: MessageProps) => {
         },
       ],
       backgroundColor: toastBackground(),
-    };
-  };
+    });
 
   const renderIcon = useMemo(() => {
     switch (type) {

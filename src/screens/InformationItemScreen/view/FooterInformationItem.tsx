@@ -1,28 +1,27 @@
-import {StyleSheet, View} from 'react-native';
-import React, {useState} from 'react';
+import { StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
 import AppBlockButton from '@/elements/button/AppBlockButton';
-import {AppButton} from '@/elements/button/AppButton';
-import {AppText} from '@/elements/text/AppText';
+import { AppButton } from '@/elements/button/AppButton';
+import { AppText } from '@/elements/text/AppText';
 import IconAutoAssign from '@assets/icon/IconAutoAssign';
 import IconSaveTmp from '@assets/icon/IconSaveTmp';
-import {useTranslation} from 'react-i18next';
-import Animated, {FadeInDown} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {s, vs} from 'react-native-size-matters';
-import {PaddingHorizontal} from '@/utils/Constans';
-import {Colors} from '@/theme/Config';
-import {useAlert} from '@/elements/alert/AlertProvider';
+import { useTranslation } from 'react-i18next';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { s, vs } from 'react-native-size-matters';
+import { PaddingHorizontal } from '@/utils/Constans';
+import { Colors } from '@/theme/Config';
+import { useAlert } from '@/elements/alert/AlertProvider';
 import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
-import ConfettiAnimation from '@/views/animation/Confetti';
-import {TYPE_TOAST} from '@/elements/toast/Message';
+import { TYPE_TOAST } from '@/elements/toast/Message';
 
 const FooterInformationItem = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [isLoadingReject, setIsLoadingReject] = useState(false);
   const [isLoadingAssign, setIsLoadingAssign] = useState(false);
-  const {bottom} = useSafeAreaInsets();
-  const {showAlert, showToast} = useAlert();
+  const { bottom } = useSafeAreaInsets();
+  const { showAlert, showToast } = useAlert();
   const onReject = async () => {
     setIsLoadingReject(true);
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -38,7 +37,7 @@ const FooterInformationItem = () => {
       ],
       <FastImage
         source={Images.ModalApprovedError}
-        style={{width: s(285), aspectRatio: 285 / 187}}
+        style={{ width: s(285), aspectRatio: 285 / 187 }}
       />,
     );
   };
@@ -57,7 +56,7 @@ const FooterInformationItem = () => {
       ],
       <FastImage
         source={Images.ModalApprovedSuccess}
-        style={{width: s(285), aspectRatio: 285 / 187}}
+        style={{ width: s(285), aspectRatio: 285 / 187 }}
       />,
       // <ConfettiAnimation
       //   autoPlay={true}
@@ -81,7 +80,7 @@ const FooterInformationItem = () => {
   return (
     <Animated.View
       entering={FadeInDown.delay(200).duration(1000).springify()}
-      style={[styles.bottomContainer, {paddingBlock: bottom}]}>
+      style={[styles.bottomContainer, { paddingBlock: bottom }]}>
       <View style={styles.footerContainer}>
         <AppBlockButton onPress={onAutoAssign} style={styles.footerButton}>
           <IconAutoAssign />
@@ -136,7 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.PRIMARY,
     borderRadius: s(8),
   },
-  blockButton: {width: s(162), alignItems: 'center'},
+  blockButton: { width: s(162), alignItems: 'center' },
 
   actionButtonsContainer: {
     flexDirection: 'row',
@@ -177,9 +176,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
-  },
-  footerWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
 });

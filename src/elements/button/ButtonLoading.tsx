@@ -1,14 +1,14 @@
-import React, {useEffect, useState, useMemo} from 'react';
-import {Platform, ActivityIndicator, StyleSheet} from 'react-native';
-import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Platform, ActivityIndicator, StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 import Ripple from './Ripple';
-import {useThemeContext} from '../../hook/contextHook';
-import {type ButtonLoadingProps} from './ButtonProps';
-import {sizes} from '../../theme/theming';
-import {AppText} from '../text/AppText';
-import {AppBlock} from '../block/Block';
-import {handleButtonStarlingStyle} from '../../helper/styleHelper';
+import { useThemeContext } from '../../hook/contextHook';
+import { type ButtonLoadingProps } from './ButtonProps';
+import { sizes } from '../../theme/theming';
+import { AppText } from '../text/AppText';
+import { AppBlock } from '../block/Block';
+import { handleButtonStarlingStyle } from '../../helper/styleHelper';
 
 const AnimatedText = Animated.createAnimatedComponent(AppText);
 const AnimatedButton = Animated.createAnimatedComponent(Ripple);
@@ -26,14 +26,13 @@ export default function ButtonLoading(props: ButtonLoadingProps) {
     primary,
     disabled,
     disabledStyle,
-    disabledOpacity,
     text,
     textColor,
     textStyle,
   } = props;
 
   const maxWidth = width;
-  const {colors} = useThemeContext();
+  const { colors } = useThemeContext();
 
   const borderRadius = typeof radius === 'number' ? radius : sizes.radius;
 
@@ -51,16 +50,13 @@ export default function ButtonLoading(props: ButtonLoadingProps) {
 
   const animTextStyle = useAnimatedStyle(
     () => ({
-      transform: [{scale: withTiming(isLoading ? 0 : 1, {duration: 450})}],
+      transform: [{ scale: withTiming(isLoading ? 0 : 1, { duration: 450 }) }],
     }),
     [isLoading],
   );
 
   const children = isLoading ? (
-    <ActivityIndicator
-      animating
-      color={primary ? colors.white : colors.buttonText}
-    />
+    <ActivityIndicator animating color={primary ? colors.white : colors.buttonText} />
   ) : (
     props.children ?? (
       <AnimatedText
@@ -74,8 +70,8 @@ export default function ButtonLoading(props: ButtonLoadingProps) {
     )
   );
 
-  const {elementStyles, elementProps} = useMemo(
-    () => handleButtonStarlingStyle({...props, width, height, radius}, colors),
+  const { elementStyles, elementProps } = useMemo(
+    () => handleButtonStarlingStyle({ ...props, width, height, radius }, colors),
     [props, width, height, radius, colors],
   );
 
@@ -84,8 +80,8 @@ export default function ButtonLoading(props: ButtonLoadingProps) {
       borderRadius: withTiming(isLoading ? animateRadius : borderRadius, {
         duration: 650,
       }),
-      width: withTiming(isLoading ? minWidth : maxWidth, {duration: 450}),
-      opacity: withTiming(isLoading ? animateOpacity : 1, {duration: 450}),
+      width: withTiming(isLoading ? minWidth : maxWidth, { duration: 450 }),
+      opacity: withTiming(isLoading ? animateOpacity : 1, { duration: 450 }),
     }),
     [isLoading],
   );
@@ -110,6 +106,6 @@ export default function ButtonLoading(props: ButtonLoadingProps) {
 }
 
 const styles = StyleSheet.create({
-  opacity: {opacity: 0.3},
-  button: {alignItems: 'center', justifyContent: 'center', borderRadius: 8},
+  opacity: { opacity: 0.3 },
+  button: { alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
 });

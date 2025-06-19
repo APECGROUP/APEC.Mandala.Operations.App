@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
-import {Text as RNText, StyleSheet} from 'react-native';
+import {Text as RNText} from 'react-native';
 
 import {type AppTextProps} from './TextProps';
 import StarlingThemeContext from '../../theme/ThemeContext';
 import type {StarlingTheme} from '../../theme/type';
 import {handleTextStarlingStyle} from '../../helper/styleHelper';
 import type {TextProps, StyleProp, TextStyle} from 'react-native';
-import {getFontSize} from '@/constants';
 
 type FontWeightType =
   | '100'

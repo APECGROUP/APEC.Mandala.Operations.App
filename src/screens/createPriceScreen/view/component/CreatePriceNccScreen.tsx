@@ -1,19 +1,19 @@
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import React from 'react';
 import Header from '@/screens/notificationScreen/view/component/Header';
-import {useTranslation} from 'react-i18next';
-import {s, vs} from 'react-native-size-matters';
-import {AppText} from '@/elements/text/AppText';
-import {Colors} from '@/theme/Config';
-import {getFontSize} from '@/constants';
+import { useTranslation } from 'react-i18next';
+import { s, vs } from 'react-native-size-matters';
+import { AppText } from '@/elements/text/AppText';
+import { Colors } from '@/theme/Config';
+import { getFontSize } from '@/constants';
 import light from '@/theme/light';
-import {PaddingHorizontal} from '@/utils/Constans';
+import { PaddingHorizontal } from '@/utils/Constans';
 import FooterDefault from '@/screens/filterScreen/view/component/FooterFilter';
 
 const CreatePriceNccScreen = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.flex1}>
       <Header title={t('createPrice.createNcc')} iconWidth={s(40)} />
 
       <View style={styles.titleContainer}>
@@ -22,7 +22,7 @@ const CreatePriceNccScreen = () => {
           <AppText style={styles.countBadgeText}>{0}</AppText>
         </View>
       </View>
-      <View style={styles.listContent}></View>
+      <View style={styles.listContent} />
 
       <FooterDefault
         onLeftAction={async () => {
@@ -39,6 +39,7 @@ const CreatePriceNccScreen = () => {
 export default CreatePriceNccScreen;
 
 const styles = StyleSheet.create({
+  flex1: { flex: 1 },
   listContent: {
     paddingHorizontal: PaddingHorizontal,
     flex: 1,

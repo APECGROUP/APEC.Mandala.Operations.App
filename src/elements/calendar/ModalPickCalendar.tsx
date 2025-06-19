@@ -1,16 +1,16 @@
-import React, {useCallback, useRef, useEffect, useState} from 'react';
-import {Animated, TouchableOpacity, View} from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {MainParams} from '../../navigation/params';
-import {AppText} from '../../elements/text/AppText';
+import React, { useCallback, useRef, useEffect, useState } from 'react';
+import { Animated, TouchableOpacity, View } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MainParams } from '../../navigation/params';
+import { AppText } from '../../elements/text/AppText';
 import AppBlockButton from '../button/AppBlockButton';
 import IconClose from '../../../assets/icon/IconClose';
 import moment from 'moment';
 import CalendarPicker from 'react-native-calendar-picker';
-import {ScaledSheet, s, vs} from 'react-native-size-matters';
+import { ScaledSheet, s, vs } from 'react-native-size-matters';
 import light from '../../theme/light';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 moment.locale('vi');
 
@@ -22,14 +22,14 @@ type ModalPickCalendarParams = {
   onSelectRange?: (start: Date, end: Date) => void;
 };
 
-const ModalPickCalendar = ({navigation, route}: Props) => {
+const ModalPickCalendar = ({ navigation, route }: Props) => {
   const {
     isSingleMode = false,
     onSelectDate,
     onSelectRange,
   } = route.params as ModalPickCalendarParams;
-  const {t} = useTranslation();
-  const {bottom} = useSafeAreaInsets();
+  const { t } = useTranslation();
+  const { bottom } = useSafeAreaInsets();
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -42,6 +42,7 @@ const ModalPickCalendar = ({navigation, route}: Props) => {
       duration: 300,
       useNativeDriver: true,
     }).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const goBack = useCallback(() => {
@@ -52,6 +53,7 @@ const ModalPickCalendar = ({navigation, route}: Props) => {
     }).start(() => {
       navigation.goBack();
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
   const handleReset = () => {
@@ -89,14 +91,14 @@ const ModalPickCalendar = ({navigation, route}: Props) => {
           styles.container,
           {
             paddingBottom: bottom,
-            transform: [{translateY: slideAnim}],
+            transform: [{ translateY: slideAnim }],
           },
         ]}>
         <View style={styles.header}>
           <AppText size={20} weight="bold" textAlign="center">
             {t('calendar.selectTime')}
           </AppText>
-          <AppBlockButton onPress={goBack} style={{padding: vs(16)}}>
+          <AppBlockButton onPress={goBack} style={{ padding: vs(16) }}>
             <IconClose />
           </AppBlockButton>
         </View>

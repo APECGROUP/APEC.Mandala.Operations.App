@@ -1,21 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {
-  RefObject,
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import {
-  Dimensions,
-  Keyboard,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import React, { RefObject, createContext, useContext, useEffect, useRef, useState } from 'react';
+import { Dimensions, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Animated, {
   FadeInDown,
   FadeOut,
@@ -24,16 +9,16 @@ import Animated, {
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
-import {IOtpContext, IOtpInput} from './Type';
-import {s, vs} from 'react-native-size-matters';
-import {getFontSize} from '../../constants';
+import { IOtpContext, IOtpInput } from './Type';
+import { s, vs } from 'react-native-size-matters';
+import { getFontSize } from '../../constants';
 import light from '../../theme/light';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const OtpContext = createContext<IOtpContext>({} as IOtpContext);
 
-const OtpItem = ({i}: {i: number}) => {
+const OtpItem = ({ i }: { i: number }) => {
   const {
     inputRef,
     onPress,
@@ -44,7 +29,6 @@ const OtpItem = ({i}: {i: number}) => {
     setOtpValue,
     focus,
     focusColor,
-    autoFocus,
     containerStyle,
     inputStyle,
     textStyle,
@@ -57,17 +41,15 @@ const OtpItem = ({i}: {i: number}) => {
 
   const border = useSharedValue(focus === i ? 1.5 : 0);
 
-  const borderStyle = useAnimatedStyle(() => {
-    return {
+  const borderStyle = useAnimatedStyle(
+    () => ({
       borderWidth: border.value,
-    };
-  }, [focus]);
+    }),
+    [focus],
+  );
 
   useEffect(() => {
-    border.value = withDelay(
-      50,
-      withTiming(focus === i ? 1.5 : 0, {duration: 100}),
-    );
+    border.value = withDelay(50, withTiming(focus === i ? 1.5 : 0, { duration: 100 }));
   }, [focus]);
 
   useEffect(() => {
@@ -144,9 +126,7 @@ export const AppOTP = ({
   // );
 
   if (inputRef.current.length === 0) {
-    inputRef.current = Array.from({length: otpCount}, () =>
-      React.createRef<TextInput>(),
-    );
+    inputRef.current = Array.from({ length: otpCount }, () => React.createRef<TextInput>());
   }
   const [focus, setFocus] = useState<number>(0);
   const [otpValue, setOtpValue] = useState<string[]>(data);
@@ -258,9 +238,9 @@ export const AppOTP = ({
         </Text>
       )}
       <View style={[styles.rowCenter, styles.container]}>
-        {data.map((_, i) => {
-          return <OtpItem key={i} i={i} />;
-        })}
+        {data.map((_, i) => (
+          <OtpItem key={i} i={i} />
+        ))}
       </View>
       {errorMessage && (
         <Text

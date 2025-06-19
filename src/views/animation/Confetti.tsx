@@ -10,8 +10,7 @@ interface ConfettiAnimationProps {
 }
 
 const ConfettiAnimation = forwardRef<LottieView, ConfettiAnimationProps>(
-  ({source, style, autoPlay = false, loop = true}, ref) => {
-    return (
+  ({source, style, autoPlay = false, loop = true}, ref) => (
       <LottieView
         ref={ref}
         source={source || require('../animation/source/ConfettiAnimation.json')}
@@ -19,8 +18,7 @@ const ConfettiAnimation = forwardRef<LottieView, ConfettiAnimationProps>(
         autoPlay={autoPlay}
         loop={loop}
       />
-    );
-  },
+    ),
 );
 
 export default ConfettiAnimation;

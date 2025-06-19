@@ -1,29 +1,23 @@
-import {AppText} from '@/elements/text/AppText';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import { AppText } from '@/elements/text/AppText';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {s, vs} from 'react-native-size-matters';
+import { s, vs } from 'react-native-size-matters';
 import IconInfomation from '../../../../../assets/icon/IconInfomation';
 import IconNote from '../../../../../assets/icon/IconNote';
 import Images from '../../../../../assets/image/Images';
-import {memo} from 'react';
-import {getFontSize} from '@/constants';
-import {useTranslation} from 'react-i18next';
+import { memo } from 'react';
+import { getFontSize } from '@/constants';
+import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
-import {navigate} from '@/navigation/RootNavigation';
-import {DataAssignPrice} from '../../modal/AssignPriceModal';
+import { navigate } from '@/navigation/RootNavigation';
+import { DataAssignPrice } from '../../modal/AssignPriceModal';
 
-const AssignPriceCard = ({
-  item,
-  index,
-}: {
-  item: DataAssignPrice;
-  index: number;
-}) => {
-  const {t} = useTranslation();
+const AssignPriceCard = ({ item, index }: { item: DataAssignPrice; index: number }) => {
+  const { t } = useTranslation();
   return (
     <TouchableOpacity
       activeOpacity={0.8}
-      onPress={() => navigate('InformationItemsScreen', {item})}
+      onPress={() => navigate('InformationItemsScreen', { item })}
       style={styles.card}>
       <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
       <View style={styles.itemInfo}>
@@ -35,22 +29,13 @@ const AssignPriceCard = ({
            <AppText style={styles.noteBadgeText}>{t('Ghi chú')}</AppText>
          </View> */}
           <IconNote />
-          <AppBlockButton
-            onPress={() => navigate('DetailAssignPriceCardScreen', {item})}>
-            <IconInfomation style={{marginHorizontal: s(6)}} />
+          <AppBlockButton onPress={() => navigate('DetailAssignPriceCardScreen', { item })}>
+            <IconInfomation style={{ marginHorizontal: s(6) }} />
           </AppBlockButton>
         </View>
         <AppText style={styles.dateText}>{item.user.name}</AppText>
         {index % 3 === 0 && (
-          <View
-            style={{
-              paddingVertical: vs(2),
-              paddingHorizontal: s(4),
-              borderRadius: s(4),
-              backgroundColor: '#FFE2CE',
-              alignSelf: 'flex-start',
-              marginTop: vs(6),
-            }}>
+          <View style={styles.blockWaiting}>
             <AppText size={12} color={'#FF7009'} weight="500">
               {t('Chờ gắn giá')}
             </AppText>
@@ -64,6 +49,14 @@ const AssignPriceCard = ({
 export default memo(AssignPriceCard);
 
 const styles = StyleSheet.create({
+  blockWaiting: {
+    paddingVertical: vs(2),
+    paddingHorizontal: s(4),
+    borderRadius: s(4),
+    backgroundColor: '#FFE2CE',
+    alignSelf: 'flex-start',
+    marginTop: vs(6),
+  },
   dateText: {
     fontSize: getFontSize(12),
     fontWeight: '400',
@@ -83,7 +76,7 @@ const styles = StyleSheet.create({
     padding: s(12),
     marginBottom: vs(12),
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,

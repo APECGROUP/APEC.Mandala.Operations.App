@@ -62,9 +62,7 @@ const DetailApproveCardScreen = ({
     });
   }, []);
 
-  const formatDate = useCallback((date: Date | undefined) => {
-    return moment(date).format('DD/MM/YYYY');
-  }, []);
+  const formatDate = useCallback((date: Date | undefined) => moment(date).format('DD/MM/YYYY'), []);
 
   return (
     <View style={styles.container}>

@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useEffect, useRef} from 'react';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   ActivityIndicator,
@@ -7,29 +7,24 @@ import {
   NativeScrollEvent,
   TouchableOpacity,
 } from 'react-native';
-import {FlashList} from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
 import PostItem from '../components/PostItem';
 import PostSkeleton from '../components/PostSkeleton';
-import {usePostViewModel} from '../../viewmodals/assignPrice/usePostViewModel';
-import {scale, verticalScale, vs} from 'react-native-size-matters';
+import { usePostViewModel } from '../../viewmodals/assignPrice/usePostViewModel';
+import { scale, verticalScale, vs } from 'react-native-size-matters';
 import Icon from 'react-native-vector-icons/Feather';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
-import {Post} from '../../models/Post';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useInfoUser} from '../../../../zustand/store/useInfoUser/useInfoUser';
-import {SCREEN_WIDTH} from '../../../../constants';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { Post } from '../../models/Post';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useInfoUser } from '../../../../zustand/store/useInfoUser/useInfoUser';
+import { SCREEN_WIDTH } from '../../../../constants';
 import AppImage from '../../../../elements/appImage/AppImage';
-import {AppText} from '../../../../elements/text/AppText';
+import { AppText } from '../../../../elements/text/AppText';
 import light from '../../../../theme/light';
 import AppLoadingScreen, {
   AppLoadingScreenRef,
 } from '../../../../views/animation/AppLoadingScreen';
 // Constants
-const AVATAR_SIZE = scale(40); // Cố định size avatar
 const HEADER_HEIGHT = verticalScale(100); // Cố định height header
 
 const getGreeting = (): string => {
@@ -45,17 +40,11 @@ const FeedScreen = ({
 }: {
   onScrollDirectionChange: (direction: 'up' | 'down') => void;
 }) => {
-  const {
-    posts,
-    isLoading,
-    refreshing,
-    loadingMore,
-    refreshPosts,
-    loadMorePosts,
-  } = usePostViewModel();
+  const { posts, isLoading, refreshing, loadingMore, refreshPosts, loadMorePosts } =
+    usePostViewModel();
 
-  const {top} = useSafeAreaInsets();
-  const {infoUser} = useInfoUser();
+  const { top } = useSafeAreaInsets();
+  const { infoUser } = useInfoUser();
 
   const loadingRef = useRef<AppLoadingScreenRef>(null);
   const flatListRef = useRef<FlashList<Post>>(null);
@@ -64,14 +53,14 @@ const FeedScreen = ({
   const showHeader = useSharedValue(1);
 
   const opacityStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollButton.value, {duration: 200}),
+    opacity: withTiming(showScrollButton.value, { duration: 200 }),
   }));
   const opacityHeaderStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showHeader.value, {duration: 100}),
+    opacity: withTiming(showHeader.value, { duration: 100 }),
   }));
 
   const scrollToTop = () => {
-    flatListRef.current?.scrollToOffset({animated: true, offset: 0});
+    flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
     showScrollButton.value = 0;
   };
 
@@ -89,7 +78,7 @@ const FeedScreen = ({
   };
 
   const renderItem = useCallback(
-    ({item, index}: {item: Post; index: number}) =>
+    ({ item, index }: { item: Post; index: number }) =>
       isLoading ? (
         <PostSkeleton />
       ) : (
@@ -122,19 +111,9 @@ const FeedScreen = ({
 
   return (
     <View style={styles.container}>
-      <Animated.View
-        style={[
-          {
-            height: HEADER_HEIGHT,
-            backgroundColor: light.transparent,
-            position: 'absolute',
-            top: 0,
-            width: SCREEN_WIDTH,
-            zIndex: 100,
-          },
-          opacityHeaderStyle,
-        ]}>
+      <Animated.View style={[styles.root, opacityHeaderStyle]}>
         <View
+          // eslint-disable-next-line react-native/no-inline-styles
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -155,16 +134,11 @@ const FeedScreen = ({
           }}>
           <AppImage
             source={{
-              uri:
-                infoUser?.profile?.avatar || 'https://via.placeholder.com/150',
+              uri: infoUser?.profile?.avatar || 'https://via.placeholder.com/150',
             }}
-            style={{height: vs(30), width: vs(30), borderRadius: vs(30)}}
+            style={{ height: vs(30), width: vs(30), borderRadius: vs(30) }}
           />
-          <View
-            style={{
-              flex: 1,
-              marginLeft: scale(12),
-            }}>
+          <View style={styles.containerFlex}>
             <AppText weight="medium" size={14} color="#888">
               {getGreeting()}
             </AppText>
@@ -176,7 +150,7 @@ const FeedScreen = ({
       </Animated.View>
       <FlashList
         ref={flatListRef}
-        data={isLoading ? Array.from({length: 10}) : posts}
+        data={isLoading ? Array.from({ length: 10 }) : posts}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         estimatedItemSize={verticalScale(300)}
@@ -187,9 +161,7 @@ const FeedScreen = ({
         onEndReached={isLoading ? undefined : loadMorePosts}
         onEndReachedThreshold={0.6}
         ListFooterComponent={
-          loadingMore && !isLoading ? (
-            <ActivityIndicator style={styles.loadingMore} />
-          ) : null
+          loadingMore && !isLoading ? <ActivityIndicator style={styles.loadingMore} /> : null
         }
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
@@ -209,6 +181,18 @@ const FeedScreen = ({
 };
 
 const styles = StyleSheet.create({
+  containerFlex: {
+    flex: 1,
+    marginLeft: scale(12),
+  },
+  root: {
+    height: HEADER_HEIGHT,
+    backgroundColor: light.transparent,
+    position: 'absolute',
+    top: 0,
+    width: SCREEN_WIDTH,
+    zIndex: 100,
+  },
   container: {
     flex: 1,
   },
@@ -230,21 +214,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.15,
     shadowRadius: 6,
-    shadowOffset: {width: 0, height: 2},
-  },
-  commentRow: {
-    marginTop: verticalScale(10),
-    paddingHorizontal: scale(10),
-    paddingBottom: verticalScale(20),
-    backgroundColor: '#fff',
-  },
-  commentInput: {
-    height: verticalScale(40),
-    borderRadius: scale(6),
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingLeft: scale(10),
-    marginBottom: verticalScale(10),
+    shadowOffset: { width: 0, height: 2 },
   },
 });
 

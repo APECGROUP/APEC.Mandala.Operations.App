@@ -115,27 +115,21 @@ const AppDropdown: <T>(
     const [searchText, setSearchText] = useState('');
 
     const {width: W, height: H} = Dimensions.get('window');
-    const styleContainerVertical: ViewStyle = useMemo(() => {
-      return {
+    const styleContainerVertical: ViewStyle = useMemo(() => ({
         backgroundColor: 'rgba(0,0,0,0.1)',
         alignItems: 'center',
-      };
-    }, []);
-    const styleHorizontal: ViewStyle = useMemo(() => {
-      return {
+      }), []);
+    const styleHorizontal: ViewStyle = useMemo(() => ({
         width: orientation === 'LANDSCAPE' ? W / 2 : '100%',
         alignSelf: 'center',
-      };
-    }, [W, orientation]);
+      }), [W, orientation]);
 
-    useImperativeHandle(currentRef, () => {
-      return {open: eventOpen, close: eventClose};
-    });
+    useImperativeHandle(currentRef, () => ({open: eventOpen, close: eventClose}));
 
-    useEffect(() => {
-      return eventClose;
+    useEffect(() => 
+       eventClose
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    , []);
 
     const excludeData = useCallback(
       (data: any[]) => {
@@ -599,8 +593,7 @@ const AppDropdown: <T>(
       (isTopPosition: boolean) => {
         const isInverted = !inverted ? false : isTopPosition;
 
-        const _renderListHelper = () => {
-          return (
+        const _renderListHelper = () => (
             <FlatList
               testID={testID + ' flatlist'}
               accessibilityLabel={accessibilityLabel + ' flatlist'}
@@ -615,7 +608,6 @@ const AppDropdown: <T>(
               showsVerticalScrollIndicator={showsVerticalScrollIndicator}
             />
           );
-        };
 
         return (
           <TouchableWithoutFeedback>

@@ -16,7 +16,7 @@ const IconCreatePrice = (props: SvgProps) => (
         fill="white"
       />
     </G>
-    <Defs></Defs>
+    <Defs />
   </Svg>
 );
 export default IconCreatePrice;

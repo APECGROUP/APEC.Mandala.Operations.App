@@ -1,4 +1,3 @@
-import {FontWeight} from './../../node_modules/csstype/index.d';
 import {ms, s, vs} from 'react-native-size-matters';
 import {getFontSize} from '../constants';
 

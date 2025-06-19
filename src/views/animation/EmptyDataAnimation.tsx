@@ -10,8 +10,7 @@ interface EmptyDataAnimationProps {
 }
 
 const EmptyDataAnimation = forwardRef<LottieView, EmptyDataAnimationProps>(
-  ({source, style, autoPlay = false, loop = true}, ref) => {
-    return (
+  ({source, style, autoPlay = false, loop = true}, ref) => (
       <LottieView
         ref={ref}
         source={
@@ -21,8 +20,7 @@ const EmptyDataAnimation = forwardRef<LottieView, EmptyDataAnimationProps>(
         autoPlay={autoPlay}
         loop={loop}
       />
-    );
-  },
+    ),
 );
 
 export default EmptyDataAnimation;

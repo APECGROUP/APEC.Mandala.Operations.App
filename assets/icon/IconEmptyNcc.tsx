@@ -1,27 +1,12 @@
 import * as React from 'react';
-import {vs} from 'react-native-size-matters';
-import Svg, {
-  SvgProps,
-  G,
-  Mask,
-  Path,
-  Defs,
-  ClipPath,
-  Rect,
-} from 'react-native-svg';
+import { vs } from 'react-native-size-matters';
+import Svg, { SvgProps, G, Mask, Path, Defs, ClipPath, Rect } from 'react-native-svg';
 const IconEmptyNcc = (props: SvgProps) => (
-  <Svg
-    width={vs(121)}
-    height={vs(117)}
-    viewBox="0 0 121 117"
-    fill="none"
-    {...props}>
+  <Svg width={vs(121)} height={vs(117)} viewBox="0 0 121 117" fill="none" {...props}>
     <G clipPath="url(#clip0_1121_9931)">
       <Mask
         id="mask0_1121_9931"
-        style={{
-          maskType: 'luminance',
-        }}
+        style={styles.mask}
         maskUnits="userSpaceOnUse"
         x={0}
         y={0}
@@ -114,10 +99,7 @@ const IconEmptyNcc = (props: SvgProps) => (
           d="M70.1908 72.5281C69.6603 72.5281 69.4153 73.5428 69.334 74.8828C69.334 74.9641 69.334 75.0047 69.334 75.086C69.334 75.1673 69.334 75.208 69.334 75.2888C69.334 76.6287 69.5378 77.644 70.0684 77.6846C70.5578 77.6846 70.8434 76.6694 70.9252 75.3294C70.9252 75.2481 70.9252 75.208 70.9252 75.1267C70.9252 75.0454 70.9252 75.0047 70.9252 74.9234C70.9252 73.5835 70.6803 72.5281 70.1908 72.5281Z"
           fill="#1B1B1B"
         />
-        <Path
-          d="M72.2305 77.0348L72.2711 75.208L75.3316 76.02L72.2305 77.0348Z"
-          fill="#E2E2E2"
-        />
+        <Path d="M72.2305 77.0348L72.2711 75.208L75.3316 76.02L72.2305 77.0348Z" fill="#E2E2E2" />
         <Path
           d="M45.7503 79.2274C45.8727 79.7553 50.8508 78.6181 57.1751 76.9128C57.5014 76.832 57.8277 76.7507 58.1133 76.6694C58.4401 76.5881 58.7257 76.5068 59.052 76.426C65.3763 74.6394 70.2318 73.0962 70.0687 72.6094C69.9462 72.1221 65.0088 73.2182 58.6439 74.9235C58.3176 75.0048 57.9908 75.0861 57.7052 75.1674C57.3789 75.2482 57.0933 75.3295 56.767 75.4108C50.4427 77.1974 45.6279 78.7807 45.7503 79.2274Z"
           fill="#1B1B1B"
@@ -190,14 +172,15 @@ const IconEmptyNcc = (props: SvgProps) => (
     </G>
     <Defs>
       <ClipPath id="clip0_1121_9931">
-        <Rect
-          width={120}
-          height={116}
-          fill="white"
-          transform="translate(0.5 0.5)"
-        />
+        <Rect width={120} height={116} fill="white" transform="translate(0.5 0.5)" />
       </ClipPath>
     </Defs>
   </Svg>
 );
 export default IconEmptyNcc;
+
+const styles = StyleSheet.create({
+  mask: {
+    maskType: 'luminance',
+  },
+});

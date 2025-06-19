@@ -1,10 +1,9 @@
-import {Alert, StyleSheet, View} from 'react-native';
-import {useLinkBuilder, useTheme} from '@react-navigation/native';
+import { StyleSheet, View} from 'react-native';
+import {useLinkBuilder} from '@react-navigation/native';
 import {PlatformPressable} from '@react-navigation/elements';
 import light from '../theme/light';
 import {cloneElement} from 'react';
 import {AppText} from '../elements/text/AppText';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useTranslation} from 'react-i18next';
 import {vs} from 'react-native-size-matters';
 import IconTab1 from '@assets/icon/IconTab1';

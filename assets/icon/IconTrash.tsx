@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {scale, vs} from 'react-native-size-matters';
+import { vs} from 'react-native-size-matters';
 import Svg, {SvgProps, Path} from 'react-native-svg';
 const IconTrash = (props: SvgProps) => (
   <Svg

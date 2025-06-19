@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {vs} from 'react-native-size-matters';
-import Svg, {SvgProps, G, Rect, Path, Defs} from 'react-native-svg';
+import Svg, {SvgProps, G, Rect, Path} from 'react-native-svg';
 /* SVGR has dropped some elements not supported by react-native-svg: filter */
 const IconScrollBottom = (props: SvgProps) => (
   <Svg

@@ -1,4 +1,4 @@
-import React, {ReactElement, useEffect, useState} from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import {
   TextStyle,
   View,
@@ -11,12 +11,12 @@ import {
 } from 'react-native';
 
 import IconClose from '../../../assets/icon/IconClose';
-import {s} from 'react-native-size-matters';
+import { s } from 'react-native-size-matters';
 import IconEyeOffOutline from '../../../assets/icon/IconEyeOffOutline';
 import IconEyeOutline from '../../../assets/icon/IconEyeOutline';
-import {numberFormat} from '../../utils/Utilities';
+import { numberFormat } from '../../utils/Utilities';
 import FormStyles from './FormStyles';
-import {AppText} from '../text/AppText';
+import { AppText } from '../text/AppText';
 import light from '../../theme/light';
 
 type AppInputLabelProps = {
@@ -56,12 +56,7 @@ type TextContentType =
   | 'oneTimeCode'
   | undefined;
 
-export function AppInputLabel({
-  label,
-  required,
-  labelStyle,
-  inline,
-}: AppInputLabelProps) {
+export function AppInputLabel({ label, required, labelStyle, inline }: AppInputLabelProps) {
   return (
     <View style={[FormStyles.labelContainer, inline && FormStyles.inlineLabel]}>
       <AppText style={labelStyle}>{label}</AppText>
@@ -73,7 +68,7 @@ export function AppInputLabel({
 interface AppInputRegularProps extends TextInputProps {
   refName?: any;
   required?: boolean;
-  validate?: (_str: string) => {error: boolean; message: string};
+  validate?: (_str: string) => { error: boolean; message: string };
   error?: string;
   label?: string;
   errorColor?: string;
@@ -106,14 +101,11 @@ interface AppInputRegularProps extends TextInputProps {
 }
 
 export default function AppTextInput(props: AppInputRegularProps) {
-  const {required, containerStyle, label, errorColor, editable, placeholder} =
-    props;
+  const { required, containerStyle, label, errorColor, editable, placeholder } = props;
   const [value, setValue] = useState(props.value);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [showPassword, setShowPassword] = useState(
-    !props.secureTextEntry || false,
-  );
+  const [showPassword, setShowPassword] = useState(!props.secureTextEntry || false);
   useEffect(() => {
     setError(props.errorMessage ? true : false);
     if (props.errorMessage) {
@@ -129,19 +121,13 @@ export default function AppTextInput(props: AppInputRegularProps) {
 
   const onChangeText = (text: string) => {
     setValue(text);
-    props.onChangeText &&
-      props.onChangeText(props.numberFormat ? text.replace(/\./g, '') : text);
+    props.onChangeText && props.onChangeText(props.numberFormat ? text.replace(/\./g, '') : text);
   };
 
   const disabled = editable !== undefined && !editable;
   const onRemove = () => onChangeText('');
   return (
-    <View
-      style={[
-        FormStyles.item,
-        props.inline && FormStyles.inline,
-        containerStyle,
-      ]}>
+    <View style={[FormStyles.item, props.inline && FormStyles.inline, containerStyle]}>
       {label ? (
         <AppInputLabel
           labelStyle={props.labelStyle}
@@ -171,31 +157,22 @@ export default function AppTextInput(props: AppInputRegularProps) {
             secureTextEntry={!showPassword}
             autoCapitalize={props.autoCapitalize}
             value={
-              (props.numberFormat &&
-                value &&
-                numberFormat(value.replace(/\./g, ''), '.')) ||
-              value
+              (props.numberFormat && value && numberFormat(value.replace(/\./g, ''), '.')) || value
             }
             style={[
               FormStyles.input,
-              {color: '#000'},
+              styles.colorBlack,
               props.leftIcon !== null && styles.pl0,
               props.inputTextStyle,
             ]}
-            placeholderTextColor={
-              props.placeholderTextColor || light.placeholderTextColor
-            }
+            placeholderTextColor={props.placeholderTextColor || light.placeholderTextColor}
             onChangeText={onChangeText}
-            maxLength={
-              props.keyboardType === 'phone-pad' ? 10 : props.maxLength || 255
-            }
+            maxLength={props.keyboardType === 'phone-pad' ? 10 : props.maxLength || 255}
             placeholder={placeholder}
           />
           {props.suffix}
           {props.secureTextEntry ? (
-            <TouchableOpacity
-              onPress={() => setShowPassword(!showPassword)}
-              style={FormStyles.eye}>
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={FormStyles.eye}>
               {showPassword ? <IconEyeOffOutline /> : <IconEyeOutline />}
             </TouchableOpacity>
           ) : value && !disabled && !props.hideIconRight ? (
@@ -205,9 +182,7 @@ export default function AppTextInput(props: AppInputRegularProps) {
           ) : null}
 
           {props.rightIcon && (
-            <TouchableOpacity onPress={props.onPressRightIcon}>
-              {props.rightIcon}
-            </TouchableOpacity>
+            <TouchableOpacity onPress={props.onPressRightIcon}>{props.rightIcon}</TouchableOpacity>
           )}
 
           {props.rightComponent && props.rightComponent}
@@ -228,6 +203,7 @@ export default function AppTextInput(props: AppInputRegularProps) {
 }
 
 const styles = StyleSheet.create({
+  colorBlack: { color: '#000' },
   pl0: {
     paddingLeft: 0,
   },

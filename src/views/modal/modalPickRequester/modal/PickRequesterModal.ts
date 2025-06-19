@@ -23,12 +23,10 @@ export const fetchRequesterData = async (
   key: string = '',
 ): Promise<TypePickRequester[]> => {
   const url = buildNccUrl(page, limit, key);
-  const {data} = await axios.get(url);
+  const { data } = await axios.get(url);
 
-  return data.map((item: any, index: number) => {
-    return {
-      id: item.id,
-      name: 'Nguyễn Văn A',
-    };
-  });
+  return data.map((item: any) => ({
+    id: item.id,
+    name: 'Nguyễn Văn A',
+  }));
 };

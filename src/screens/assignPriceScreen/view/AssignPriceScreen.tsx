@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, {useState, useRef, useCallback} from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -11,19 +11,15 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {FlashList} from '@shopify/flash-list';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
-import {s, vs} from 'react-native-size-matters';
-import {useTranslation} from 'react-i18next';
+import { FlashList } from '@shopify/flash-list';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { s, vs } from 'react-native-size-matters';
+import { useTranslation } from 'react-i18next';
 
-import {getFontSize, SCREEN_WIDTH} from '../../../constants';
+import { getFontSize, SCREEN_WIDTH } from '../../../constants';
 // import {AppText} from '../../elements/text/AppText';
-import {PaddingHorizontal} from '../../../utils/Constans';
+import { PaddingHorizontal } from '../../../utils/Constans';
 import light from '../../../theme/light';
 import AppBlockButton from '../../../elements/button/AppBlockButton';
 
@@ -32,18 +28,18 @@ import IconSearch from '../../../../assets/icon/IconSearch';
 import IconFilter from '../../../../assets/icon/IconFillter';
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
-import {DataAssignPrice} from '../modal/AssignPriceModal';
+import { DataAssignPrice } from '../modal/AssignPriceModal';
 import Images from '../../../../assets/image/Images';
-import {navigate} from '../../../navigation/RootNavigation';
+import { navigate } from '../../../navigation/RootNavigation';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
-import {AppText} from '@/elements/text/AppText';
-import {useAssignPriceViewModel} from '../viewmodal/useAssignPriceViewModel';
+import { AppText } from '@/elements/text/AppText';
+import { useAssignPriceViewModel } from '../viewmodal/useAssignPriceViewModel';
 import ToastContainer from '@/elements/toast/ToastContainer';
 import AssignPriceCard from './component/AssignPriceCard';
 
 const AssignPriceScreen: React.FC = () => {
-  const {top} = useSafeAreaInsets();
-  const {t} = useTranslation();
+  const { top } = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const refToast = useRef<any>(null);
 
@@ -70,19 +66,19 @@ const AssignPriceScreen: React.FC = () => {
 
   // Animated styles
   const opacityScrollTopStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToTop.value, {duration: 200}),
+    opacity: withTiming(showScrollToTop.value, { duration: 200 }),
   }));
   const opacityScrollBottomStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToBottom.value, {duration: 200}),
+    opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
   }));
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = () => {
-    flashListRef.current?.scrollToOffset({offset: 0, animated: true});
+    flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
   };
   const scrollToBottom = () => {
-    flashListRef.current?.scrollToEnd({animated: true});
+    flashListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
   };
 
@@ -147,7 +143,7 @@ const AssignPriceScreen: React.FC = () => {
   const goToNotification = () => navigate('NotificationScreen');
 
   const renderItem = useCallback(
-    ({item, index}: {item: DataAssignPrice; index: number}) => (
+    ({ item, index }: { item: DataAssignPrice; index: number }) => (
       <AssignPriceCard item={item} index={index} />
     ),
     [],
@@ -163,7 +159,7 @@ const AssignPriceScreen: React.FC = () => {
         resizeMode={FastImage.resizeMode.cover}
       />
       {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-      <View style={[styles.headerContainer, {marginTop: top}]}>
+      <View style={[styles.headerContainer, { marginTop: top }]}>
         <View style={styles.headerLeft}>
           <AppBlockButton onPress={goToAccount}>
             <FastImage
@@ -184,9 +180,7 @@ const AssignPriceScreen: React.FC = () => {
           </View>
         </View>
         <View style={styles.headerRight}>
-          <AppBlockButton
-            onPress={goToNotification}
-            style={styles.notificationWrapper}>
+          <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
             <IconNotification />
             <View style={styles.notificationBadge}>
               <AppText style={styles.notificationBadgeText}>3</AppText>
@@ -206,9 +200,7 @@ const AssignPriceScreen: React.FC = () => {
           returnKeyType="search"
           onSubmitEditing={handleSubmitSearch}
         />
-        <AppBlockButton
-          style={styles.filterButton}
-          onPress={handleSubmitSearch}>
+        <AppBlockButton style={styles.filterButton} onPress={handleSubmitSearch}>
           <IconFilter />
         </AppBlockButton>
       </View>
@@ -248,7 +240,7 @@ const AssignPriceScreen: React.FC = () => {
       <AnimatedButton
         onPress={scrollToTop}
         style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-        <IconScrollBottom style={{transform: [{rotate: '180deg'}]}} />
+        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
       </AnimatedButton>
       {!isFetchingNextPage && (
         <AnimatedButton
@@ -263,8 +255,7 @@ const AssignPriceScreen: React.FC = () => {
 };
 
 export default AssignPriceScreen;
-export const AnimatedButton =
-  Animated.createAnimatedComponent(TouchableOpacity);
+export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -341,7 +332,7 @@ const styles = StyleSheet.create({
     paddingLeft: s(12),
     height: vs(46),
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
@@ -405,19 +396,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  noteBadge: {
-    marginLeft: s(8),
-    backgroundColor: '#FFE2CE',
-    borderRadius: s(4),
-    paddingHorizontal: s(6),
-    paddingVertical: vs(2),
-  },
-  noteBadgeText: {
-    fontSize: getFontSize(12),
-    color: '#FF7009',
-    fontWeight: '600',
-  },
-
   scrollBottomContainer: {
     position: 'absolute',
     alignSelf: 'center',
@@ -445,14 +423,5 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
 
     elevation: 2,
-  },
-  scrollButton: {
-    backgroundColor: light.primary,
-    borderRadius: s(25),
-    width: s(50),
-    height: s(50),
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
   },
 });

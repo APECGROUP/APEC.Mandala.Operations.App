@@ -10,8 +10,7 @@ interface LoadingAnimationProps {
 }
 
 const LoadingAnimation = forwardRef<LottieView, LoadingAnimationProps>(
-  ({source, style, autoPlay = false, loop = true}, ref) => {
-    return (
+  ({source, style, autoPlay = false, loop = true}, ref) => (
       <LottieView
         ref={ref}
         source={source || require('../animation/source/LoadingAnimation.json')}
@@ -19,8 +18,7 @@ const LoadingAnimation = forwardRef<LottieView, LoadingAnimationProps>(
         autoPlay={autoPlay}
         loop={loop}
       />
-    );
-  },
+    ),
 );
 
 export default LoadingAnimation;

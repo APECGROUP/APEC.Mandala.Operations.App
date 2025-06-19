@@ -23,10 +23,10 @@ export function useNotificationViewModel() {
         const page = typeof pageParam === 'number' ? pageParam : 1;
         return fetchNotificationData(page, ITEMS_PER_PAGE);
       },
-      getNextPageParam: (lastPage, allPages) => {
+      getNextPageParam: (lastPage, allPages) => 
         // Nếu chưa phải trang cuối thì còn trang tiếp theo
-        return lastPage.lastPage ? undefined : allPages.length + 1;
-      },
+         lastPage.lastPage ? undefined : allPages.length + 1
+      ,
       staleTime: 60 * 1000,
       initialPageParam: 1,
     },

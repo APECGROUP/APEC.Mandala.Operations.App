@@ -1,4 +1,3 @@
-import axios from 'axios';
 
 export type SimpleItem = {
   id: string;

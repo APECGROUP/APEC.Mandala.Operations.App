@@ -1,18 +1,14 @@
-import {useState, useMemo, useCallback} from 'react';
-import {useInfiniteQuery, useQueryClient} from '@tanstack/react-query';
+import { useState, useMemo, useCallback } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import {
-  fetchDepartmentData,
-  fetchNccData,
-  ResponseNcc,
-} from '../modal/PickDepartmentModal';
+import { fetchDepartmentData, ResponseNcc } from '../modal/PickDepartmentModal';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;
 
 export function usePickDepartmentViewModel() {
   const [searchKey, setSearchKey] = useState<string>('');
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   // Infinite Query cho phân trang + search
   const {
@@ -25,16 +21,13 @@ export function usePickDepartmentViewModel() {
     hasNextPage,
     isRefetching,
   } = useInfiniteQuery<ResponseNcc[], Error>({
-    queryKey: ['listDepartment', searchKey.trim()],
-    queryFn: async ({pageParam}: {pageParam?: unknown}) => {
+    queryKey: ['listDepartment', searchKey.trim(), searchKey],
+    queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
       return fetchDepartmentData(page, ITEMS_PER_PAGE, searchKey);
     },
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length === ITEMS_PER_PAGE
-        ? allPages.length + 1
-        : undefined;
-    },
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
     staleTime: 60 * 1000,
   });

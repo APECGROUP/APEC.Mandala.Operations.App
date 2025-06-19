@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -33,7 +33,6 @@ import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
 import { useApproveViewModel } from '../viewmodal/useApproveViewModel';
 import ToastContainer from '@/elements/toast/ToastContainer';
-import ApproveCard from './component/ApproveCard';
 import AssignPriceCard from '@/screens/assignPriceScreen/view/component/AssignPriceCard';
 
 const AssignPriceScreen: React.FC = () => {
@@ -395,19 +394,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  noteBadge: {
-    marginLeft: s(8),
-    backgroundColor: '#FFE2CE',
-    borderRadius: s(4),
-    paddingHorizontal: s(6),
-    paddingVertical: vs(2),
-  },
-  noteBadgeText: {
-    fontSize: getFontSize(12),
-    color: '#FF7009',
-    fontWeight: '600',
-  },
-
   scrollBottomContainer: {
     position: 'absolute',
     alignSelf: 'center',
@@ -435,14 +421,5 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
 
     elevation: 2,
-  },
-  scrollButton: {
-    backgroundColor: light.primary,
-    borderRadius: s(25),
-    width: s(50),
-    height: s(50),
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
   },
 });

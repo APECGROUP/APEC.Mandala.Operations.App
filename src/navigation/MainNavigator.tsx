@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MainParams } from './params';
-import { s, vs } from 'react-native-size-matters';
+import { s } from 'react-native-size-matters';
 import NotificationScreen from '../screens/notificationScreen/view/NotificationScreen';
 
 import Utilities from '../utils/Utilities';
@@ -13,18 +13,14 @@ import { useTranslation } from 'react-i18next';
 import { getFontSize } from '../constants';
 import ImageViewScreen from '../modules/social/views/screens/ImageViewScreen';
 import MyTabs from './MyTabs';
-import { HeaderLeft, HeaderLeftWhite } from './AuthNavigator';
+import { HeaderLeft } from './AuthNavigator';
 import { PaddingHorizontal } from '@/utils/Constans';
 import ModalPickCalendar from '@/elements/calendar/ModalPickCalendar';
 import AccountScreen from '@/screens/accountScreen/AccountScreen';
 import { Colors } from '@/theme/Config';
 import ChangePasswordScreen from '@/screens/changePasswordScreen/ChangePasswordScreen';
 import InformationItemsScreen from '@/screens/InformationItemScreen/view/InformationItemsScreen';
-import IconInfomation from '@assets/icon/IconInfomation';
-import AppBlockButton from '@/elements/button/AppBlockButton';
-import { navigate } from './RootNavigation';
 import DetailAssignPriceCardScreen from '@/screens/assignPriceScreen/view/component/DetailAssignPriceCardScreen';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PickNccScreen from '@/views/modal/modalPickNcc/view/PickNccScreen';
 import FilterScreen from '@/screens/filterScreen/view/FilterScreen';
 import PickDepartmentScreen from '@/views/modal/modalPickDepartment/view/PickDepartmentScreen';
@@ -48,6 +44,7 @@ export default function MainNavigator() {
   useEffect(() => {
     // fetData();
     getPermission();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <Navigator

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {vs} from 'react-native-size-matters';
-import Svg, {SvgProps, Path, Rect} from 'react-native-svg';
+import Svg, {SvgProps, Rect} from 'react-native-svg';
 const IconUnCheckBox = (props: SvgProps) => (
   <Svg
     viewBox="0 0 16 16"

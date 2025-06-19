@@ -1,11 +1,9 @@
-import {Alert, Platform, PermissionsAndroid} from 'react-native';
-import DeviceInfo from 'react-native-device-info';
-import notifee, {AndroidImportance, EventType} from '@notifee/react-native';
+import { Alert, Platform, PermissionsAndroid } from 'react-native';
+import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import Toast from 'react-native-toast-message';
-import {navigate} from '../src/navigation/RootNavigation';
-import api from '../src/utils/setup-axios';
-import {LanguageType} from '../src/languages/locales/type';
-import {AppState} from 'react-native';
+import { navigate } from '../src/navigation/RootNavigation';
+import { LanguageType } from '../src/languages/locales/type';
+import { AppState } from 'react-native';
 
 import {
   getMessaging,
@@ -48,15 +46,12 @@ const requestAndroidNotificationPermission = async (): Promise<boolean> => {
     );
     return granted === PermissionsAndroid.RESULTS.GRANTED;
   } catch (error) {
-    console.log('[FCM] ❌ Lỗi khi xin quyền thông báo Android:', error);
     return false;
   }
 };
 
 // Lấy FCM token và gửi lên server
-export const getFCMTokenAndSendToServer = async (
-  t: (key: string) => string,
-) => {
+export const getFCMTokenAndSendToServer = async (t: (key: string) => string) => {
   try {
     await registerDeviceForRemoteMessages(messaging);
     const permissionGranted = await requestAndroidNotificationPermission();
@@ -97,8 +92,7 @@ export const setupFCM = async () => {
   console.log('[FCM] 📲 Trạng thái quyền:', authStatus);
 
   const enabled =
-    authStatus === AuthorizationStatus.AUTHORIZED ||
-    authStatus === AuthorizationStatus.PROVISIONAL;
+    authStatus === AuthorizationStatus.AUTHORIZED || authStatus === AuthorizationStatus.PROVISIONAL;
 
   if (!enabled) {
     console.log('[FCM] ❌ Không được cấp quyền thông báo');
@@ -119,12 +113,9 @@ export const setupFCM = async () => {
   });
 
   // Lắng nghe sự kiện người dùng nhấn vào notification (cả foreground và background)
-  notifee.onForegroundEvent(({type, detail}) => {
+  notifee.onForegroundEvent(({ type, detail }) => {
     if (type === EventType.PRESS) {
-      console.log(
-        '[FCM] 👆 Notification pressed foreground:',
-        detail.notification,
-      );
+      console.log('[FCM] 👆 Notification pressed foreground:', detail.notification);
       handleNotificationAction(detail);
     }
   });
@@ -138,10 +129,7 @@ export const setupFCM = async () => {
   // Khi người dùng mở app từ trạng thái killed
   const initialNotification = await getInitialNotification(messaging);
   if (initialNotification) {
-    console.log(
-      '[FCM] 🧊 Notification khi mở app lần đầu:',
-      initialNotification,
-    );
+    console.log('[FCM] 🧊 Notification khi mở app lần đầu:', initialNotification);
     handleNotificationAction(initialNotification);
   } else {
     console.log('[FCM] ✅ Không có notification khi khởi động app');
@@ -171,7 +159,7 @@ const showLocalNotification = async (remoteMessage: any) => {
         android: {
           channelId: 'default_channel_id_v2',
           sound: 'default', // 🔊 Thêm dòng này để có âm thanh mặc định
-          pressAction: {id: 'default'},
+          pressAction: { id: 'default' },
           importance: AndroidImportance.HIGH,
         },
         data: remoteMessage.data,
@@ -181,9 +169,7 @@ const showLocalNotification = async (remoteMessage: any) => {
     }
   } else {
     // App đang ở background hoặc killed, Firebase tự hiển thị notification rồi
-    console.log(
-      '[FCM] App ở background hoặc killed, không hiển thị local notification.',
-    );
+    console.log('[FCM] App ở background hoặc killed, không hiển thị local notification.');
   }
 };
 

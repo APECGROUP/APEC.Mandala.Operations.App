@@ -1,23 +1,15 @@
-import {useState, useMemo, useCallback} from 'react';
-import {
-  InfiniteData,
-  useInfiniteQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
-import {
-  TypeCreatePrice,
-  deleteCreatePrice,
-  fetchCreatePrice,
-} from '../modal/CreatePriceModal';
+import { useState, useMemo, useCallback } from 'react';
+import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { TypeCreatePrice, fetchCreatePrice } from '../modal/CreatePriceModal';
 import debounce from 'lodash/debounce';
-import {useAlert} from '@/elements/alert/AlertProvider';
-import {useTranslation} from 'react-i18next';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;
 
 export function useCreatePriceViewModel() {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [searchKey, setSearchKey] = useState<string>('');
   const queryClient = useQueryClient();
 
@@ -32,17 +24,14 @@ export function useCreatePriceViewModel() {
     hasNextPage,
     isRefetching,
   } = useInfiniteQuery<TypeCreatePrice[], Error>({
-    queryKey: ['listCreatePrice', searchKey.trim()],
+    queryKey: ['listCreatePrice', searchKey.trim(), searchKey],
 
-    queryFn: async ({pageParam}: {pageParam?: unknown}) => {
+    queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
       return fetchCreatePrice(page, ITEMS_PER_PAGE, searchKey);
     },
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length === ITEMS_PER_PAGE
-        ? allPages.length + 1
-        : undefined;
-    },
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
     staleTime: 60 * 1000,
   });
@@ -108,28 +97,23 @@ export function useCreatePriceViewModel() {
   //       ),
   //     });
   //   };
-  const {showAlert} = useAlert();
+  const { showAlert } = useAlert();
   const onDelete = async (id: string) => {
     const cached = queryClient.getQueryData<InfiniteData<TypeCreatePrice[]>>([
       'listCreatePrice',
       searchKey.trim(),
     ]);
     if (!cached) {
-      console.warn('🟥 No cache found for key:', [
-        'listCreatePrice',
-        searchKey.trim(),
-      ]);
+      console.warn('🟥 No cache found for key:', ['listCreatePrice', searchKey.trim()]);
       return;
     }
-    const isSuccess = await deleteCreatePrice(id);
+    // const isSuccess = await deleteCreatePrice(id);
     // if (isSuccess) {
     if (Number(id) % 3 === 0) {
       console.log('✅ Updating price...');
       queryClient.setQueryData(['listCreatePrice', searchKey.trim()], {
         ...cached,
-        pages: cached.pages.map(
-          page => page.filter(item => item.id !== id) || [],
-        ),
+        pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
       });
     } else {
       await new Promise(resolve => setTimeout(resolve, 500));

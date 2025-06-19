@@ -1,6 +1,6 @@
-import {useState, useMemo, useCallback} from 'react';
-import {useInfiniteQuery, useQueryClient} from '@tanstack/react-query';
-import {DataAssignPrice, fetchAssignPriceData} from '../modal/AssignPriceModal';
+import { useState, useMemo, useCallback } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { DataAssignPrice, fetchAssignPriceData } from '../modal/AssignPriceModal';
 import debounce from 'lodash/debounce';
 
 const ITEMS_PER_PAGE = 50;
@@ -8,7 +8,7 @@ const DEBOUNCE_DELAY = 300;
 
 export function useAssignPriceViewModel() {
   const [searchKey, setSearchKey] = useState<string>('');
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   // Infinite Query cho phân trang + search
   const {
@@ -21,17 +21,14 @@ export function useAssignPriceViewModel() {
     hasNextPage,
     isRefetching,
   } = useInfiniteQuery<DataAssignPrice[], Error>({
-    queryKey: ['listAssignPrice', searchKey.trim()],
+    queryKey: ['listAssignPrice', searchKey.trim(), searchKey],
 
-    queryFn: async ({pageParam}: {pageParam?: unknown}) => {
+    queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
       return fetchAssignPriceData(page, ITEMS_PER_PAGE, searchKey);
     },
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length === ITEMS_PER_PAGE
-        ? allPages.length + 1
-        : undefined;
-    },
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
     staleTime: 60 * 1000,
   });

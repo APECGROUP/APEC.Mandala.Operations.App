@@ -35,8 +35,7 @@ export const fetchCreatePrice = async (
   const url = buildCreatePriceUrl(page, limit, key);
   const {data} = await axios.get(url);
 
-  return data.map((item: any, index: number) => {
-    return {
+  return data.map((item: any, index: number) => ({
       id: item.id,
       name: item.author,
       price: 100000 * (page + 1) + index * 150 + limit * 500,
@@ -45,8 +44,7 @@ export const fetchCreatePrice = async (
       vat: 'V8',
       ncc: 'Công Ty TNHH XNK Thuận Phát',
       end: 'Chai',
-    };
-  });
+    }));
 };
 
 export const deleteCreatePrice = async (id: string) => {

@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, {useRef, useCallback, useState, useLayoutEffect} from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,45 +8,45 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
-import {FlashList} from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   FadeInLeft,
 } from 'react-native-reanimated';
-import {s, vs} from 'react-native-size-matters';
-import {useTranslation} from 'react-i18next';
+import { s, vs } from 'react-native-size-matters';
+import { useTranslation } from 'react-i18next';
 
-import {getFontSize} from '../../../constants';
+import { getFontSize } from '../../../constants';
 // import {AppText} from '../../elements/text/AppText';
-import {PaddingHorizontal} from '../../../utils/Constans';
+import { PaddingHorizontal } from '../../../utils/Constans';
 import light from '../../../theme/light';
 
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
-import {DataInformationItems} from '../modal/InformationItemsModal';
+import { DataInformationItems } from '../modal/InformationItemsModal';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
-import {AppText} from '@/elements/text/AppText';
+import { AppText } from '@/elements/text/AppText';
 import ToastContainer from '@/elements/toast/ToastContainer';
-import {AnimatedButton} from '@/screens/assignPriceScreen/view/AssignPriceScreen';
-import {useInformationItemsViewModel} from '../viewmodal/useInformationItemsViewModel';
+import { AnimatedButton } from '@/screens/assignPriceScreen/view/AssignPriceScreen';
+import { useInformationItemsViewModel } from '../viewmodal/useInformationItemsViewModel';
 import InformationItemsCard from './component/InformationItemsCard';
-import {Colors} from '@/theme/Config';
+import { Colors } from '@/theme/Config';
 import FooterInformationItem from './FooterInformationItem';
 import Header from '@/screens/notificationScreen/view/component/Header';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainParams} from '@/navigation/params';
-import {navigate} from '@/navigation/RootNavigation';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { MainParams } from '@/navigation/params';
+import { navigate } from '@/navigation/RootNavigation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import IconInfomation from '@assets/icon/IconInfomation';
 
 const InformationItemsScreen = ({
   route,
 }: NativeStackScreenProps<MainParams, 'InformationItemsScreen'>) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const refToast = useRef<any>(null);
-  const {content} = route.params.item;
+  const { content } = route.params.item;
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
     flatData,
@@ -73,19 +73,19 @@ const InformationItemsScreen = ({
 
   // Animated styles
   const opacityScrollTopStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToTop.value, {duration: 200}),
+    opacity: withTiming(showScrollToTop.value, { duration: 200 }),
   }));
   const opacityScrollBottomStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToBottom.value, {duration: 200}),
+    opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
   }));
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = () => {
-    flashListRef.current?.scrollToOffset({offset: 0, animated: true});
+    flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
   };
   const scrollToBottom = () => {
-    flashListRef.current?.scrollToEnd({animated: true});
+    flashListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
   };
 
@@ -145,7 +145,7 @@ const InformationItemsScreen = ({
   };
 
   const renderItem = useCallback(
-    ({item, index}: {item: DataInformationItems; index: number}) => (
+    ({ item, index }: { item: DataInformationItems; index: number }) => (
       <Animated.View
         entering={FadeInLeft.delay(index * 10)
           .duration(0)
@@ -164,34 +164,26 @@ const InformationItemsScreen = ({
         />
       </Animated.View>
     ),
-    [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [flatData, onUpdatePrice],
   );
 
-  const rightComponent = () => {
-    return (
-      <AppBlockButton
-        style={{
-          width: vs(40),
-          height: vs(40),
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-        }}
-        onPress={() =>
-          navigate('DetailAssignPriceCardScreen', {
-            item: route.params?.item,
-          })
-        }>
-        <IconInfomation fill={Colors.WHITE} />
-      </AppBlockButton>
-    );
-  };
+  const rightComponent = () => (
+    <AppBlockButton
+      style={styles.rightComponent}
+      onPress={() =>
+        navigate('DetailAssignPriceCardScreen', {
+          item: route.params?.item,
+        })
+      }>
+      <IconInfomation fill={Colors.WHITE} />
+    </AppBlockButton>
+  );
   return (
     <View style={styles.container}>
       <Header primary title={content} rightComponent={rightComponent()} />
       <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>
-          {t('Thông tin các mặt hàng')}
-        </AppText>
+        <AppText style={styles.titleText}>{t('Thông tin các mặt hàng')}</AppText>
         <View style={styles.countBadge}>
           <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
         </View>
@@ -224,7 +216,7 @@ const InformationItemsScreen = ({
       <AnimatedButton
         onPress={scrollToTop}
         style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-        <IconScrollBottom style={{transform: [{rotate: '180deg'}]}} />
+        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
       </AnimatedButton>
       {!isFetchingNextPage && (
         <AnimatedButton
@@ -242,6 +234,12 @@ const InformationItemsScreen = ({
 export default InformationItemsScreen;
 
 const styles = StyleSheet.create({
+  rightComponent: {
+    width: vs(40),
+    height: vs(40),
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
   container: {
     flex: 1,
   },
@@ -267,10 +265,6 @@ const styles = StyleSheet.create({
     color: Colors.WHITE,
     fontSize: getFontSize(12),
     fontWeight: '600',
-  },
-  containerActivity: {
-    flex: 1,
-    justifyContent: 'center',
   },
   listContent: {
     paddingHorizontal: PaddingHorizontal,

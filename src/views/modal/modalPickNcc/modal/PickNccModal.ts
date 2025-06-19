@@ -23,12 +23,10 @@ export const fetchNccData = async (
   key: string = '',
 ): Promise<ResponseNcc[]> => {
   const url = buildNccUrl(page, limit, key);
-  const {data} = await axios.get(url);
+  const { data } = await axios.get(url);
 
-  return data.map((item: any, index: number) => {
-    return {
-      id: item.id,
-      name: 'Công Ty TNHH XNK Thuận Phát - 200.000',
-    };
-  });
+  return data.map((item: any) => ({
+    id: item.id,
+    name: 'Công Ty TNHH XNK Thuận Phát - 200.000',
+  }));
 };

@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { fetchApproveData, TypeApprove } from '../modal/ApproveModal';
 
@@ -8,7 +8,7 @@ const DEBOUNCE_DELAY = 300;
 
 export function useApproveViewModel() {
   const [searchKey, setSearchKey] = useState<string>('');
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   // Infinite Query cho phân trang + search
   const {
