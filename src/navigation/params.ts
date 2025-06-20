@@ -39,6 +39,7 @@ export type MainParams = {
   InformationItemsScreen: { item: DataAssignPrice };
   MyTabs: undefined;
   NotificationScreen: undefined;
+  DetailOrderApproveScreen: { item: DataAssignPrice };
 
   // Modals
   ModalPhotoOrCamera: {

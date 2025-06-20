@@ -1,5 +1,5 @@
-import {t} from 'i18next';
-import {Linking, Permission, PermissionsAndroid, Platform} from 'react-native';
+import { t } from 'i18next';
+import { Linking, Permission, PermissionsAndroid, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import ImagePicker from 'react-native-image-crop-picker';
 import isArray from 'lodash/isArray';
@@ -24,14 +24,10 @@ export default class Utilities {
     }
 
     if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-      alertHandler(
-        'Quyền bị từ chối',
-        'Bạn đã từ chối cấp quyền. Hãy vào Cài đặt để bật lại.',
-        [
-          {text: t('Hủy'), style: 'cancel', onPress: () => {}},
-          {text: 'Mở Cài đặt', onPress: () => Linking.openSettings()},
-        ],
-      );
+      alertHandler('Quyền bị từ chối', 'Bạn đã từ chối cấp quyền. Hãy vào Cài đặt để bật lại.', [
+        { text: t('Hủy'), style: 'cancel', onPress: () => {} },
+        { text: 'Mở Cài đặt', onPress: () => Linking.openSettings() },
+      ]);
     } else {
       Toast.show({
         type: 'error',
@@ -47,17 +43,11 @@ export default class Utilities {
   }
 
   static async requestContactsPermission(alertHandler: any) {
-    return await this.requestPermission(
-      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-      alertHandler,
-    );
+    return await this.requestPermission(PermissionsAndroid.PERMISSIONS.READ_CONTACTS, alertHandler);
   }
 
   static async requestCameraPermission(alertHandler: any) {
-    return await this.requestPermission(
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-      alertHandler,
-    );
+    return await this.requestPermission(PermissionsAndroid.PERMISSIONS.CAMERA, alertHandler);
   }
 
   static async requestStoragePermission(alertHandler: any) {
@@ -89,8 +79,7 @@ export default class Utilities {
       }.jpg`;
     } else {
       const splitedPath = image.path.split('/');
-      image.filename =
-        splitedPath[splitedPath.length - 1]?.split('.')[0] + '.jpg';
+      image.filename = splitedPath[splitedPath.length - 1]?.split('.')[0] + '.jpg';
     }
   };
 
@@ -153,7 +142,7 @@ export default class Utilities {
       return Promise.reject(error);
     }
   };
-  static showImageCrop = async ({uri, params}: {uri: string; params?: any}) => {
+  static showImageCrop = async ({ uri, params }: { uri: string; params?: any }) => {
     const defaultOptions = {
       path: uri,
       width: 300,
@@ -199,10 +188,7 @@ export default class Utilities {
 
 export const isAndroid = () => Platform.OS === 'android';
 
-export const numberFormat = (
-  number: string | number,
-  thousandSeparator = '.',
-) => {
+export const numberFormat = (number: string | number, thousandSeparator = '.') => {
   if (Number(number) === 0) {
     return 0;
   }
@@ -227,12 +213,8 @@ export const numberFormat = (
   return resPrefix + result;
 };
 
-export const moneyFormat = (
-  number: string | number,
-  thousandSeparator = '.',
-  dot = ' VND',
-) => {
-  if (!number) {
+export const moneyFormat = (number: string | number, thousandSeparator = '.', dot = ' VND') => {
+  if (!number && number !== 0) {
     return '0 VND';
   }
   return numberFormat(number, thousandSeparator) + dot;

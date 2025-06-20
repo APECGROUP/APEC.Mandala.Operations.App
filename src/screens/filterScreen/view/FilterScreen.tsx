@@ -7,13 +7,13 @@ import light from '../../../theme/light';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import { navigate } from '@/navigation/RootNavigation';
-import FooterDefault from './component/FooterFilter';
 import { PaddingHorizontal } from '@/utils/Constans';
 import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconCalendar from '@assets/icon/IconCalendar';
 import { vs } from 'react-native-size-matters';
+import Footer from './component/Footer';
 
 const FilterScreen = () => {
   //  const { listDepartment, listRequester } = useFilterViewModel();
@@ -129,7 +129,7 @@ const FilterScreen = () => {
           rightIcon={<IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />}
         />
       </View>
-      <FooterDefault />
+      <Footer />
     </AppBlock>
   );
 };

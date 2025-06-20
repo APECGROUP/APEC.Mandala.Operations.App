@@ -9,16 +9,18 @@
 import * as Keychain from 'react-native-keychain';
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
-import {refreshTokenAPI} from '../utils/AuthService';
-import {ResponseAPILogin, TypeUser} from '../interface/Authen.interface';
-import {useIsLogin} from '../zustand/store/useIsLogin/useIsLogin';
-import {useInfoUser} from '../zustand/store/useInfoUser/useInfoUser';
-import {Strings} from '../languages/FunctionLanguage';
-import {storage} from '../views/appProvider/AppProvider';
+import { refreshTokenAPI } from '../utils/AuthService';
+import { ResponseAPILogin, TypeUser } from '../interface/Authen.interface';
+import { useIsLogin } from '../zustand/store/useIsLogin/useIsLogin';
+import { useInfoUser } from '../zustand/store/useInfoUser/useInfoUser';
+import { Strings } from '../languages/FunctionLanguage';
+import { storage } from '../views/appProvider/AppProvider';
+import i18n from '../languages/i18n';
 
 export const TOKEN_KEY = 'ACCESS_TOKEN';
 export const USER_KEY = 'USER_INFO';
 export const REMEMBER_KEY = 'REMEMBER_LOGIN';
+export const LANGUAGE_KEY = 'CURRENT_LANGUAGE';
 
 export type TokenType = {
   accessToken: string;
@@ -34,6 +36,7 @@ const DataLocal = {
   user: null as TypeUser | null,
   authStatus: 'loading' as AuthStatus,
   rememberLogin: false,
+  currentLanguage: 'vi' as string, // Mặc định là tiếng Việt
 
   setAuthStatus: (status: AuthStatus) => {
     DataLocal.authStatus = status;
@@ -61,7 +64,7 @@ const DataLocal = {
 
       DataLocal.setAuthStatus('authenticated');
     } catch (error) {
-      Toast.show({type: 'error', text2: 'Lưu token thất bại'});
+      Toast.show({ type: 'error', text2: 'Lưu token thất bại' });
     }
   },
 
@@ -82,9 +85,7 @@ const DataLocal = {
           DataLocal.setAuthStatus('authenticated');
           return parsedToken;
         } else if (currentTime < parsedToken.refreshExpiresAt) {
-          const newToken = await DataLocal.refreshAccessToken(
-            parsedToken.refreshToken,
-          );
+          const newToken = await DataLocal.refreshAccessToken(parsedToken.refreshToken);
           if (newToken) {
             return newToken;
           }
@@ -94,7 +95,7 @@ const DataLocal = {
         return null;
       }
     } catch (error) {
-      Toast.show({type: 'error', text2: 'Lấy token thất bại'});
+      Toast.show({ type: 'error', text2: 'Lấy token thất bại' });
     }
 
     DataLocal.setAuthStatus('unauthenticated');
@@ -108,7 +109,7 @@ const DataLocal = {
       await useInfoUser.getState().saveInfoUser(user);
       storage.set(USER_KEY, JSON.stringify(user));
     } catch (error) {
-      Toast.show({type: 'error', text2: 'Lưu thông tin người dùng thất bại'});
+      Toast.show({ type: 'error', text2: 'Lưu thông tin người dùng thất bại' });
     }
   },
 
@@ -126,9 +127,50 @@ const DataLocal = {
         return parsedUser;
       }
     } catch (error) {
-      Toast.show({type: 'error', text2: 'Lấy thông tin người dùng thất bại'});
+      Toast.show({ type: 'error', text2: 'Lấy thông tin người dùng thất bại' });
     }
     return null;
+  },
+
+  // ✅ Lưu ngôn ngữ hiện tại
+  saveLanguage: async (language: string): Promise<void> => {
+    try {
+      DataLocal.currentLanguage = language;
+      storage.set(LANGUAGE_KEY, language);
+
+      // Cập nhật ngôn ngữ trong i18n
+      await i18n.changeLanguage(language);
+
+      Toast.show({
+        type: 'success',
+        text2: language === 'vi' ? 'Đã chuyển sang tiếng Việt' : 'Switched to English',
+      });
+    } catch (error) {
+      Toast.show({ type: 'error', text2: 'Lưu ngôn ngữ thất bại' });
+    }
+  },
+
+  // ✅ Lấy ngôn ngữ hiện tại
+  getLanguage: (): string => DataLocal.currentLanguage,
+
+  // ✅ Load ngôn ngữ từ storage
+  loadLanguage: (): void => {
+    try {
+      const storedLanguage = storage.getString(LANGUAGE_KEY);
+      if (storedLanguage) {
+        DataLocal.currentLanguage = storedLanguage;
+        // Cập nhật ngôn ngữ trong i18n
+        i18n.changeLanguage(storedLanguage);
+      } else {
+        // Nếu chưa có ngôn ngữ được lưu, dùng ngôn ngữ mặc định
+        DataLocal.currentLanguage = 'vi';
+        i18n.changeLanguage('vi');
+      }
+    } catch (error) {
+      // Nếu có lỗi, dùng ngôn ngữ mặc định
+      DataLocal.currentLanguage = 'vi';
+      i18n.changeLanguage('vi');
+    }
   },
 
   // ✅ Xoá toàn bộ thông tin (Keychain + storage)
@@ -159,14 +201,12 @@ const DataLocal = {
         res.data.refreshExpiresIn,
       );
     } catch (error) {
-      Toast.show({type: 'error', text2: 'Lưu dữ liệu thất bại'});
+      Toast.show({ type: 'error', text2: 'Lưu dữ liệu thất bại' });
     }
   },
 
   // ✅ Gọi API để refresh access token khi hết hạn
-  refreshAccessToken: async (
-    refreshToken: string,
-  ): Promise<TokenType | null> => {
+  refreshAccessToken: async (refreshToken: string): Promise<TokenType | null> => {
     try {
       const response = await refreshTokenAPI(refreshToken);
       if (response) {
@@ -188,6 +228,7 @@ const DataLocal = {
   checkAuthStatus: async (): Promise<AuthStatus> => {
     DataLocal.setAuthStatus('loading');
     DataLocal.loadRememberLogin();
+    DataLocal.loadLanguage(); // Load ngôn ngữ khi khởi động app
 
     if (DataLocal.rememberLogin) {
       await DataLocal.getUser();

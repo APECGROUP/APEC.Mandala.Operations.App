@@ -1,47 +1,75 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState, useMemo } from 'react';
 import {
   StyleSheet,
   View,
   TextInput,
   ActivityIndicator,
-  TouchableOpacity,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  useDerivedValue,
+  FadeInLeft,
+} from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 
 import { getFontSize, SCREEN_WIDTH } from '../../../constants';
-// import {AppText} from '../../elements/text/AppText';
 import { PaddingHorizontal } from '../../../utils/Constans';
 import light from '../../../theme/light';
 import AppBlockButton from '../../../elements/button/AppBlockButton';
+import { AppText } from '@/elements/text/AppText';
+import { AnimatedButton } from '@/screens/assignPriceScreen/view/AssignPriceScreen';
+import Footer from '@/screens/filterScreen/view/component/Footer';
+import { Colors } from '@/theme/Config';
+import ToastContainer from '@/elements/toast/ToastContainer';
+import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 
 import IconNotification from '../../../../assets/icon/IconNotification';
 import IconSearch from '../../../../assets/icon/IconSearch';
 import IconFilter from '../../../../assets/icon/IconFillter';
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
+import Images from '../../../../assets/image/Images';
 
 import { TypeApprove } from '../modal/ApproveModal';
-import Images from '../../../../assets/image/Images';
-import { navigate } from '../../../navigation/RootNavigation';
-import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
-import { AppText } from '@/elements/text/AppText';
 import { useApproveViewModel } from '../viewmodal/useApproveViewModel';
-import ToastContainer from '@/elements/toast/ToastContainer';
-import AssignPriceCard from '@/screens/assignPriceScreen/view/component/AssignPriceCard';
+import ApproveCard from './component/ApproveCard';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { navigate } from '../../../navigation/RootNavigation';
+import IconCheckBox from '@assets/icon/IconCheckBox';
+import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 
-const AssignPriceScreen: React.FC = () => {
+// Constants
+const BOTTOM_HEIGHT = vs(120);
+const BOTTOM_LOW = vs(20);
+const ANIMATION_DURATION = 300;
+const SCROLL_THRESHOLD = 100;
+
+const ApprovePrScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
+  const { infoUser } = useInfoUser();
 
+  // Refs
   const refToast = useRef<any>(null);
+  const flashListRef = useRef<FlashList<TypeApprove> | null>(null);
+  const lastOffsetY = useRef<number>(0);
 
-  // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
+  // State
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  // Shared values for animations
+  const showScrollToTop = useSharedValue<number>(0);
+  const showScrollToBottom = useSharedValue<number>(0);
+  const footerVisible = useSharedValue<number>(0);
+
+  // ViewModel
   const {
     flatData,
     isLoading,
@@ -53,64 +81,103 @@ const AssignPriceScreen: React.FC = () => {
     searchKey,
   } = useApproveViewModel();
 
-  // ─── Refs và shared values Reanimated ───────────────────────────────────────
-  const flashListRef = useRef<FlashList<TypeApprove> | null>(null);
-  const lastOffsetY = useRef<number>(0);
-
-  // show Scroll‐to‐Top khi scroll lên (swipe xuống), 0 = hidden, 1 = visible
-  const showScrollToTop = useSharedValue<number>(0);
-  // show Scroll‐to‐Bottom khi scroll xuống (swipe lên), 0 = hidden, 1 = visible
-  const showScrollToBottom = useSharedValue<number>(0);
+  // Update footer visibility when selectedIds changes
+  useDerivedValue(
+    () =>
+      (footerVisible.value = withTiming(selectedIds.length > 0 ? 1 : 0, {
+        duration: ANIMATION_DURATION / 10,
+      })),
+    [selectedIds.length],
+  );
 
   // Animated styles
   const opacityScrollTopStyle = useAnimatedStyle(() => ({
     opacity: withTiming(showScrollToTop.value, { duration: 200 }),
   }));
+
   const opacityScrollBottomStyle = useAnimatedStyle(() => ({
     opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
   }));
 
-  // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
+  const footerAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateY: withTiming(footerVisible.value === 1 ? 0 : 100, {
+          duration: ANIMATION_DURATION,
+        }),
+      },
+    ],
+    opacity: withTiming(footerVisible.value, { duration: ANIMATION_DURATION }),
+  }));
+
+  const positionScrollStyle = useAnimatedStyle(() => ({
+    position: 'absolute' as const,
+    alignSelf: 'center' as const,
+    bottom: footerVisible.value === 1 ? BOTTOM_HEIGHT : BOTTOM_LOW,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  }));
+
+  // Scroll handlers
   const scrollToTop = () => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
   };
+
   const scrollToBottom = () => {
     flashListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
   };
 
-  /**
-   * onScroll handler:
-   *  - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
-   *  - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
-   */
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
-    // Scroll xuống (lúc này y > lastOffsetY): hiện scroll‐to‐bottom, ẩn scroll‐to‐top
-    if (y > lastOffsetY.current && y > 100) {
+
+    if (y > lastOffsetY.current && y > SCROLL_THRESHOLD) {
       showScrollToBottom.value = 1;
       showScrollToTop.value = 0;
-    }
-    // Scroll lên (y < lastOffsetY): hiện scroll‐to‐top, ẩn scroll‐to‐bottom
-    else if (y < lastOffsetY.current && y > 100) {
+    } else if (y < lastOffsetY.current && y > SCROLL_THRESHOLD) {
       showScrollToTop.value = 1;
       showScrollToBottom.value = 0;
     } else {
-      // Chưa vượt 100px thì ẩn cả hai
       showScrollToTop.value = 0;
       showScrollToBottom.value = 0;
     }
     lastOffsetY.current = y;
   };
 
-  // ─── Khi bấm "Tìm kiếm" (submit) hoặc nút "Filter" ───────────────────────
-  const handleSubmitSearch = () => {
-    // Gọi onSearch của ViewModel để cập nhật searchKey → trigger loadPage(1, key)
-    // scrollToTop();
-    // onSearch(inputKey.trim());
-    navigate('FilterScreen');
-  };
+  // Navigation handlers
+  const goToNotification = () => navigate('NotificationScreen');
+  const goToAccount = () => navigate('AccountScreen');
+  const handleSubmitSearch = () => navigate('FilterScreen');
+
+  // Selection handler
+  const handleSelect = useCallback((id: string) => {
+    setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+  }, []);
+
+  // Render functions
+  const renderItem = useCallback(
+    ({ item, index }: { item: TypeApprove; index: number }) => {
+      const isSelected = selectedIds.includes(item.id);
+      return (
+        <Animated.View
+          entering={FadeInLeft.delay(index * 10)
+            .duration(0)
+            .springify()}>
+          <ApproveCard
+            item={item}
+            index={index}
+            isSelected={isSelected}
+            handleSelect={handleSelect}
+          />
+        </Animated.View>
+      );
+    },
+    [handleSelect, selectedIds],
+  );
 
   const listEmptyComponent = () => {
     if (isLoading) {
@@ -137,43 +204,40 @@ const AssignPriceScreen: React.FC = () => {
       );
     }
   };
+  const toggleSelectAll = () => {
+    const allIds = flatData.map(item => item.id);
+    if (selectedIds.length === flatData.length) {
+      setSelectedIds([]); // Bỏ chọn tất cả
+    } else {
+      setSelectedIds(allIds); // Chọn tất cả
+    }
+  };
 
-  const goToNotification = () => navigate('NotificationScreen');
-
-  const renderItem = useCallback(
-    ({ item, index }: { item: TypeApprove; index: number }) => (
-      <AssignPriceCard item={item} index={index} />
-    ),
-    [],
+  const selectedAll = useMemo(
+    () => selectedIds.length === flatData.length && flatData.length > 0,
+    [selectedIds, flatData],
   );
-
-  const goToAccount = () => navigate('AccountScreen');
   return (
     <View style={styles.container}>
-      {/* ─── Background Image ─────────────────────────────────────────────── */}
+      {/* Background Image */}
       <FastImage
         style={styles.backgroundImage}
         source={Images.BackgroundAssignPrice}
         resizeMode={FastImage.resizeMode.cover}
       />
-      {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
+
+      {/* Header */}
       <View style={[styles.headerContainer, { marginTop: top }]}>
         <View style={styles.headerLeft}>
           <AppBlockButton onPress={goToAccount}>
-            <FastImage
-              source={{
-                uri: 'https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/depositphotos13895290xl-1713863023175.jpg',
-              }}
-              style={styles.avatar}
-            />
+            <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
           </AppBlockButton>
-
           <View style={styles.greetingContainer}>
             <AppText color="#FFFFFF" style={styles.greetingText}>
-              {t('assignPrice.title')}
+              {t('approve.title')}
             </AppText>
             <AppText color="#FFFFFF" style={styles.greetingText}>
-              {t(' Vũ Linh')}
+              {infoUser.profile.fullName}
             </AppText>
           </View>
         </View>
@@ -186,13 +250,14 @@ const AssignPriceScreen: React.FC = () => {
           </AppBlockButton>
         </View>
       </View>
-      {/* ─── Search Bar ────────────────────────────────────────────────────── */}
+
+      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <IconSearch width={vs(18)} />
         <TextInput
           value={searchKey}
           onChangeText={onSearch}
-          placeholder={t('assignPrice.searchPlaceholder')}
+          placeholder={t('approve.searchPlaceholder')}
           placeholderTextColor={light.placeholderTextColor}
           style={styles.searchInput}
           returnKeyType="search"
@@ -203,18 +268,27 @@ const AssignPriceScreen: React.FC = () => {
         </AppBlockButton>
       </View>
 
-      {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
+      {/* Title + Count Badge */}
       <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>{t('Danh sách gán giá NCC')}</AppText>
+        <AppText style={styles.titleText}>{t('approve.listOfPurchaseOrder')}</AppText>
         <View style={styles.countBadge}>
           <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
         </View>
       </View>
-      {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
 
+      <View style={styles.header}>
+        <AppBlockButton onPress={toggleSelectAll} style={styles.buttonCenter}>
+          {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
+          <AppText style={styles.ml7}>{t('approve.selectAll')}</AppText>
+        </AppBlockButton>
+        <AppText>
+          {selectedIds.length} {t('approve.orderSelected')}
+        </AppText>
+      </View>
+
+      {/* FlashList */}
       <FlashList
         ref={flashListRef}
-        // data={[]}
         data={flatData || []}
         renderItem={renderItem}
         keyExtractor={item => item.id}
@@ -229,32 +303,56 @@ const AssignPriceScreen: React.FC = () => {
         ListEmptyComponent={listEmptyComponent}
         ListFooterComponent={listFooterComponent}
         estimatedItemSize={100}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={
+          selectedIds.length > 0 ? styles.listContent : styles.listContentNoFooter
+        }
       />
 
+      {/* Toast Container */}
       <ToastContainer ref={refToast} />
 
-      {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
-      <AnimatedButton
-        onPress={scrollToTop}
-        style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
+      {/* Scroll Buttons */}
+      <AnimatedButton onPress={scrollToTop} style={[positionScrollStyle, opacityScrollTopStyle]}>
         <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
       </AnimatedButton>
+
       {!isFetchingNextPage && (
         <AnimatedButton
           onPress={scrollToBottom}
-          style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-          {/* style={[styles.scrollButtonContainer, opacityScrollBottomStyle]}> */}
+          style={[positionScrollStyle, opacityScrollBottomStyle]}>
           <IconScrollBottom />
         </AnimatedButton>
       )}
+
+      {/* Footer with slide-up animation */}
+      <Animated.View style={[styles.footerContainer, footerAnimatedStyle]}>
+        <Footer
+          leftButtonTitle={t('approve.reject')}
+          rightButtonTitle={t('approve.approve')}
+          leftButtonStyle={{ backgroundColor: Colors.ERROR_600 }}
+          leftTextStyle={{ color: Colors.WHITE }}
+        />
+      </Animated.View>
     </View>
   );
 };
 
-export default AssignPriceScreen;
-export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
+export default ApprovePrScreen;
+
 const styles = StyleSheet.create({
+  buttonCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  ml7: { marginLeft: s(7) },
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: vs(16),
+    paddingHorizontal: s(16),
+    // borderBottomWidth: 1,
+  },
   container: {
     flex: 1,
   },
@@ -319,7 +417,6 @@ const styles = StyleSheet.create({
     fontSize: getFontSize(8),
     fontWeight: '500',
   },
-
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -350,7 +447,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -374,10 +470,13 @@ const styles = StyleSheet.create({
     fontSize: getFontSize(14),
     fontWeight: '700',
   },
-
-  listContent: {
+  listContentNoFooter: {
     paddingHorizontal: PaddingHorizontal,
     paddingBottom: vs(16),
+  },
+  listContent: {
+    paddingHorizontal: PaddingHorizontal,
+    paddingBottom: vs(100),
   },
   emptyContainer: {
     flex: 1,
@@ -393,33 +492,11 @@ const styles = StyleSheet.create({
     marginVertical: vs(12),
     alignItems: 'center',
   },
-
-  scrollBottomContainer: {
+  footerContainer: {
     position: 'absolute',
-    alignSelf: 'center',
-    bottom: vs(20),
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
-  },
-  scrollTopContainer: {
-    position: 'absolute',
-    alignSelf: 'center',
-    bottom: vs(20),
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
   },
 });

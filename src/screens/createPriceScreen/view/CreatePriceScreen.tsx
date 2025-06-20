@@ -13,7 +13,12 @@ import {
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  FadeInLeft,
+} from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 
@@ -41,6 +46,7 @@ import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import { Colors } from '@/theme/Config';
 import { Gesture } from 'react-native-gesture-handler'; // Thêm dòng này
 import IconCreatePrice from '@assets/icon/IconCreatePrice';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 
 const CreatePriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -60,7 +66,7 @@ const CreatePriceScreen: React.FC = () => {
     handleDelete,
     searchKey,
   } = useCreatePriceViewModel();
-
+  const { infoUser } = useInfoUser();
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
   const flashListRef = useRef<FlashList<TypeCreatePrice> | null>(null);
   const lastOffsetY = useRef<number>(0);
@@ -175,16 +181,21 @@ const CreatePriceScreen: React.FC = () => {
   };
 
   const renderItem = useCallback(
-    ({ item }: { item: TypeCreatePrice }) => {
+    ({ item, index }: { item: TypeCreatePrice; index: number }) => {
       const isSelected = selectedIds.includes(item.id);
       return (
-        <CreatePriceCard
-          item={item}
-          handleDelete={handleDelete}
-          handleSelect={handleSelect}
-          isSelected={isSelected}
-          simultaneousGesture={flashListNativeGesture}
-        />
+        <Animated.View
+          entering={FadeInLeft.delay(index * 10)
+            .duration(0)
+            .springify()}>
+          <CreatePriceCard
+            item={item}
+            handleDelete={handleDelete}
+            handleSelect={handleSelect}
+            isSelected={isSelected}
+            simultaneousGesture={flashListNativeGesture}
+          />
+        </Animated.View>
       );
     },
     [selectedIds, handleDelete, handleSelect, flashListNativeGesture],
@@ -207,12 +218,7 @@ const CreatePriceScreen: React.FC = () => {
       <View style={[styles.headerContainer, { marginTop: top }]}>
         <View style={styles.headerLeft}>
           <AppBlockButton onPress={goToAccount}>
-            <FastImage
-              source={{
-                uri: 'https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/depositphotos13895290xl-1713863023175.jpg',
-              }}
-              style={styles.avatar}
-            />
+            <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
           </AppBlockButton>
 
           <View style={styles.greetingContainer}>
@@ -220,7 +226,7 @@ const CreatePriceScreen: React.FC = () => {
               {t('createPrice.title')}
             </AppText>
             <AppText color="#FFFFFF" style={styles.greetingText}>
-              {t(' Vũ Linh')}
+              {infoUser.profile.fullName}
             </AppText>
           </View>
         </View>
@@ -260,9 +266,11 @@ const CreatePriceScreen: React.FC = () => {
       <View style={styles.header}>
         <AppBlockButton onPress={toggleSelectAll} style={styles.buttonCenter}>
           {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
-          <AppText style={styles.ml7}>Chọn tất cả</AppText>
+          <AppText style={styles.ml7}>{t('createPrice.pickAll')}</AppText>
         </AppBlockButton>
-        <AppText>{selectedIds.length} đơn đã chọn</AppText>
+        <AppText>
+          {selectedIds.length} {t('createPrice.orderSelected')}
+        </AppText>
       </View>
       {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
       {isLoading && flatData.length === 0 ? (

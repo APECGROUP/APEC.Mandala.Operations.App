@@ -15,6 +15,7 @@ import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reani
 import { AnimatedButton } from '../CreatePriceScreen';
 import { Colors } from '@/theme/Config';
 import { moneyFormat } from '@/utils/Utilities';
+import { useTranslation } from 'react-i18next';
 
 const CreatePriceCard = ({
   item,
@@ -29,6 +30,7 @@ const CreatePriceCard = ({
   handleSelect: (id: string) => void;
   simultaneousGesture: any; // Hoặc 'any' nếu bạn muốn đơn giản
 }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
   // SharedValue để đồng bộ chiều cao cho delete button
@@ -74,9 +76,8 @@ const CreatePriceCard = ({
             {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
           </AppBlockButton>
 
-          <AppBlockButton
-            style={styles.center}
-            onPress={() => console.log('Đi tới chi tiết:', item.id)}>
+          <AppBlockButton style={styles.center} onPress={() => {}}>
+            {/* onPress={() => navigate('DetailCreatePriceScreen', { item })}> */}
             <View style={styles.row}>
               <View style={styles.iconWrapper}>
                 <IconListPen />
@@ -84,7 +85,7 @@ const CreatePriceCard = ({
               <View style={styles.nameWrapper}>
                 <AppText style={styles.name}>{item.name}</AppText>
                 <View style={styles.row}>
-                  <AppText style={styles.titlePrice}>Giá: </AppText>
+                  <AppText style={styles.titlePrice}>{t('createPrice.price')}: </AppText>
                   <AppText style={styles.price}>
                     {moneyFormat(item.price, '.', '')}/{item.end}/{item.vat}
                   </AppText>
@@ -101,8 +102,8 @@ const CreatePriceCard = ({
         {expanded && (
           <View style={styles.expandedContent}>
             {[
-              { label: 'Thời gian', value: item.time },
-              { label: 'NCC', value: item.ncc },
+              { label: t('createPrice.time'), value: item.time },
+              { label: t('createPrice.ncc'), value: item.ncc },
             ].map(({ label, value }, idx) => (
               <View key={idx} style={styles.detailRow}>
                 <AppText style={styles.detailLabel}>{label}</AppText>
@@ -216,8 +217,4 @@ const styles = ScaledSheet.create({
     width: s(50),
     borderRadius: '8@s',
   },
-});
-
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center' },
 });

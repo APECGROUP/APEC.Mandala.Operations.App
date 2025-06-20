@@ -6,7 +6,10 @@ const IconEmptyNcc = (props: SvgProps) => (
     <G clipPath="url(#clip0_1121_9931)">
       <Mask
         id="mask0_1121_9931"
-        style={styles.mask}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{
+          maskType: 'luminance',
+        }}
         maskUnits="userSpaceOnUse"
         x={0}
         y={0}
@@ -178,9 +181,3 @@ const IconEmptyNcc = (props: SvgProps) => (
   </Svg>
 );
 export default IconEmptyNcc;
-
-const styles = StyleSheet.create({
-  mask: {
-    maskType: 'luminance',
-  },
-});

@@ -66,7 +66,7 @@ const DetailApproveCardScreen = ({
 
   return (
     <View style={styles.container}>
-      <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
+      <FastImage source={Images.IconApproved} style={styles.itemIcon} />
 
       <AppBlockButton onPress={onCopy} style={styles.prRow}>
         <AppText size={12} weight="500" color={light.placeholderTextColor}>
@@ -134,11 +134,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: vs(8),
+    // marginBottom: vs(8),
   },
   valueContainer: {
+    minWidth: '60%',
+    // paddingVertical: vs(4),
+    height: vs(24),
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   icon: {
     marginRight: s(6),

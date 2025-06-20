@@ -1,11 +1,11 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {useState, useCallback} from 'react';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainParams} from '@/navigation/params';
-import {useTranslation} from 'react-i18next';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { MainParams } from '@/navigation/params';
+import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
-import {s, vs} from 'react-native-size-matters';
-import {AppText} from '@/elements/text/AppText';
+import { s, vs } from 'react-native-size-matters';
+import { AppText } from '@/elements/text/AppText';
 import light from '@/theme/light';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -13,8 +13,8 @@ import IconName from '@assets/icon/IconName';
 import IconCalendar from '@assets/icon/IconCalendar';
 import IconCopy from '@assets/icon/IconCopy';
 import Images from '@assets/image/Images';
-import {Colors} from '@/theme/Config';
-import {navigate} from '@/navigation/RootNavigation';
+import { Colors } from '@/theme/Config';
+import { navigate } from '@/navigation/RootNavigation';
 import moment from 'moment';
 
 interface RowItemProps {
@@ -24,15 +24,12 @@ interface RowItemProps {
   onPress?: () => void;
 }
 
-const RowItem: React.FC<RowItemProps> = ({label, value, icon, onPress}) => (
+const RowItem: React.FC<RowItemProps> = ({ label, value, icon, onPress }) => (
   <View style={styles.rowItem}>
     <AppText weight="500" size={14} color={Colors.TEXT_SECONDARY}>
       {label}
     </AppText>
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={1}
-      style={styles.valueContainer}>
+    <TouchableOpacity onPress={onPress} activeOpacity={1} style={styles.valueContainer}>
       {icon && <View style={styles.icon}>{icon}</View>}
       {value && <AppText weight="700">{value}</AppText>}
     </TouchableOpacity>
@@ -42,8 +39,8 @@ const RowItem: React.FC<RowItemProps> = ({label, value, icon, onPress}) => (
 const DetailAssignPriceCardScreen = ({
   route,
 }: NativeStackScreenProps<MainParams, 'DetailAssignPriceCardScreen'>) => {
-  const {item} = route.params;
-  const {t} = useTranslation();
+  const { item } = route.params;
+  const { t } = useTranslation();
   const [dateCreate, setDateCreate] = useState<Date | undefined>(undefined);
   const [dateEstimate, setDateEstimate] = useState<Date | undefined>(undefined);
 
@@ -92,21 +89,13 @@ const DetailAssignPriceCardScreen = ({
           value={formatDate(dateEstimate)}
           icon={<IconCalendar />}
         />
-        <RowItem
-          label={t('orderInfo.department')}
-          value="01023-House Keeping"
-        />
+        <RowItem label={t('orderInfo.department')} value="01023-House Keeping" />
         <RowItem label={t('orderInfo.location')} value="Stock-CAKE SHOP" />
-        <RowItem
-          label={t('orderInfo.requester')}
-          value="Nguyễn Văn A"
-          icon={<IconName />}
-        />
+        <RowItem label={t('orderInfo.requester')} value="Nguyễn Văn A" icon={<IconName />} />
         <RowItem label={t('orderInfo.note')} />
         <View style={styles.noteContainer}>
           <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry
           </AppText>
         </View>
       </View>
@@ -145,9 +134,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: vs(8),
+    // marginBottom: vs(8),
   },
   valueContainer: {
+    minWidth: '60%',
+    // paddingVertical: vs(4),
+    height: vs(24),
     flexDirection: 'row',
     alignItems: 'center',
   },

@@ -29,6 +29,7 @@ import CreatePriceNccScreen from '@/screens/createPriceScreen/view/component/Cre
 import ApprovePrScreen from '@/screens/approvePrScreen/view/ApprovePrScreen';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import DetailApproveCardScreen from '@/screens/approvePrScreen/view/component/DetailApproveCardScreen';
+import DetailOrderApproveScreen from '@/screens/detailOrderApproveScreen/view/DetailOrderApproveScreen';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -108,6 +109,16 @@ export default function MainNavigator() {
         <Screen
           name="InformationItemsScreen"
           component={InformationItemsScreen}
+          options={{
+            headerShown: false,
+            contentStyle: {
+              paddingHorizontal: 0,
+            },
+          }}
+        />
+        <Screen
+          name="DetailOrderApproveScreen"
+          component={DetailOrderApproveScreen}
           options={{
             headerShown: false,
             contentStyle: {

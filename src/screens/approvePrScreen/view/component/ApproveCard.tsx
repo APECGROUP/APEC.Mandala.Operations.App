@@ -3,44 +3,61 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { s, vs } from 'react-native-size-matters';
 import IconInfomation from '../../../../../assets/icon/IconInfomation';
-import IconNote from '../../../../../assets/icon/IconNote';
 import Images from '../../../../../assets/image/Images';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
 import { TypeApprove } from '../../modal/ApproveModal';
+import IconCheckBox from '@assets/icon/IconCheckBox';
+import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 
-const ApproveCard = ({ item, index }: { item: TypeApprove; index: number }) => {
+const ApproveCard = ({
+  item,
+  index,
+  isSelected,
+  handleSelect,
+}: {
+  item: TypeApprove;
+  index: number;
+  isSelected: boolean;
+  handleSelect: (id: string) => void;
+}) => {
   const { t } = useTranslation();
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => navigate('InformationItemsScreen', { item })}
-      style={styles.card}>
-      <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
-      <View style={styles.itemInfo}>
-        <View style={styles.itemInfoRow}>
-          <AppText numberOfLines={1} style={styles.prCodeText}>
-            {item.content}
-          </AppText>
-          {/* <View style={styles.noteBadge}>
-           <AppText style={styles.noteBadgeText}>{t('Ghi chú')}</AppText>
-         </View> */}
-          <IconNote />
-          <AppBlockButton onPress={() => navigate('DetailApproveCardScreen', { item })}>
-            <IconInfomation style={{ marginHorizontal: s(6) }} />
-          </AppBlockButton>
-        </View>
-        <AppText style={styles.dateText}>{item.user.name}</AppText>
-        {index % 3 === 0 && (
-          <View style={styles.noAssign}>
-            <AppText size={12} color={'#FF7009'} weight="500">
-              {t('Chờ gắn giá')}
+    <TouchableOpacity style={styles.card}>
+      <AppBlockButton
+        onPress={() => {
+          handleSelect(item.id);
+        }}
+        style={{ paddingRight: s(10) }}>
+        {/* <AppBlockButton onPress={() => handleSelect(item.id)} style={{ paddingRight: s(10) }}> */}
+        {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
+      </AppBlockButton>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => navigate('DetailOrderApproveScreen', { item })}
+        style={styles.buttonDetailOrder}>
+        <FastImage source={Images.IconApproved} style={styles.itemIcon} />
+        <View style={styles.itemInfo}>
+          <View style={styles.itemInfoRow}>
+            <AppText numberOfLines={1} style={styles.prCodeText}>
+              {item.content}
             </AppText>
+            <AppBlockButton onPress={() => navigate('DetailApproveCardScreen', { item })}>
+              <IconInfomation style={{ marginHorizontal: s(0) }} />
+            </AppBlockButton>
           </View>
-        )}
-      </View>
+          <AppText style={styles.dateText}>{item.user.name}</AppText>
+          {index % 3 === 0 && (
+            <View style={styles.noAssign}>
+              <AppText size={12} color={'#FF7009'} weight="500">
+                {t('Chờ gắn giá')}
+              </AppText>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 };
@@ -48,6 +65,7 @@ const ApproveCard = ({ item, index }: { item: TypeApprove; index: number }) => {
 export default ApproveCard;
 
 const styles = StyleSheet.create({
+  buttonDetailOrder: { flexDirection: 'row', alignItems: 'center' },
   noAssign: {
     paddingVertical: vs(2),
     paddingHorizontal: s(4),

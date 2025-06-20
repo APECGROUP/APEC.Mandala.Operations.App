@@ -25,19 +25,19 @@ const TOTAL_NOTIFICATIONS = 50;
  * - date: random trong tháng 5–6/2025
  */
 const ALL_FAKE_NOTIFICATIONS: ContentNotification[] = Array.from(
-  {length: TOTAL_NOTIFICATIONS},
+  { length: TOTAL_NOTIFICATIONS },
   (_, idx) => {
     const id = idx + 1;
     // Sinh ngày ngẫu nhiên giữa 2025-05-01 và 2025-06-30
     const randomTimestamp =
-      new Date(2025, 4, 1).getTime() +
-      Math.floor(Math.random() * 60) * 24 * 60 * 60 * 1000;
+      new Date(2025, 4, 1).getTime() + Math.floor(Math.random() * 60) * 24 * 60 * 60 * 1000;
     const date = new Date(randomTimestamp).toISOString();
 
     return {
       id,
       title: `Chờ Kế toán trưởng duyệt #${id}`,
       body: `Bạn có đơn hàng PR20250409#0003 chờ KTT duyệt ${id}.`,
+      content: `Bạn có đơn hàng PR20250409#0003 chờ KTT duyệt ${id}.`,
       read: false,
       date,
     };
@@ -54,7 +54,7 @@ const ALL_FAKE_NOTIFICATIONS: ContentNotification[] = Array.from(
 export function fetchNotificationData(
   pageNumber: number,
   limit: number = 10,
-): Promise<{data: ContentNotification[]; lastPage: boolean}> {
+): Promise<{ data: ContentNotification[]; lastPage: boolean }> {
   console.log('API', pageNumber);
   return new Promise(resolve => {
     setTimeout(() => {
@@ -62,7 +62,7 @@ export function fetchNotificationData(
       const end = Math.min(start + limit, ALL_FAKE_NOTIFICATIONS.length);
       const pageData = ALL_FAKE_NOTIFICATIONS.slice(start, end);
       const lastPage = end >= ALL_FAKE_NOTIFICATIONS.length;
-      resolve({data: pageData, lastPage});
+      resolve({ data: pageData, lastPage });
     }, 800); // Giả lập độ trễ 800ms
   });
 }

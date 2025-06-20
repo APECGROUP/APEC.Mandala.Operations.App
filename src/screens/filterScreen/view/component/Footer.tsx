@@ -1,20 +1,20 @@
-import React, {useState, useCallback} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Animated, {FadeInDown} from 'react-native-reanimated';
-import {s, vs} from 'react-native-size-matters';
+import React, { useState, useCallback } from 'react';
+import { StyleProp, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { s, vs } from 'react-native-size-matters';
 
-import {Colors} from '@/theme/Config';
-import {PaddingHorizontal} from '@/utils/Constans';
-import {useAlert} from '@/elements/alert/AlertProvider';
-import {AppButton} from '@/elements/button/AppButton';
-import {AppText} from '@/elements/text/AppText';
+import { Colors } from '@/theme/Config';
+import { PaddingHorizontal } from '@/utils/Constans';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { AppButton } from '@/elements/button/AppButton';
+import { AppText } from '@/elements/text/AppText';
 import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
 
 // --- Type Definition for Props ---
-type ScreenActionFooterProps = {
+type FooterProps = {
   /**
    * Callback for the left (secondary) action button.
    * Can be an async function. Defaults to showing a rejection success alert.
@@ -45,27 +45,35 @@ type ScreenActionFooterProps = {
    * Defaults to true.
    */
   showRightButton?: boolean;
+  leftButtonStyle?: StyleProp<ViewStyle>;
+  rightButtonStyle?: StyleProp<ViewStyle>;
+  leftTextStyle?: StyleProp<TextStyle>;
+  rightTextStyle?: StyleProp<TextStyle>;
 };
 
 // --- ScreenActionFooter Component ---
-const ScreenActionFooter = ({
+const Footer = ({
   onLeftAction,
   onRightAction,
   leftButtonTitle, // New prop for left button title
   rightButtonTitle, // New prop for right button title
   showLeftButton = true, // New prop to control left button visibility
   showRightButton = true, // New prop to control right button visibility
-}: ScreenActionFooterProps) => {
-  const {t} = useTranslation();
-  const {bottom} = useSafeAreaInsets();
-  const {showAlert} = useAlert();
+  leftButtonStyle, // New prop for left button style
+  rightButtonStyle, // New prop for right button style
+  leftTextStyle, // New prop for left text style
+  rightTextStyle, // New prop for right text style
+}: FooterProps) => {
+  const { t } = useTranslation();
+  const { bottom } = useSafeAreaInsets();
+  const { showAlert } = useAlert();
 
   const [isLeftActionLoading, setIsLeftActionLoading] = useState(false);
   const [isRightActionLoading, setIsRightActionLoading] = useState(false);
 
   // Default alert handlers, now more generic
   const showDefaultRejectedAlert = useCallback(async () => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise<void>(resolve => setTimeout(resolve, 2000));
     showAlert(
       t('Bạn đã từ chối đơn thành công'),
       '',
@@ -75,15 +83,12 @@ const ScreenActionFooter = ({
           onPress: () => {},
         },
       ],
-      <FastImage
-        source={Images.ModalApprovedError}
-        style={styles.modalImage}
-      />,
+      <FastImage source={Images.ModalApprovedError} style={styles.modalImage} />,
     );
   }, [showAlert, t]);
 
   const showDefaultApprovedAlert = useCallback(async () => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise<void>(resolve => setTimeout(resolve, 2000));
 
     showAlert(
       t('Bạn đã duyệt đơn thành công'),
@@ -94,10 +99,7 @@ const ScreenActionFooter = ({
           onPress: () => {},
         },
       ],
-      <FastImage
-        source={Images.ModalApprovedSuccess}
-        style={styles.modalImage}
-      />,
+      <FastImage source={Images.ModalApprovedSuccess} style={styles.modalImage} />,
     );
   }, [showAlert, t]);
 
@@ -137,32 +139,30 @@ const ScreenActionFooter = ({
   return (
     <Animated.View
       entering={FadeInDown.delay(200).duration(1000).springify()}
-      style={[styles.container, {paddingBottom: bottom + vs(8)}]}>
+      style={[styles.container, { paddingBottom: bottom + vs(8) }]}>
       <View style={styles.buttonGroup}>
         {showLeftButton && (
-          <View style={{width: s(162)}}>
+          <View style={{ width: s(162) }}>
             <AppButton
               width={s(162)} // Consider making button width configurable if needed
               onPress={handleLeftAction}
               processing={isLeftActionLoading}
-              style={styles.leftButton}>
-              <AppText size={14} weight="700">
-                {leftButtonTitle || t('filter.reset')}{' '}
-                {/* Use prop title or default */}
+              style={[styles.leftButton, leftButtonStyle]}>
+              <AppText size={14} weight="700" style={leftTextStyle}>
+                {leftButtonTitle || t('filter.reset')} {/* Use prop title or default */}
               </AppText>
             </AppButton>
           </View>
         )}
         {showRightButton && (
-          <View style={{width: s(162)}}>
+          <View style={{ width: s(162) }}>
             <AppButton
               width={s(162)} // Consider making button width configurable if needed
               onPress={handleRightAction}
               processing={isRightActionLoading}
-              style={styles.rightButton}>
-              <AppText size={14} weight="700" color={Colors.WHITE}>
-                {rightButtonTitle || t('filter.confirm')}{' '}
-                {/* Use prop title or default */}
+              style={[styles.rightButton, rightButtonStyle]}>
+              <AppText size={14} weight="700" color={Colors.WHITE} style={rightTextStyle}>
+                {rightButtonTitle || t('filter.confirm')} {/* Use prop title or default */}
               </AppText>
             </AppButton>
           </View>
@@ -172,7 +172,7 @@ const ScreenActionFooter = ({
   );
 };
 
-export default ScreenActionFooter;
+export default Footer;
 
 // --- Stylesheet ---
 const styles = StyleSheet.create({

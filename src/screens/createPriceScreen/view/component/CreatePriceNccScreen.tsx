@@ -8,7 +8,7 @@ import { Colors } from '@/theme/Config';
 import { getFontSize } from '@/constants';
 import light from '@/theme/light';
 import { PaddingHorizontal } from '@/utils/Constans';
-import FooterDefault from '@/screens/filterScreen/view/component/FooterFilter';
+import Footer from '@/screens/filterScreen/view/component/Footer';
 
 const CreatePriceNccScreen = () => {
   const { t } = useTranslation();
@@ -24,7 +24,7 @@ const CreatePriceNccScreen = () => {
       </View>
       <View style={styles.listContent} />
 
-      <FooterDefault
+      <Footer
         onLeftAction={async () => {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }}

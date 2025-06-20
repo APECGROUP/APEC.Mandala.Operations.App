@@ -13,7 +13,12 @@ import {
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  FadeInLeft,
+} from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 
@@ -36,6 +41,7 @@ import { AppText } from '@/elements/text/AppText';
 import { useAssignPriceViewModel } from '../viewmodal/useAssignPriceViewModel';
 import ToastContainer from '@/elements/toast/ToastContainer';
 import AssignPriceCard from './component/AssignPriceCard';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 
 const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -144,11 +150,16 @@ const AssignPriceScreen: React.FC = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: DataAssignPrice; index: number }) => (
-      <AssignPriceCard item={item} index={index} />
+      <Animated.View
+        entering={FadeInLeft.delay(index * 10)
+          .duration(0)
+          .springify()}>
+        <AssignPriceCard item={item} index={index} />
+      </Animated.View>
     ),
     [],
   );
-
+  const { infoUser } = useInfoUser();
   const goToAccount = () => navigate('AccountScreen');
   return (
     <View style={styles.container}>
@@ -162,12 +173,7 @@ const AssignPriceScreen: React.FC = () => {
       <View style={[styles.headerContainer, { marginTop: top }]}>
         <View style={styles.headerLeft}>
           <AppBlockButton onPress={goToAccount}>
-            <FastImage
-              source={{
-                uri: 'https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/depositphotos13895290xl-1713863023175.jpg',
-              }}
-              style={styles.avatar}
-            />
+            <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
           </AppBlockButton>
 
           <View style={styles.greetingContainer}>
@@ -175,7 +181,7 @@ const AssignPriceScreen: React.FC = () => {
               {t('assignPrice.title')}
             </AppText>
             <AppText color="#FFFFFF" style={styles.greetingText}>
-              {t(' Vũ Linh')}
+              {infoUser.profile.fullName}
             </AppText>
           </View>
         </View>
@@ -207,7 +213,7 @@ const AssignPriceScreen: React.FC = () => {
 
       {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
       <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>{t('Danh sách gán giá NCC')}</AppText>
+        <AppText style={styles.titleText}>{t('assignPrice.header')}</AppText>
         <View style={styles.countBadge}>
           <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
         </View>

@@ -19,6 +19,7 @@ import IconEditAvatar from '@assets/icon/IconEditAvatar';
 import IconLanguage from '@assets/icon/IconLanguage';
 import IconLogout from '@assets/icon/IconLogout';
 import IconVietNam from '@assets/icon/IconVietNam';
+import { useLanguage } from '@/hook/useLanguage';
 
 const animatedDelay = (index: number) => FadeInDown.delay(150 * index).springify();
 
@@ -26,6 +27,7 @@ const AccountScreen = () => {
   const { t } = useTranslation();
   const { infoUser } = useInfoUser();
   const { showAlert } = useAlert();
+  const { toggleLanguage } = useLanguage();
   const [allowNotification, setAllowNotification] = useState(false);
 
   const toggleAllowNotification = () => setAllowNotification(prev => !prev);
@@ -70,6 +72,7 @@ const AccountScreen = () => {
           key: 'language',
           icon: <IconLanguage />,
           title: t('account.language'),
+          onPress: toggleLanguage,
           right: (
             <>
               <IconVietNam />
