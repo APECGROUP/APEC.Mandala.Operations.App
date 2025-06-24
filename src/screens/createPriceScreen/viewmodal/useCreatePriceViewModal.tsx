@@ -99,37 +99,48 @@ export function useCreatePriceViewModel() {
   //   };
   const { showAlert } = useAlert();
   const onDelete = useCallback(
-    async (id: string) => {
+    async (id: string, onSuccess?: (deletedId: string) => void) => {
       const cached = queryClient.getQueryData<InfiniteData<TypeCreatePrice[]>>([
         'listCreatePrice',
         searchKey.trim(),
       ]);
       if (!cached) {
         console.warn('🟥 No cache found for key:', ['listCreatePrice', searchKey.trim()]);
-        return;
+        return false;
       }
 
-      if (Number(id) % 3 === 0) {
-        console.log('✅ Updating price...');
-        queryClient.setQueryData(['listCreatePrice', searchKey.trim()], {
-          ...cached,
-          pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
-        });
-      } else {
-        await new Promise(resolve => setTimeout(() => resolve(undefined), 500));
-        return showAlert(t('createPrice.warningRemove'), '', [
-          {
-            text: t('createPrice.close'),
-            onPress: () => {},
-          },
-        ]);
+      try {
+        if (Number(id) % 5 !== 0) {
+          console.log('✅ Deleting item successfully...');
+          queryClient.setQueryData(['listCreatePrice', searchKey.trim()], {
+            ...cached,
+            pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
+          });
+
+          // Gọi callback khi xóa thành công
+          onSuccess?.(id);
+          return true;
+        } else {
+          // Simulate failed delete
+          await new Promise(resolve => setTimeout(() => resolve(undefined), 500));
+          showAlert(t('createPrice.warningRemove'), '', [
+            {
+              text: t('createPrice.close'),
+              onPress: () => {},
+            },
+          ]);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error deleting item:', error);
+        return false;
       }
     },
     [queryClient, searchKey, showAlert, t],
   );
 
   const handleDelete = useCallback(
-    (id: string) => {
+    (id: string, onSuccess?: (deletedId: string) => void) => {
       showAlert(t('createPrice.remove.title'), '', [
         {
           text: t('createPrice.remove.cancel'),
@@ -138,7 +149,12 @@ export function useCreatePriceViewModel() {
         },
         {
           text: t('createPrice.remove.agree'),
-          onPress: () => onDelete(id),
+          onPress: async () => {
+            const success = await onDelete(id, onSuccess);
+            if (!success) {
+              console.log('❌ Delete failed, no action needed');
+            }
+          },
         },
       ]);
     },

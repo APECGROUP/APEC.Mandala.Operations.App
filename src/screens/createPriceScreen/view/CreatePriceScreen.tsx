@@ -166,6 +166,13 @@ const CreatePriceScreen: React.FC = () => {
     setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
   }, []);
 
+  // Callback để xử lý khi xóa thành công
+  const handleDeleteSuccess = useCallback((deletedId: string) => {
+    // Nếu item đã được selected thì trừ đi 1 số lượng
+    setSelectedIds(prev => prev.filter(id => id !== deletedId));
+    console.log(`✅ Item ${deletedId} deleted successfully and removed from selection`);
+  }, []);
+
   const toggleSelectAll = useCallback(() => {
     const allIds = flatData.map(item => item.id);
     if (selectedIds.length === flatData.length) {
@@ -179,13 +186,13 @@ const CreatePriceScreen: React.FC = () => {
     ({ item }: { item: TypeCreatePrice; index: number }) => (
       <CreatePriceCard
         item={item}
-        handleDelete={handleDelete}
+        handleDelete={id => handleDelete(id, handleDeleteSuccess)}
         handleSelect={handleSelect}
         isSelected={selectedIds.includes(item.id)}
         simultaneousGesture={flashListNativeGesture}
       />
     ),
-    [handleDelete, handleSelect, selectedIds, flashListNativeGesture],
+    [handleDelete, handleSelect, selectedIds, flashListNativeGesture, handleDeleteSuccess],
   );
 
   const selectedAll = useMemo(
