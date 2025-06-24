@@ -156,7 +156,10 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
             value={hotel?.name?.toString()}
             placeholder={t('auth.login.pickHotel')}
             rightIcon={
-              <IconArrowRight stroke="#D8D8D8" style={{ transform: [{ rotate: '90deg' }] }} />
+              <IconArrowRight
+                stroke={Colors.ICON_SECONDARY}
+                style={{ transform: [{ rotate: '90deg' }], marginRight: s(2) }}
+              />
             }
             // onPress={onPickHotel}
             inputStyle={styles.inputStyle}

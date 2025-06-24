@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { TypeCreatePrice, fetchCreatePrice } from '../modal/CreatePriceModal';
 import debounce from 'lodash/debounce';
@@ -12,6 +12,7 @@ export function useCreatePriceViewModel() {
   const { t } = useTranslation();
   const [searchKey, setSearchKey] = useState<string>('');
   const queryClient = useQueryClient();
+  const debouncedSearchRef = useRef<ReturnType<typeof debounce> | null>(null);
 
   // Infinite Query cho phân trang + search
   const {
@@ -24,11 +25,10 @@ export function useCreatePriceViewModel() {
     hasNextPage,
     isRefetching,
   } = useInfiniteQuery<TypeCreatePrice[], Error>({
-    queryKey: ['listCreatePrice', searchKey.trim(), searchKey],
-
+    queryKey: ['listCreatePrice', searchKey.trim()],
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchCreatePrice(page, ITEMS_PER_PAGE, searchKey);
+      return fetchCreatePrice(page, ITEMS_PER_PAGE, searchKey.trim());
     },
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
@@ -39,15 +39,15 @@ export function useCreatePriceViewModel() {
   // Gộp data các page lại thành 1 mảng
   const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
   // console.log('render useAssignPriceViewModel');
-  // Debounce search
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((key: string) => {
+  // Debounce search - chỉ tạo một lần
+  const debouncedSearch = useMemo(() => {
+    if (!debouncedSearchRef.current) {
+      debouncedSearchRef.current = debounce((key: string) => {
         setSearchKey(key);
-        // queryClient.removeQueries({queryKey: ['listAssignPrice']});
-      }, DEBOUNCE_DELAY),
-    [],
-  );
+      }, DEBOUNCE_DELAY);
+    }
+    return debouncedSearchRef.current;
+  }, []);
 
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
@@ -98,46 +98,52 @@ export function useCreatePriceViewModel() {
   //     });
   //   };
   const { showAlert } = useAlert();
-  const onDelete = async (id: string) => {
-    const cached = queryClient.getQueryData<InfiniteData<TypeCreatePrice[]>>([
-      'listCreatePrice',
-      searchKey.trim(),
-    ]);
-    if (!cached) {
-      console.warn('🟥 No cache found for key:', ['listCreatePrice', searchKey.trim()]);
-      return;
-    }
-    // const isSuccess = await deleteCreatePrice(id);
-    // if (isSuccess) {
-    if (Number(id) % 3 === 0) {
-      console.log('✅ Updating price...');
-      queryClient.setQueryData(['listCreatePrice', searchKey.trim()], {
-        ...cached,
-        pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
-      });
-    } else {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return showAlert(t('createPrice.warningRemove'), '', [
+  const onDelete = useCallback(
+    async (id: string) => {
+      const cached = queryClient.getQueryData<InfiniteData<TypeCreatePrice[]>>([
+        'listCreatePrice',
+        searchKey.trim(),
+      ]);
+      if (!cached) {
+        console.warn('🟥 No cache found for key:', ['listCreatePrice', searchKey.trim()]);
+        return;
+      }
+
+      if (Number(id) % 3 === 0) {
+        console.log('✅ Updating price...');
+        queryClient.setQueryData(['listCreatePrice', searchKey.trim()], {
+          ...cached,
+          pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
+        });
+      } else {
+        await new Promise(resolve => setTimeout(() => resolve(undefined), 500));
+        return showAlert(t('createPrice.warningRemove'), '', [
+          {
+            text: t('createPrice.close'),
+            onPress: () => {},
+          },
+        ]);
+      }
+    },
+    [queryClient, searchKey, showAlert, t],
+  );
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      showAlert(t('createPrice.remove.title'), '', [
         {
-          text: t('createPrice.close'),
+          text: t('createPrice.remove.cancel'),
+          style: 'cancel',
           onPress: () => {},
         },
+        {
+          text: t('createPrice.remove.agree'),
+          onPress: () => onDelete(id),
+        },
       ]);
-    }
-  };
-  const handleDelete = (id: string) => {
-    showAlert(t('createPrice.remove.title'), '', [
-      {
-        text: t('createPrice.remove.cancel'),
-        style: 'cancel',
-        onPress: () => {},
-      },
-      {
-        text: t('createPrice.remove.agree'),
-        onPress: () => onDelete(id),
-      },
-    ]);
-  };
+    },
+    [showAlert, t, onDelete],
+  );
 
   return {
     flatData,

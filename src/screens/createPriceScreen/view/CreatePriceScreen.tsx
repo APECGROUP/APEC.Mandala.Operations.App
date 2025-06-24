@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useRef, useCallback, useMemo, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -13,12 +13,7 @@ import {
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  FadeInLeft,
-} from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 
@@ -44,14 +39,14 @@ import CreatePriceCard from './component/CreatePriceCard';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import { Colors } from '@/theme/Config';
-import { Gesture } from 'react-native-gesture-handler'; // Thêm dòng này
+import { Gesture } from 'react-native-gesture-handler';
 import IconCreatePrice from '@assets/icon/IconCreatePrice';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 
 const CreatePriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
-
+  console.log('CreatePriceScreen');
   const refToast = useRef<any>(null);
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
@@ -67,6 +62,7 @@ const CreatePriceScreen: React.FC = () => {
     searchKey,
   } = useCreatePriceViewModel();
   const { infoUser } = useInfoUser();
+
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
   const flashListRef = useRef<FlashList<TypeCreatePrice> | null>(null);
   const lastOffsetY = useRef<number>(0);
@@ -85,21 +81,24 @@ const CreatePriceScreen: React.FC = () => {
   }));
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
-  };
-  const scrollToBottom = () => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
     flashListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * onScroll handler:
    *  - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
    *  - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
    */
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
     // Scroll xuống (lúc này y > lastOffsetY): hiện scroll‐to‐bottom, ẩn scroll‐to‐top
     if (y > lastOffsetY.current && y > 100) {
@@ -116,17 +115,15 @@ const CreatePriceScreen: React.FC = () => {
       showScrollToBottom.value = 0;
     }
     lastOffsetY.current = y;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ─── Khi bấm "Tìm kiếm" (submit) hoặc nút "Filter" ───────────────────────
-  const handleSubmitSearch = () => {
-    // Gọi onSearch của ViewModel để cập nhật searchKey → trigger loadPage(1, key)
-    // scrollToTop();
-    // onSearch(inputKey.trim());
+  const handleSubmitSearch = useCallback(() => {
     navigate('FilterScreen');
-  };
+  }, []);
 
-  const listEmptyComponent = () => {
+  const listEmptyComponent = useMemo(() => {
     if (isLoading) {
       return (
         <View style={styles.emptyContainer}>
@@ -143,9 +140,10 @@ const CreatePriceScreen: React.FC = () => {
         </AppBlockButton>
       </View>
     );
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, t]);
 
-  const listFooterComponent = () => {
+  const listFooterComponent = useMemo(() => {
     if (isFetchingNextPage) {
       return (
         <View style={styles.footerLoading}>
@@ -153,9 +151,12 @@ const CreatePriceScreen: React.FC = () => {
         </View>
       );
     }
-  };
+    return null;
+  }, [isFetchingNextPage]);
 
-  const goToNotification = () => navigate('NotificationScreen');
+  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
+  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
+  const onCreatePrice = useCallback(() => navigate('CreatePriceNccScreen'), []);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -165,51 +166,38 @@ const CreatePriceScreen: React.FC = () => {
     setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
   }, []);
 
-  const goToAccount = () => navigate('AccountScreen');
-
-  const toggleSelectAll = () => {
+  const toggleSelectAll = useCallback(() => {
     const allIds = flatData.map(item => item.id);
     if (selectedIds.length === flatData.length) {
       setSelectedIds([]); // Bỏ chọn tất cả
     } else {
       setSelectedIds(allIds); // Chọn tất cả
     }
-  };
-
-  const onCreatePrice = () => {
-    navigate('CreatePriceNccScreen');
-  };
+  }, [selectedIds.length, flatData]);
 
   const renderItem = useCallback(
-    ({ item, index }: { item: TypeCreatePrice; index: number }) => {
-      const isSelected = selectedIds.includes(item.id);
-      return (
-        <Animated.View
-          entering={FadeInLeft.delay(index * 10)
-            .duration(0)
-            .springify()}>
-          <CreatePriceCard
-            item={item}
-            handleDelete={handleDelete}
-            handleSelect={handleSelect}
-            isSelected={isSelected}
-            simultaneousGesture={flashListNativeGesture}
-          />
-        </Animated.View>
-      );
-    },
-    [selectedIds, handleDelete, handleSelect, flashListNativeGesture],
+    ({ item }: { item: TypeCreatePrice; index: number }) => (
+      <CreatePriceCard
+        item={item}
+        handleDelete={handleDelete}
+        handleSelect={handleSelect}
+        isSelected={selectedIds.includes(item.id)}
+        simultaneousGesture={flashListNativeGesture}
+      />
+    ),
+    [handleDelete, handleSelect, selectedIds, flashListNativeGesture],
   );
 
   const selectedAll = useMemo(
     () => selectedIds.length === flatData.length && flatData.length > 0,
-    [selectedIds, flatData],
+    [selectedIds.length, flatData.length],
   );
 
   return (
     <View style={styles.container}>
       {/* ─── Background Image ─────────────────────────────────────────────── */}
       <FastImage
+        id="backgroundImage"
         style={styles.backgroundImage}
         source={Images.BackgroundAssignPrice}
         resizeMode={FastImage.resizeMode.cover}
@@ -315,7 +303,6 @@ const CreatePriceScreen: React.FC = () => {
         <AnimatedButton
           onPress={scrollToBottom}
           style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-          {/* style={[styles.scrollButtonContainer, opacityScrollBottomStyle]}> */}
           <IconScrollBottom />
         </AnimatedButton>
       )}

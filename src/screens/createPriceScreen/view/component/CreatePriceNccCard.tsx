@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
 import IconListPen from '@assets/icon/IconListPen';
@@ -16,105 +16,122 @@ import { AnimatedButton } from '../CreatePriceScreen';
 import { Colors } from '@/theme/Config';
 import { moneyFormat } from '@/utils/Utilities';
 
-const CreatePriceNccCard = ({
-  item,
-  isSelected,
-  handleDelete,
-  handleSelect,
-  simultaneousGesture,
-}: {
+interface CreatePriceNccCardProps {
   item: TypeCreatePrice;
   isSelected: boolean;
   handleDelete: (id: string) => void;
   handleSelect: (id: string) => void;
-  simultaneousGesture: any; // Hoặc 'any' nếu bạn muốn đơn giản
-}) => {
-  const [expanded, setExpanded] = useState(false);
+  simultaneousGesture: any;
+}
 
-  // SharedValue để đồng bộ chiều cao cho delete button
-  const heightAction = useSharedValue(0);
+const CreatePriceNccCard = memo<CreatePriceNccCardProps>(
+  ({ item, isSelected, handleDelete, handleSelect, simultaneousGesture }) => {
+    const [expanded, setExpanded] = useState(false);
 
-  // Animate delete button theo heightAction
-  const animatedDeleteStyle = useAnimatedStyle(() => ({
-    height: heightAction.value,
-  }));
+    // SharedValue để đồng bộ chiều cao cho delete button
+    const heightAction = useSharedValue(0);
 
-  // onLayout gọi mỗi khi layout thay đổi (do expand/collapse)
-  const onItemLayout = (e: any) => {
-    const height = e.nativeEvent.layout.height - vs(1);
-    heightAction.value = withTiming(height, { duration: 0 });
-  };
+    // Animate delete button theo heightAction
+    const animatedDeleteStyle = useAnimatedStyle(() => ({
+      height: heightAction.value,
+    }));
 
-  // Xử lý expand/collapse
-  const handleExpand = () => {
-    setExpanded(prev => !prev);
-  };
+    // onLayout gọi mỗi khi layout thay đổi (do expand/collapse)
+    const onItemLayout = useCallback((e: any) => {
+      const height = e.nativeEvent.layout.height - vs(1);
+      heightAction.value = withTiming(height, { duration: 0 });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-  // Phần render nút delete
-  const renderRightActions = (id: string) => (
-    <AnimatedButton
-      activeOpacity={1}
-      style={[styles.deleteBtn, animatedDeleteStyle]}
-      onPress={() => handleDelete(id)}>
-      <IconTrashPrice />
-    </AnimatedButton>
-  );
+    // Xử lý expand/collapse
+    const handleExpand = useCallback(() => {
+      setExpanded(prev => !prev);
+    }, []);
 
-  return (
-    <ReanimatedSwipeable
-      renderRightActions={() => renderRightActions(item.id)}
-      simultaneousGesture={simultaneousGesture}
-      onSwipe={() => {}}>
-      <View
-        style={[styles.itemContainer, expanded ? styles.itemExpanded : styles.itemCollapsed]}
-        onLayout={onItemLayout} // Ghi nhận chiều cao để animate nút xóa
-      >
-        <View style={styles.headerItem}>
-          <AppBlockButton onPress={() => handleSelect(item.id)} style={styles.left}>
-            {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
-          </AppBlockButton>
+    // Phần render nút delete
+    const renderRightActions = useCallback(
+      (id: string) => (
+        <AnimatedButton
+          activeOpacity={1}
+          style={[styles.deleteBtn, animatedDeleteStyle]}
+          onPress={() => handleDelete(id)}>
+          <IconTrashPrice />
+        </AnimatedButton>
+      ),
+      [animatedDeleteStyle, handleDelete],
+    );
 
-          <AppBlockButton
-            style={styles.center}
-            onPress={() => console.log('Đi tới chi tiết:', item.id)}>
-            <View style={styles.row}>
-              <View style={styles.iconWrapper}>
-                <IconListPen />
-              </View>
-              <View style={styles.nameWrapper}>
-                <AppText style={styles.name}>{item.name}</AppText>
-                <View style={styles.rowStyle}>
-                  <AppText style={styles.titlePrice}>Giá: </AppText>
-                  <AppText style={styles.price}>
-                    {moneyFormat(item.price, '.', '')}/{item.end}/{item.vat}
-                  </AppText>
+    const handleSelectPress = useCallback(() => {
+      handleSelect(item.id);
+    }, [handleSelect, item.id]);
+
+    const handleDetailPress = useCallback(() => {
+      console.log('Đi tới chi tiết:', item.id);
+    }, [item.id]);
+
+    const formattedPrice = useMemo(
+      () => `${moneyFormat(item.price, '.', '')}/${item.end}/${item.vat}`,
+      [item.price, item.end, item.vat],
+    );
+
+    const detailItems = useMemo(
+      () => [
+        { label: 'Thời gian', value: item.time },
+        { label: 'NCC', value: item.ncc },
+      ],
+      [item.time, item.ncc],
+    );
+
+    return (
+      <ReanimatedSwipeable
+        renderRightActions={() => renderRightActions(item.id)}
+        simultaneousGesture={simultaneousGesture}
+        onSwipe={() => {}}>
+        <View
+          style={[styles.itemContainer, expanded ? styles.itemExpanded : styles.itemCollapsed]}
+          onLayout={onItemLayout}>
+          <View style={styles.headerItem}>
+            <AppBlockButton onPress={handleSelectPress} style={styles.left}>
+              {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
+            </AppBlockButton>
+
+            <AppBlockButton style={styles.center} onPress={handleDetailPress}>
+              <View style={styles.row}>
+                <View style={styles.iconWrapper}>
+                  <IconListPen />
+                </View>
+                <View style={styles.nameWrapper}>
+                  <AppText style={styles.name}>{item.name}</AppText>
+                  <View style={styles.rowStyle}>
+                    <AppText style={styles.titlePrice}>Giá: </AppText>
+                    <AppText style={styles.price}>{formattedPrice}</AppText>
+                  </View>
                 </View>
               </View>
-            </View>
-          </AppBlockButton>
+            </AppBlockButton>
 
-          <AppBlockButton style={styles.right} onPress={handleExpand}>
-            <Icon name={expanded ? 'expand-less' : 'expand-more'} size={vs(20)} color="#999" />
-          </AppBlockButton>
-        </View>
-
-        {expanded && (
-          <View style={styles.expandedContent}>
-            {[
-              { label: 'Thời gian', value: item.time },
-              { label: 'NCC', value: item.ncc },
-            ].map(({ label, value }, idx) => (
-              <View key={idx} style={styles.detailRow}>
-                <AppText style={styles.detailLabel}>{label}</AppText>
-                <AppText style={styles.detailValue}>{value}</AppText>
-              </View>
-            ))}
+            <AppBlockButton style={styles.right} onPress={handleExpand}>
+              <Icon name={expanded ? 'expand-less' : 'expand-more'} size={vs(20)} color="#999" />
+            </AppBlockButton>
           </View>
-        )}
-      </View>
-    </ReanimatedSwipeable>
-  );
-};
+
+          {expanded && (
+            <View style={styles.expandedContent}>
+              {detailItems.map(({ label, value }, idx) => (
+                <View key={idx} style={styles.detailRow}>
+                  <AppText style={styles.detailLabel}>{label}</AppText>
+                  <AppText style={styles.detailValue}>{value}</AppText>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+      </ReanimatedSwipeable>
+    );
+  },
+);
+
+CreatePriceNccCard.displayName = 'CreatePriceNccCard';
 
 export default CreatePriceNccCard;
 
@@ -136,6 +153,10 @@ const styles = ScaledSheet.create({
     paddingVertical: vs(10),
   },
   row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rowStyle: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -216,8 +237,4 @@ const styles = ScaledSheet.create({
     width: s(50),
     borderRadius: '8@s',
   },
-});
-
-const styles = StyleSheet.create({
-  rowStyle: { flexDirection: 'row', alignItems: 'center' },
 });
