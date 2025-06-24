@@ -1,5 +1,5 @@
 import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { s, vs } from 'react-native-size-matters';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ToastContainer from '@/elements/toast/ToastContainer';
@@ -22,6 +22,9 @@ import FastImage from 'react-native-fast-image';
 import { TYPE_TOAST } from '@/elements/toast/Message';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import DataLocal from '@/data/DataLocal';
+import { useAutoLogin } from '@/hook/useAutoLogin';
+
 export type typeHotel = {
   id: number | string | undefined;
   name: number | string | undefined;
@@ -35,6 +38,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   const { t } = useTranslation();
   const { setIsLogin } = useIsLogin();
   const { saveInfoUser, infoUser } = useInfoUser();
+  const { credentials, loading: loadingCredentials } = useAutoLogin();
   const refToast = useRef<any>(null);
   const refPassword = useRef<TextInput>(null);
   const [userName, setUserName] = useState('');
@@ -43,21 +47,48 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   const { isRememberLogin, setIsRememberLogin } = useIsLogin();
   const [processing, setProcessing] = useState<boolean | undefined>(false);
 
+  // Tự động điền thông tin đăng nhập nếu có
+  useEffect(() => {
+    if (credentials && !loadingCredentials) {
+      setUserName(credentials.username);
+      setPassword(credentials.password);
+      if (credentials.hotel && credentials.hotel.id) {
+        setHotel(credentials.hotel);
+      }
+      setIsRememberLogin(true);
+      DataLocal.setRememberLogin(true);
+    }
+  }, [credentials, loadingCredentials]);
+
   const disabled = !userName || !password || !hotel.id;
   const { bottom } = useSafeAreaInsets();
+
   const onSubmit = async () => {
     setProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise<void>(resolve => setTimeout(() => resolve(), 2000));
     setProcessing(false);
+
     if (userName.toLocaleLowerCase() === 'approve') {
       saveInfoUser({ ...infoUser, isApprove: true });
       setIsLogin(true);
+      // Luôn lưu thông tin đăng nhập
+      await DataLocal.saveLoginCredentials(userName, password, hotel);
+      // Chỉ hiện thông báo khi user tích "Nhớ đăng nhập"
+      if (isRememberLogin) {
+        refToast.current?.show('Đã lưu thông tin đăng nhập', TYPE_TOAST.SUCCESS);
+      }
     }
     if (userName.toLocaleLowerCase() !== 'dung') {
       saveInfoUser({ ...infoUser, isApprove: false });
       return refToast.current?.show(t('auth.login.loginError'), TYPE_TOAST.ERROR);
     } else {
       setIsLogin(true);
+      // Luôn lưu thông tin đăng nhập
+      await DataLocal.saveLoginCredentials(userName, password, hotel);
+      // Chỉ hiện thông báo khi user tích "Nhớ đăng nhập"
+      if (isRememberLogin) {
+        refToast.current?.show('Đã lưu thông tin đăng nhập', TYPE_TOAST.SUCCESS);
+      }
     }
 
     // try {
@@ -76,6 +107,12 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
     //   setProcessing(false);
     //   await DataLocal.saveAll(resp);
     //   DataLocal.setRememberLogin(isRememberLogin);
+    //   // Luôn lưu credentials
+    //   await DataLocal.saveLoginCredentials(userName, password, hotel);
+    //   // Chỉ hiện thông báo khi user tích "Nhớ đăng nhập"
+    //   if (isRememberLogin) {
+    //     refToast.current?.show('Đã lưu thông tin đăng nhập', TYPE_TOAST.SUCCESS);
+    //   }
     //   if (resp.status !== 200) {
     //     throw new Error();
     //   }
@@ -96,11 +133,22 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
 
   const onSave = () => {
     setIsRememberLogin(!isRememberLogin);
+    DataLocal.setRememberLogin(!isRememberLogin);
   };
 
   const onForgotPassword = () => {
     navigation.navigate('ForgotPasswordScreen');
   };
+
+  const handleClearCredentials = () => {
+    // Refresh form khi xóa credentials
+    setUserName('');
+    setPassword('');
+    setHotel({} as typeHotel);
+    setIsRememberLogin(false);
+    DataLocal.setRememberLogin(false);
+  };
+
   console.log('hotel', hotel);
   return (
     <View style={[styles.container, { paddingBottom: bottom }]}>
@@ -113,12 +161,16 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
           }}
           source={Images.BackgroundAssignPrice}
         />
+
+        {/* Hiển thị thông tin credentials đã lưu */}
+
         <AppTextInput
           required
           labelStyle={styles.labelUser}
           label={t('auth.login.userName')}
           placeholderTextColor={light.placeholderTextColor}
           value={userName}
+          maxLength={20}
           onChangeText={setUserName}
           placeholder={t('auth.login.inputUserName')}
           onSubmitEditing={() => refPassword.current?.focus()}
@@ -136,6 +188,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
           label={t('auth.login.password')}
           secureTextEntry
           value={password}
+          maxLength={20}
           onChangeText={setPassword}
           onSubmitEditing={onPickHotel}
           placeholder={t('auth.login.inputPassword')}

@@ -3,13 +3,13 @@
     "auth": {
       "login": {
         "title": "Hello",
-        "subtitle": "Log in to your account to work",
+        "subtitle": "Login to your account to work",
         "userName": "Username",
         "password": "Password",
-        "login": "Log in",
+        "login": "Login",
         "inputUserName": "Enter username",
         "inputPassword": "Enter password",
-        "loginError": "Incorrect username or password. Please check again",
+        "loginError": "Username or password is incorrect. Please check again",
         "hotel": "Hotel",
         "pickHotel": "Select hotel",
         "saveInfoLogin": "Save login information",

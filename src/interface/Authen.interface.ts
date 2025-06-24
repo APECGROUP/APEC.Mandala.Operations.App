@@ -52,71 +52,12 @@ export interface TypeProfile {
   ssnType: null;
 }
 
-// check login
-export enum ECheckLoginStatus {
-  SUCCESS = 0, // Thành công
-  ACCOUNT_NOT_EXISTS = 1, // chưa đăng ký tài khoản
-  ACCOUNT_LOCKED = 2, // user bị khoá
-  OTP_REQUIRED = 3, // cần gửi otp
-  OTP_REQUIRED_EX = 4, // ko cần gửi otp
-  PASSWORD_REQUIRED = 5, // user đã từng dùng qua rồi
-}
-
-// check otp login/register
-export enum ECheckOtpStatus {
-  SUCCESS = 0, // Thành công
-  WRONG_OTP = 1, // sai mã otp
-  MAX_TIME_OTP = 2, // quá số lần nhập sai otp
-  WRONG_SESSION = 3, // sai sessionId
-}
-
 // login
 export enum ELoginStatus {
   SUCCESS = 0, // Thành công
   INVALID_USERNAME_OR_PASSWORD = 1, // tk hoặc mk không đúng
   LOCKED_OUT = 2, // tài khoản bị khoá
   FAILED = 3, // các lỗi khác từ uaa
-}
-
-// register
-export enum ERegisterStatus {
-  SUCCESS = 0, // Thành công
-  USER_CONFLICT = 1, // user này đã được đăng ký rồi
-}
-
-// gen otp register
-export enum EGenOtpRegisterStatus {
-  OTP_REQUIRED = 3, // cần gửi otp
-  OTP_REQUIRED_EX = 4, // ko cần gửi otp
-}
-
-// verify email
-export enum EVerifyEmailStatus {
-  SUCCESS = 0, // Thành công
-  WRONG_OTP = 1, // sai mã otp
-  MAX_TIME_OTP = 2, // quá số lần nhập sai otp
-  EMAIL_VERIFIED = 3, // email đã được xác thực rồi
-}
-
-// send otp to email
-export enum ESendOtpEmailStatus {
-  SUCCESS = 0, // Thành công
-  USER_PROFILE_NOT_FOUND = 1, // không tìm thấy profile người dùng
-}
-
-// gen otp password reset
-export enum EGenOtpResetPasswordStatus {
-  SUCCESS = 0, // Thành công
-  OTP_REQUIRED = 1, // cần gửi otp
-  OTP_REQUIRED_EX = 2, // ko cần gửi otp
-}
-
-// verify otp password reset
-export enum EVerifyOtpResetPasswordStatus {
-  SUCCESS = 0, // Thành công
-  WRONG_OTP = 1, // sai mã otp
-  MAX_TIME_OTP = 2, // quá số lần nhập sai otp
-  WRONG_SESSION = 3, // sai sessionId
 }
 
 // reset password

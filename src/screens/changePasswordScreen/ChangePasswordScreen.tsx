@@ -14,6 +14,9 @@ import { AppButton } from '@/elements/button/AppButton';
 import { getFontSize, SCREEN_WIDTH } from '@/constants';
 import IconClose from '@assets/icon/IconClose';
 import { useKeyboard } from '@/hook/keyboardHook';
+import DataLocal from '@/data/DataLocal';
+import { useAutoLogin } from '@/hook/useAutoLogin';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<MainParams, 'ChangePasswordScreen'>;
 
@@ -21,6 +24,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
   const { keyboardHeight, keyboardVisible } = useKeyboard();
+  const { credentials } = useAutoLogin();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -40,13 +44,37 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
     try {
       setProcessing(true);
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Kiểm tra mật khẩu hiện tại có đúng không
+      if (credentials && currentPassword !== credentials.password) {
+        Toast.show({
+          type: 'error',
+          text2: 'Mật khẩu hiện tại không đúng',
+        });
+        setProcessing(false);
+        return;
+      }
+
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
+
+      // Cập nhật mật khẩu mới vào Keychain
+      if (credentials) {
+        await DataLocal.saveCredentials(credentials.username, newPassword, credentials.hotel);
+        Toast.show({
+          type: 'success',
+          text2: 'Đổi mật khẩu thành công',
+        });
+      }
+
       setProcessing(false);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
       goBack();
     } catch (error) {
       console.log(error);
-    } finally {
+      Toast.show({
+        type: 'error',
+        text2: 'Đổi mật khẩu thất bại',
+      });
+      setProcessing(false);
     }
     // Gọi API đổi mật khẩu hoặc xử lý xác thực tại đây
   };
@@ -77,6 +105,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
             placeholder={t('account.changePassword.inputCurrentPassword')}
             value={currentPassword}
             secureTextEntry
+            maxLength={20}
             onChangeText={setCurrentPassword}
             inputStyle={styles.input}
             containerStyle={{
@@ -91,6 +120,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
             placeholder={t('account.changePassword.inputNewPassword')}
             value={newPassword}
             secureTextEntry
+            maxLength={20}
             onChangeText={setNewPassword}
             inputStyle={styles.input}
             containerStyle={{
@@ -105,6 +135,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
             placeholder={t('account.changePassword.inputConfirmPassword')}
             value={confirmPassword}
             secureTextEntry
+            maxLength={20}
             onChangeText={setConfirmPassword}
             inputStyle={styles.input}
             containerStyle={{

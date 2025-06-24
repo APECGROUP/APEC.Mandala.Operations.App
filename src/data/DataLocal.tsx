@@ -1,6 +1,7 @@
 // 🧾 Giải thích:
 // - Quản lý token, user, trạng thái đăng nhập.
-// - Token được lưu bằng Keychain (bảo mật).
+// - Tài khoản + mật khẩu được lưu bằng Keychain (bảo mật).
+// - Token được lưu bằng MMKV (nhanh hơn).
 // - User vẫn dùng storage vì không cần bảo mật cao.
 
 // 📦 Package cần thiết:
@@ -21,6 +22,7 @@ export const TOKEN_KEY = 'ACCESS_TOKEN';
 export const USER_KEY = 'USER_INFO';
 export const REMEMBER_KEY = 'REMEMBER_LOGIN';
 export const LANGUAGE_KEY = 'CURRENT_LANGUAGE';
+export const CREDENTIALS_KEY = 'USER_CREDENTIALS';
 
 export type TokenType = {
   accessToken: string;
@@ -29,11 +31,21 @@ export type TokenType = {
   refreshExpiresAt: number;
 };
 
+export type CredentialsType = {
+  username: string;
+  password: string;
+  hotel: {
+    id: number | string | undefined;
+    name: number | string | undefined;
+  };
+};
+
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 const DataLocal = {
   token: null as TokenType | null,
   user: null as TypeUser | null,
+  credentials: null as CredentialsType | null,
   authStatus: 'loading' as AuthStatus,
   rememberLogin: false,
   currentLanguage: 'vi' as string, // Mặc định là tiếng Việt
@@ -43,7 +55,50 @@ const DataLocal = {
     useIsLogin.getState().setIsLogin(status === 'authenticated');
   },
 
-  // ✅ Lưu token vào Keychain
+  // ✅ Lưu thông tin đăng nhập (username + password + hotel) khi user chọn "Nhớ đăng nhập"
+  saveLoginCredentials: async (
+    username: string,
+    password: string,
+    hotel: { id: number | string | undefined; name: number | string | undefined },
+  ): Promise<void> => {
+    await DataLocal.saveCredentials(username, password, hotel);
+  },
+
+  // ✅ Lưu tài khoản + mật khẩu + khách sạn vào Keychain
+  saveCredentials: async (
+    username: string,
+    password: string,
+    hotel: { id: number | string | undefined; name: number | string | undefined },
+  ): Promise<void> => {
+    try {
+      const credentials: CredentialsType = { username, password, hotel };
+      DataLocal.credentials = credentials;
+      await Keychain.setGenericPassword(CREDENTIALS_KEY, JSON.stringify(credentials));
+    } catch (error) {
+      Toast.show({ type: 'error', text2: 'Lưu thông tin đăng nhập thất bại' });
+    }
+  },
+
+  // ✅ Lấy tài khoản + mật khẩu từ Keychain
+  getCredentials: async (): Promise<CredentialsType | null> => {
+    if (DataLocal.credentials) {
+      return DataLocal.credentials;
+    }
+
+    try {
+      const credentials = await Keychain.getGenericPassword();
+      if (credentials) {
+        const parsedCredentials: CredentialsType = JSON.parse(credentials.password);
+        DataLocal.credentials = parsedCredentials;
+        return parsedCredentials;
+      }
+    } catch (error) {
+      Toast.show({ type: 'error', text2: 'Lấy thông tin đăng nhập thất bại' });
+    }
+    return null;
+  },
+
+  // ✅ Lưu token vào MMKV
   saveToken: async (
     accessToken: string,
     refreshToken: string,
@@ -60,7 +115,7 @@ const DataLocal = {
       };
 
       DataLocal.token = tokenData;
-      await Keychain.setGenericPassword(TOKEN_KEY, JSON.stringify(tokenData));
+      storage.set(TOKEN_KEY, JSON.stringify(tokenData));
 
       DataLocal.setAuthStatus('authenticated');
     } catch (error) {
@@ -68,16 +123,16 @@ const DataLocal = {
     }
   },
 
-  // ✅ Lấy token từ Keychain
+  // ✅ Lấy token từ MMKV
   getToken: async (): Promise<TokenType | null> => {
     if (DataLocal.token) {
       return DataLocal.token;
     }
 
     try {
-      const credentials = await Keychain.getGenericPassword();
-      if (credentials) {
-        const parsedToken: TokenType = JSON.parse(credentials.password);
+      const storedToken = storage.getString(TOKEN_KEY);
+      if (storedToken) {
+        const parsedToken: TokenType = JSON.parse(storedToken);
         const currentTime = moment().valueOf();
 
         if (currentTime < parsedToken.expiresAt) {
@@ -173,13 +228,22 @@ const DataLocal = {
     }
   },
 
-  // ✅ Xoá toàn bộ thông tin (Keychain + storage)
+  // ✅ Xoá toàn bộ thông tin (Keychain + MMKV + storage)
   removeAll: async (): Promise<void> => {
     try {
       DataLocal.token = null;
       DataLocal.user = null;
-      await Keychain.resetGenericPassword();
+      DataLocal.credentials = null;
+
+      // Xóa token từ MMKV
+      storage.delete(TOKEN_KEY);
+
+      // Xóa user từ storage
       storage.delete(USER_KEY);
+
+      // Xóa credentials từ Keychain
+      await Keychain.resetGenericPassword();
+
       await useInfoUser.getState().saveInfoUser({} as TypeUser);
       DataLocal.setAuthStatus('unauthenticated');
     } catch (error) {
@@ -233,6 +297,7 @@ const DataLocal = {
     if (DataLocal.rememberLogin) {
       await DataLocal.getUser();
       await DataLocal.getToken();
+      await DataLocal.getCredentials(); // Load credentials nếu có
     } else {
       await DataLocal.removeAll();
     }
@@ -244,6 +309,12 @@ const DataLocal = {
   setRememberLogin: (val: boolean): void => {
     DataLocal.rememberLogin = val;
     storage.set(REMEMBER_KEY, val ? 'true' : 'false');
+
+    // Nếu tắt "Nhớ đăng nhập" thì xóa credentials
+    if (!val) {
+      DataLocal.credentials = null;
+      Keychain.resetGenericPassword();
+    }
   },
 
   // ✅ Load trạng thái nhớ đăng nhập

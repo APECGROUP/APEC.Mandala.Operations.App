@@ -19,6 +19,7 @@ import { useAlert } from '@/elements/alert/AlertProvider';
 import { goBack } from '@/navigation/RootNavigation';
 import DeviceInfo from 'react-native-device-info';
 import api from '@/utils/setup-axios';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ForgotPasswordScreen = ({
   navigation,
@@ -28,7 +29,7 @@ const ForgotPasswordScreen = ({
   const [userName, setUserName] = useState('');
   const [processing, setProcessing] = useState<boolean | undefined>(false);
   const [hotel, setHotel] = useState<typeHotel>({} as typeHotel);
-
+  const { bottom } = useSafeAreaInsets();
   const disabled = !userName || !hotel.id;
   const onPickHotel = () => {
     Keyboard.dismiss();
@@ -75,7 +76,7 @@ const ForgotPasswordScreen = ({
     }
   };
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: bottom }]}>
       <AppBlock>
         <AppText size={20} weight="700">
           {t('auth.forgotPassword.title')}
@@ -90,6 +91,7 @@ const ForgotPasswordScreen = ({
           containerStyle={styles.bottom10}
           label={t('auth.forgotPassword.userName')}
           value={userName}
+          maxLength={20}
           inputStyle={styles.inputStyle}
           onChangeText={setUserName}
           onSubmitEditing={onPickHotel}
@@ -102,6 +104,7 @@ const ForgotPasswordScreen = ({
           label={t('auth.forgotPassword.hotel')}
           placeholderTextColor={light.placeholderTextColor}
           noBorder
+          maxLength={20}
           value={hotel?.name}
           placeholder={t('auth.forgotPassword.pickHotel')}
           rightIcon={

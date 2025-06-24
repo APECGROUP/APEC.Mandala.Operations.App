@@ -76,19 +76,7 @@ export type MainParams = {
 
 export type AuthParams = {
   LoginScreen: undefined;
-  RegisterScreen: {
-    code: string;
-    phone: string;
-    type: 'forgotPassword' | 'register' | 'confirm';
-  };
   ForgotPasswordScreen: undefined;
-  NewPasswordScreen: {
-    otp: string;
-  };
-  OTPScreen: {
-    phone: string;
-    type: 'forgotPassword' | 'register' | 'confirm' | 'unLinkBank' | 'verifyEmail';
-  };
   ModalPickHotel: {
     setHotel: Dispatch<SetStateAction<typeHotel>>;
     hotel: typeHotel;

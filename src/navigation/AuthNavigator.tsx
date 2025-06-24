@@ -3,9 +3,6 @@ import { AuthParams } from './params';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ForgotPasswordScreen from '../screens/authScreen/ForgotPasswordScreen';
 import LoginScreen from '../screens/authScreen/LoginScreen';
-import NewPasswordScreen from '../screens/authScreen/NewPasswordScreen';
-import OTPScreen from '../screens/authScreen/OTPScreen';
-import RegisterScreen from '../screens/authScreen/RegisterScreen';
 import { s } from 'react-native-size-matters';
 import { getFontSize } from '../constants';
 import light from '../theme/light';
@@ -50,26 +47,6 @@ export default function AuthNavigator() {
       initialRouteName={'LoginScreen'}>
       <Group>
         <Screen name="LoginScreen" component={LoginScreen} />
-        <Screen
-          name="RegisterScreen"
-          options={({ route }) => ({
-            headerShown: true,
-            headerTitleAlign: 'center',
-            headerTitle:
-              route.params?.type === 'forgotPassword' ? 'Tạo mật khẩu mới' : 'Đăng ký tài khoản',
-          })}
-          component={RegisterScreen}
-        />
-        <Screen
-          name="OTPScreen"
-          options={({ route }) => ({
-            headerShown: true,
-            headerTitleAlign: 'center',
-            headerTitle:
-              route.params?.type === 'forgotPassword' ? 'Tạo mật khẩu mới' : 'Đăng ký tài khoản',
-          })}
-          component={OTPScreen}
-        />
 
         <Screen
           options={{
@@ -80,7 +57,6 @@ export default function AuthNavigator() {
           name="ForgotPasswordScreen"
           component={ForgotPasswordScreen}
         />
-        <Screen name="NewPasswordScreen" component={NewPasswordScreen} />
       </Group>
 
       <Group
