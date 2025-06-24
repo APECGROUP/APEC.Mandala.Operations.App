@@ -1,24 +1,26 @@
 // import light from '@vn.starlingtech/theme/light'
 // import { sizes } from '@vn.starlingtech/theme/theming'
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 import light from '../../theme/light';
-import {s, vs} from 'react-native-size-matters';
-import {getFontSize} from '../../constants';
+import { s, vs } from 'react-native-size-matters';
+import { getFontSize } from '../../constants';
 
 export default StyleSheet.create({
   appInputEye: {
     paddingRight: s(55),
   },
-  colorRed: {color: light.danger},
+  colorRed: { color: light.danger },
   disabled: {},
   // disabled: {backgroundColor: light.disabled},
   eye: {
-    alignItems: 'center',
-    height: vs(50),
+    alignItems: 'flex-end',
+
+    height: vs(40),
     justifyContent: 'center',
-    position: 'absolute',
-    right: 0,
-    width: s(50),
+    // position: 'absolute',
+    // right: 0,
+    width: s(25),
+    // backgroundColor: 'red',
   },
   helperTxt: {
     color: light.danger,
@@ -33,7 +35,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  inlineLabel: {width: 122},
+  inlineLabel: { width: 122 },
   input: {
     flex: 1,
     height: '100%',
@@ -43,7 +45,7 @@ export default StyleSheet.create({
     fontWeight: '500',
     // borderColor:light
   },
-  inputDisabled: {backgroundColor: light.inputDisabled},
+  inputDisabled: { backgroundColor: light.inputDisabled },
   inputError: {
     borderColor: light.danger,
   },
@@ -63,10 +65,10 @@ export default StyleSheet.create({
     paddingTop: 0,
     width: '100%',
   },
-  item: {width: '100%'},
-  itemInputInLine: {flexDirection: 'row', width: 120},
-  labelContainer: {flexDirection: 'row', marginBottom: 8},
-  radius5: {borderRadius: 5, paddingHorizontal: s(7)},
+  item: { width: '100%' },
+  itemInputInLine: { flexDirection: 'row', width: 120 },
+  labelContainer: { flexDirection: 'row', marginBottom: 8 },
+  radius5: { borderRadius: 5, paddingHorizontal: s(7) },
   textErr: {
     color: light.danger,
     marginTop: vs(5),

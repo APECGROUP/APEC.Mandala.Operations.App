@@ -5,20 +5,33 @@ import { s, vs } from 'react-native-size-matters';
 import IconInfomation from '../../../../../assets/icon/IconInfomation';
 import IconNote from '../../../../../assets/icon/IconNote';
 import Images from '../../../../../assets/image/Images';
-import { memo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
 import { DataAssignPrice } from '../../modal/AssignPriceModal';
 
-const AssignPriceCard = ({ item, index }: { item: DataAssignPrice; index: number }) => {
+interface AssignPriceCardProps {
+  item: DataAssignPrice;
+  index: number;
+}
+
+const AssignPriceCard = memo<AssignPriceCardProps>(({ item, index }) => {
   const { t } = useTranslation();
+
+  const handlePress = useCallback(() => {
+    navigate('InformationItemsScreen', { item });
+  }, [item]);
+
+  const handleDetailPress = useCallback(() => {
+    navigate('DetailAssignPriceCardScreen', { item });
+  }, [item]);
+
+  const shouldShowWaiting = useMemo(() => index % 3 === 0, [index]);
+
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => navigate('InformationItemsScreen', { item })}
-      style={styles.card}>
+    <TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={styles.card}>
       <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
       <View style={styles.itemInfo}>
         <View style={styles.itemInfoRow}>
@@ -29,12 +42,12 @@ const AssignPriceCard = ({ item, index }: { item: DataAssignPrice; index: number
            <AppText style={styles.noteBadgeText}>{t('Ghi chú')}</AppText>
          </View> */}
           <IconNote />
-          <AppBlockButton onPress={() => navigate('DetailAssignPriceCardScreen', { item })}>
+          <AppBlockButton onPress={handleDetailPress}>
             <IconInfomation style={{ marginHorizontal: s(6) }} />
           </AppBlockButton>
         </View>
         <AppText style={styles.dateText}>{item.user.name}</AppText>
-        {index % 3 === 0 && (
+        {shouldShowWaiting && (
           <View style={styles.blockWaiting}>
             <AppText size={12} color={'#FF7009'} weight="500">
               {t('Chờ gắn giá')}
@@ -44,9 +57,11 @@ const AssignPriceCard = ({ item, index }: { item: DataAssignPrice; index: number
       </View>
     </TouchableOpacity>
   );
-};
+});
 
-export default memo(AssignPriceCard);
+AssignPriceCard.displayName = 'AssignPriceCard';
+
+export default AssignPriceCard;
 
 const styles = StyleSheet.create({
   blockWaiting: {

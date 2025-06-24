@@ -1,19 +1,19 @@
-import { StyleSheet, View} from 'react-native';
-import {useLinkBuilder} from '@react-navigation/native';
-import {PlatformPressable} from '@react-navigation/elements';
+import { StyleSheet, View } from 'react-native';
+import { useLinkBuilder } from '@react-navigation/native';
+import { PlatformPressable } from '@react-navigation/elements';
 import light from '../theme/light';
-import {cloneElement} from 'react';
-import {AppText} from '../elements/text/AppText';
-import {useTranslation} from 'react-i18next';
-import {vs} from 'react-native-size-matters';
+import { cloneElement } from 'react';
+import { AppText } from '../elements/text/AppText';
+import { useTranslation } from 'react-i18next';
+import { vs } from 'react-native-size-matters';
 import IconTab1 from '@assets/icon/IconTab1';
 import IconTab2 from '@assets/icon/IconTab2';
-import {Colors} from '@/theme/Config';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-const MyTabBar = ({state, descriptors, navigation}: any) => {
-  const {t} = useTranslation();
-  const {buildHref} = useLinkBuilder();
-  const {bottom} = useSafeAreaInsets();
+import { Colors } from '@/theme/Config';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+const MyTabBar = ({ state, descriptors, navigation }: any) => {
+  const { t } = useTranslation();
+  const { buildHref } = useLinkBuilder();
+  const { bottom } = useSafeAreaInsets();
   const tabIcons: any = [
     {
       icon: <IconTab1 />,
@@ -44,7 +44,7 @@ const MyTabBar = ({state, descriptors, navigation}: any) => {
   return (
     <View style={[styles.row]}>
       {state.routes.map((route: any, index: string) => {
-        const {options} = descriptors[route.key];
+        const { options } = descriptors[route.key];
 
         const isFocused = state.index === index;
 
@@ -72,14 +72,14 @@ const MyTabBar = ({state, descriptors, navigation}: any) => {
           <PlatformPressable
             key={index}
             pressOpacity={1}
-            android_ripple={{color: 'transparent'}}
+            android_ripple={{ color: 'transparent' }}
             href={buildHref(route.name, route.params)}
-            accessibilityState={isFocused ? {selected: true} : {}}
+            accessibilityState={isFocused ? { selected: true } : {}}
             accessibilityLabel={options.tabBarAccessibilityLabel}
             testID={options.tabBarButtonTestID}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={[styles.button, {paddingBottom: bottom}]}>
+            style={[styles.button, { paddingBottom: bottom }]}>
             {isFocused
               ? cloneElement(tabIcons[index].iconActive)
               : cloneElement(tabIcons[index].icon)}
@@ -109,6 +109,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: vs(10),
+    borderTopWidth: 0.5,
+    borderTopColor: Colors.BLACK_100,
   },
   row: {
     flexDirection: 'row',

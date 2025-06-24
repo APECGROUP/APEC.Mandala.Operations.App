@@ -11,17 +11,23 @@ export interface DataAssignPrice {
   };
 }
 
+// Cache để tránh gọi API trùng lặp
+const cache = new Map<string, DataAssignPrice[]>();
+
 /**
  * Tạo URL API lấy danh sách ảnh, có hỗ trợ search (giả lập).
  */
-function buildAssignPriceUrl(
-  page: number,
-  limit: number,
-  key?: string,
-): string {
+function buildAssignPriceUrl(page: number, limit: number, key?: string): string {
   let url = `https://picsum.photos/v2/list?page=${page}&limit=${limit}`;
   if (key) url += `&search=${encodeURIComponent(key)}`;
   return url;
+}
+
+/**
+ * Tạo cache key
+ */
+function getCacheKey(page: number, limit: number, key: string): string {
+  return `${page}_${limit}_${key}`;
 }
 
 /**
@@ -32,31 +38,56 @@ export const fetchAssignPriceData = async (
   limit: number = 50,
   key: string = '',
 ): Promise<DataAssignPrice[]> => {
-  const url = buildAssignPriceUrl(page, limit, key);
-  const {data} = await axios.get(url);
+  const cacheKey = getCacheKey(page, limit, key);
 
-  const allImageIds: string[] = data.map((item: any) => item.id);
+  // Kiểm tra cache trước
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey)!;
+  }
 
-  return data.map((item: any, index: number) => {
-    const numberOfImages = Math.floor(Math.random() * 10) + 1;
-    const otherIds = allImageIds.filter(id => id !== item.id);
-    const shuffled = [...otherIds].sort(() => 0.5 - Math.random());
-    const selectedImageIds = [
-      item.id,
-      ...shuffled.slice(0, numberOfImages - 1),
-    ];
-    const imageUrls = selectedImageIds.map(
-      id => `https://picsum.photos/id/${id}/300/300`,
-    );
-    return {
-      id: item.id,
-      content: `PR20240624#0001#${(page - 1) * limit + index + 1}`,
-      images: imageUrls,
-      videos: [],
-      user: {
-        name: item.author,
-        avatar: `https://picsum.photos/id/${item.id}/100/100`,
-      },
-    };
-  });
+  try {
+    const url = buildAssignPriceUrl(page, limit, key);
+    const { data } = await axios.get(url);
+
+    const allImageIds: string[] = data.map((item: any) => item.id);
+
+    const result = data.map((item: any, index: number) => {
+      const numberOfImages = Math.floor(Math.random() * 10) + 1;
+      const otherIds = allImageIds.filter(id => id !== item.id);
+      const shuffled = [...otherIds].sort(() => 0.5 - Math.random());
+      const selectedImageIds = [item.id, ...shuffled.slice(0, numberOfImages - 1)];
+      const imageUrls = selectedImageIds.map(id => `https://picsum.photos/id/${id}/300/300`);
+      return {
+        id: item.id,
+        content: `PR20240624#0001#${(page - 1) * limit + index + 1}`,
+        images: imageUrls,
+        videos: [],
+        user: {
+          name: item.author,
+          avatar: `https://picsum.photos/id/${item.id}/100/100`,
+        },
+      };
+    });
+
+    // Lưu vào cache
+    cache.set(cacheKey, result);
+
+    // Giới hạn cache size để tránh memory leak
+    if (cache.size > 100) {
+      const firstKey = cache.keys().next().value;
+      cache.delete(firstKey);
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching assign price data:', error);
+    throw error;
+  }
+};
+
+/**
+ * Clear cache khi cần thiết
+ */
+export const clearAssignPriceCache = () => {
+  cache.clear();
 };

@@ -54,6 +54,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
       setIsLogin(true);
     }
     if (userName.toLocaleLowerCase() !== 'dung') {
+      saveInfoUser({ ...infoUser, isApprove: false });
       return refToast.current?.show(t('auth.login.loginError'), TYPE_TOAST.ERROR);
     } else {
       setIsLogin(true);
@@ -100,7 +101,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   const onForgotPassword = () => {
     navigation.navigate('ForgotPasswordScreen');
   };
-
+  console.log('hotel', hotel);
   return (
     <View style={[styles.container, { paddingBottom: bottom }]}>
       <View style={styles.center}>
@@ -117,7 +118,6 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
           labelStyle={styles.labelUser}
           label={t('auth.login.userName')}
           placeholderTextColor={light.placeholderTextColor}
-          maxLength={10}
           value={userName}
           onChangeText={setUserName}
           placeholder={t('auth.login.inputUserName')}
@@ -130,9 +130,6 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
         />
 
         <AppTextInput
-          onPress={() => {
-            console.log('11111');
-          }}
           refName={refPassword}
           required
           labelStyle={styles.labelPassword}
@@ -156,8 +153,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
             label={t('auth.login.hotel')}
             placeholderTextColor={light.placeholderTextColor}
             noBorder
-            maxLength={10}
-            value={hotel?.name}
+            value={hotel?.name?.toString()}
             placeholder={t('auth.login.pickHotel')}
             rightIcon={
               <IconArrowRight stroke="#D8D8D8" style={{ transform: [{ rotate: '90deg' }] }} />

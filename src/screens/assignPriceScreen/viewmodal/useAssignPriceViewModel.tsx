@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { DataAssignPrice, fetchAssignPriceData } from '../modal/AssignPriceModal';
 import debounce from 'lodash/debounce';
@@ -8,7 +8,7 @@ const DEBOUNCE_DELAY = 300;
 
 export function useAssignPriceViewModel() {
   const [searchKey, setSearchKey] = useState<string>('');
-  // const queryClient = useQueryClient();
+  const debouncedSearchRef = useRef<ReturnType<typeof debounce> | null>(null);
 
   // Infinite Query cho phân trang + search
   const {
@@ -21,11 +21,10 @@ export function useAssignPriceViewModel() {
     hasNextPage,
     isRefetching,
   } = useInfiniteQuery<DataAssignPrice[], Error>({
-    queryKey: ['listAssignPrice', searchKey.trim(), searchKey],
-
+    queryKey: ['listAssignPrice', searchKey.trim()],
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchAssignPriceData(page, ITEMS_PER_PAGE, searchKey);
+      return fetchAssignPriceData(page, ITEMS_PER_PAGE, searchKey.trim());
     },
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
@@ -35,16 +34,16 @@ export function useAssignPriceViewModel() {
 
   // Gộp data các page lại thành 1 mảng
   const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
-  // console.log('render useAssignPriceViewModel');
-  // Debounce search
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((key: string) => {
+
+  // Debounce search - chỉ tạo một lần
+  const debouncedSearch = useMemo(() => {
+    if (!debouncedSearchRef.current) {
+      debouncedSearchRef.current = debounce((key: string) => {
         setSearchKey(key);
-        // queryClient.removeQueries({queryKey: ['listAssignPrice']});
-      }, DEBOUNCE_DELAY),
-    [],
-  );
+      }, DEBOUNCE_DELAY);
+    }
+    return debouncedSearchRef.current;
+  }, []);
 
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {

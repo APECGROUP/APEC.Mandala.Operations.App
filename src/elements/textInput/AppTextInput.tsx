@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 
 import IconClose from '../../../assets/icon/IconClose';
-import { s } from 'react-native-size-matters';
 import IconEyeOffOutline from '../../../assets/icon/IconEyeOffOutline';
 import IconEyeOutline from '../../../assets/icon/IconEyeOutline';
 import { numberFormat } from '../../utils/Utilities';
 import FormStyles from './FormStyles';
 import { AppText } from '../text/AppText';
 import light from '../../theme/light';
+import { Colors } from '@/theme/Config';
 
 type AppInputLabelProps = {
   required?: boolean;
@@ -176,13 +176,15 @@ export default function AppTextInput(props: AppInputRegularProps) {
               {showPassword ? <IconEyeOffOutline /> : <IconEyeOutline />}
             </TouchableOpacity>
           ) : value && !disabled && !props.hideIconRight ? (
-            <TouchableOpacity onPress={onRemove} style={styles.w25}>
-              <IconClose width={16} />
+            <TouchableOpacity onPress={onRemove} style={FormStyles.eye}>
+              <IconClose fill={Colors.ICON_SECONDARY} width={16} />
             </TouchableOpacity>
           ) : null}
 
           {props.rightIcon && (
-            <TouchableOpacity onPress={props.onPressRightIcon}>{props.rightIcon}</TouchableOpacity>
+            <TouchableOpacity style={FormStyles.eye} onPress={props.onPressRightIcon}>
+              {props.rightIcon}
+            </TouchableOpacity>
           )}
 
           {props.rightComponent && props.rightComponent}
@@ -206,9 +208,5 @@ const styles = StyleSheet.create({
   colorBlack: { color: '#000' },
   pl0: {
     paddingLeft: 0,
-  },
-  w25: {
-    width: s(25),
-    alignItems: 'flex-end',
   },
 });

@@ -11,7 +11,7 @@ import PcPrScreen from '@/screens/pcPrScreen/view/PcPrScreen';
 
 const MyTabs = () => {
   const Tab = createBottomTabNavigator<TabBarParams>();
-  const tabBar = (props: any) => <MyTabBar {...props} />;  
+  const tabBar = (props: any) => <MyTabBar {...props} />;
   return (
     <Tab.Navigator
       screenOptions={{
@@ -19,6 +19,7 @@ const MyTabs = () => {
         tabBarHideOnKeyboard: true,
         sceneStyle: {
           backgroundColor: light.backgroundScreenDefault,
+
           // paddingTop: top,
           // paddingHorizontal: s(16),
         },

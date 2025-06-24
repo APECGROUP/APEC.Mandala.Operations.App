@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '@/navigation/params';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +24,7 @@ interface RowItemProps {
   onPress?: () => void;
 }
 
-const RowItem: React.FC<RowItemProps> = ({ label, value, icon, onPress }) => (
+const RowItem = memo<RowItemProps>(({ label, value, icon, onPress }) => (
   <View style={styles.rowItem}>
     <AppText weight="500" size={14} color={Colors.TEXT_SECONDARY}>
       {label}
@@ -34,7 +34,9 @@ const RowItem: React.FC<RowItemProps> = ({ label, value, icon, onPress }) => (
       {value && <AppText weight="700">{value}</AppText>}
     </TouchableOpacity>
   </View>
-);
+));
+
+RowItem.displayName = 'RowItem';
 
 const DetailAssignPriceCardScreen = ({
   route,
@@ -64,6 +66,9 @@ const DetailAssignPriceCardScreen = ({
 
   const formatDate = useCallback((date: Date | undefined) => moment(date).format('DD/MM/YYYY'), []);
 
+  const dateCreateFormatted = useMemo(() => formatDate(dateCreate), [dateCreate, formatDate]);
+  const dateEstimateFormatted = useMemo(() => formatDate(dateEstimate), [dateEstimate, formatDate]);
+
   return (
     <View style={styles.container}>
       <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
@@ -80,13 +85,13 @@ const DetailAssignPriceCardScreen = ({
         <RowItem
           onPress={onPressDateCreate}
           label={t('orderInfo.createDate')}
-          value={formatDate(dateCreate)}
+          value={dateCreateFormatted}
           icon={<IconCalendar />}
         />
         <RowItem
           onPress={onPressDateEstimate}
           label={t('orderInfo.estimateDate')}
-          value={formatDate(dateEstimate)}
+          value={dateEstimateFormatted}
           icon={<IconCalendar />}
         />
         <RowItem label={t('orderInfo.department')} value="01023-House Keeping" />

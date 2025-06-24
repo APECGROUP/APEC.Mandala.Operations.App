@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import {
   StyleSheet,
   View,
@@ -13,12 +13,7 @@ import {
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  FadeInLeft,
-} from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 
@@ -48,7 +43,7 @@ const AssignPriceScreen: React.FC = () => {
   const { t } = useTranslation();
 
   const refToast = useRef<any>(null);
-
+  console.log('AssignPriceScreen');
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
     flatData,
@@ -79,21 +74,24 @@ const AssignPriceScreen: React.FC = () => {
   }));
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
-  };
-  const scrollToBottom = () => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
     flashListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * onScroll handler:
    *  - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
    *  - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
    */
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
     // Scroll xuống (lúc này y > lastOffsetY): hiện scroll‐to‐bottom, ẩn scroll‐to‐top
     if (y > lastOffsetY.current && y > 100) {
@@ -110,17 +108,15 @@ const AssignPriceScreen: React.FC = () => {
       showScrollToBottom.value = 0;
     }
     lastOffsetY.current = y;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ─── Khi bấm "Tìm kiếm" (submit) hoặc nút "Filter" ───────────────────────
-  const handleSubmitSearch = () => {
-    // Gọi onSearch của ViewModel để cập nhật searchKey → trigger loadPage(1, key)
-    // scrollToTop();
-    // onSearch(inputKey.trim());
+  const handleSubmitSearch = useCallback(() => {
     navigate('FilterScreen');
-  };
+  }, []);
 
-  const listEmptyComponent = () => {
+  const listEmptyComponent = useMemo(() => {
     if (isLoading) {
       return (
         <View style={styles.emptyContainer}>
@@ -134,9 +130,9 @@ const AssignPriceScreen: React.FC = () => {
         <AppText style={styles.emptyText}>{t('assignPrice.empty')}</AppText>
       </View>
     );
-  };
+  }, [isLoading, t]);
 
-  const listFooterComponent = () => {
+  const listFooterComponent = useMemo(() => {
     if (isFetchingNextPage) {
       return (
         <View style={styles.footerLoading}>
@@ -144,23 +140,21 @@ const AssignPriceScreen: React.FC = () => {
         </View>
       );
     }
-  };
+    return null;
+  }, [isFetchingNextPage]);
 
-  const goToNotification = () => navigate('NotificationScreen');
+  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
+  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
 
   const renderItem = useCallback(
     ({ item, index }: { item: DataAssignPrice; index: number }) => (
-      <Animated.View
-        entering={FadeInLeft.delay(index * 10)
-          .duration(0)
-          .springify()}>
-        <AssignPriceCard item={item} index={index} />
-      </Animated.View>
+      <AssignPriceCard item={item} index={index} />
     ),
     [],
   );
+
   const { infoUser } = useInfoUser();
-  const goToAccount = () => navigate('AccountScreen');
+
   return (
     <View style={styles.container}>
       {/* ─── Background Image ─────────────────────────────────────────────── */}
@@ -222,7 +216,6 @@ const AssignPriceScreen: React.FC = () => {
 
       <FlashList
         ref={flashListRef}
-        // data={[]}
         data={flatData || []}
         renderItem={renderItem}
         keyExtractor={item => item.id}
@@ -252,7 +245,6 @@ const AssignPriceScreen: React.FC = () => {
         <AnimatedButton
           onPress={scrollToBottom}
           style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-          {/* style={[styles.scrollButtonContainer, opacityScrollBottomStyle]}> */}
           <IconScrollBottom />
         </AnimatedButton>
       )}
