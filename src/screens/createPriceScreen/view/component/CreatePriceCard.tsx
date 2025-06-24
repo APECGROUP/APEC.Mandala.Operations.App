@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo, memo } from 'react';
 import { View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
 import IconListPen from '@assets/icon/IconListPen';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { TypeCreatePrice } from '../../modal/CreatePriceModal';
 import { getFontSize } from '@/constants';
 import AppBlockButton from '@/elements/button/AppBlockButton';
@@ -109,7 +108,7 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
             </AppBlockButton>
 
             <AppBlockButton style={styles.right} onPress={handleExpand}>
-              <Icon name={expanded ? 'expand-less' : 'expand-more'} size={vs(20)} color="#999" />
+              {/* <AppText style={{ fontSize: vs(20), color: '#999' }}>{expanded ? '▲' : '▼'}</AppText> */}
             </AppBlockButton>
           </View>
 

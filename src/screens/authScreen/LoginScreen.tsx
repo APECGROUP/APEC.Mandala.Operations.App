@@ -58,7 +58,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
       setIsRememberLogin(true);
       DataLocal.setRememberLogin(true);
     }
-  }, [credentials, loadingCredentials]);
+  }, [credentials, loadingCredentials, setIsRememberLogin]);
 
   const disabled = !userName || !password || !hotel.id;
   const { bottom } = useSafeAreaInsets();
@@ -140,14 +140,14 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
     navigation.navigate('ForgotPasswordScreen');
   };
 
-  const handleClearCredentials = () => {
-    // Refresh form khi xóa credentials
-    setUserName('');
-    setPassword('');
-    setHotel({} as typeHotel);
-    setIsRememberLogin(false);
-    DataLocal.setRememberLogin(false);
-  };
+  // const handleClearCredentials = () => {
+  //   // Refresh form khi xóa credentials
+  //   setUserName('');
+  //   setPassword('');
+  //   setHotel({} as typeHotel);
+  //   setIsRememberLogin(false);
+  //   DataLocal.setRememberLogin(false);
+  // };
 
   console.log('hotel', hotel);
   return (

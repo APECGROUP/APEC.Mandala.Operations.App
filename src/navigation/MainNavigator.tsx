@@ -11,7 +11,6 @@ import ProfileScreen from '../screens/profileScreen/ProfileScreen';
 import light from '../theme/light';
 import { useTranslation } from 'react-i18next';
 import { getFontSize } from '../constants';
-import ImageViewScreen from '../modules/social/views/screens/ImageViewScreen';
 import MyTabs from './MyTabs';
 import { HeaderLeft } from './AuthNavigator';
 import { PaddingHorizontal } from '@/utils/Constans';
