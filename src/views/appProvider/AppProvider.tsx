@@ -10,7 +10,6 @@ import { Platform, StatusBar, StyleSheet } from 'react-native';
 import { SCREEN_WIDTH } from '../../constants';
 import { s, vs } from 'react-native-size-matters';
 import { PaperProvider } from 'react-native-paper';
-import { MenuProvider } from 'react-native-popup-menu';
 import { navigationRef } from '../../navigation/RootNavigation';
 import { setupFCM } from '../../../firebase/fcmService';
 import NameScreen from '../../navigation/nameScreen/NameScreen';
@@ -64,17 +63,15 @@ export default function AppProvider(props: Props) {
     <SafeAreaProvider>
       <AlertProvider>
         <NavigationContainer onStateChange={handleNavigationChange} ref={navigationRef}>
-          <MenuProvider>
-            <GestureHandlerRootView style={styles.flex1}>
-              <PaperProvider>
-                <QueryClientProvider client={queryClient}>
-                  <I18nextProvider i18n={i18n}>{props.children}</I18nextProvider>
-                </QueryClientProvider>
-                {__DEV__ && <NameScreen />}
-                <Toast config={toastConfig} />
-              </PaperProvider>
-            </GestureHandlerRootView>
-          </MenuProvider>
+          <GestureHandlerRootView style={styles.flex1}>
+            <PaperProvider>
+              <QueryClientProvider client={queryClient}>
+                <I18nextProvider i18n={i18n}>{props.children}</I18nextProvider>
+              </QueryClientProvider>
+              {__DEV__ && <NameScreen />}
+              <Toast config={toastConfig} />
+            </PaperProvider>
+          </GestureHandlerRootView>
         </NavigationContainer>
       </AlertProvider>
     </SafeAreaProvider>

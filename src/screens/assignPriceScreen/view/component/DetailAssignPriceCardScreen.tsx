@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
   valueContainer: {
     minWidth: '60%',
     // paddingVertical: vs(4),
+    justifyContent: 'flex-end',
     height: vs(24),
     flexDirection: 'row',
     alignItems: 'center',

@@ -73,15 +73,6 @@ export default function MainNavigator() {
       <Group>
         <Screen
           options={{
-            headerShown: false,
-            contentStyle: { paddingHorizontal: s(0) },
-            animation: 'fade',
-          }}
-          name="ImageViewScreen"
-          component={ImageViewScreen}
-        />
-        <Screen
-          options={{
             headerShown: true,
             headerTitle: t('orderInfo.title'),
           }}
