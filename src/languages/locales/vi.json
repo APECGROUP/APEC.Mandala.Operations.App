@@ -212,6 +212,12 @@
       "tab3": "Tạo PO ",
       "tab4": "PC PR",
       "tab5": "PC Log"
+    },
+    "error": {
+      "title": "Oops!",
+      "subtitle": "Đã có lỗi sảy ra xin vui lòng thử lại sau ...",
+      "goBack": "Quay lại",
+      "tryAgain": "Thử lại"
     }
   }
 }

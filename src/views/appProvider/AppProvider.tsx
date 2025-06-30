@@ -6,7 +6,7 @@ import '../../languages/i18n';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../languages/i18n';
 import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
-import { Platform, StatusBar, StyleSheet } from 'react-native';
+import { LogBox, Platform, StatusBar, StyleSheet } from 'react-native';
 import { SCREEN_WIDTH } from '../../constants';
 import { s, vs } from 'react-native-size-matters';
 import { PaperProvider } from 'react-native-paper';
@@ -17,6 +17,9 @@ import { useNameScreen } from '../../zustand/store/useNameScreen/useNameScreen';
 import { MMKV } from 'react-native-mmkv';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+LogBox.ignoreAllLogs(true);
+
 type Props = {
   children: ReactNode;
   onReady?: () => void;

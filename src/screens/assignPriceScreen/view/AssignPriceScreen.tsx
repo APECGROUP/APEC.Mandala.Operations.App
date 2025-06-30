@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, { useRef, useCallback, useMemo } from 'react';
+import React, { useRef, useCallback, useMemo, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -37,10 +37,14 @@ import { useAssignPriceViewModel } from '../viewmodal/useAssignPriceViewModel';
 import ToastContainer from '@/elements/toast/ToastContainer';
 import AssignPriceCard from './component/AssignPriceCard';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
+import SkeletonItem from '@/components/skeleton/SkeletonItem';
 
 const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   const refToast = useRef<any>(null);
   console.log('AssignPriceScreen');
@@ -54,6 +58,7 @@ const AssignPriceScreen: React.FC = () => {
     onLoadMore,
     onSearch,
     searchKey,
+    isError,
   } = useAssignPriceViewModel();
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
@@ -155,100 +160,123 @@ const AssignPriceScreen: React.FC = () => {
 
   const { infoUser } = useInfoUser();
 
+  // return (
+  //   <ViewContainer>
+  //     <Test />
+  //   </ViewContainer>
+  // );
+  const reLoadData = useCallback(() => {
+    setIsFirstLoad(false);
+    onRefresh();
+  }, [onRefresh]);
+  console.log('error:', isError);
+  if (isError || (isFirstLoad && !isLoading)) {
+    return <FallbackComponent resetError={reLoadData} />;
+  }
   return (
-    <View style={styles.container}>
-      {/* ─── Background Image ─────────────────────────────────────────────── */}
-      <FastImage
-        style={styles.backgroundImage}
-        source={Images.BackgroundAssignPrice}
-        resizeMode={FastImage.resizeMode.cover}
-      />
-      {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-      <View style={[styles.headerContainer, { marginTop: top }]}>
-        <View style={styles.headerLeft}>
-          <AppBlockButton onPress={goToAccount}>
-            <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
-          </AppBlockButton>
+    <ViewContainer>
+      <View style={styles.container}>
+        {/* <Test /> */}
 
-          <View style={styles.greetingContainer}>
-            <AppText color="#FFFFFF" style={styles.greetingText}>
-              {t('assignPrice.title')}
-            </AppText>
-            <AppText color="#FFFFFF" style={styles.greetingText}>
-              {infoUser.profile.fullName}
-            </AppText>
+        {/* ─── Background Image ─────────────────────────────────────────────── */}
+        <FastImage
+          style={styles.backgroundImage}
+          source={Images.BackgroundAssignPrice}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+        {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
+        <View style={[styles.headerContainer, { marginTop: top }]}>
+          <View style={styles.headerLeft}>
+            <AppBlockButton onPress={goToAccount}>
+              <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
+            </AppBlockButton>
+            <View style={styles.greetingContainer}>
+              <AppText color="#FFFFFF" style={styles.greetingText}>
+                {t('assignPrice.title')}
+              </AppText>
+              <AppText color="#FFFFFF" style={styles.greetingText}>
+                {infoUser.profile.fullName}
+              </AppText>
+            </View>
+          </View>
+          <View style={styles.headerRight}>
+            <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
+              <IconNotification />
+              <View style={styles.notificationBadge}>
+                <AppText style={styles.notificationBadgeText}>3</AppText>
+              </View>
+            </AppBlockButton>
           </View>
         </View>
-        <View style={styles.headerRight}>
-          <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
-            <IconNotification />
-            <View style={styles.notificationBadge}>
-              <AppText style={styles.notificationBadgeText}>3</AppText>
-            </View>
+        {/* ─── Search Bar ────────────────────────────────────────────────────── */}
+        <View style={styles.searchContainer}>
+          <IconSearch width={vs(18)} />
+          <TextInput
+            value={searchKey}
+            onChangeText={onSearch}
+            placeholder={t('assignPrice.searchPlaceholder')}
+            placeholderTextColor={light.placeholderTextColor}
+            style={styles.searchInput}
+            returnKeyType="search"
+            onSubmitEditing={handleSubmitSearch}
+          />
+          <AppBlockButton style={styles.filterButton} onPress={handleSubmitSearch}>
+            <IconFilter />
           </AppBlockButton>
         </View>
-      </View>
-      {/* ─── Search Bar ────────────────────────────────────────────────────── */}
-      <View style={styles.searchContainer}>
-        <IconSearch width={vs(18)} />
-        <TextInput
-          value={searchKey}
-          onChangeText={onSearch}
-          placeholder={t('assignPrice.searchPlaceholder')}
-          placeholderTextColor={light.placeholderTextColor}
-          style={styles.searchInput}
-          returnKeyType="search"
-          onSubmitEditing={handleSubmitSearch}
-        />
-        <AppBlockButton style={styles.filterButton} onPress={handleSubmitSearch}>
-          <IconFilter />
-        </AppBlockButton>
-      </View>
 
-      {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
-      <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>{t('assignPrice.header')}</AppText>
-        <View style={styles.countBadge}>
-          <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+        {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
+        <View style={styles.titleContainer}>
+          <AppText style={styles.titleText}>{t('assignPrice.header')}</AppText>
+          <View style={styles.countBadge}>
+            <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+          </View>
         </View>
-      </View>
-      {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
+        {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
+        {isLoading && flatData.length === 0 ? (
+          <View style={styles.listContent}>
+            {new Array(10).fill(0).map((_, index) => (
+              <SkeletonItem key={index} />
+            ))}
+          </View>
+        ) : (
+          <FlashList
+            ref={flashListRef}
+            data={flatData || []}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            onEndReached={onLoadMore}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.5}
+            removeClippedSubviews
+            refreshing={isRefetching}
+            onRefresh={onRefresh}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            ListEmptyComponent={listEmptyComponent}
+            ListFooterComponent={listFooterComponent}
+            estimatedItemSize={100}
+            contentContainerStyle={styles.listContent}
+          />
+        )}
 
-      <FlashList
-        ref={flashListRef}
-        data={flatData || []}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        onEndReached={onLoadMore}
-        showsVerticalScrollIndicator={false}
-        onEndReachedThreshold={0.5}
-        removeClippedSubviews
-        refreshing={isRefetching}
-        onRefresh={onRefresh}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        ListEmptyComponent={listEmptyComponent}
-        ListFooterComponent={listFooterComponent}
-        estimatedItemSize={100}
-        contentContainerStyle={styles.listContent}
-      />
+        <ToastContainer ref={refToast} />
 
-      <ToastContainer ref={refToast} />
-
-      {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
-      <AnimatedButton
-        onPress={scrollToTop}
-        style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
-      </AnimatedButton>
-      {!isFetchingNextPage && (
+        {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
         <AnimatedButton
-          onPress={scrollToBottom}
-          style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-          <IconScrollBottom />
+          onPress={scrollToTop}
+          style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
+          <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
         </AnimatedButton>
-      )}
-    </View>
+        {!isFetchingNextPage && (
+          <AnimatedButton
+            onPress={scrollToBottom}
+            style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
+            <IconScrollBottom />
+          </AnimatedButton>
+        )}
+      </View>
+    </ViewContainer>
   );
 };
 

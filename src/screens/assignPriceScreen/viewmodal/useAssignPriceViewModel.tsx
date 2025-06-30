@@ -20,6 +20,7 @@ export function useAssignPriceViewModel() {
     fetchNextPage,
     hasNextPage,
     isRefetching,
+    isError,
   } = useInfiniteQuery<DataAssignPrice[], Error>({
     queryKey: ['listAssignPrice', searchKey.trim()],
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
@@ -81,5 +82,6 @@ export function useAssignPriceViewModel() {
     onLoadMore,
     onSearch,
     searchKey,
+    isError,
   };
 }
