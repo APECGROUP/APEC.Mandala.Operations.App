@@ -46,7 +46,7 @@ const ICON_SECTION_WIDTH = s(130);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation();
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(false);
 
   // ─── ViewModel (MVVM) ────────────────────────────────────────────────
 
@@ -158,11 +158,6 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-  const reLoadData = useCallback(() => {
-    setIsFirstLoad(false);
-    onRefresh();
-  }, [onRefresh]);
-
   const listFooterComponent = useMemo(() => {
     if (isFetchingNextPage) {
       return (
@@ -173,9 +168,9 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
     }
     return null;
   }, [isFetchingNextPage]);
-  console.log('error:', isError);
-  if (isError || (isFirstLoad && !isLoading)) {
-    return <FallbackComponent resetError={reLoadData} />;
+  console.log('error:', isError, flatData);
+  if (isError) {
+    return <FallbackComponent resetError={onRefresh} />;
   }
 
   return (
@@ -185,7 +180,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
         {isLoading && flatData.length === 0 ? (
-          <View style={styles.listContent}>
+          <View style={styles.listContentSkeleton}>
             {new Array(10).fill(0).map((_, index) => (
               <SkeletonItem key={index} />
             ))}
@@ -206,7 +201,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent}
             ListFooterComponent={listFooterComponent}
-            estimatedItemSize={100}
+            // estimatedItemSize={100}
             contentContainerStyle={styles.listContent}
           />
         )}
@@ -284,5 +279,10 @@ const styles = StyleSheet.create({
   listContent: {
     flexGrow: 1,
     paddingBottom: vs(50),
+  },
+  listContentSkeleton: {
+    flexGrow: 1,
+    paddingBottom: vs(50),
+    paddingHorizontal: PaddingHorizontal,
   },
 });

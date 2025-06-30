@@ -44,25 +44,44 @@ const ALL_FAKE_NOTIFICATIONS: ContentNotification[] = Array.from(
   },
 );
 
+// Cache để tránh gọi API trùng lặp
+const cache = new Map<string, ContentNotification[]>();
+
+function getCacheKey(page: number, limit: number, key: string = ''): string {
+  return `${page}_${limit}_${key}`;
+}
+
 /**
  * Giả lập gọi API, trả về một “trang” notifications (limit = 10).
  *
  * @param pageNumber 1-based index
  * @param limit số phần tử/trang (mặc định 10)
- * @returns Promise<{ data: ContentNotification[]; lastPage: boolean }>
+ * @param key search key (không dùng ở đây, để tương thích)
+ * @returns Promise<ContentNotification[]>
  */
-export function fetchNotificationData(
+export async function fetchNotificationData(
   pageNumber: number,
   limit: number = 10,
-): Promise<{ data: ContentNotification[]; lastPage: boolean }> {
-  console.log('API', pageNumber);
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const start = (pageNumber - 1) * limit;
-      const end = Math.min(start + limit, ALL_FAKE_NOTIFICATIONS.length);
-      const pageData = ALL_FAKE_NOTIFICATIONS.slice(start, end);
-      const lastPage = end >= ALL_FAKE_NOTIFICATIONS.length;
-      resolve({ data: pageData, lastPage });
-    }, 800); // Giả lập độ trễ 800ms
-  });
+  key: string = '',
+): Promise<ContentNotification[]> {
+  const cacheKey = getCacheKey(pageNumber, limit, key);
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey)!;
+  }
+  // Giả lập delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  const start = (pageNumber - 1) * limit;
+  const end = Math.min(start + limit, ALL_FAKE_NOTIFICATIONS.length);
+  const pageData = ALL_FAKE_NOTIFICATIONS.slice(start, end);
+  cache.set(cacheKey, pageData);
+  // Giới hạn cache size để tránh memory leak
+  if (cache.size > 100) {
+    const firstKey = cache.keys().next().value;
+    cache.delete(firstKey);
+  }
+  return pageData;
 }
+
+export const clearNotificationCache = () => {
+  cache.clear();
+};
