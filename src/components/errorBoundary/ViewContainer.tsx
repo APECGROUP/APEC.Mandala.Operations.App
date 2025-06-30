@@ -12,6 +12,7 @@ export type ErrorBoundaryWithGoBackProps = {
 };
 
 const ViewContainer = ({ children, goBack }: ErrorBoundaryWithGoBackProps) => (
+  // eslint-disable-next-line react/no-unstable-nested-components
   <ErrorBoundary FallbackComponent={props => <FallbackComponent {...props} goBack={goBack} />}>
     {children}
   </ErrorBoundary>

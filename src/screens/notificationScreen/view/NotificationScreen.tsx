@@ -1,6 +1,6 @@
 // views/NotificationScreen.tsx
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -35,16 +35,22 @@ import { FlashList } from '@shopify/flash-list';
 import IconSeeAll from '@assets/icon/IconSeeAll';
 import { getFontSize } from '@/constants';
 import { PaddingHorizontal } from '@/utils/Constans';
+import SkeletonItem from '@/components/skeleton/SkeletonItem';
+import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 type Props = NativeStackScreenProps<MainParams, 'NotificationScreen'>;
 const totalNotification = 100; // Hoặc truyền từ props nếu dynamic
 const ICON_SECTION_WIDTH = s(130);
 
-const NotificationScreen: React.FC<Props> = () => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation();
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   // ─── ViewModel (MVVM) ────────────────────────────────────────────────
-  const { flatData, isLoading, isRefetching, isFetchingNextPage, onRefresh, onLoadMore } =
+
+  const { flatData, isLoading, isRefetching, isFetchingNextPage, onRefresh, onLoadMore, isError } =
     useNotificationViewModel();
 
   // ─── Refs & shared values để show/hide nút cuộn ─────────────────────
@@ -151,57 +157,78 @@ const NotificationScreen: React.FC<Props> = () => {
       </AppText>
     </TouchableOpacity>
   );
-  console.log('render màn notification: ', isLoading);
-  return (
-    <AppBlock flex>
-      <Header rightComponent={rightComponent()} iconWidth={s(130)} />
-      {isLoading && !flatData ? (
-        <ActivityIndicator size="large" color={light.primary} style={styles.flex} />
-      ) : (
-        <FlashList
-          ref={flatListRef}
-          data={flatData || []}
-          keyExtractor={item => `${item.id}_${item.read}`}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
-          refreshing={isRefetching}
-          onRefresh={onRefresh}
-          ListEmptyComponent={listEmptyComponent}
-          onEndReached={onLoadMore}
-          onEndReachedThreshold={0.5}
-          removeClippedSubviews
-          ListFooterComponent={
-            isFetchingNextPage ? (
-              <View style={styles.footerLoading}>
-                <ActivityIndicator size="small" color={light.primary} />
-              </View>
-            ) : null
-          }
-          contentContainerStyle={styles.fg1Content}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-        />
-      )}
 
-      <AnimatedButton
-        onPress={scrollToTop}
-        style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
-      </AnimatedButton>
-      <AnimatedButton
-        onPress={scrollToBottom}
-        style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-        <IconScrollBottom />
-      </AnimatedButton>
-    </AppBlock>
+  const reLoadData = useCallback(() => {
+    setIsFirstLoad(false);
+    onRefresh();
+  }, [onRefresh]);
+
+  const listFooterComponent = useMemo(() => {
+    if (isFetchingNextPage) {
+      return (
+        <View style={styles.footerLoading}>
+          <ActivityIndicator size="small" color={light.primary} />
+        </View>
+      );
+    }
+    return null;
+  }, [isFetchingNextPage]);
+  console.log('error:', isError);
+  if (isError || (isFirstLoad && !isLoading)) {
+    return <FallbackComponent resetError={reLoadData} />;
+  }
+
+  return (
+    <ViewContainer>
+      <AppBlock flex>
+        <Header rightComponent={rightComponent()} iconWidth={s(130)} />
+
+        {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
+        {isLoading && flatData.length === 0 ? (
+          <View style={styles.listContent}>
+            {new Array(10).fill(0).map((_, index) => (
+              <SkeletonItem key={index} />
+            ))}
+          </View>
+        ) : (
+          <FlashList
+            ref={flatListRef}
+            data={flatData || []}
+            renderItem={renderItem}
+            keyExtractor={item => `${item.id}_${item.read}`}
+            onEndReached={onLoadMore}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.5}
+            removeClippedSubviews
+            refreshing={isRefetching}
+            onRefresh={onRefresh}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            ListEmptyComponent={listEmptyComponent}
+            ListFooterComponent={listFooterComponent}
+            estimatedItemSize={100}
+            contentContainerStyle={styles.listContent}
+          />
+        )}
+
+        <AnimatedButton
+          onPress={scrollToTop}
+          style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
+          <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
+        </AnimatedButton>
+        <AnimatedButton
+          onPress={scrollToBottom}
+          style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
+          <IconScrollBottom />
+        </AnimatedButton>
+      </AppBlock>
+    </ViewContainer>
   );
 };
 
 export default NotificationScreen;
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  fg1Content: { flexGrow: 1, paddingBottom: vs(50) },
   rightButton: {
     width: ICON_SECTION_WIDTH,
     height: vs(40),
@@ -253,5 +280,9 @@ const styles = StyleSheet.create({
     marginTop: vs(40),
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  listContent: {
+    flexGrow: 1,
+    paddingBottom: vs(50),
   },
 });

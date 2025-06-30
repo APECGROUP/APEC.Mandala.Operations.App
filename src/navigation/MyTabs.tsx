@@ -37,8 +37,8 @@ const MyTabs = () => {
       />
       <Tab.Screen name="CreatePriceScreen" component={CreatePriceScreen} />
       <Tab.Screen name="CreatePoScreen" component={CreatePoScreen} />
-      <Tab.Screen name="PcLogScreen" component={PcLogScreen} />
       <Tab.Screen name="PcPrScreen" component={PcPrScreen} />
+      <Tab.Screen name="PcLogScreen" component={PcLogScreen} />
     </Tab.Navigator>
   );
 };

@@ -1,13 +1,6 @@
-import { useMemo, useCallback} from 'react';
-import {
-  InfiniteData,
-  useInfiniteQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
-import {
-  DataInformationItems,
-  fetchInformationItemsData,
-} from '../modal/InformationItemsModal';
+import { useMemo, useCallback } from 'react';
+import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { DataInformationItems, fetchInformationItemsData } from '../modal/InformationItemsModal';
 
 const ITEMS_PER_PAGE = 50;
 const key = ['informationItems'];
@@ -25,15 +18,15 @@ export function useInformationItemsViewModel() {
     fetchNextPage,
     hasNextPage,
     isRefetching,
+    isError,
   } = useInfiniteQuery<DataInformationItems[], Error>({
     queryKey: key,
-    queryFn: async ({pageParam}: {pageParam?: unknown}) => {
+    queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
       return fetchInformationItemsData(page, ITEMS_PER_PAGE);
     },
-    getNextPageParam: (lastPage, allPages) => lastPage.length === ITEMS_PER_PAGE
-        ? allPages.length + 1
-        : undefined,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
     staleTime: 60 * 1000,
     gcTime: 300000,
@@ -61,8 +54,7 @@ export function useInformationItemsViewModel() {
   }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
   const onUpdatePrice = (id: number | string, price: number) => {
-    const cached =
-      queryClient.getQueryData<InfiniteData<DataInformationItems[]>>(key);
+    const cached = queryClient.getQueryData<InfiniteData<DataInformationItems[]>>(key);
 
     if (!cached) {
       console.warn('🟥 No cache found for key:', key);
@@ -73,7 +65,7 @@ export function useInformationItemsViewModel() {
     queryClient.setQueryData(key, {
       ...cached,
       pages: cached.pages.map(page =>
-        page.map(item => (item.id === id ? {...item, price} : item)),
+        page.map(item => (item.id === id ? { ...item, price } : item)),
       ),
     });
   };
@@ -88,5 +80,6 @@ export function useInformationItemsViewModel() {
     onRefresh,
     onLoadMore,
     onUpdatePrice,
+    isError,
   };
 }

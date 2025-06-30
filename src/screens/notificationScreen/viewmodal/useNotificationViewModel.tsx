@@ -1,11 +1,14 @@
-import { useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { DetailOrderApprove, fetchDetailOrderApproveData } from '../modal/DetailOrderApproveModal';
+import debounce from 'lodash/debounce';
+import { ContentNotification, fetchNotificationData } from '../modal/notificationModel';
 
 const ITEMS_PER_PAGE = 50;
+const DEBOUNCE_DELAY = 300;
 
-export function useDetailOrderApproveViewModel(orderId: string) {
-  const key = ['detailOrderApprove', orderId];
+export function useNotificationViewModel() {
+  const [searchKey, setSearchKey] = useState<string>('');
+  const debouncedSearchRef = useRef<ReturnType<typeof debounce> | null>(null);
 
   // Infinite Query cho phân trang + search
   const {
@@ -18,22 +21,30 @@ export function useDetailOrderApproveViewModel(orderId: string) {
     hasNextPage,
     isRefetching,
     isError,
-  } = useInfiniteQuery<DetailOrderApprove[], Error>({
-    queryKey: key,
+  } = useInfiniteQuery<ContentNotification[], Error>({
+    queryKey: ['listNotification', searchKey.trim()],
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchDetailOrderApproveData(orderId, page, ITEMS_PER_PAGE);
+      return fetchNotificationData(page, ITEMS_PER_PAGE);
     },
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
     staleTime: 60 * 1000,
-    gcTime: 300000,
   });
 
   // Gộp data các page lại thành 1 mảng
   const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
-  // console.log('render useInformationItemsViewModel');
+
+  // Debounce search - chỉ tạo một lần
+  const debouncedSearch = useMemo(() => {
+    if (!debouncedSearchRef.current) {
+      debouncedSearchRef.current = debounce((key: string) => {
+        setSearchKey(key);
+      }, DEBOUNCE_DELAY);
+    }
+    return debouncedSearchRef.current;
+  }, []);
 
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
@@ -52,6 +63,14 @@ export function useDetailOrderApproveViewModel(orderId: string) {
     }
   }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
+  // Search
+  const onSearch = useCallback(
+    (key: string) => {
+      debouncedSearch(key);
+    },
+    [debouncedSearch],
+  );
+
   return {
     flatData,
     isLoading,
@@ -61,6 +80,8 @@ export function useDetailOrderApproveViewModel(orderId: string) {
     hasNextPage: !!hasNextPage,
     onRefresh,
     onLoadMore,
+    onSearch,
+    searchKey,
     isError,
   };
 }

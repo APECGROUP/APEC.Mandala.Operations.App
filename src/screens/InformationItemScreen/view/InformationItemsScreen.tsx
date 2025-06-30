@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -40,6 +40,9 @@ import { MainParams } from '@/navigation/params';
 import { navigate } from '@/navigation/RootNavigation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import IconInfomation from '@assets/icon/IconInfomation';
+import SkeletonItem from '@/components/skeleton/SkeletonItem';
+import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 const InformationItemsScreen = ({
   route,
@@ -47,6 +50,8 @@ const InformationItemsScreen = ({
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
   const { content } = route.params.item;
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
     flatData,
@@ -58,6 +63,7 @@ const InformationItemsScreen = ({
     onLoadMore,
     hasNextPage,
     onUpdatePrice,
+    isError,
   } = useInformationItemsViewModel();
 
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
@@ -179,55 +185,75 @@ const InformationItemsScreen = ({
       <IconInfomation fill={Colors.WHITE} />
     </AppBlockButton>
   );
+
+  const reLoadData = useCallback(() => {
+    setIsFirstLoad(false);
+    onRefresh();
+  }, [onRefresh]);
+
+  console.log('error:', isError);
+  if (isError || (isFirstLoad && !isLoading)) {
+    return <FallbackComponent resetError={reLoadData} />;
+  }
+
   return (
-    <View style={styles.container}>
-      <Header primary title={content} rightComponent={rightComponent()} />
-      <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>{t('Thông tin các mặt hàng')}</AppText>
-        <View style={styles.countBadge}>
-          <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+    <ViewContainer>
+      <View style={styles.container}>
+        <Header primary title={content} rightComponent={rightComponent()} />
+        <View style={styles.titleContainer}>
+          <AppText style={styles.titleText}>{t('Thông tin các mặt hàng')}</AppText>
+          <View style={styles.countBadge}>
+            <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+          </View>
         </View>
-      </View>
-      {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
+        {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
+        {isLoading && flatData.length === 0 ? (
+          <View style={styles.listContent}>
+            {new Array(10).fill(0).map((_, index) => (
+              <SkeletonItem key={index} showWaiting={index % 3 === 0} />
+            ))}
+          </View>
+        ) : (
+          <FlashList
+            ref={flashListRef}
+            // data={[]}
+            data={flatData || []}
+            renderItem={renderItem}
+            keyExtractor={item => `${item.id}-${item.price}`}
+            onEndReached={onEndReached}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.5}
+            removeClippedSubviews
+            refreshing={isRefetching}
+            onRefresh={onRefresh}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            ListEmptyComponent={listEmptyComponent}
+            ListFooterComponent={listFooterComponent}
+            estimatedItemSize={100}
+            contentContainerStyle={styles.listContent}
+          />
+        )}
 
-      <FlashList
-        ref={flashListRef}
-        // data={[]}
-        data={flatData || []}
-        renderItem={renderItem}
-        keyExtractor={item => `${item.id}-${item.price}`}
-        onEndReached={onEndReached}
-        showsVerticalScrollIndicator={false}
-        onEndReachedThreshold={0.5}
-        removeClippedSubviews
-        refreshing={isRefetching}
-        onRefresh={onRefresh}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        ListEmptyComponent={listEmptyComponent}
-        ListFooterComponent={listFooterComponent}
-        estimatedItemSize={100}
-        contentContainerStyle={styles.listContent}
-      />
+        <ToastContainer ref={refToast} />
 
-      <ToastContainer ref={refToast} />
-
-      {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
-      <AnimatedButton
-        onPress={scrollToTop}
-        style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
-      </AnimatedButton>
-      {!isFetchingNextPage && (
+        {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
         <AnimatedButton
-          onPress={scrollToBottom}
-          style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-          {/* style={[styles.scrollButtonContainer, opacityScrollBottomStyle]}> */}
-          <IconScrollBottom />
+          onPress={scrollToTop}
+          style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
+          <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
         </AnimatedButton>
-      )}
-      {flatData && flatData.length > 0 && <FooterInformationItem />}
-    </View>
+        {!isFetchingNextPage && (
+          <AnimatedButton
+            onPress={scrollToBottom}
+            style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
+            {/* style={[styles.scrollButtonContainer, opacityScrollBottomStyle]}> */}
+            <IconScrollBottom />
+          </AnimatedButton>
+        )}
+        {flatData && flatData.length > 0 && <FooterInformationItem />}
+      </View>
+    </ViewContainer>
   );
 };
 

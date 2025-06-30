@@ -50,7 +50,7 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item, index }) => {
         {shouldShowWaiting && (
           <View style={styles.blockWaiting}>
             <AppText size={12} color={'#FF7009'} weight="500">
-              {t('Chờ gắn giá')}
+              {t('notifications.status.waitingAssignPrice')}
             </AppText>
           </View>
         )}

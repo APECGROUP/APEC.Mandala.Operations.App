@@ -30,6 +30,8 @@ import Footer from '@/screens/filterScreen/view/component/Footer';
 import { Colors } from '@/theme/Config';
 import ToastContainer from '@/elements/toast/ToastContainer';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
+import SkeletonItem from '@/components/skeleton/SkeletonItem';
+import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 
 import IconNotification from '../../../../assets/icon/IconNotification';
 import IconSearch from '../../../../assets/icon/IconSearch';
@@ -55,6 +57,7 @@ const ApprovePrScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
   const { infoUser } = useInfoUser();
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   // Refs
   const refToast = useRef<any>(null);
@@ -79,6 +82,7 @@ const ApprovePrScreen: React.FC = () => {
     onLoadMore,
     onSearch,
     searchKey,
+    isError,
   } = useApproveViewModel();
 
   // Update footer visibility when selectedIds changes
@@ -217,6 +221,17 @@ const ApprovePrScreen: React.FC = () => {
     () => selectedIds.length === flatData.length && flatData.length > 0,
     [selectedIds, flatData],
   );
+
+  const reLoadData = useCallback(() => {
+    setIsFirstLoad(false);
+    onRefresh();
+  }, [onRefresh]);
+
+  console.log('error:', isError);
+  if (isError || (isFirstLoad && !isLoading)) {
+    return <FallbackComponent resetError={reLoadData} />;
+  }
+
   return (
     <View style={styles.container}>
       {/* Background Image */}
@@ -287,26 +302,34 @@ const ApprovePrScreen: React.FC = () => {
       </View>
 
       {/* FlashList */}
-      <FlashList
-        ref={flashListRef}
-        data={flatData || []}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        onEndReached={onLoadMore}
-        showsVerticalScrollIndicator={false}
-        onEndReachedThreshold={0.5}
-        removeClippedSubviews
-        refreshing={isRefetching}
-        onRefresh={onRefresh}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        ListEmptyComponent={listEmptyComponent}
-        ListFooterComponent={listFooterComponent}
-        estimatedItemSize={100}
-        contentContainerStyle={
-          selectedIds.length > 0 ? styles.listContent : styles.listContentNoFooter
-        }
-      />
+      {isLoading && flatData.length === 0 ? (
+        <View style={styles.listContent}>
+          {new Array(10).fill(0).map((_, index) => (
+            <SkeletonItem key={index} showWaiting={index % 3 === 0} />
+          ))}
+        </View>
+      ) : (
+        <FlashList
+          ref={flashListRef}
+          data={flatData || []}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          onEndReached={onLoadMore}
+          showsVerticalScrollIndicator={false}
+          onEndReachedThreshold={0.5}
+          removeClippedSubviews
+          refreshing={isRefetching}
+          onRefresh={onRefresh}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          ListEmptyComponent={listEmptyComponent}
+          ListFooterComponent={listFooterComponent}
+          estimatedItemSize={100}
+          contentContainerStyle={
+            selectedIds.length > 0 ? styles.listContent : styles.listContentNoFooter
+          }
+        />
+      )}
 
       {/* Toast Container */}
       <ToastContainer ref={refToast} />

@@ -42,12 +42,15 @@ import { Colors } from '@/theme/Config';
 import { Gesture } from 'react-native-gesture-handler';
 import IconCreatePrice from '@assets/icon/IconCreatePrice';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import SkeletonItem from '@/components/skeleton/SkeletonItem';
+import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 
 const CreatePriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
   console.log('CreatePriceScreen');
   const refToast = useRef<any>(null);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -60,6 +63,7 @@ const CreatePriceScreen: React.FC = () => {
     onSearch,
     handleDelete,
     searchKey,
+    isError,
   } = useCreatePriceViewModel();
   const { infoUser } = useInfoUser();
 
@@ -122,6 +126,11 @@ const CreatePriceScreen: React.FC = () => {
   const handleSubmitSearch = useCallback(() => {
     navigate('FilterScreen');
   }, []);
+
+  const reLoadData = useCallback(() => {
+    setIsFirstLoad(false);
+    onRefresh();
+  }, [onRefresh]);
 
   const listEmptyComponent = useMemo(() => {
     if (isLoading) {
@@ -200,6 +209,11 @@ const CreatePriceScreen: React.FC = () => {
     [selectedIds.length, flatData.length],
   );
 
+  console.log('error:', isError);
+  if (isError || (isFirstLoad && !isLoading)) {
+    return <FallbackComponent resetError={reLoadData} />;
+  }
+
   return (
     <View style={styles.container}>
       {/* ─── Background Image ─────────────────────────────────────────────── */}
@@ -269,8 +283,10 @@ const CreatePriceScreen: React.FC = () => {
       </View>
       {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
       {isLoading && flatData.length === 0 ? (
-        <View style={styles.flexCenter}>
-          <ActivityIndicator size="large" color={light.primary} />
+        <View style={styles.listContent}>
+          {new Array(10).fill(0).map((_, index) => (
+            <SkeletonItem key={index} showWaiting={index % 3 === 0} />
+          ))}
         </View>
       ) : (
         <FlashList
@@ -338,7 +354,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  flexCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   buttonCreatePrice2: { position: 'absolute', bottom: vs(20), right: s(16) },
   header: {
     flexDirection: 'row',

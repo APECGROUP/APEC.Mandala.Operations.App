@@ -46,6 +46,9 @@ export const fetchAssignPriceData = async (
   }
 
   try {
+    // Giả lập delay 3 giây
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
     const url = buildAssignPriceUrl(page, limit, key);
     const { data } = await axios.get(url);
 

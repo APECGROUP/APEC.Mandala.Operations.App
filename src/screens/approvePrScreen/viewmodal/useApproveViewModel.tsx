@@ -20,12 +20,12 @@ export function useApproveViewModel() {
     fetchNextPage,
     hasNextPage,
     isRefetching,
+    isError,
   } = useInfiniteQuery<TypeApprove[], Error>({
-    queryKey: ['listApprove', searchKey.trim(), searchKey],
-
+    queryKey: ['listApprove', searchKey.trim()],
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchApproveData(page, ITEMS_PER_PAGE, searchKey);
+      return fetchApproveData(page, ITEMS_PER_PAGE, searchKey.trim());
     },
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
@@ -82,5 +82,6 @@ export function useApproveViewModel() {
     onLoadMore,
     onSearch,
     searchKey,
+    isError,
   };
 }

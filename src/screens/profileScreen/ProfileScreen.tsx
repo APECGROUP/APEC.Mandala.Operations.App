@@ -9,47 +9,48 @@ import { ResponseImageElement } from '../../interface/Verify.interface';
 import { AppText } from '../../elements/text/AppText';
 import { useInfoUser } from '../../zustand/store/useInfoUser/useInfoUser';
 import { getFontSize } from '../../constants';
-import api from '../../utils/setup-axios';
-import Toast from 'react-native-toast-message';
-import { LanguageType } from '../../languages/locales/type';
-import Utilities from '../../utils/Utilities';
 import AppImage from '../../elements/appImage/AppImage';
 import IconTakeCamera from '@assets/icon/IconTakeCamera';
 import { Colors } from '@/theme/Config';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'ProfileScreen'>) => {
   const { t } = useTranslation();
   const { infoUser, updateAvatar } = useInfoUser();
 
+   
   const onUploadAvatar = async (imageAvatar: ResponseImageElement) => {
-    try {
-      const uri = imageAvatar?.path || imageAvatar?.sourceURL || imageAvatar?.uri;
-      let formData: any = new FormData();
-      formData.append('file', {
-        uri: Utilities.normalizeUri(uri || ''),
-        type: imageAvatar?.type ?? imageAvatar?.mime,
-        name: `avatar_${imageAvatar?.filename || uri}`,
-      });
-      formData.append('type', 'avatar');
-      const response = await api.post('user/commons/upload-file', formData, {
-        headers: {
-          'content-type': 'multipart/form-data',
-          Accept: 'application/json',
-        },
-      });
-      if (response.status !== 200 || response.data.status !== 0) {
-        throw new Error();
-      }
-      if (response.data.status === 0) {
-        updateAvatar(response.data.data.profile.avatar);
-      }
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text2: t(LanguageType.errorTryAgain),
-      });
-    } finally {
+    if (imageAvatar) {
+      return updateAvatar('https://mdbcdn.b-cdn.net/img/new/avatars/2.webp');
     }
+    // try {
+    //   const uri = imageAvatar?.path || imageAvatar?.sourceURL || imageAvatar?.uri;
+    //   let formData: any = new FormData();
+    //   formData.append('file', {
+    //     uri: Utilities.normalizeUri(uri || ''),
+    //     type: imageAvatar?.type ?? imageAvatar?.mime,
+    //     name: `avatar_${imageAvatar?.filename || uri}`,
+    //   });
+    //   formData.append('type', 'avatar');
+    //   const response = await api.post('user/commons/upload-file', formData, {
+    //     headers: {
+    //       'content-type': 'multipart/form-data',
+    //       Accept: 'application/json',
+    //     },
+    //   });
+    //   if (response.status !== 200 || response.data.status !== 0) {
+    //     throw new Error();
+    //   }
+    //   if (response.data.status === 0) {
+    //     updateAvatar(response.data.data.profile.avatar);
+    //   }
+    // } catch (error) {
+    //   Toast.show({
+    //     type: 'error',
+    //     text2: t(LanguageType.errorTryAgain),
+    //   });
+    // } finally {
+    // }
   };
   const onUpdateAvatar = () => {
     navigation.navigate('ModalPhotoOrCamera', { setImageAvatar: onUploadAvatar });
@@ -80,31 +81,33 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
   console.log('infoUser: ', infoUser);
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.fg1}>
-        <AnimationButton
-          entering={FadeInDown.delay(0).duration(0).springify()}
-          style={styles.avatar}
-          activeOpacity={0.8}
-          onPress={onUpdateAvatar}>
-          <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
-          <IconTakeCamera style={styles.editIcon} />
-        </AnimationButton>
-        <AppText style={styles.textTitle}>{t('account.profile.changePhoto')}</AppText>
+    <ViewContainer>
+      <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.fg1}>
+          <AnimationButton
+            entering={FadeInDown.delay(0).duration(0).springify()}
+            style={styles.avatar}
+            activeOpacity={0.8}
+            onPress={onUpdateAvatar}>
+            <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
+            <IconTakeCamera style={styles.editIcon} />
+          </AnimationButton>
+          <AppText style={styles.textTitle}>{t('account.profile.changePhoto')}</AppText>
 
-        {data.map((item, index) => (
-          <Reanimated.View
-            entering={FadeInDown.delay(150 * (index + 1))
-              .duration(0)
-              .springify()}
-            key={index}
-            style={[styles.textRow, index === 0 && styles.borderWidth0]}>
-            <AppText style={styles.textLabel}>{t(item.label)}</AppText>
-            <AppText style={styles.textValue}>{String(item.value)}</AppText>
-          </Reanimated.View>
-        ))}
-      </ScrollView>
-    </View>
+          {data.map((item, index) => (
+            <Reanimated.View
+              entering={FadeInDown.delay(150 * (index + 1))
+                .duration(0)
+                .springify()}
+              key={index}
+              style={[styles.textRow, index === 0 && styles.borderWidth0]}>
+              <AppText style={styles.textLabel}>{t(item.label)}</AppText>
+              <AppText style={styles.textValue}>{String(item.value)}</AppText>
+            </Reanimated.View>
+          ))}
+        </ScrollView>
+      </View>
+    </ViewContainer>
   );
 };
 

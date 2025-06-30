@@ -24,6 +24,7 @@ import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DataLocal from '@/data/DataLocal';
 import { useAutoLogin } from '@/hook/useAutoLogin';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 export type typeHotel = {
   id: number | string | undefined;
@@ -151,105 +152,107 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
 
   console.log('hotel', hotel);
   return (
-    <View style={[styles.container, { paddingBottom: bottom }]}>
-      <View style={styles.center}>
-        <FastImage
-          style={{
-            width: SCREEN_WIDTH,
-            aspectRatio: 375 / 186,
-            marginBottom: vs(24),
-          }}
-          source={Images.BackgroundAssignPrice}
-        />
+    <ViewContainer>
+      <View style={[styles.container, { paddingBottom: bottom }]}>
+        <View style={styles.center}>
+          <FastImage
+            style={{
+              width: SCREEN_WIDTH,
+              aspectRatio: 375 / 186,
+              marginBottom: vs(24),
+            }}
+            source={Images.BackgroundAssignPrice}
+          />
 
-        {/* Hiển thị thông tin credentials đã lưu */}
+          {/* Hiển thị thông tin credentials đã lưu */}
 
-        <AppTextInput
-          required
-          labelStyle={styles.labelUser}
-          label={t('auth.login.userName')}
-          placeholderTextColor={light.placeholderTextColor}
-          value={userName}
-          maxLength={20}
-          onChangeText={setUserName}
-          placeholder={t('auth.login.inputUserName')}
-          onSubmitEditing={() => refPassword.current?.focus()}
-          inputStyle={styles.inputStyle}
-          containerStyle={{
-            marginBottom: vs(18),
-            width: SCREEN_WIDTH - PaddingHorizontal * 2,
-          }}
-        />
-
-        <AppTextInput
-          refName={refPassword}
-          required
-          labelStyle={styles.labelPassword}
-          label={t('auth.login.password')}
-          secureTextEntry
-          value={password}
-          maxLength={20}
-          onChangeText={setPassword}
-          onSubmitEditing={onPickHotel}
-          placeholder={t('auth.login.inputPassword')}
-          inputStyle={styles.inputStyle}
-          containerStyle={{
-            marginBottom: vs(18),
-            width: SCREEN_WIDTH - PaddingHorizontal * 2,
-          }}
-        />
-        <AppBlockButton onPress={onPickHotel}>
           <AppTextInput
             required
-            editable={false}
-            labelStyle={styles.labelPassword}
-            label={t('auth.login.hotel')}
+            labelStyle={styles.labelUser}
+            label={t('auth.login.userName')}
             placeholderTextColor={light.placeholderTextColor}
-            noBorder
-            value={hotel?.name?.toString()}
-            placeholder={t('auth.login.pickHotel')}
-            rightIcon={
-              <IconArrowRight
-                stroke={Colors.ICON_SECONDARY}
-                style={{ transform: [{ rotate: '90deg' }], marginRight: s(2) }}
-              />
-            }
-            // onPress={onPickHotel}
+            value={userName}
+            maxLength={20}
+            onChangeText={setUserName}
+            placeholder={t('auth.login.inputUserName')}
+            onSubmitEditing={() => refPassword.current?.focus()}
             inputStyle={styles.inputStyle}
             containerStyle={{
+              marginBottom: vs(18),
               width: SCREEN_WIDTH - PaddingHorizontal * 2,
             }}
           />
-        </AppBlockButton>
-        <AppBlockButton onPress={onSave} style={styles.buttonSave}>
-          {isRememberLogin ? <IconCheckBox /> : <IconUnCheckBox />}
 
-          <AppText ml={s(5)} size={12} weight="500">
-            {t('auth.login.saveInfoLogin')}
-          </AppText>
-        </AppBlockButton>
-        <ToastContainer ref={refToast} />
+          <AppTextInput
+            refName={refPassword}
+            required
+            labelStyle={styles.labelPassword}
+            label={t('auth.login.password')}
+            secureTextEntry
+            value={password}
+            maxLength={20}
+            onChangeText={setPassword}
+            onSubmitEditing={onPickHotel}
+            placeholder={t('auth.login.inputPassword')}
+            inputStyle={styles.inputStyle}
+            containerStyle={{
+              marginBottom: vs(18),
+              width: SCREEN_WIDTH - PaddingHorizontal * 2,
+            }}
+          />
+          <AppBlockButton onPress={onPickHotel}>
+            <AppTextInput
+              required
+              editable={false}
+              labelStyle={styles.labelPassword}
+              label={t('auth.login.hotel')}
+              placeholderTextColor={light.placeholderTextColor}
+              noBorder
+              value={hotel?.name?.toString()}
+              placeholder={t('auth.login.pickHotel')}
+              rightIcon={
+                <IconArrowRight
+                  stroke={Colors.ICON_SECONDARY}
+                  style={{ transform: [{ rotate: '90deg' }], marginRight: s(2) }}
+                />
+              }
+              // onPress={onPickHotel}
+              inputStyle={styles.inputStyle}
+              containerStyle={{
+                width: SCREEN_WIDTH - PaddingHorizontal * 2,
+              }}
+            />
+          </AppBlockButton>
+          <AppBlockButton onPress={onSave} style={styles.buttonSave}>
+            {isRememberLogin ? <IconCheckBox /> : <IconUnCheckBox />}
+
+            <AppText ml={s(5)} size={12} weight="500">
+              {t('auth.login.saveInfoLogin')}
+            </AppText>
+          </AppBlockButton>
+          <ToastContainer ref={refToast} />
+        </View>
+        <View>
+          <AppButton
+            width={SCREEN_WIDTH - s(32)}
+            height={vs(45)}
+            onPress={onSubmit}
+            disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
+            disabled={disabled}
+            primary
+            textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
+            processing={processing}
+            textStyle={styles.textStyleButton}
+            text={t('auth.login.login')}
+          />
+          <AppBlockButton onPress={onForgotPassword} style={styles.buttonForgotPassword}>
+            <AppText size={12} weight="500">
+              {t('auth.login.forgotPassword')}
+            </AppText>
+          </AppBlockButton>
+        </View>
       </View>
-      <View>
-        <AppButton
-          width={SCREEN_WIDTH - s(32)}
-          height={vs(45)}
-          onPress={onSubmit}
-          disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
-          disabled={disabled}
-          primary
-          textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
-          processing={processing}
-          textStyle={styles.textStyleButton}
-          text={t('auth.login.login')}
-        />
-        <AppBlockButton onPress={onForgotPassword} style={styles.buttonForgotPassword}>
-          <AppText size={12} weight="500">
-            {t('auth.login.forgotPassword')}
-          </AppText>
-        </AppBlockButton>
-      </View>
-    </View>
+    </ViewContainer>
   );
 };
 

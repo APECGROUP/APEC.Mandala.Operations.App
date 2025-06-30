@@ -20,6 +20,7 @@ import { goBack } from '@/navigation/RootNavigation';
 import DeviceInfo from 'react-native-device-info';
 import api from '@/utils/setup-axios';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 const ForgotPasswordScreen = ({
   navigation,
@@ -76,62 +77,64 @@ const ForgotPasswordScreen = ({
     }
   };
   return (
-    <View style={[styles.container, { paddingBottom: bottom }]}>
-      <AppBlock>
-        <AppText size={20} weight="700">
-          {t('auth.forgotPassword.title')}
-        </AppText>
-        <AppText size={12} weight="500" color={'#727272'} mt={vs(8)}>
-          {t('auth.forgotPassword.subtitle')}
-        </AppText>
+    <ViewContainer>
+      <View style={[styles.container, { paddingBottom: bottom }]}>
+        <AppBlock>
+          <AppText size={20} weight="700">
+            {t('auth.forgotPassword.title')}
+          </AppText>
+          <AppText size={12} weight="500" color={'#727272'} mt={vs(8)}>
+            {t('auth.forgotPassword.subtitle')}
+          </AppText>
 
-        <AppTextInput
-          required
-          labelStyle={styles.labelPassword}
-          containerStyle={styles.bottom10}
-          label={t('auth.forgotPassword.userName')}
-          value={userName}
-          maxLength={20}
-          inputStyle={styles.inputStyle}
-          onChangeText={setUserName}
-          onSubmitEditing={onPickHotel}
-          placeholder={t('auth.forgotPassword.inputUserName')}
-        />
-        <AppTextInput
-          required
-          editable={false}
-          labelStyle={styles.labelPassword}
-          label={t('auth.forgotPassword.hotel')}
-          placeholderTextColor={light.placeholderTextColor}
-          noBorder
-          maxLength={20}
-          value={hotel?.name}
-          placeholder={t('auth.forgotPassword.pickHotel')}
-          rightIcon={
-            <IconArrowRight stroke="#D8D8D8" style={{ transform: [{ rotate: '90deg' }] }} />
-          }
-          onPress={onPickHotel}
-          inputStyle={styles.inputStyle}
-          containerStyle={{
-            width: SCREEN_WIDTH - PaddingHorizontal * 2,
-          }}
-        />
-      </AppBlock>
-      <View>
-        <AppButton
-          width={SCREEN_WIDTH - s(32)}
-          height={vs(45)}
-          onPress={onSubmit}
-          disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
-          disabled={disabled}
-          primary
-          textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
-          processing={processing}
-          textStyle={styles.textStyleButton}
-          text={t('auth.forgotPassword.confirm')}
-        />
+          <AppTextInput
+            required
+            labelStyle={styles.labelPassword}
+            containerStyle={styles.bottom10}
+            label={t('auth.forgotPassword.userName')}
+            value={userName}
+            maxLength={20}
+            inputStyle={styles.inputStyle}
+            onChangeText={setUserName}
+            onSubmitEditing={onPickHotel}
+            placeholder={t('auth.forgotPassword.inputUserName')}
+          />
+          <AppTextInput
+            required
+            editable={false}
+            labelStyle={styles.labelPassword}
+            label={t('auth.forgotPassword.hotel')}
+            placeholderTextColor={light.placeholderTextColor}
+            noBorder
+            maxLength={20}
+            value={hotel?.name}
+            placeholder={t('auth.forgotPassword.pickHotel')}
+            rightIcon={
+              <IconArrowRight stroke="#D8D8D8" style={{ transform: [{ rotate: '90deg' }] }} />
+            }
+            onPress={onPickHotel}
+            inputStyle={styles.inputStyle}
+            containerStyle={{
+              width: SCREEN_WIDTH - PaddingHorizontal * 2,
+            }}
+          />
+        </AppBlock>
+        <View>
+          <AppButton
+            width={SCREEN_WIDTH - s(32)}
+            height={vs(45)}
+            onPress={onSubmit}
+            disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
+            disabled={disabled}
+            primary
+            textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
+            processing={processing}
+            textStyle={styles.textStyleButton}
+            text={t('auth.forgotPassword.confirm')}
+          />
+        </View>
       </View>
-    </View>
+    </ViewContainer>
   );
 };
 

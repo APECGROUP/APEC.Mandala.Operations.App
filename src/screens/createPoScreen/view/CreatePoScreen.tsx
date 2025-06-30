@@ -1,18 +1,45 @@
 import { StyleSheet, View } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DevelopingAnimation from '@/views/animation/DevelopingAnimation';
+import SkeletonItem from '@/components/skeleton/SkeletonItem';
+import { PaddingHorizontal } from '@/utils/Constans';
 
-const CreatePoScreen = () => (
-  <View style={styles.container}>
-    <DevelopingAnimation autoPlay={true} />
-  </View>
-);
+const CreatePoScreen = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    return () => clearTimeout(timeout);
+  }, []);
+  if (isLoading) {
+    return (
+      <View style={styles.containerLoading}>
+        {new Array(10).fill(0).map((_, index) => (
+          <SkeletonItem key={index} />
+        ))}
+      </View>
+    );
+  }
+  return (
+    <View style={styles.container}>
+      <DevelopingAnimation autoPlay={true} />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  containerLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: PaddingHorizontal,
+    marginTop: 100,
   },
 });
 

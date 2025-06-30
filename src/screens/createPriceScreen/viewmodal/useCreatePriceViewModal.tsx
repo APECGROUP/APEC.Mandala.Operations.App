@@ -24,6 +24,7 @@ export function useCreatePriceViewModel() {
     fetchNextPage,
     hasNextPage,
     isRefetching,
+    isError,
   } = useInfiniteQuery<TypeCreatePrice[], Error>({
     queryKey: ['listCreatePrice', searchKey.trim()],
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
@@ -174,5 +175,6 @@ export function useCreatePriceViewModel() {
     // handleExpand,
     handleDelete,
     searchKey,
+    isError,
   };
 }
