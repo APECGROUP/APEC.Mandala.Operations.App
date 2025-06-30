@@ -1,6 +1,6 @@
 // views/NotificationScreen.tsx
 
-import React, { useRef, useState, useCallback, useMemo } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
