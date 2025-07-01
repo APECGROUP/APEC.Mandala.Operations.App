@@ -106,22 +106,16 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
                 </View>
               </View>
             </AppBlockButton>
-
-            <AppBlockButton style={styles.right} onPress={handleExpand}>
-              {/* <AppText style={{ fontSize: vs(20), color: '#999' }}>{expanded ? '▲' : '▼'}</AppText> */}
-            </AppBlockButton>
           </View>
 
-          {expanded && (
-            <View style={styles.expandedContent}>
-              {detailItems.map(({ label, value }, idx) => (
-                <View key={idx} style={styles.detailRow}>
-                  <AppText style={styles.detailLabel}>{label}</AppText>
-                  <AppText style={styles.detailValue}>{value}</AppText>
-                </View>
-              ))}
-            </View>
-          )}
+          <View style={styles.expandedContent}>
+            {detailItems.map(({ label, value }, idx) => (
+              <View key={idx} style={styles.detailRow}>
+                <AppText style={styles.detailLabel}>{label}</AppText>
+                <AppText style={styles.detailValue}>{value}</AppText>
+              </View>
+            ))}
+          </View>
         </View>
       </ReanimatedSwipeable>
     );

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthParams } from '../../navigation/params';
 import { AppBlock } from '../../elements/block/Block';
@@ -41,6 +41,26 @@ const fakeData = [
     name: 'Mandala Hotel & Spa Bắc Ninh',
     id: 6,
   },
+  {
+    name: 'Mandala 7',
+    id: 7,
+  },
+  {
+    name: 'Mandala 8',
+    id: 8,
+  },
+  {
+    name: 'Mandala 9',
+    id: 9,
+  },
+  {
+    name: 'Mandala 10',
+    id: 10,
+  },
+  {
+    name: 'Mandala 11',
+    id: 11,
+  },
 ];
 const ModalPickHotel = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
@@ -58,7 +78,7 @@ const ModalPickHotel = ({ navigation, route }: Props) => {
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
       <Animated.View
         entering={FadeInDown.delay(0).duration(0).springify()}
-        style={styles.container}>
+        style={[styles.container, { paddingBottom: bottom }]}>
         <AppBlock
           pl={PaddingHorizontal}
           row
@@ -73,7 +93,7 @@ const ModalPickHotel = ({ navigation, route }: Props) => {
           </TouchableOpacity>
         </AppBlock>
 
-        <AppBlock pt={10} pb={bottom} ph={PaddingHorizontal}>
+        <ScrollView style={[styles.scrollView]} showsVerticalScrollIndicator={false}>
           {fakeData.map((item, index) => {
             const isFocus = item?.id === hotel?.id;
             const onSelect = () => {
@@ -90,7 +110,7 @@ const ModalPickHotel = ({ navigation, route }: Props) => {
               </AppBlockButton>
             );
           })}
-        </AppBlock>
+        </ScrollView>
       </Animated.View>
     </TouchableOpacity>
   );
@@ -99,6 +119,7 @@ const ModalPickHotel = ({ navigation, route }: Props) => {
 export default ModalPickHotel;
 
 const styles = StyleSheet.create({
+  scrollView: { maxHeight: vs(300), paddingHorizontal: PaddingHorizontal, paddingTop: vs(10) },
   itemFocus: {
     backgroundColor: light.selected,
     padding: vs(10),

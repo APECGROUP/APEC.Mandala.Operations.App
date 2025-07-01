@@ -354,12 +354,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  buttonCreatePrice2: { position: 'absolute', bottom: vs(20), right: s(16) },
+  buttonCreatePrice2: {
+    position: 'absolute',
+    bottom: vs(20),
+    right: s(16),
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+
+    elevation: 2,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingBottom: vs(16),
     paddingHorizontal: s(16),
+
     // borderBottomWidth: 1,
   },
   container: {

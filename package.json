@@ -12,7 +12,7 @@
     "start": "react-native start --reset-cache",
     "clean:android": "cd android && ./gradlew clean && cd ..",
     "clean:ios": "cd ios && rm -rf Pods && rm -rf Podfile.lock && pod install && cd ..",
-    "android-build-APK": "rm -rf build && rm -rf android/build && cd android && ./gradlew clean && ./gradlew assembleRelease && cd ..",
+    "android-build-APK": "rm -rf build && rm -rf android/build && cd android && ./gradlew clean && ./gradlew assembleRelease && cd .. && APK_PATH=$(find android/app/build/outputs/apk/release -name '*.apk' | head -n 1) && DATE=$(date +%d_%m_%Y) && mv \"$APK_PATH\" \"android/app/build/outputs/apk/release/Smart_Purchase$DATE.apk\"",
     "android-build-AAB": "rm -rf build && rm -rf android/build && cd android && ./gradlew clean && ./gradlew bundleRelease && cd ..",
     "open-folder-apk": "open ./android/app/build/outputs/apk",
     "open-folder-aab": "open ./android/app/build/outputs/bundle",

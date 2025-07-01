@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import DevelopingAnimation from '@/views/animation/DevelopingAnimation';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
@@ -23,6 +23,7 @@ const CreatePoScreen = () => {
   }
   return (
     <View style={styles.container}>
+      <StatusBar barStyle={'default'} />
       <DevelopingAnimation autoPlay={true} />
     </View>
   );

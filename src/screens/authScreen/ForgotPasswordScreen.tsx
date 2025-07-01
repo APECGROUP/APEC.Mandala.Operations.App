@@ -21,6 +21,7 @@ import DeviceInfo from 'react-native-device-info';
 import api from '@/utils/setup-axios';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import AppBlockButton from '@/elements/button/AppBlockButton';
 
 const ForgotPasswordScreen = ({
   navigation,
@@ -38,7 +39,7 @@ const ForgotPasswordScreen = ({
   };
 
   const onSubmit = async () => {
-    if (userName.toLocaleLowerCase() === 'tuan') {
+    if (userName.toLocaleLowerCase() === 'dung') {
       showAlert(t('auth.forgotPassword.success'), t('auth.forgotPassword.subSuccess'), [
         {
           text: t('auth.forgotPassword.close'),
@@ -106,40 +107,42 @@ const ForgotPasswordScreen = ({
             onSubmitEditing={onPickHotel}
             placeholder={t('auth.forgotPassword.inputUserName')}
           />
-          <AppTextInput
-            required
-            editable={false}
-            labelStyle={styles.labelPassword}
-            label={t('auth.forgotPassword.hotel')}
-            placeholderTextColor={light.placeholderTextColor}
-            noBorder
-            maxLength={20}
-            value={hotel?.name}
-            placeholder={t('auth.forgotPassword.pickHotel')}
-            rightIcon={
-              <IconArrowRight stroke="#D8D8D8" style={{ transform: [{ rotate: '90deg' }] }} />
-            }
-            onPress={onPickHotel}
-            inputStyle={styles.inputStyle}
-            containerStyle={{
-              width: SCREEN_WIDTH - PaddingHorizontal * 2,
-            }}
-          />
+          <AppBlockButton onPress={onPickHotel}>
+            <AppTextInput
+              disabled
+              required
+              editable={false}
+              labelStyle={styles.labelPassword}
+              label={t('auth.forgotPassword.hotel')}
+              placeholderTextColor={light.placeholderTextColor}
+              noBorder
+              maxLength={20}
+              value={hotel?.name}
+              placeholder={t('auth.forgotPassword.pickHotel')}
+              rightIcon={
+                <IconArrowRight stroke="#D8D8D8" style={{ transform: [{ rotate: '90deg' }] }} />
+              }
+              onPress={onPickHotel}
+              inputStyle={styles.inputStyle}
+              containerStyle={{
+                width: SCREEN_WIDTH - PaddingHorizontal * 2,
+              }}
+            />
+          </AppBlockButton>
         </AppBlock>
-        <View>
-          <AppButton
-            width={SCREEN_WIDTH - s(32)}
-            height={vs(45)}
-            onPress={onSubmit}
-            disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
-            disabled={disabled}
-            primary
-            textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
-            processing={processing}
-            textStyle={styles.textStyleButton}
-            text={t('auth.forgotPassword.confirm')}
-          />
-        </View>
+        <AppButton
+          width={SCREEN_WIDTH - s(32)}
+          height={vs(45)}
+          onPress={onSubmit}
+          disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
+          disabled={disabled}
+          primary
+          textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
+          processing={processing}
+          textStyle={styles.textStyleButton}
+          text={t('auth.forgotPassword.confirm')}
+          style={{ marginTop: vs(32) }}
+        />
       </View>
     </ViewContainer>
   );
@@ -154,7 +157,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: light.white,
     paddingTop: vs(16),
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
   },
   labelPassword: {
     fontSize: getFontSize(14),

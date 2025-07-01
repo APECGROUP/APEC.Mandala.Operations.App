@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import React from 'react';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 import ConfettiAnimation from '@/views/animation/Confetti';
@@ -6,13 +6,14 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/constants';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 const PcPrScreen = () => (
-    <ViewContainer>
-      <View style={styles.container}>
-        <ConfettiAnimation style={styles.confetti} autoPlay={true} />
-        <EmptyDataAnimation autoPlay={true} />
-      </View>
-    </ViewContainer>
-  );
+  <ViewContainer>
+    <View style={styles.container}>
+      <StatusBar barStyle={'default'} />
+      <ConfettiAnimation style={styles.confetti} autoPlay={true} />
+      <EmptyDataAnimation autoPlay={true} />
+    </View>
+  </ViewContainer>
+);
 
 export default PcPrScreen;
 

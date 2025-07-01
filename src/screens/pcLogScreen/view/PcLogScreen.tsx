@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import React from 'react';
 import DevelopingAnimation from '@/views/animation/DevelopingAnimation';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
@@ -6,6 +6,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 const PcLogScreen = () => (
   <ViewContainer>
     <View style={styles.container}>
+      <StatusBar barStyle={'default'} />
       <DevelopingAnimation autoPlay={true} />
     </View>
   </ViewContainer>

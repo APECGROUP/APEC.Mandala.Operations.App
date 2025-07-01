@@ -6,4 +6,5 @@ export default {
   IconEmptyDataAssign: require('./iconEmptyDataAssign.png'),
   IconBox: require('./iconBox.png'),
   IconApproved: require('./iconApprove.png'),
+  BackgroundLogin: require('./backgroundLogin.png'),
 };

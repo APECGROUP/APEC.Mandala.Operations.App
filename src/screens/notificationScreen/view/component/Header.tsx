@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, StatusBar } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../../../../elements/text/AppText';
@@ -27,22 +27,29 @@ const Header = ({
 }: HeaderProps) => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
-  return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: top },
-        primary && { backgroundColor: Colors.PRIMARY },
-      ]}>
-      <AppBlockButton onPress={goBack} style={[styles.buttonBack, { width: iconWidth }]}>
-        <IconBack color={primary ? Colors.WHITE : Colors.BLACK_900} />
-      </AppBlockButton>
 
-      <AppText style={[styles.title, primary && { color: Colors.WHITE }]}>
-        {title || t('Thông báo')}
-      </AppText>
-      <View style={{ width: iconWidth }}>{rightComponent}</View>
-    </View>
+  return (
+    <>
+      <StatusBar
+        barStyle={primary ? 'light-content' : 'dark-content'}
+        backgroundColor={primary ? 'white' : 'black'}
+      />
+      <View
+        style={[
+          styles.container,
+          { paddingTop: top },
+          primary && { backgroundColor: Colors.PRIMARY },
+        ]}>
+        <AppBlockButton onPress={goBack} style={[styles.buttonBack, { width: iconWidth }]}>
+          <IconBack color={primary ? Colors.WHITE : Colors.BLACK_900} />
+        </AppBlockButton>
+
+        <AppText style={[styles.title, primary && { color: Colors.WHITE }]}>
+          {title || t('Thông báo')}
+        </AppText>
+        <View style={{ width: iconWidth }}>{rightComponent}</View>
+      </View>
+    </>
   );
 };
 

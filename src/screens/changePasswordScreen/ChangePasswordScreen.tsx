@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, TextInput } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../navigation/params';
 import { useTranslation } from 'react-i18next';
@@ -30,9 +30,9 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [processing, setProcessing] = useState<boolean | undefined>(false);
 
-  const refCurrent = useRef(null);
-  const refNew = useRef(null);
-  const refConfirm = useRef(null);
+  const refCurrent = useRef<TextInput>(null);
+  const refNew = useRef<TextInput>(null);
+  const refConfirm = useRef<TextInput>(null);
 
   const disabled = !currentPassword || !confirmPassword || newPassword !== confirmPassword;
 
@@ -107,6 +107,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
             secureTextEntry
             maxLength={20}
             onChangeText={setCurrentPassword}
+            onSubmitEditing={() => refNew.current?.focus()}
             inputStyle={styles.input}
             containerStyle={{
               width: SCREEN_WIDTH - PaddingHorizontal * 2,
@@ -122,6 +123,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
             secureTextEntry
             maxLength={20}
             onChangeText={setNewPassword}
+            onSubmitEditing={() => refConfirm.current?.focus()}
             inputStyle={styles.input}
             containerStyle={{
               width: SCREEN_WIDTH - PaddingHorizontal * 2,

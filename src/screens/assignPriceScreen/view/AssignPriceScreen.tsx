@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  StatusBar,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
@@ -173,11 +174,16 @@ const AssignPriceScreen: React.FC = () => {
   if (isError || (isFirstLoad && !isLoading)) {
     return <FallbackComponent resetError={reLoadData} />;
   }
+
+  const total = '60';
   return (
     <ViewContainer>
       <View style={styles.container}>
         {/* <Test /> */}
-
+        <StatusBar
+          barStyle={'light-content'}
+          // backgroundColor={primary ? 'white' : 'black'}
+        />
         {/* ─── Background Image ─────────────────────────────────────────────── */}
         <FastImage
           style={styles.backgroundImage}
@@ -229,7 +235,7 @@ const AssignPriceScreen: React.FC = () => {
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('assignPrice.header')}</AppText>
           <View style={styles.countBadge}>
-            <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+            <AppText style={styles.countBadgeText}>{total}</AppText>
           </View>
         </View>
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}

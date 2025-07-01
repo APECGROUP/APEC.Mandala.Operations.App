@@ -16,6 +16,7 @@ import Images from '@assets/image/Images';
 import { Colors } from '@/theme/Config';
 import { navigate } from '@/navigation/RootNavigation';
 import moment from 'moment';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface RowItemProps {
   label: string;
@@ -43,11 +44,17 @@ const DetailAssignPriceCardScreen = ({
 }: NativeStackScreenProps<MainParams, 'DetailAssignPriceCardScreen'>) => {
   const { item } = route.params;
   const { t } = useTranslation();
+  const { bottom } = useSafeAreaInsets();
   const [dateCreate, setDateCreate] = useState<Date | undefined>(undefined);
   const [dateEstimate, setDateEstimate] = useState<Date | undefined>(undefined);
+  const [isCoppied, setIsCoppied] = useState(false);
 
   const onCopy = useCallback(() => {
     Clipboard.setString(item.content);
+    setIsCoppied(true);
+    setTimeout(() => {
+      setIsCoppied(false);
+    }, 2000);
   }, [item.content]);
 
   const onPressDateCreate = useCallback(() => {
@@ -104,11 +111,27 @@ const DetailAssignPriceCardScreen = ({
           </AppText>
         </View>
       </View>
+      {isCoppied && (
+        <View style={[styles.blockTextCoppied, { bottom: bottom + 70 }]}>
+          <AppText size={14} weight="500" color={Colors.TEXT_DEFAULT}>
+            Đã sao chép
+          </AppText>
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  blockTextCoppied: {
+    backgroundColor: Colors.GRAY_100,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: s(3),
+    position: 'absolute',
+    alignSelf: 'center',
+    zIndex: 10,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -139,6 +162,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: vs(2),
     // marginBottom: vs(8),
   },
   valueContainer: {

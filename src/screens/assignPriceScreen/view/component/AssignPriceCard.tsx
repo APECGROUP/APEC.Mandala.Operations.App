@@ -46,7 +46,7 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item, index }) => {
             <IconInfomation style={{ marginHorizontal: s(6) }} />
           </AppBlockButton>
         </View>
-        <AppText style={styles.dateText}>{item.user.name}</AppText>
+        <AppText style={styles.dateText}>{item.time}</AppText>
         {shouldShowWaiting && (
           <View style={styles.blockWaiting}>
             <AppText size={12} color={'#FF7009'} weight="500">
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   itemIcon: {
     width: s(40),

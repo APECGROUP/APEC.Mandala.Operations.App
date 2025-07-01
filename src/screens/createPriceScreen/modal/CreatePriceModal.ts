@@ -53,8 +53,15 @@ export const fetchCreatePrice = async (
 
     const result = data.map((item: any, index: number) => ({
       id: item.id,
-      name: item.author,
-      price: 100000 * (page + 1) + index * 150 + limit * 500,
+      name: [
+        'Táo đỏ khô',
+        'Thịt gà đông tảo',
+        'Thịt chó đông lạnh',
+        'Thịt lợn đông đá',
+        'Thịt chuột đông anh',
+        'Thịt bò Mỹ Đình',
+      ][Math.floor(Math.random() * 6)],
+      price: Math.floor(Math.random() * 100 + 1) * 1000,
       expanded: false,
       time: '28/05/2025 - 30/05/2025',
       vat: 'V8',

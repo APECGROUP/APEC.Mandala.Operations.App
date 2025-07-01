@@ -12,6 +12,7 @@ import light from '../../theme/light';
 import { getFontSize, SCREEN_WIDTH } from '../../constants';
 import { PaddingHorizontal } from '@/utils/Constans';
 import { AppText } from '../text/AppText';
+import { Colors } from '@/theme/Config';
 
 interface ButtonType {
   text: string;
@@ -170,6 +171,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: getFontSize(18),
+    marginBottom: vs(4),
     fontWeight: '700',
     color: light.text,
     textAlign: 'center',
@@ -178,7 +180,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'center',
     fontSize: getFontSize(14),
-    color: light.placeholderTextColor,
+    color: Colors.TEXT_SECONDARY,
+    marginBottom: vs(10),
   },
   button: {
     backgroundColor: light.primary,

@@ -5,6 +5,7 @@ export interface DataAssignPrice {
   content: string;
   images: string[];
   videos: string[];
+  time: string;
   user: {
     name: string;
     avatar: string;
@@ -62,9 +63,10 @@ export const fetchAssignPriceData = async (
       const imageUrls = selectedImageIds.map(id => `https://picsum.photos/id/${id}/300/300`);
       return {
         id: item.id,
-        content: `PR20240624#0001#${(page - 1) * limit + index + 1}`,
+        content: `PR20240624#${String(Math.floor(Math.random() * 10000) + 1).padStart(4, '0')}`,
         images: imageUrls,
         videos: [],
+        time: '28/05/2025 - 30/05/2025',
         user: {
           name: item.author,
           avatar: `https://picsum.photos/id/${item.id}/100/100`,

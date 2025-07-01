@@ -191,6 +191,8 @@
       "title": "Tài khoản",
       "language": "Ngôn ngữ",
       "allowNotification": "Cho phép gửi thông báo",
+      "allowNotificationSubtitle": "Bạn đã cho phép gửi thông báo",
+      "allowNotificationSubtitle2": "Bạn đã tắt gửi thông báo",
       "changePasswordTitle": "Đổi mật khẩu",
       "checkUpdate": "Kiểm tra cập nhật",
       "logout": "Đăng xuất",

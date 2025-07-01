@@ -24,6 +24,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { appVersion, useOtaUpdate } from '@/hook/useOtaUpdate';
 import RightItemAccount from './RightItemAccount';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 const animatedDelay = (index: number) => FadeInDown.delay(150 * index).springify();
 
@@ -39,7 +40,20 @@ const AccountScreen = () => {
   const { checkForOtaUpdate, progress, loading } = useOtaUpdate();
   const [allowNotification, setAllowNotification] = useState(false);
 
-  const toggleAllowNotification = () => setAllowNotification(prev => !prev);
+  const toggleAllowNotification = () => {
+    if (!allowNotification) {
+      Toast.show({
+        text2: t('account.allowNotificationSubtitle'),
+        type: 'success',
+      });
+    } else {
+      Toast.show({
+        text2: t('account.allowNotificationSubtitle2'),
+        type: 'success',
+      });
+    }
+    setAllowNotification(prev => !prev);
+  };
 
   // const onCheckUpdate = () => {
   //   showAlert(t('account.checkUpdate'), t('account.checkUpdate'), [
@@ -65,7 +79,7 @@ const AccountScreen = () => {
         <View>
           <Animated.View entering={animatedDelay(0)}>
             <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>
-              <View>
+              <View style={{ marginTop: vs(20) }}>
                 <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
                 <IconEditAvatar style={styles.editIcon} />
               </View>
