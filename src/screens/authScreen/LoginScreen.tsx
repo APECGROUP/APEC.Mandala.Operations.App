@@ -69,13 +69,11 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
     setProcessing(false);
 
     // Hàm loại bỏ dấu tiếng Việt
-    const removeVietnameseTones = (str: string) => {
-      return str
+    const removeVietnameseTones = (str: string) => str
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/đ/g, 'd')
         .replace(/Đ/g, 'D');
-    };
 
     if (removeVietnameseTones(userName.toLocaleLowerCase()).includes('duyet')) {
       saveInfoUser({ ...infoUser, isApprove: true });
