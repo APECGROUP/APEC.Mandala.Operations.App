@@ -5,29 +5,29 @@ import semver from 'semver';
 import hotUpdate from 'react-native-ota-hot-update';
 import { useCallback, useState } from 'react';
 import { useAlert } from '../elements/alert/AlertProvider';
+import { useTranslation } from 'react-i18next';
 const branch = Platform.OS === 'ios' ? 'iOS' : 'android';
 export const appVersion = DeviceInfo.getVersion();
 
 // Hook kiểm tra và thực hiện OTA update qua Git
 export const useOtaUpdate = () => {
   const { showAlert, showLoading, hideLoading } = useAlert();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false); // Trạng thái loading khi update
   const [progress, setProgress] = useState(0); // Tiến trình tải OTA
 
   // Hàm fetch có timeout để tránh treo app khi mạng kém
-  const fetchWithTimeout = (url: string, options = {}, timeout = 30000): Promise<Response> => {
-    return Promise.race([
+  const fetchWithTimeout = (url: string, options = {}, timeout = 30000): Promise<Response> =>
+    Promise.race([
       fetch(url, options),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Kết nối hết thời gian chờ.')), timeout),
-      ),
+      new Promise((_, reject) => setTimeout(() => reject(new Error(t('update.timeout'))), timeout)),
     ]) as Promise<Response>;
-  };
 
   // Hàm kiểm tra và thực hiện update
   const checkForOtaUpdate = useCallback(async () => {
     try {
       setLoading(true);
+      showLoading('Đang kiểm tra cập nhật...');
       console.log('[OTA] Bắt đầu kiểm tra cập nhật...');
       // Lấy version hiện tại của app
       console.log(`[OTA] Phiên bản app hiện tại: ${appVersion}`);
@@ -58,37 +58,35 @@ export const useOtaUpdate = () => {
           appVersion,
           minVersion,
         );
+        hideLoading();
         const appStoreUrl = 'itms-apps://apps.apple.com/app/idYOUR_APP_ID'; // Thay YOUR_APP_ID
         const playStoreUrl = 'market://details?id=YOUR_PACKAGE_NAME'; // Thay YOUR_PACKAGE_NAME
         const storeUrl = Platform.OS === 'ios' ? appStoreUrl : playStoreUrl;
-        showAlert(
-          'Cập nhật bắt buộc',
-          'Phiên bản ứng dụng của bạn đã quá cũ.\n Vui lòng cập nhật.',
-          [
-            {
-              text: 'Để sau',
-              onPress: () => {
-                console.log('[OTA] User chọn để sau khi app quá cũ');
-              },
-              style: 'cancel',
+
+        showAlert(t('update.updateObligatory'), t('update.updateObligatorySubtitle'), [
+          {
+            text: 'Để sau',
+            onPress: () => {
+              console.log('[OTA] User chọn để sau khi app quá cũ');
             },
-            {
-              text: 'Cập nhật ngay',
-              onPress: () => {
-                console.log('[OTA] User chọn cập nhật ngay, mở store');
-                Linking.openURL(storeUrl).catch(() => {
-                  // fallback nếu store URL lỗi → mở web
-                  const fallbackWebUrl =
-                    Platform.OS === 'ios'
-                      ? 'https://apps.apple.com/app/idYOUR_APP_ID'
-                      : 'https://play.google.com/store/apps/details?id=YOUR_PACKAGE_NAME';
-                  console.log('[OTA] Store URL lỗi, mở fallback web:', fallbackWebUrl);
-                  Linking.openURL(fallbackWebUrl);
-                });
-              },
+            style: 'cancel',
+          },
+          {
+            text: t('update.updateNow'),
+            onPress: () => {
+              console.log('[OTA] User chọn cập nhật ngay, mở store');
+              Linking.openURL(storeUrl).catch(() => {
+                // fallback nếu store URL lỗi → mở web
+                const fallbackWebUrl =
+                  Platform.OS === 'ios'
+                    ? 'https://apps.apple.com/app/idYOUR_APP_ID'
+                    : 'https://play.google.com/store/apps/details?id=YOUR_PACKAGE_NAME';
+                console.log('[OTA] Store URL lỗi, mở fallback web:', fallbackWebUrl);
+                Linking.openURL(fallbackWebUrl);
+              });
             },
-          ],
-        );
+          },
+        ]);
       }
       // 2. Nếu appVersion >= minVersion && appVersion <= maxVersion && appVersion < otaVersion: cho phép update OTA
       else if (
@@ -103,6 +101,7 @@ export const useOtaUpdate = () => {
           maxVersion,
           otaVersion,
         );
+        showLoading('Đang tải cập nhật...');
         hotUpdate.git.checkForGitUpdate({
           branch: branch,
           bundlePath,
@@ -110,7 +109,7 @@ export const useOtaUpdate = () => {
 
           onCloneFailed(msg: string) {
             console.log('[OTA] Clone repo thất bại:', msg);
-            showAlert('Thông báo', `Đã có bản cập nhật ${msg}`, [
+            showAlert(t('update.title'), t('update.cloneFailed'), [
               { text: 'Hủy', onPress: () => {}, style: 'cancel' },
             ]);
           },
@@ -131,13 +130,15 @@ export const useOtaUpdate = () => {
 
           onPullFailed(msg: string) {
             console.log('[OTA] Pull repo thất bại:', msg);
-            showAlert('Cập nhật thất bại khi pull!', msg, [
+            hideLoading();
+            showAlert('Cập nhật thất bại!', msg, [
               { text: 'Đóng', onPress: () => {}, style: 'cancel' },
             ]);
           },
 
           onPullSuccess() {
             console.log('[OTA] Pull repo thành công!');
+            hideLoading();
             showAlert('Cập nhật thành công!', 'Khởi động lại để áp dụng thay đổi', [
               { text: 'Để sau', onPress: () => {}, style: 'cancel' },
               {
@@ -163,6 +164,7 @@ export const useOtaUpdate = () => {
           onFinishProgress() {
             console.log('[OTA] Hoàn thành tải bundle OTA!');
             setLoading(false);
+            hideLoading();
           },
         });
       }
@@ -175,9 +177,10 @@ export const useOtaUpdate = () => {
           maxVersion,
           otaVersion,
         );
-        showAlert('Chúc mừng', 'Ứng dụng của bạn đã là phiên bản mới nhất.', [
+        hideLoading();
+        showAlert(t('update.Congratulations'), t('update.CongratulationsSubtitle'), [
           {
-            text: 'Đóng',
+            text: t('update.close'),
             onPress: () => {
               console.log('[OTA] User đóng thông báo không cần cập nhật');
             },
@@ -187,6 +190,7 @@ export const useOtaUpdate = () => {
       }
     } catch (err: any) {
       console.log('[OTA] Lỗi kiểm tra/cập nhật:', err?.message || err);
+      hideLoading();
       showAlert('Lỗi kiểm tra phiên bản!', err?.message || 'Không thể kết nối.', [
         {
           text: 'Đóng',

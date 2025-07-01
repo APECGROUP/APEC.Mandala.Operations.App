@@ -174,6 +174,19 @@
         "note": "Ghi chú"
       }
     },
+    "update": {
+      "title": "Thông báo",
+      "cloneFailed": "Clone repo thất bại",
+      "timeout": "Kết nối hết thời gian chờ.",
+      "updateObligatory": "Cập nhật bắt buộc",
+      "updateObligatorySubtitle": "Phiên bản ứng dụng của bạn đã quá cũ.\n Vui lòng cập nhật.",
+      "updateNow": "Cập nhật ngay",
+      "updateLater": "Để sau",
+      "Congratulations": "Chúc mừng",
+      "CongratulationsSubtitle": "Ứng dụng của bạn đã là phiên bản mới nhất.",
+      "CongratulationsSubtitle2": "Khởi động lại để áp dụng thay đổi",
+      "close": "Đóng"
+    },
     "account": {
       "title": "Tài khoản",
       "language": "Ngôn ngữ",

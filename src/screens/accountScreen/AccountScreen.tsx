@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, StyleSheet, Switch, View } from 'react-native';
+import { StyleSheet, Switch, View } from 'react-native';
 import { Colors } from '@/theme/Config';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import AppImage from '@/elements/appImage/AppImage';
