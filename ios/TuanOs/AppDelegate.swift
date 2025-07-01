@@ -7,6 +7,8 @@ import Firebase
 
 @main
 class AppDelegate: RCTAppDelegate {
+  var taskIdentifier: UIBackgroundTaskIdentifier = .invalid
+
   override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
     self.moduleName = "TuanOs"
     self.dependencyProvider = RCTAppDependencyProvider()
@@ -24,6 +26,24 @@ class AppDelegate: RCTAppDelegate {
     self.bundleURL()
   }
 
+
+  override func applicationWillResignActive(_ application: UIApplication) {
+          // End any existing background task
+          if taskIdentifier != .invalid {
+              application.endBackgroundTask(taskIdentifier)
+              taskIdentifier = .invalid
+          }
+
+          // Start a new background task
+          taskIdentifier = application.beginBackgroundTask(withName: nil) { [weak self] in
+              if let strongSelf = self {
+                  application.endBackgroundTask(strongSelf.taskIdentifier)
+                  strongSelf.taskIdentifier = .invalid
+              }
+          }
+      }
+
+
    override func customize(_ rootView: RCTRootView!) {
     super.customize(rootView)
     RNBootSplash.initWithStoryboard("BootSplash", rootView: rootView) 
@@ -34,6 +54,9 @@ class AppDelegate: RCTAppDelegate {
     RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
 #else
     Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+                        OtaHotUpdate.getBundle()  // -> Add this line
+
+
 #endif
   }
 }

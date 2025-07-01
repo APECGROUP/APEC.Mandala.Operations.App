@@ -12,6 +12,7 @@ import { PaddingHorizontal } from '@/utils/Constans';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import Utilities from '../../utils/Utilities';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 type Props = NativeStackScreenProps<MainParams, 'ModalPhotoOrCamera'>;
 
@@ -59,33 +60,35 @@ const ModalPhotoOrCamera = ({ navigation, route }: Props) => {
   );
 
   return (
-    <TouchableWithoutFeedback onPress={goBack}>
-      <View style={[styles.overlay, { paddingBottom: bottom }]}>
-        <Animated.View entering={SlideInDown.springify().mass(0.5)}>
-          <AppBlock background={light.white} style={styles.container}>
-            <TouchableOpacity style={styles.option} onPress={() => handlePick(true)}>
-              <AppText size={20} weight="600" color={'#007AFF'}>
-                {t('account.profile.takePhoto')}
+    <ViewContainer>
+      <TouchableWithoutFeedback onPress={goBack}>
+        <View style={[styles.overlay, { paddingBottom: bottom }]}>
+          <Animated.View entering={SlideInDown.springify().mass(0.5)}>
+            <AppBlock background={light.white} style={styles.container}>
+              <TouchableOpacity style={styles.option} onPress={() => handlePick(true)}>
+                <AppText size={20} weight="600" color={'#007AFF'}>
+                  {t('account.profile.takePhoto')}
+                </AppText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.option, styles.borderWidth0]}
+                onPress={() => handlePick(false)}>
+                <AppText size={20} weight="600" color={'#007AFF'}>
+                  {t('account.profile.updatePhoto')}
+                </AppText>
+              </TouchableOpacity>
+            </AppBlock>
+
+            <TouchableOpacity style={styles.cancelButton} onPress={goBack}>
+              <AppText size={20} weight="600" color={Colors.RED_950}>
+                {t('account.profile.cancel')}
               </AppText>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.option, styles.borderWidth0]}
-              onPress={() => handlePick(false)}>
-              <AppText size={20} weight="600" color={'#007AFF'}>
-                {t('account.profile.updatePhoto')}
-              </AppText>
-            </TouchableOpacity>
-          </AppBlock>
-
-          <TouchableOpacity style={styles.cancelButton} onPress={goBack}>
-            <AppText size={20} weight="600" color={Colors.RED_950}>
-              {t('account.profile.cancel')}
-            </AppText>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    </TouchableWithoutFeedback>
+          </Animated.View>
+        </View>
+      </TouchableWithoutFeedback>
+    </ViewContainer>
   );
 };
 

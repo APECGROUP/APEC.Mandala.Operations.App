@@ -13,7 +13,10 @@
         "hotel": "Khách sạn",
         "pickHotel": "Chọn khách sạn",
         "saveInfoLogin": "Lưu thông tin đăng nhập",
-        "forgotPassword": "Quên mật khẩu?"
+        "forgotPassword": "Quên mật khẩu?",
+        "emptyUserName": "Tên người dùng không được để trống",
+        "emptyPassword": "Mật khẩu không được để trống",
+        "emptyHotel": "Khách sạn không được để trống"
       },
       "forgotPassword": {
         "title": "Quên mật khẩu",
@@ -176,6 +179,7 @@
       "language": "Ngôn ngữ",
       "allowNotification": "Cho phép gửi thông báo",
       "changePasswordTitle": "Đổi mật khẩu",
+      "checkUpdate": "Kiểm tra cập nhật",
       "logout": "Đăng xuất",
       "VietNam": "Tiếng việt",
       "confirm": "Xác nhận",
@@ -192,6 +196,7 @@
         "changePhoto": "Thay đổi ảnh"
       },
       "changePassword": {
+        "currentPasswordNotMatch": "Mật khẩu hiện tại không đúng",
         "title": "Đổi mật khẩu",
         "currentPassword": "Mật khẩu hiện tại",
         "newPassword": "Mật khẩu mới",
@@ -202,7 +207,7 @@
         "inputConfirmPassword": "Nhập lại mật khẩu mới",
         "changePasswordSuccess": "Đổi mật khẩu thành công",
         "changePasswordFail": "Đổi mật khẩu thất bại",
-        "newPasswordNotMatch": "Mật khẩu mới không khớp"
+        "newPasswordNotMatch": "Mật khẩu mới và xác nhận mật khẩu mới chưa khớp với nhau"
       },
       "warningLogout": "Bạn có chắc chắn muốn đổi từ đăng xuất tài khoản này?"
     },

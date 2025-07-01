@@ -48,7 +48,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
       if (credentials && currentPassword !== credentials.password) {
         Toast.show({
           type: 'error',
-          text2: 'Mật khẩu hiện tại không đúng',
+          text2: t('account.changePassword.currentPasswordNotMatch'),
         });
         setProcessing(false);
         return;
@@ -61,7 +61,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
         await DataLocal.saveCredentials(credentials.username, newPassword, credentials.hotel);
         Toast.show({
           type: 'success',
-          text2: 'Đổi mật khẩu thành công',
+          text2: t('account.changePassword.changePasswordSuccess'),
         });
       }
 
@@ -72,7 +72,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
       console.log(error);
       Toast.show({
         type: 'error',
-        text2: 'Đổi mật khẩu thất bại',
+        text2: t('account.changePassword.changePasswordFail'),
       });
       setProcessing(false);
     }

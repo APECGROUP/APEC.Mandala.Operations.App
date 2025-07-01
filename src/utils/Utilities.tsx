@@ -8,6 +8,11 @@ import map from 'lodash/map';
 export default class Utilities {
   static isAndroid = () => Platform.OS === 'android';
 
+  static normalizeVersion(version: string) {
+    const parts = version.split('.');
+    while (parts.length < 3) parts.push('0');
+    return parts.join('.');
+  }
   static async requestPermission(permission: Permission, alertHandler: any) {
     if (Platform.OS !== 'android') {
       return true;

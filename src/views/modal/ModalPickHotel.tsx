@@ -13,7 +13,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBlockButton from '../../elements/button/AppBlockButton';
 import IconSelectHotel from '../../../assets/icon/IconSelectHotel';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { TYPE_TOAST } from '@/elements/toast/Message';
 type Props = NativeStackScreenProps<AuthParams, 'ModalPickHotel'>;
 const fakeData = [
   {
@@ -43,11 +44,15 @@ const fakeData = [
 ];
 const ModalPickHotel = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
+  const { showToast } = useAlert();
   const { setHotel, hotel } = route.params;
   const { bottom } = useSafeAreaInsets();
   const goBack = useCallback(() => {
+    if (!hotel?.id) {
+      showToast(t('auth.login.emptyHotel'), TYPE_TOAST.ERROR);
+    }
     navigation.goBack();
-  }, [navigation]);
+  }, [hotel.id, navigation, showToast, t]);
 
   return (
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>

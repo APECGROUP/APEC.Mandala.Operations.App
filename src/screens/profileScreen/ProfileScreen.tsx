@@ -18,7 +18,6 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
   const { t } = useTranslation();
   const { infoUser, updateAvatar } = useInfoUser();
 
-   
   const onUploadAvatar = async (imageAvatar: ResponseImageElement) => {
     if (imageAvatar) {
       return updateAvatar('https://mdbcdn.b-cdn.net/img/new/avatars/2.webp');

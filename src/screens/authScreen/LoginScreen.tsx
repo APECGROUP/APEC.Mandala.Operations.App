@@ -127,6 +127,18 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
     // }
   };
 
+  const onBlurUserName = () => {
+    if (!userName.trim()) {
+      refToast.current?.show(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
+    }
+  };
+
+  const onBlurPassword = () => {
+    if (!password.trim()) {
+      refToast.current?.show(t('auth.login.emptyPassword'), TYPE_TOAST.ERROR);
+    }
+  };
+
   const onPickHotel = () => {
     Keyboard.dismiss();
     navigation.navigate('ModalPickHotel', { hotel, setHotel });
@@ -174,6 +186,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
             value={userName}
             maxLength={20}
             onChangeText={setUserName}
+            onBlur={onBlurUserName}
             placeholder={t('auth.login.inputUserName')}
             onSubmitEditing={() => refPassword.current?.focus()}
             inputStyle={styles.inputStyle}
@@ -193,6 +206,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
             maxLength={20}
             onChangeText={setPassword}
             onSubmitEditing={onPickHotel}
+            onBlur={onBlurPassword}
             placeholder={t('auth.login.inputPassword')}
             inputStyle={styles.inputStyle}
             containerStyle={{

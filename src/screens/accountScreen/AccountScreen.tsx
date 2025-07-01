@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Switch, View } from 'react-native';
 import { Colors } from '@/theme/Config';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import AppImage from '@/elements/appImage/AppImage';
@@ -21,17 +21,32 @@ import IconLogout from '@assets/icon/IconLogout';
 import IconVietNam from '@assets/icon/IconVietNam';
 import { useLanguage } from '@/hook/useLanguage';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import { appVersion, useOtaUpdate } from '@/hook/useOtaUpdate';
+import RightItemAccount from './RightItemAccount';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const animatedDelay = (index: number) => FadeInDown.delay(150 * index).springify();
 
 const AccountScreen = () => {
   const { t } = useTranslation();
   const { infoUser } = useInfoUser();
+  const { bottom } = useSafeAreaInsets();
   const { showAlert } = useAlert();
+
   const { toggleLanguage } = useLanguage();
+  // const [isHasUpdate, setIsHasUpdate] = useState(false);
+  // const { isHasUpdate, isCheckingUpdate, isDone, isSuccess, isError } = useCheckUpdate();
+  const { checkForOtaUpdate, progress, loading } = useOtaUpdate();
   const [allowNotification, setAllowNotification] = useState(false);
 
   const toggleAllowNotification = () => setAllowNotification(prev => !prev);
+
+  // const onCheckUpdate = () => {
+  //   showAlert(t('account.checkUpdate'), t('account.checkUpdate'), [
+  //     { text: t('account.profile.cancel'), style: 'cancel', onPress: () => {} },
+  //     { text: t('account.confirm'), onPress: () => {} },
+  //   ]);
+  // };
 
   const goToChangePassword = () => navigate('ChangePasswordScreen');
 
@@ -47,79 +62,95 @@ const AccountScreen = () => {
   return (
     <ViewContainer>
       <View style={styles.container}>
-        <Animated.View entering={animatedDelay(0)}>
-          <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>
-            <View>
-              <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
-              <IconEditAvatar style={styles.editIcon} />
-            </View>
-            <AppText weight="700" size={18} mb={2}>
-              {infoUser?.profile?.fullName}
-            </AppText>
-            <AppText
-              pv={2}
-              ph={6}
-              radius={2}
-              weight="500"
-              size={12}
-              mb={12}
-              background={Colors.BLACK_100}>
-              {infoUser?.userName}
-            </AppText>
-          </AppBlockButton>
-        </Animated.View>
-
-        {[
-          {
-            key: 'language',
-            icon: <IconLanguage />,
-            title: t('account.language'),
-            onPress: toggleLanguage,
-            right: (
-              <>
-                <IconVietNam />
-                <AppText weight="700" size={14} ml={4}>
-                  {t('account.VietNam')}
-                </AppText>
-              </>
-            ),
-          },
-          {
-            key: 'notification',
-            icon: <IconAllowNotification />,
-            title: t('account.allowNotification'),
-            onPress: toggleAllowNotification,
-            right: <Switch value={allowNotification} />,
-          },
-          {
-            key: 'password',
-            icon: <IconChangePassword />,
-            title: t('account.changePasswordTitle'),
-            onPress: goToChangePassword,
-            right: <IconArrowRight />,
-          },
-          {
-            key: 'logout',
-            icon: <IconLogout />,
-            title: t('account.logout'),
-            onPress: onLogout,
-            right: <IconArrowRight />,
-          },
-        ].map((item, index) => (
-          <Animated.View key={item.key} entering={animatedDelay(index + 1)}>
-            <AppBlockButton
-              onPress={item.onPress}
-              style={[styles.itemContainer, index === 0 && styles.border0]}>
-              <View style={styles.row}>
-                {item.icon}
-                <AppText weight="700" size={14} ml={6}>
-                  {item.title}
-                </AppText>
+        <View>
+          <Animated.View entering={animatedDelay(0)}>
+            <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>
+              <View>
+                <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
+                <IconEditAvatar style={styles.editIcon} />
               </View>
-              <View style={styles.row}>{item.right}</View>
+              <AppText weight="700" size={18} mb={2}>
+                {infoUser?.profile?.fullName}
+              </AppText>
+              <AppText
+                pv={2}
+                ph={6}
+                radius={2}
+                weight="500"
+                size={12}
+                mb={12}
+                background={Colors.BLACK_100}>
+                {infoUser?.userName}
+              </AppText>
             </AppBlockButton>
           </Animated.View>
-        ))}
+
+          {[
+            {
+              key: 'language',
+              icon: <IconLanguage />,
+              title: t('account.language'),
+              onPress: toggleLanguage,
+              right: (
+                <>
+                  <IconVietNam />
+                  <AppText weight="700" size={14} ml={4}>
+                    {t('account.VietNam')}
+                  </AppText>
+                </>
+              ),
+            },
+            {
+              key: 'notification',
+              icon: <IconAllowNotification />,
+              title: t('account.allowNotification'),
+              onPress: toggleAllowNotification,
+              right: <Switch value={allowNotification} />,
+            },
+            {
+              key: 'checkUpdate',
+              icon: <IconChangePassword />,
+              title: t('account.checkUpdate'),
+              onPress: checkForOtaUpdate,
+              right: <IconArrowRight />,
+            },
+            {
+              key: 'password',
+              icon: <IconChangePassword />,
+              title: t('account.changePasswordTitle'),
+              onPress: goToChangePassword,
+              right: <IconArrowRight />,
+            },
+            {
+              key: 'logout',
+              icon: <IconLogout />,
+              title: t('account.logout'),
+              onPress: onLogout,
+              right: <IconArrowRight />,
+            },
+          ].map((item, index) => (
+            <Animated.View key={item.key} entering={animatedDelay(index + 1)}>
+              <AppBlockButton
+                onPress={item.onPress}
+                style={[styles.itemContainer, index === 0 && styles.border0]}>
+                <View style={styles.row}>
+                  {item.icon}
+                  <AppText weight="700" size={14} ml={6}>
+                    {item.title}
+                  </AppText>
+                </View>
+                {item.key === 'checkUpdate' ? (
+                  <RightItemAccount item={item} />
+                ) : (
+                  <View style={styles.row}>{item.right}</View>
+                )}
+              </AppBlockButton>
+            </Animated.View>
+          ))}
+        </View>
+        <AppText mb={bottom} size={12} weight="bold" style={styles.center}>
+          version: {appVersion}
+        </AppText>
       </View>
     </ViewContainer>
   );
@@ -128,10 +159,12 @@ const AccountScreen = () => {
 export default AccountScreen;
 
 const styles = StyleSheet.create({
+  center: { textAlign: 'center' },
   border0: { borderTopWidth: 0 },
   container: {
     flex: 1,
     backgroundColor: Colors.WHITE,
+    justifyContent: 'space-between',
   },
   centerAlign: {
     alignItems: 'center',

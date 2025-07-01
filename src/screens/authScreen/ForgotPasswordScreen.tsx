@@ -76,6 +76,12 @@ const ForgotPasswordScreen = ({
       setProcessing(false);
     }
   };
+
+  const onBlurUserName = () => {
+    if (!userName.trim()) {
+      showToast(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
+    }
+  };
   return (
     <ViewContainer>
       <View style={[styles.container, { paddingBottom: bottom }]}>
@@ -95,6 +101,7 @@ const ForgotPasswordScreen = ({
             value={userName}
             maxLength={20}
             inputStyle={styles.inputStyle}
+            onBlur={onBlurUserName}
             onChangeText={setUserName}
             onSubmitEditing={onPickHotel}
             placeholder={t('auth.forgotPassword.inputUserName')}
