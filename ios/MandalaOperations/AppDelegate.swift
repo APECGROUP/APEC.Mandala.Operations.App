@@ -10,7 +10,7 @@ class AppDelegate: RCTAppDelegate {
   var taskIdentifier: UIBackgroundTaskIdentifier = .invalid
 
   override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    self.moduleName = "TuanOs"
+    self.moduleName = "MandalaOperations"
     self.dependencyProvider = RCTAppDependencyProvider()
   FirebaseApp.configure()
 

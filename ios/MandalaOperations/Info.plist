@@ -38,7 +38,7 @@
 	<key>NSContactsUsageDescription</key>
 	<string>Ứng dụng cần truy cập danh bạ để tìm bạn bè.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>GoogleSans-Bold.ttf</string>

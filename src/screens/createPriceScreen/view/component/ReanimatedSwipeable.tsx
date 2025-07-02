@@ -1,5 +1,5 @@
-import React, {ReactNode} from 'react';
-import {View, StyleSheet} from 'react-native';
+import React, { ReactNode } from 'react';
+import { View, StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -9,8 +9,8 @@ import Animated, {
   // 💡 Thêm useAnimatedReaction nếu bạn muốn kiểm soát opacity chặt chẽ hơn
   useAnimatedReaction,
 } from 'react-native-reanimated';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import {s} from 'react-native-size-matters';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { s } from 'react-native-size-matters';
 
 const SWIPE_WIDTH = -s(50);
 const SWIPE_THRESHOLD = SWIPE_WIDTH;
@@ -39,21 +39,21 @@ const ReanimatedSwipeable = ({
       // Khi translateX đang di chuyển sang trái (mở)
       if (currentValue < 0 && previousValue! >= 0) {
         // Đảm bảo opacity = 1 khi bắt đầu mở
-        opacity.value = withTiming(1, {duration: 150});
+        opacity.value = withTiming(1, { duration: 150 });
       }
       // Khi translateX đang đóng lại hoàn toàn về 0
       else if (currentValue >= -5 && previousValue! < -5) {
         // Threshold nhỏ để bắt sự kiện đóng
-        opacity.value = withTiming(0, {duration: 300}); // Thời gian khớp với animation đóng
+        opacity.value = withTiming(0, { duration: 300 }); // Thời gian khớp với animation đóng
       }
     },
     [], // Dependency array rỗng vì chúng ta chỉ quan tâm đến translateX.value
   );
 
   const panGesture = Gesture.Pan()
-    .minDistance(5)
-    .activeOffsetX([-10, 10])
-    .failOffsetY([-10, 10])
+    .minDistance(2)
+    .activeOffsetX([-30, 30])
+    .failOffsetY([-3, 3])
     .onStart(() => {
       // 💡 BỎ: Không cần đặt opacity ở đây nữa, useAnimatedReaction sẽ lo
       // opacity.value = withTiming(1, {duration: 150});
@@ -98,7 +98,7 @@ const ReanimatedSwipeable = ({
   const composedGesture = Gesture.Exclusive(panGesture, simultaneousGesture);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{translateX: translateX.value}],
+    transform: [{ translateX: translateX.value }],
   }));
 
   const animatedActionsStyle = useAnimatedStyle(() => ({
@@ -115,9 +115,7 @@ const ReanimatedSwipeable = ({
       )}
 
       <GestureDetector gesture={composedGesture}>
-        <Animated.View style={[styles.swipeableItem, animatedStyle]}>
-          {children}
-        </Animated.View>
+        <Animated.View style={[styles.swipeableItem, animatedStyle]}>{children}</Animated.View>
       </GestureDetector>
     </View>
   );

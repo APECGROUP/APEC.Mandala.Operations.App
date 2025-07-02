@@ -5,7 +5,7 @@ set -e
 
 # Đường dẫn các file cần chỉnh
 MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
-INFO_PLIST="ios/TuanOs/Info.plist"
+INFO_PLIST="ios/MandalaOperations/Info.plist"
 ANDROID_BUILD_GRADLE="android/app/build.gradle"
 STRINGS_XML="android/app/src/main/res/values/strings.xml"
 
