@@ -36,12 +36,12 @@ if [ "$ENV" = "dev" ]; then
     # ✅ Android
     sed -i '' "s/versionCode [0-9]*/versionCode $VERSION_CODE_ANDROID/" "$ANDROID_BUILD_GRADLE"
     sed -i '' "s/versionName \".*\"/versionName \"$VERSION_NAME\"/" "$ANDROID_BUILD_GRADLE"
-    sed -i '' 's/<string name="app_name">[^<]*<\/string>/<string name="app_name">Duyệt đơn<\/string>/' "$STRINGS_XML"
+    sed -i '' 's/<string name="app_name">[^<]*<\/string>/<string name="app_name">Mandala Operations<\/string>/' "$STRINGS_XML"
 
     # ✅ iOS
     /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NAME" "$INFO_PLIST"
     /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION_CODE_IOS" "$INFO_PLIST"
-    /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Duyệt đơn" "$INFO_PLIST"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Mandala Operations" "$INFO_PLIST"
 
 elif [ "$ENV" = "prod" ]; then
     echo "🚀 Đang cài đặt cấu hình cho môi trường Production..."
@@ -52,12 +52,12 @@ elif [ "$ENV" = "prod" ]; then
     # ✅ Android
     sed -i '' "s/versionCode [0-9]*/versionCode $VERSION_CODE_ANDROID/" "$ANDROID_BUILD_GRADLE"
     sed -i '' "s/versionName \".*\"/versionName \"$VERSION_NAME\"/" "$ANDROID_BUILD_GRADLE"
-    sed -i '' 's/<string name="app_name">[^<]*<\/string>/<string name="app_name">Duyệt đơn<\/string>/' "$STRINGS_XML"
+    sed -i '' 's/<string name="app_name">[^<]*<\/string>/<string name="app_name">Mandala Operations<\/string>/' "$STRINGS_XML"
 
     # ✅ iOS
     /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NAME" "$INFO_PLIST"
     /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION_CODE_IOS" "$INFO_PLIST"
-    /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Duyệt đơn" "$INFO_PLIST"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Mandala Operations" "$INFO_PLIST"
 
 else
     echo "❌ Lỗi: Môi trường không hợp lệ. Sử dụng 'dev' hoặc 'prod'."
