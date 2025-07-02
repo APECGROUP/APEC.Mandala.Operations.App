@@ -51,9 +51,9 @@ const ReanimatedSwipeable = ({
   );
 
   const panGesture = Gesture.Pan()
-    .minDistance(2)
+    .minDistance(1)
     .activeOffsetX([-30, 30])
-    .failOffsetY([-3, 3])
+    .failOffsetY([-1, 1])
     .onStart(() => {
       // 💡 BỎ: Không cần đặt opacity ở đây nữa, useAnimatedReaction sẽ lo
       // opacity.value = withTiming(1, {duration: 150});
