@@ -1,4 +1,4 @@
-package vn.vinnet.openpay
+package com.fourier.mandala.perations
 
 import android.app.Application
 import com.facebook.react.PackageList

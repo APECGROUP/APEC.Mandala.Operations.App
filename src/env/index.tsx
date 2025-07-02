@@ -5,4 +5,4 @@ export const DOMAIN_IMAGE =
 
 export const BUILD_NAME = '-dev';
 export const BUILD_VERSION = '1.0.0';
-export const IS_DEV = true;
+export const IS_DEV=true
