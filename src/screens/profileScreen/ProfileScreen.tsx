@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../navigation/params';
@@ -82,6 +82,8 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
   return (
     <ViewContainer>
       <View style={styles.container}>
+        <StatusBar barStyle={'dark-content'} />
+
         <ScrollView contentContainerStyle={styles.fg1}>
           <AnimationButton
             entering={FadeInDown.delay(0).duration(0).springify()}

@@ -34,6 +34,14 @@ export type typeNcc = {
   name: string | undefined;
 };
 
+// Hàm loại bỏ dấu tiếng Việt
+export const removeVietnameseTones = (str: string) =>
+  str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D');
+
 const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginScreen'>) => {
   const { t } = useTranslation();
   const { setIsLogin } = useIsLogin();
@@ -67,13 +75,6 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
     setProcessing(true);
     await new Promise<void>(resolve => setTimeout(() => resolve(), 2000));
     setProcessing(false);
-
-    // Hàm loại bỏ dấu tiếng Việt
-    const removeVietnameseTones = (str: string) => str
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/đ/g, 'd')
-        .replace(/Đ/g, 'D');
 
     if (removeVietnameseTones(userName.toLocaleLowerCase()).includes('duyet')) {
       saveInfoUser({ ...infoUser, isApprove: true });
@@ -177,15 +178,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
       <ViewContainer>
         <View style={[styles.container, { paddingBottom: bottom }]}>
           <View style={styles.center}>
-            <ImageBackground
-              style={{
-                width: SCREEN_WIDTH,
-                aspectRatio: 375 / 186,
-                marginBottom: vs(24),
-                justifyContent: 'center',
-                paddingHorizontal: PaddingHorizontal,
-              }}
-              source={Images.BackgroundLogin}>
+            <ImageBackground style={styles.imageBackground} source={Images.BackgroundLogin}>
               <AppText size={20} weight="700" color={Colors.WHITE}>
                 {t('auth.login.title')}
               </AppText>
@@ -293,6 +286,13 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
 export default LoginScreen;
 
 const styles = StyleSheet.create({
+  imageBackground: {
+    width: SCREEN_WIDTH,
+    aspectRatio: 375 / 186,
+    marginBottom: vs(24),
+    justifyContent: 'center',
+    paddingHorizontal: PaddingHorizontal,
+  },
   textStyleButton: { fontWeight: '700', fontSize: getFontSize(14) },
   buttonForgotPassword: {
     padding: vs(12),

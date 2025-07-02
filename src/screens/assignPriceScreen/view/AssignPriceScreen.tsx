@@ -41,6 +41,7 @@ import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
+import { isAndroid } from '@/utils/Utilities';
 
 const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -81,12 +82,14 @@ const AssignPriceScreen: React.FC = () => {
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
+    console.log('scrollToTop');
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const scrollToBottom = useCallback(() => {
+    console.log('scrollToBottom');
     flashListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -271,7 +274,11 @@ const AssignPriceScreen: React.FC = () => {
         {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
         <AnimatedButton
           onPress={scrollToTop}
-          style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
+          style={[
+            styles.scrollTopContainer,
+            isAndroid() && { bottom: vs(40) },
+            opacityScrollTopStyle,
+          ]}>
           <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
         </AnimatedButton>
         {!isFetchingNextPage && (
@@ -435,12 +442,11 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   scrollTopContainer: {
     position: 'absolute',
@@ -449,11 +455,10 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

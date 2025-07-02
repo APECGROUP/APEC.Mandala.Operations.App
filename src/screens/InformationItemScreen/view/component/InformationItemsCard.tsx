@@ -71,7 +71,7 @@ const InformationItemsCard = ({
               <View style={styles.itemInfoRow}>
                 <AppText style={styles.dateText}>{t('Giá')}: </AppText>
                 <AppText style={styles.dateTextEnd}>
-                  {item.price}/{item.end}
+                  {moneyFormat(item.price, '.', '')}/{item.end}
                 </AppText>
               </View>
             ) : (
@@ -84,6 +84,7 @@ const InformationItemsCard = ({
                     onChangeText={text => setPrice(Number(text))}
                     keyboardType="numeric"
                     style={styles.inputPrice}
+                    underlineColorAndroid="transparent" // loại bỏ line mặc định Android
                   />
                   <AppText style={styles.dateTextEnd}>/{item.end}</AppText>
                 </View>
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
   dateTextEnd: {
     fontSize: getFontSize(14),
     fontWeight: '700',
-    lineHeight: vs(20),
+    // lineHeight: vs(20),
   },
   detailContainer: {
     marginTop: vs(12),
@@ -279,6 +280,12 @@ const styles = StyleSheet.create({
     minWidth: vs(50),
     borderBottomWidth: 1,
     borderBottomColor: '#BABABA',
-    height: vs(20),
+    height: vs(14),
+    paddingVertical: 0,
+    textAlignVertical: 'center',
+    // lineHeight: vs(20),
+    color: Colors.TEXT_DEFAULT,
+    fontWeight: '500',
+    fontSize: getFontSize(14),
   },
 });

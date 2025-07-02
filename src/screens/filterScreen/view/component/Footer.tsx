@@ -49,6 +49,7 @@ type FooterProps = {
   rightButtonStyle?: StyleProp<ViewStyle>;
   leftTextStyle?: StyleProp<TextStyle>;
   rightTextStyle?: StyleProp<TextStyle>;
+  customBottom?: number;
 };
 
 // --- ScreenActionFooter Component ---
@@ -63,6 +64,7 @@ const Footer = ({
   rightButtonStyle, // New prop for right button style
   leftTextStyle, // New prop for left text style
   rightTextStyle, // New prop for right text style
+  customBottom,
 }: FooterProps) => {
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
@@ -139,7 +141,7 @@ const Footer = ({
   return (
     <Animated.View
       entering={FadeInDown.delay(200).duration(1000).springify()}
-      style={[styles.container, { paddingBottom: bottom + vs(8) }]}>
+      style={[styles.container, { paddingBottom: customBottom ? customBottom : bottom + vs(8) }]}>
       <View style={styles.buttonGroup}>
         {showLeftButton && (
           <View style={{ width: s(162) }}>

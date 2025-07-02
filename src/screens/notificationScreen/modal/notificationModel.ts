@@ -69,7 +69,7 @@ export async function fetchNotificationData(
     return cache.get(cacheKey)!;
   }
   // Giả lập delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 800));
   const start = (pageNumber - 1) * limit;
   const end = Math.min(start + limit, ALL_FAKE_NOTIFICATIONS.length);
   const pageData = ALL_FAKE_NOTIFICATIONS.slice(start, end);

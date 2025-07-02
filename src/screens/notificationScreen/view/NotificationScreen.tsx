@@ -1,6 +1,6 @@
 // views/NotificationScreen.tsx
 
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useMemo } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -46,7 +46,6 @@ const ICON_SECTION_WIDTH = s(130);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation();
-  const [isFirstLoad, setIsFirstLoad] = useState(false);
 
   // ─── ViewModel (MVVM) ────────────────────────────────────────────────
 

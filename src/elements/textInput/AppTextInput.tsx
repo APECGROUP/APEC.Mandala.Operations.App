@@ -173,7 +173,7 @@ export default function AppTextInput(props: AppInputRegularProps) {
           {props.suffix}
           {props.secureTextEntry ? (
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={FormStyles.eye}>
-              {showPassword ? <IconEyeOffOutline /> : <IconEyeOutline />}
+              {!showPassword ? <IconEyeOffOutline /> : <IconEyeOutline />}
             </TouchableOpacity>
           ) : value && !disabled && !props.hideIconRight ? (
             <TouchableOpacity onPress={onRemove} style={FormStyles.eye}>

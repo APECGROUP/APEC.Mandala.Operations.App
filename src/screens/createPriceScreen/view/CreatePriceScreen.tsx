@@ -31,7 +31,6 @@ import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 import { TypeCreatePrice } from '../modal/CreatePriceModal';
 import Images from '../../../../assets/image/Images';
 import { navigate } from '../../../navigation/RootNavigation';
-import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
 import { useCreatePriceViewModel } from '../viewmodal/useCreatePriceViewModal';
 import ToastContainer from '@/elements/toast/ToastContainer';
@@ -44,6 +43,11 @@ import IconCreatePrice from '@assets/icon/IconCreatePrice';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
+import IconPlus from '@assets/icon/IconPlus';
+import Footer from '@/screens/filterScreen/view/component/Footer';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { isAndroid } from '@/utils/Utilities';
 
 const CreatePriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -51,6 +55,7 @@ const CreatePriceScreen: React.FC = () => {
   console.log('CreatePriceScreen');
   const refToast = useRef<any>(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const { showToast } = useAlert();
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -127,6 +132,10 @@ const CreatePriceScreen: React.FC = () => {
     navigate('FilterScreen');
   }, []);
 
+  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
+  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
+  const onCreatePrice = useCallback(() => navigate('CreatePriceNccScreen'), []);
+
   const reLoadData = useCallback(() => {
     setIsFirstLoad(false);
     onRefresh();
@@ -142,10 +151,13 @@ const CreatePriceScreen: React.FC = () => {
     }
     return (
       <View style={styles.emptyContainer}>
-        <EmptyDataAnimation autoPlay />
+        {/* <EmptyDataAnimation autoPlay /> */}
+        <FastImage source={Images.IconEmptyDataAssign} style={styles.emptyImage} />
+
         <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
         <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice}>
-          <AppText style={styles.textCreatePrice}>{t('createPrice.create')}</AppText>
+          <IconPlus fill={Colors.WHITE} />
+          <AppText style={styles.textCreatePrice}>{t('createPrice.createPrice')}</AppText>
         </AppBlockButton>
       </View>
     );
@@ -162,10 +174,6 @@ const CreatePriceScreen: React.FC = () => {
     }
     return null;
   }, [isFetchingNextPage]);
-
-  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
-  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
-  const onCreatePrice = useCallback(() => navigate('CreatePriceNccScreen'), []);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -209,135 +217,175 @@ const CreatePriceScreen: React.FC = () => {
     [selectedIds.length, flatData.length],
   );
 
+  const onReject = useCallback(async () => {
+    await new Promise(resolve => {
+      setTimeout(() => {
+        resolve(true);
+      }, 1000);
+    });
+    showToast(t('createPrice.approvedSuccess'), 'success');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onApproved = useCallback(async () => {
+    await new Promise(resolve => {
+      setTimeout(() => {
+        resolve(true);
+      }, 1000);
+    });
+    showToast(t('createPrice.rejectSuccess'), 'success');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   console.log('error:', isError);
   if (isError || (isFirstLoad && !isLoading)) {
     return <FallbackComponent resetError={reLoadData} />;
   }
 
   return (
-    <View style={styles.container}>
-      {/* ─── Background Image ─────────────────────────────────────────────── */}
-      <FastImage
-        id="backgroundImage"
-        style={styles.backgroundImage}
-        source={Images.BackgroundAssignPrice}
-        resizeMode={FastImage.resizeMode.cover}
-      />
-      {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-      <View style={[styles.headerContainer, { marginTop: top }]}>
-        <View style={styles.headerLeft}>
-          <AppBlockButton onPress={goToAccount}>
-            <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
-          </AppBlockButton>
+    <ViewContainer>
+      <View style={styles.container}>
+        {/* ─── Background Image ─────────────────────────────────────────────── */}
+        <FastImage
+          id="backgroundImage"
+          style={styles.backgroundImage}
+          source={Images.BackgroundAssignPrice}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+        {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
+        <View style={[styles.headerContainer, { marginTop: top }]}>
+          <View style={styles.headerLeft}>
+            <AppBlockButton onPress={goToAccount}>
+              <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
+            </AppBlockButton>
 
-          <View style={styles.greetingContainer}>
-            <AppText color="#FFFFFF" style={styles.greetingText}>
-              {t('createPrice.title')}
-            </AppText>
-            <AppText color="#FFFFFF" style={styles.greetingText}>
-              {infoUser.profile.fullName}
-            </AppText>
+            <View style={styles.greetingContainer}>
+              <AppText color="#FFFFFF" style={styles.greetingText}>
+                {t('createPrice.title')}
+              </AppText>
+              <AppText color="#FFFFFF" style={styles.greetingText}>
+                {infoUser.profile.fullName}
+              </AppText>
+            </View>
+          </View>
+          <View style={styles.headerRight}>
+            <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
+              <IconNotification />
+              <View style={styles.notificationBadge}>
+                <AppText style={styles.notificationBadgeText}>3</AppText>
+              </View>
+            </AppBlockButton>
           </View>
         </View>
-        <View style={styles.headerRight}>
-          <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
-            <IconNotification />
-            <View style={styles.notificationBadge}>
-              <AppText style={styles.notificationBadgeText}>3</AppText>
-            </View>
+        {/* ─── Search Bar ────────────────────────────────────────────────────── */}
+        <View style={styles.searchContainer}>
+          <IconSearch width={vs(18)} />
+          <TextInput
+            value={searchKey}
+            onChangeText={onSearch}
+            placeholder={t('createPrice.searchPlaceholder')}
+            placeholderTextColor={light.placeholderTextColor}
+            style={styles.searchInput}
+            returnKeyType="search"
+            onSubmitEditing={handleSubmitSearch}
+          />
+          <AppBlockButton style={styles.filterButton} onPress={handleSubmitSearch}>
+            <IconFilter />
           </AppBlockButton>
         </View>
-      </View>
-      {/* ─── Search Bar ────────────────────────────────────────────────────── */}
-      <View style={styles.searchContainer}>
-        <IconSearch width={vs(18)} />
-        <TextInput
-          value={searchKey}
-          onChangeText={onSearch}
-          placeholder={t('createPrice.searchPlaceholder')}
-          placeholderTextColor={light.placeholderTextColor}
-          style={styles.searchInput}
-          returnKeyType="search"
-          onSubmitEditing={handleSubmitSearch}
-        />
-        <AppBlockButton style={styles.filterButton} onPress={handleSubmitSearch}>
-          <IconFilter />
-        </AppBlockButton>
-      </View>
 
-      {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
-      <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>{t('createPrice.supplierPriceList')}</AppText>
-        <View style={styles.countBadge}>
-          <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+        {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
+        <View style={styles.titleContainer}>
+          <AppText style={styles.titleText}>{t('createPrice.supplierPriceList')}</AppText>
+          <View style={styles.countBadge}>
+            <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+          </View>
         </View>
-      </View>
-      <View style={styles.header}>
-        <AppBlockButton onPress={toggleSelectAll} style={styles.buttonCenter}>
-          {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
-          <AppText style={styles.ml7}>{t('createPrice.pickAll')}</AppText>
-        </AppBlockButton>
-        <AppText>
-          {selectedIds.length} {t('createPrice.orderSelected')}
-        </AppText>
-      </View>
-      {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
-      {isLoading && flatData.length === 0 ? (
-        <View style={styles.listContent}>
-          {new Array(10).fill(0).map((_, index) => (
-            <SkeletonItem key={index} showWaiting={index % 3 === 0} />
-          ))}
+        <View style={styles.header}>
+          <AppBlockButton onPress={toggleSelectAll} style={styles.buttonCenter}>
+            {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
+            <AppText style={styles.ml7}>{t('createPrice.pickAll')}</AppText>
+          </AppBlockButton>
+          <AppText>
+            {selectedIds.length} {t('createPrice.orderSelected')}
+          </AppText>
         </View>
-      ) : (
-        <FlashList
-          ref={flashListRef}
-          data={flatData || []}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          onEndReached={onLoadMore}
-          showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.5}
-          removeClippedSubviews
-          refreshing={isRefetching}
-          nestedScrollEnabled={true}
-          onRefresh={onRefresh}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          ListEmptyComponent={listEmptyComponent}
-          ListFooterComponent={listFooterComponent}
-          estimatedItemSize={100}
-          contentContainerStyle={styles.listContent}
-        />
-      )}
+        {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
+        {isLoading && flatData.length === 0 ? (
+          <View style={styles.listContent}>
+            {new Array(10).fill(0).map((_, index) => (
+              <SkeletonItem key={index} showWaiting={index % 3 === 0} />
+            ))}
+          </View>
+        ) : (
+          <FlashList
+            ref={flashListRef}
+            // data={[]}
+            data={flatData || []}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            onEndReached={onLoadMore}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.5}
+            removeClippedSubviews
+            refreshing={isRefetching}
+            nestedScrollEnabled={true}
+            onRefresh={onRefresh}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            ListEmptyComponent={listEmptyComponent}
+            ListFooterComponent={listFooterComponent}
+            estimatedItemSize={100}
+            contentContainerStyle={styles.listContent}
+          />
+        )}
 
-      <ToastContainer ref={refToast} />
-      {flatData.length > 0 && (
-        <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice2}>
-          <IconCreatePrice />
-        </AppBlockButton>
-      )}
-      {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
-      <AnimatedButton
-        onPress={scrollToTop}
-        style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
-      </AnimatedButton>
-      {!isFetchingNextPage && (
+        <ToastContainer ref={refToast} />
+        {flatData.length > 0 && selectedIds.length === 0 && (
+          <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice2}>
+            <IconCreatePrice />
+          </AppBlockButton>
+        )}
+        {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
         <AnimatedButton
-          onPress={scrollToBottom}
-          style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-          <IconScrollBottom />
+          onPress={scrollToTop}
+          style={[
+            styles.scrollTopContainer,
+            isAndroid() && { bottom: vs(40) },
+            opacityScrollTopStyle,
+          ]}>
+          <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
         </AnimatedButton>
+        {!isFetchingNextPage && (
+          <AnimatedButton
+            onPress={scrollToBottom}
+            style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
+            <IconScrollBottom />
+          </AnimatedButton>
+        )}
+      </View>
+      {selectedIds.length > 0 && (
+        <Footer
+          onLeftAction={onReject}
+          onRightAction={onApproved}
+          leftButtonTitle={t('createPrice.reject')}
+          rightButtonTitle={t('createPrice.approvedOrder')}
+          customBottom={vs(20)}
+        />
       )}
-    </View>
+    </ViewContainer>
   );
 };
 
 export default CreatePriceScreen;
 export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
 const styles = StyleSheet.create({
+  emptyImage: {
+    width: s(125),
+    height: s(118),
+    marginBottom: vs(12),
+  },
   buttonCreatePrice: {
-    padding: vs(16),
+    padding: vs(8),
     backgroundColor: Colors.PRIMARY,
     borderRadius: 8,
     flexDirection: 'row',
@@ -345,9 +393,10 @@ const styles = StyleSheet.create({
     marginTop: vs(12),
   },
   textCreatePrice: {
-    fontSize: getFontSize(16),
+    fontSize: getFontSize(12),
     color: Colors.WHITE,
     fontWeight: '500',
+    marginLeft: s(6),
   },
   ml7: { marginLeft: s(7) },
   buttonCenter: {
@@ -505,6 +554,7 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
+    marginTop: vs(100),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -525,12 +575,11 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   scrollTopContainer: {
     position: 'absolute',
@@ -539,11 +588,10 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

@@ -1,6 +1,6 @@
-import {I18nManager, StyleSheet} from 'react-native';
-import {ms, s, vs} from 'react-native-size-matters';
-import {getFontSize} from '../../constants';
+import { I18nManager, StyleSheet } from 'react-native';
+import { ms, s, vs } from 'react-native-size-matters';
+import { getFontSize } from '../../constants';
 
 export const styles = StyleSheet.create({
   mainWrap: {
@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
   },
   textItem: {
     flex: 1,
-    fontSize: getFontSize(10),
+    fontSize: getFontSize(12),
     writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
   icon: {

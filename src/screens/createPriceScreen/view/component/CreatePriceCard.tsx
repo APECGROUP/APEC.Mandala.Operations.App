@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, memo } from 'react';
+import React, { useCallback, useMemo, memo } from 'react';
 import { View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
 import IconListPen from '@assets/icon/IconListPen';
@@ -27,7 +27,6 @@ interface CreatePriceCardProps {
 const CreatePriceCard = memo<CreatePriceCardProps>(
   ({ item, isSelected, handleDelete, handleSelect, simultaneousGesture }) => {
     const { t } = useTranslation();
-    const [expanded, setExpanded] = useState(false);
 
     // SharedValue để đồng bộ chiều cao cho delete button
     const heightAction = useSharedValue(0);
@@ -42,11 +41,6 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
       const height = e.nativeEvent.layout.height - vs(1);
       heightAction.value = withTiming(height, { duration: 0 });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // Xử lý expand/collapse
-    const handleExpand = useCallback(() => {
-      setExpanded(prev => !prev);
     }, []);
 
     // Phần render nút delete
@@ -84,9 +78,7 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
         renderRightActions={() => renderRightActions(item.id)}
         simultaneousGesture={simultaneousGesture}
         onSwipe={() => {}}>
-        <View
-          style={[styles.itemContainer, expanded ? styles.itemExpanded : styles.itemCollapsed]}
-          onLayout={onItemLayout}>
+        <View style={[styles.itemContainer, styles.itemExpanded]} onLayout={onItemLayout}>
           <View style={styles.headerItem}>
             <AppBlockButton onPress={handleSelectPress} style={styles.left}>
               {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
@@ -138,7 +130,7 @@ const styles = ScaledSheet.create({
     elevation: 2,
   },
   itemExpanded: {
-    paddingVertical: vs(6),
+    paddingTop: vs(6),
   },
   itemCollapsed: {
     paddingVertical: vs(10),

@@ -43,6 +43,7 @@ import IconInfomation from '@assets/icon/IconInfomation';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import { isAndroid } from '@/utils/Utilities';
 
 const InformationItemsScreen = ({
   route,
@@ -240,7 +241,11 @@ const InformationItemsScreen = ({
         {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
         <AnimatedButton
           onPress={scrollToTop}
-          style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
+          style={[
+            styles.scrollBottomContainer,
+            isAndroid() && { bottom: vs(50) },
+            opacityScrollTopStyle,
+          ]}>
           <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
         </AnimatedButton>
         {!isFetchingNextPage && (
@@ -251,8 +256,8 @@ const InformationItemsScreen = ({
             <IconScrollBottom />
           </AnimatedButton>
         )}
-        {flatData && flatData.length > 0 && <FooterInformationItem />}
       </View>
+      {flatData && flatData.length > 0 && <FooterInformationItem />}
     </ViewContainer>
   );
 };
@@ -311,29 +316,10 @@ const styles = StyleSheet.create({
     paddingVertical: vs(16),
     alignItems: 'center',
   },
-  scrollTopContainer: {
-    position: 'absolute',
-    right: s(16),
-    bottom: vs(100),
-    width: s(40),
-    height: s(40),
-    borderRadius: s(20),
-    backgroundColor: Colors.WHITE,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
   scrollBottomContainer: {
     position: 'absolute',
-    right: s(16),
-    bottom: vs(50),
+    alignSelf: 'center',
+    bottom: vs(30),
     width: s(40),
     height: s(40),
     borderRadius: s(20),

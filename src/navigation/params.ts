@@ -64,6 +64,11 @@ export type MainParams = {
     setDepartment: Dispatch<SetStateAction<TypePickDepartment>>;
     department: TypePickDepartment;
   };
+
+  PickItemScreen: {
+    setItem: (item: { id: string; name: string }) => void;
+  };
+
   PickRequesterScreen: {
     setRequester: Dispatch<SetStateAction<TypePickRequester>>;
     requester: TypePickRequester;

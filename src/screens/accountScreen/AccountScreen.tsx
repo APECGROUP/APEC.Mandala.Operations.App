@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Switch, View } from 'react-native';
+import { StatusBar, StyleSheet, Switch, View } from 'react-native';
 import { Colors } from '@/theme/Config';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import AppImage from '@/elements/appImage/AppImage';
@@ -37,7 +37,7 @@ const AccountScreen = () => {
   const { toggleLanguage } = useLanguage();
   // const [isHasUpdate, setIsHasUpdate] = useState(false);
   // const { isHasUpdate, isCheckingUpdate, isDone, isSuccess, isError } = useCheckUpdate();
-  const { checkForOtaUpdate, progress, loading } = useOtaUpdate();
+  const { checkForOtaUpdate } = useOtaUpdate();
   const [allowNotification, setAllowNotification] = useState(false);
 
   const toggleAllowNotification = () => {
@@ -76,6 +76,7 @@ const AccountScreen = () => {
   return (
     <ViewContainer>
       <View style={styles.container}>
+        <StatusBar barStyle={'dark-content'} />
         <View>
           <Animated.View entering={animatedDelay(0)}>
             <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>

@@ -35,11 +35,11 @@ const MyTabBar = ({ state, descriptors, navigation }: any) => {
       iconActive: <IconTab2 fill={light.primary} />,
       label: t('myTabs.tab4'),
     },
-    {
-      icon: <IconTab2 />,
-      iconActive: <IconTab2 fill={light.primary} />,
-      label: t('myTabs.tab5'),
-    },
+    // {
+    //   icon: <IconTab2 />,
+    //   iconActive: <IconTab2 fill={light.primary} />,
+    //   label: t('myTabs.tab5'),
+    // },
   ];
   return (
     <View style={[styles.row]}>

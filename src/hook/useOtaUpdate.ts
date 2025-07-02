@@ -204,7 +204,8 @@ export const useOtaUpdate = () => {
       setLoading(false);
       console.log('[OTA] Kết thúc kiểm tra/cập nhật OTA.');
     }
-  }, [showAlert]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showAlert, t]);
 
   return {
     loading, // Trạng thái loading

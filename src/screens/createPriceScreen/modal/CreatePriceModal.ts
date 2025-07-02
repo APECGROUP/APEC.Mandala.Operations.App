@@ -47,11 +47,11 @@ export const fetchCreatePrice = async (
 
   try {
     const url = buildCreatePriceUrl(page, limit, key);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     const { data } = await axios.get(url);
 
-    const result = data.map((item: any, index: number) => ({
+    const result = data.map((item: any) => ({
       id: item.id,
       name: [
         'Táo đỏ khô',

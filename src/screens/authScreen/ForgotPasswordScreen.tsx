@@ -1,4 +1,4 @@
-import { Keyboard, StyleSheet, View } from 'react-native';
+import { Keyboard, StatusBar, StyleSheet, View } from 'react-native';
 import React, { useState } from 'react';
 import light from '../../theme/light';
 import { s, vs } from 'react-native-size-matters';
@@ -10,7 +10,7 @@ import { AppBlock } from '../../elements/block/Block';
 import { AppButton } from '../../elements/button/AppButton';
 import IconArrowRight from '../../../assets/icon/IconArrowRight';
 import { PaddingHorizontal } from '../../utils/Constans';
-import { typeHotel } from './LoginScreen';
+import { removeVietnameseTones, typeHotel } from './LoginScreen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthParams } from '../../navigation/params';
 import { Colors } from '@/theme/Config';
@@ -81,11 +81,17 @@ const ForgotPasswordScreen = ({
   const onBlurUserName = () => {
     if (!userName.trim()) {
       showToast(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
+      return;
+    }
+    if (!removeVietnameseTones(userName.toLocaleLowerCase()).includes('dung')) {
+      showToast(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
     }
   };
   return (
     <ViewContainer>
       <View style={[styles.container, { paddingBottom: bottom }]}>
+        <StatusBar barStyle="default" backgroundColor="white" />
+
         <AppBlock>
           <AppText size={20} weight="700">
             {t('auth.forgotPassword.title')}
@@ -116,7 +122,6 @@ const ForgotPasswordScreen = ({
               label={t('auth.forgotPassword.hotel')}
               placeholderTextColor={light.placeholderTextColor}
               noBorder
-              maxLength={20}
               value={hotel?.name}
               placeholder={t('auth.forgotPassword.pickHotel')}
               rightIcon={

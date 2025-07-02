@@ -25,8 +25,26 @@ export const fetchNccData = async (
   const url = buildNccUrl(page, limit, key);
   const { data } = await axios.get(url);
 
-  return data.map((item: any) => ({
+  const companyNames = [
+    'Công Ty TNHH Thịt Bò Sạch Việt Nam - 150.000',
+    'Công Ty CP Chế Biến Thịt Heo Đồng Nai - 180.000',
+    'Công Ty TNHH Thịt Gà Tươi Minh Phát - 120.000',
+    'Công Ty CP Thịt Bò Mỹ Phẩm - 250.000',
+    'Công Ty TNHH Thịt Heo Sạch Bình Dương - 160.000',
+    'Công Ty CP Thịt Gà Công Nghiệp Vạn Thắng - 110.000',
+    'Công Ty TNHH Thịt Bò Úc Premium - 300.000',
+    'Công Ty CP Thịt Heo Tươi Sài Gòn - 170.000',
+    'Công Ty TNHH Thịt Gà Ta Đồng Nai - 130.000',
+    'Công Ty CP Thịt Bò Nhập Khẩu Hà Nội - 280.000',
+    'Công Ty TNHH Thịt Heo Sạch Long An - 155.000',
+    'Công Ty CP Thịt Gà Công Nghiệp Bình Phước - 125.000',
+    'Công Ty TNHH Thịt Bò Mỹ Chất Lượng Cao - 320.000',
+    'Công Ty CP Thịt Heo Tươi Đồng Tháp - 165.000',
+    'Công Ty TNHH Thịt Gà Ta Bình Dương - 135.000',
+  ];
+
+  return data.map((item: any, index: number) => ({
     id: item.id,
-    name: 'Công Ty TNHH XNK Thuận Phát - 200.000',
+    name: companyNames[index % companyNames.length],
   }));
 };

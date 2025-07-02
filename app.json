@@ -1,4 +1,5 @@
 {
   "name": "TuanOs",
-  "displayName": "Duyệt Đơn"
+  "displayName": "Duyệt Đơn",
+  "orientation": "portrait"
 }

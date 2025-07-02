@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StatusBar, StyleSheet, TextInput, View } from 'react-native';
 import React, { useRef, useState } from 'react';
 import { getFontSize } from '../../../constants';
 import { AppBlock } from '../../../elements/block/Block';
@@ -66,6 +66,8 @@ const FilterScreen = () => {
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
+        <StatusBar barStyle={'dark-content'} />
+
         <View style={styles.form}>
           <AppTextInput
             required

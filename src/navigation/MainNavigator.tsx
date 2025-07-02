@@ -29,6 +29,7 @@ import ApprovePrScreen from '@/screens/approvePrScreen/view/ApprovePrScreen';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import DetailApproveCardScreen from '@/screens/approvePrScreen/view/component/DetailApproveCardScreen';
 import DetailOrderApproveScreen from '@/screens/detailOrderApproveScreen/view/DetailOrderApproveScreen';
+import PickItemScreen from '@/views/modal/modalPickItem/view/PickItemScreen';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -186,6 +187,7 @@ export default function MainNavigator() {
         <Screen name={'ModalPickCalendar'} component={ModalPickCalendar} />
         <Screen name={'PickNccScreen'} component={PickNccScreen} />
         <Screen name={'PickDepartmentScreen'} component={PickDepartmentScreen} />
+        <Screen name={'PickItemScreen'} component={PickItemScreen} />
         <Screen name={'PickRequesterScreen'} component={PickRequesterScreen} />
         <Screen name={'ChangePasswordScreen'} component={ChangePasswordScreen} />
       </Group>

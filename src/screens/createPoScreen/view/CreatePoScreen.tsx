@@ -1,12 +1,13 @@
 import { StatusBar, StyleSheet, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import DevelopingAnimation from '@/views/animation/DevelopingAnimation';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { PaddingHorizontal } from '@/utils/Constans';
 
 const CreatePoScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
+  useLayoutEffect(() => {
+    StatusBar.setBarStyle('dark-content');
     const timeout = setTimeout(() => {
       setIsLoading(false);
     }, 2000);

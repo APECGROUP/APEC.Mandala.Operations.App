@@ -37,7 +37,7 @@
       "header": "Danh sách báo giá NCC",
       "empty": "Không có kết quả phù hợp",
 
-      "searchPlaceholder": "Tìm kiếm PR NO, bộ phận"
+      "searchPlaceholder": "Tìm kiếm bộ phận"
     },
     "notifications": {
       "title": "Thông báo",
@@ -113,27 +113,31 @@
       "emptySupplier": "Chưa có thông tin nhà cung cấp",
       "infoGroupItem": "Thông tin nhóm mặt hàng",
       "emptyGroupItem": "Chưa có thông tin nhóm mặt hàng",
-      "groupItem": "Nhóm mặt hàng"
+      "groupItem": "Nhóm mặt hàng",
+      "pickItem": "Chọn mặt hàng"
     },
     "createPrice": {
       "title": "Xin chào",
-      "searchPlaceholder": "Tìm kiếm PR NO, tên mặt hàng",
+      "searchPlaceholder": "Tìm kiếm tên mặt hàng",
       "supplierPriceList": "Bảng giá NCC",
-      "empty": "Hiện chưa có bảng giá \n nhà cung cấp",
+      "empty": "Hiện chưa có bảng giá nhà \n cung cấp",
       "create": "Tạo bảng giá NCC",
-      "pickAll": "Chọn tất cả",
       "orderSelected": "đơn đã chọn",
       "time": "Thời gian",
       "ncc": "NCC",
       "price": "Giá",
       "createPrice": "Tạo giá",
+      "pickAll": "Chọn tất cả",
+      "createNew": "Tạo mới",
       "warningRemove": "Mặt hàng đã được duyệt không được xoá",
+      "createPriceNcc": "Tạo giá nhà cung cấp",
       "close": "Đóng",
       "cancel": "Hủy",
       "agree": "Đồng ý",
       "reject": "Từ chối",
       "approvedOrder": "Duyệt đơn",
       "approvedSuccess": "Duyệt đơn thành công",
+      "rejectSuccess": "Từ chối đơn thành công",
       "approvedFail": "Duyệt đơn thất bại",
       "listPrice": "Danh sách giá",
       "vat": "VAT",
@@ -149,7 +153,12 @@
         "agree": "Đồng ý",
         "cancel": "Hủy"
       },
-      "createNcc": "Tạo bảng giá NCC"
+      "createNcc": "Tạo bảng giá NCC",
+      "pickItem": "Chọn mặt hàng",
+      "pickNcc": "Chọn nhà cung cấp",
+      "pickVat": "Chọn VAT",
+      "error": "Chưa nhập đủ thông tin",
+      "saveInfoSuccess": "Lưu thông tin thành công"
     },
     "approve": {
       "title": "Xin chào",

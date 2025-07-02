@@ -8,7 +8,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 const PcPrScreen = () => (
   <ViewContainer>
     <View style={styles.container}>
-      <StatusBar barStyle={'default'} />
+      <StatusBar barStyle={'dark-content'} />
       <ConfettiAnimation style={styles.confetti} autoPlay={true} />
       <EmptyDataAnimation autoPlay={true} />
     </View>

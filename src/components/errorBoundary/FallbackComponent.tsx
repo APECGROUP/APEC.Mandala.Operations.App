@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 
 import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
@@ -17,6 +17,8 @@ const FallbackComponent = (props: Props) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle={'dark-content'} />
+
       <View style={styles.content}>
         <ErrorBoundaryAnimation style={styles.imageError} />
         <View style={styles.textView}>

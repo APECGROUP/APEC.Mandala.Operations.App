@@ -6,7 +6,6 @@ import MyTabBar from './MyTabBar';
 import AssignPriceScreen from '../screens/assignPriceScreen/view/AssignPriceScreen';
 import CreatePriceScreen from '@/screens/createPriceScreen/view/CreatePriceScreen';
 import CreatePoScreen from '@/screens/createPoScreen/view/CreatePoScreen';
-import PcLogScreen from '@/screens/pcLogScreen/view/PcLogScreen';
 import PcPrScreen from '@/screens/pcPrScreen/view/PcPrScreen';
 
 const MyTabs = () => {
@@ -38,7 +37,7 @@ const MyTabs = () => {
       <Tab.Screen name="CreatePriceScreen" component={CreatePriceScreen} />
       <Tab.Screen name="CreatePoScreen" component={CreatePoScreen} />
       <Tab.Screen name="PcPrScreen" component={PcPrScreen} />
-      <Tab.Screen name="PcLogScreen" component={PcLogScreen} />
+      {/* <Tab.Screen name="PcLogScreen" component={PcLogScreen} /> */}
     </Tab.Navigator>
   );
 };

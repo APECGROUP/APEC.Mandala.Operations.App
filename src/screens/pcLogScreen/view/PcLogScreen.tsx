@@ -6,7 +6,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 const PcLogScreen = () => (
   <ViewContainer>
     <View style={styles.container}>
-      <StatusBar barStyle={'default'} />
+      <StatusBar barStyle={'dark-content'} />
       <DevelopingAnimation autoPlay={true} />
     </View>
   </ViewContainer>

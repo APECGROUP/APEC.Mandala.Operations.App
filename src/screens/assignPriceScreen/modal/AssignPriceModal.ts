@@ -48,14 +48,14 @@ export const fetchAssignPriceData = async (
 
   try {
     // Giả lập delay 3 giây
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     const url = buildAssignPriceUrl(page, limit, key);
     const { data } = await axios.get(url);
 
     const allImageIds: string[] = data.map((item: any) => item.id);
 
-    const result = data.map((item: any, index: number) => {
+    const result = data.map((item: any) => {
       const numberOfImages = Math.floor(Math.random() * 10) + 1;
       const otherIds = allImageIds.filter(id => id !== item.id);
       const shuffled = [...otherIds].sort(() => 0.5 - Math.random());
