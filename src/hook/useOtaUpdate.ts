@@ -6,7 +6,11 @@ import hotUpdate from 'react-native-ota-hot-update';
 import { useCallback, useState } from 'react';
 import { useAlert } from '../elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
-const branch = Platform.OS === 'ios' ? 'iOS' : 'android';
+import { IS_DEV } from '@/env';
+
+const branch =
+  Platform.OS === 'ios' ? (IS_DEV ? 'iOS-dev' : 'iOS') : IS_DEV ? 'android-dev' : 'android';
+
 export const appVersion = DeviceInfo.getVersion();
 
 // Hook kiểm tra và thực hiện OTA update qua Git
