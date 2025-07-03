@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, { useRef, useCallback, useMemo, useState } from 'react';
+import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -16,9 +16,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
+import { useRoute } from '@react-navigation/native';
 
 import { getFontSize, SCREEN_WIDTH } from '../../../constants';
-// import {AppText} from '../../elements/text/AppText';
 import { PaddingHorizontal } from '../../../utils/Constans';
 import light from '../../../theme/light';
 import AppBlockButton from '../../../elements/button/AppBlockButton';
@@ -52,10 +52,10 @@ import { isAndroid } from '@/utils/Utilities';
 const CreatePriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
-  console.log('CreatePriceScreen');
   const refToast = useRef<any>(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const { showToast } = useAlert();
+  const route = useRoute() as any;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -65,9 +65,11 @@ const CreatePriceScreen: React.FC = () => {
     isFetchingNextPage,
     onRefresh,
     onLoadMore,
-    onSearch,
+    onSearch, // Đổi tên từ onSearchPrNo thành onSearch
+    applyFilters,
     handleDelete,
-    searchKey,
+    currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
+    currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
   } = useCreatePriceViewModel();
   const { infoUser } = useInfoUser();
@@ -104,8 +106,8 @@ const CreatePriceScreen: React.FC = () => {
 
   /**
    * onScroll handler:
-   *  - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
-   *  - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
+   * - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
+   * - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
    */
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
@@ -127,10 +129,12 @@ const CreatePriceScreen: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Khi bấm "Tìm kiếm" (submit) hoặc nút "Filter" ───────────────────────
-  const handleSubmitSearch = useCallback(() => {
-    navigate('FilterScreen');
-  }, []);
+  // Lắng nghe params.filters trả về từ FilterScreen
+  useEffect(() => {
+    if (route.params?.filters) {
+      applyFilters(route.params.filters);
+    }
+  }, [route.params?.filters, applyFilters]);
 
   const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
   const goToAccount = useCallback(() => navigate('AccountScreen'), []);
@@ -151,9 +155,7 @@ const CreatePriceScreen: React.FC = () => {
     }
     return (
       <View style={styles.emptyContainer}>
-        {/* <EmptyDataAnimation autoPlay /> */}
         <FastImage source={Images.IconEmptyDataAssign} style={styles.emptyImage} />
-
         <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
         <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice}>
           <IconPlus fill={Colors.WHITE} />
@@ -217,6 +219,13 @@ const CreatePriceScreen: React.FC = () => {
     [selectedIds.length, flatData.length],
   );
 
+  const goToFilterScreen = useCallback(() => {
+    navigate('FilterScreen', {
+      onApplyFilters: applyFilters, // Callback để FilterScreen gọi khi confirm
+      currentFilters: currentFilters, // Filters hiện tại đang hiển thị trên màn hình A
+    });
+  }, [applyFilters, currentFilters]);
+
   const onReject = useCallback(async () => {
     await new Promise(resolve => {
       setTimeout(() => {
@@ -236,8 +245,19 @@ const CreatePriceScreen: React.FC = () => {
     showToast(t('createPrice.rejectSuccess'), 'success');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  console.log('error:', isError);
-  if (isError || (isFirstLoad && !isLoading)) {
+  console.log('CreatePriceScreen', flatData);
+
+  // Bug fix: Ban đầu `isFirstLoad` là true và `isLoading` cũng true, `FallbackComponent` sẽ hiển thị
+  // Sau khi load lần đầu xong, `isLoading` thành false, `isFirstLoad` vẫn true,
+  // nên cần cập nhật `isFirstLoad` sau khi load thành công.
+  useEffect(() => {
+    if (isFirstLoad && !isLoading && flatData.length > 0) {
+      setIsFirstLoad(false);
+    }
+  }, [isFirstLoad, isLoading, flatData.length]);
+
+  if (isError || (isFirstLoad && isLoading)) {
+    // Bug fix: Nếu là lần đầu load VÀ đang loading thì hiện Fallback
     return <FallbackComponent resetError={reLoadData} />;
   }
 
@@ -280,15 +300,15 @@ const CreatePriceScreen: React.FC = () => {
         <View style={styles.searchContainer}>
           <IconSearch width={vs(18)} />
           <TextInput
-            value={searchKey}
-            onChangeText={onSearch}
-            placeholder={t('createPrice.searchPlaceholder')}
+            value={currentPrNoInput} // Sửa: Sử dụng currentPrNoInput để giữ giá trị trong input
+            onChangeText={onSearch} // Sửa: Gọi onSearch từ ViewModel
+            placeholder={t('assignPrice.searchPlaceholder')}
             placeholderTextColor={light.placeholderTextColor}
             style={styles.searchInput}
             returnKeyType="search"
-            onSubmitEditing={handleSubmitSearch}
+            onSubmitEditing={() => onSearch(currentPrNoInput)} // Sửa: Đảm bảo khi bấm search thì filter được áp dụng
           />
-          <AppBlockButton style={styles.filterButton} onPress={handleSubmitSearch}>
+          <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
             <IconFilter />
           </AppBlockButton>
         </View>
@@ -312,14 +332,18 @@ const CreatePriceScreen: React.FC = () => {
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
         {isLoading && flatData.length === 0 ? (
           <View style={styles.listContent}>
-            {new Array(10).fill(0).map((_, index) => (
-              <SkeletonItem key={index} showWaiting={index % 3 === 0} />
-            ))}
+            {new Array(3).fill(0).map(
+              (
+                _,
+                index, // Giảm số lượng skeleton để demo
+              ) => (
+                <SkeletonItem key={index} />
+              ),
+            )}
           </View>
         ) : (
           <FlashList
             ref={flashListRef}
-            // data={[]}
             data={flatData || []}
             renderItem={renderItem}
             keyExtractor={item => item.id}
@@ -349,16 +373,16 @@ const CreatePriceScreen: React.FC = () => {
         <AnimatedButton
           onPress={scrollToTop}
           style={[
-            styles.scrollTopContainer,
-            isAndroid() && { bottom: vs(40) },
+            styles.scrollButtonBase,
+            isAndroid() && { bottom: vs(50) },
             opacityScrollTopStyle,
           ]}>
-          <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
+          <IconScrollBottom style={styles.rotateIcon} />
         </AnimatedButton>
         {!isFetchingNextPage && (
           <AnimatedButton
             onPress={scrollToBottom}
-            style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
+            style={[styles.scrollButtonBase, opacityScrollBottomStyle]}>
             <IconScrollBottom />
           </AnimatedButton>
         )}
@@ -549,8 +573,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: PaddingHorizontal,
     paddingBottom: vs(16),
-    // backgroundColor: '#F2F3F5',
-    // flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
@@ -567,31 +589,23 @@ const styles = StyleSheet.create({
     marginVertical: vs(12),
     alignItems: 'center',
   },
-
-  scrollBottomContainer: {
+  scrollButtonBase: {
     position: 'absolute',
     alignSelf: 'center',
-    bottom: vs(20),
+    width: vs(33),
+    height: vs(33),
+    borderRadius: vs(24),
+    backgroundColor: light.white,
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    bottom: vs(20),
   },
-  scrollTopContainer: {
-    position: 'absolute',
-    alignSelf: 'center',
-    bottom: vs(20),
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  rotateIcon: {
+    transform: [{ rotate: '180deg' }],
   },
 });

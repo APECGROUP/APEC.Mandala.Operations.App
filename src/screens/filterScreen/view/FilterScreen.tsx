@@ -34,7 +34,7 @@ const FilterScreen = ({
   // Đảm bảo default values cho department và requester là { id: '', name: '' }
   const initialFilters: AssignPriceFilters = route.params?.currentFilters || {};
 
-  const [prNo, setPrNo] = useState<string>(initialFilters.prNo || '');
+  const [prNo, setPrNo] = useState<string>(initialFilters.prNo || initialFilters?.searchKey || '');
   const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.fromDate);
   const [toDate, setToDate] = useState<Date | undefined>(initialFilters.toDate);
   const [department, setDepartment] = useState<SelectedOption>(
@@ -61,7 +61,7 @@ const FilterScreen = ({
       selectedDate: fromDate, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [fromDate]);
-
+  console.log('filter', initialFilters);
   const onPressToDate = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('ModalPickCalendar', {
@@ -78,7 +78,7 @@ const FilterScreen = ({
       department: department, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [department]);
-
+  console.log('filter', initialFilters);
   const onPressRequester = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickRequesterScreen', {

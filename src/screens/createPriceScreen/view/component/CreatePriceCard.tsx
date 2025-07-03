@@ -15,6 +15,7 @@ import { AnimatedButton } from '../CreatePriceScreen';
 import { Colors } from '@/theme/Config';
 import { moneyFormat } from '@/utils/Utilities';
 import { useTranslation } from 'react-i18next';
+import moment from 'moment';
 
 interface CreatePriceCardProps {
   item: TypeCreatePrice;
@@ -67,10 +68,15 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
 
     const detailItems = useMemo(
       () => [
-        { label: t('createPrice.time'), value: item.time },
+        {
+          label: t('createPrice.time'),
+          value: `${moment(item.createdAt).format('DD/MM/YYYY')} - ${moment(
+            item.estimateDate,
+          ).format('DD/MM/YYYY')}`,
+        },
         { label: t('createPrice.ncc'), value: item.ncc },
       ],
-      [t, item.time, item.ncc],
+      [t, item.createdAt, item.estimateDate, item.ncc],
     );
 
     return (

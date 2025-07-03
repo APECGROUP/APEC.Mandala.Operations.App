@@ -300,8 +300,7 @@ const AssignPriceScreen: React.FC = () => {
           onPress={scrollToTop}
           style={[
             styles.scrollButtonBase, // Style chung
-            styles.scrollTopContainer,
-            isAndroid() && { bottom: vs(40) }, // Điều chỉnh vị trí cho Android nếu cần
+            isAndroid() && { bottom: vs(50) }, // Điều chỉnh vị trí cho Android nếu cần
             opacityScrollTopStyle,
           ]}>
           <IconScrollBottom style={styles.rotateIcon} />
@@ -309,11 +308,7 @@ const AssignPriceScreen: React.FC = () => {
         {!isFetchingNextPage && ( // Chỉ hiển thị scroll to bottom nếu không đang fetching trang tiếp theo
           <AnimatedButton
             onPress={scrollToBottom}
-            style={[
-              styles.scrollButtonBase,
-              styles.scrollBottomContainer,
-              opacityScrollBottomStyle,
-            ]}>
+            style={[styles.scrollButtonBase, opacityScrollBottomStyle]}>
             <IconScrollBottom />
           </AnimatedButton>
         )}
@@ -482,12 +477,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-  },
-  scrollBottomContainer: {
     bottom: vs(20),
-  },
-  scrollTopContainer: {
-    bottom: vs(80), // Để không chồng lên nút scrollBottom (nếu cả hai cùng hiện)
   },
   rotateIcon: {
     transform: [{ rotate: '180deg' }],
