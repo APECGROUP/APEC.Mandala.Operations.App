@@ -1,4 +1,4 @@
-package com.fourier.mandala.perations
+package com.fourier.mandala.operations
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

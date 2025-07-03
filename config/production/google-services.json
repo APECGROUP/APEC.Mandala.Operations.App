@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:4990778105:android:a3ebb880482cd669610028",
+        "mobilesdk_app_id": "1:4990778105:android:9ae9f43068bbfe95610028",
         "android_client_info": {
-          "package_name": "com.fourier.mandala.perations"
+          "package_name": "com.fourier.mandala.operations"
         }
       },
       "oauth_client": [],

@@ -78,9 +78,9 @@ android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
-    namespace "com.fourier.mandala.perations"
+    namespace "com.fourier.mandala.operations"
     defaultConfig {
-        applicationId "com.fourier.mandala.perations"
+        applicationId "com.fourier.mandala.operations"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

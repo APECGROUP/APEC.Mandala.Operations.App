@@ -10,8 +10,7 @@
 		05754C15F2B96C78D29194A2 /* Pods_MandalaOperations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 350BAAD22E121F80B3831325 /* Pods_MandalaOperations.framework */; };
 		08DF16A5381A4A1D9E314ADD /* GoogleSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2205F9BB6C5949488C1C6BE0 /* GoogleSans-MediumItalic.ttf */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		176983162E15410900E03188 /* GoogleService-Info 7.plist in Resources */ = {isa = PBXBuildFile; fileRef = 176983152E15410900E03188 /* GoogleService-Info 7.plist */; };
-		176983182E15412800E03188 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 176983172E15412800E03188 /* GoogleService-Info.plist */; };
+		1777EC612E1619FD0090BBDB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1777EC602E1619FD0090BBDB /* GoogleService-Info.plist */; };
 		24E526C1468456B594B8CB18 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		3E8E827C0058479AA8E3FCAD /* GoogleSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 27EB5EA02ADB43A38FD4A952 /* GoogleSans-BoldItalic.ttf */; };
 		4A80AA5B7CBC48A0A5B10BCA /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B8384FA68F704138A98D1FFF /* BootSplash.storyboard */; };
@@ -30,8 +29,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = MandalaOperations/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = MandalaOperations/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = MandalaOperations/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		176983152E15410900E03188 /* GoogleService-Info 7.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info 7.plist"; sourceTree = "<group>"; };
-		176983172E15412800E03188 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		1777EC602E1619FD0090BBDB /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		2205F9BB6C5949488C1C6BE0 /* GoogleSans-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSans-MediumItalic.ttf"; path = "../assets/fonts/GoogleSans-MediumItalic.ttf"; sourceTree = "<group>"; };
 		238323351941421F87C856F7 /* GoogleSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSans-Regular.ttf"; path = "../assets/fonts/GoogleSans-Regular.ttf"; sourceTree = "<group>"; };
 		27EB5EA02ADB43A38FD4A952 /* GoogleSans-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSans-BoldItalic.ttf"; path = "../assets/fonts/GoogleSans-BoldItalic.ttf"; sourceTree = "<group>"; };
@@ -63,10 +61,9 @@
 			isa = PBXGroup;
 			children = (
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
+				1777EC602E1619FD0090BBDB /* GoogleService-Info.plist */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				176983152E15410900E03188 /* GoogleService-Info 7.plist */,
-				176983172E15412800E03188 /* GoogleService-Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				B8384FA68F704138A98D1FFF /* BootSplash.storyboard */,
@@ -197,18 +194,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				176983182E15412800E03188 /* GoogleService-Info.plist in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				4A80AA5B7CBC48A0A5B10BCA /* BootSplash.storyboard in Resources */,
 				7F752D5DE7B5465DBA7FD9CB /* Colors.xcassets in Resources */,
 				24E526C1468456B594B8CB18 /* PrivacyInfo.xcprivacy in Resources */,
+				1777EC612E1619FD0090BBDB /* GoogleService-Info.plist in Resources */,
 				6B2F1562EE0F49E7B5DA70FE /* GoogleSans-Bold.ttf in Resources */,
 				3E8E827C0058479AA8E3FCAD /* GoogleSans-BoldItalic.ttf in Resources */,
 				94F0227450454300BD66F0BA /* GoogleSans-Italic.ttf in Resources */,
 				E1C044DFDB3346CBBCB81410 /* GoogleSans-Medium.ttf in Resources */,
 				08DF16A5381A4A1D9E314ADD /* GoogleSans-MediumItalic.ttf in Resources */,
-				176983162E15410900E03188 /* GoogleService-Info 7.plist in Resources */,
 				7A593AEDE9F54E49835DEE49 /* GoogleSans-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -347,7 +343,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fourier.mandala.perations;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fourier.mandala.operations;
 				PRODUCT_NAME = MandalaOperations;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -381,7 +377,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fourier.mandala.perations;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fourier.mandala.operations;
 				PRODUCT_NAME = MandalaOperations;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
