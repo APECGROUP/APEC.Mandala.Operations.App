@@ -1,7 +1,6 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { DataAssignPrice, fetchAssignPriceData } from '../modal/AssignPriceModal';
-import debounce from 'lodash/debounce';
+import { fetchAssignPriceData } from '../modal/AssignPriceModal';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;
@@ -31,8 +30,7 @@ export function useAssignPriceViewModel(filters) {
     isError,
   } = useInfiniteQuery(
     queryKey,
-    async ({ pageParam = 1 }) => {
-      return fetchAssignPriceData(
+    async ({ pageParam = 1 }) => fetchAssignPriceData(
         pageParam,
         50,
         filters?.prNo,
@@ -40,8 +38,7 @@ export function useAssignPriceViewModel(filters) {
         filters?.toDate,
         filters?.department,
         filters?.requester,
-      );
-    },
+      ),
     {
       getNextPageParam: (lastPage, allPages) =>
         lastPage.length === 50 ? allPages.length + 1 : undefined,
