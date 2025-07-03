@@ -1,5 +1,5 @@
-import { StatusBar, StyleSheet, TextInput, View } from 'react-native';
-import React, { useRef, useState } from 'react';
+import { Keyboard, StatusBar, StyleSheet, TextInput, View } from 'react-native';
+import React, { useRef, useState, useCallback } from 'react';
 import { getFontSize } from '../../../constants';
 import { AppBlock } from '../../../elements/block/Block';
 import AppTextInput from '../../../elements/textInput/AppTextInput';
@@ -8,81 +8,110 @@ import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import { navigate } from '@/navigation/RootNavigation';
 import { PaddingHorizontal } from '@/utils/Constans';
-import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
-import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconCalendar from '@assets/icon/IconCalendar';
-import { vs } from 'react-native-size-matters';
+import { vs, s } from 'react-native-size-matters'; // Import s
 import Footer from './component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import AppBlockButton from '@/elements/button/AppBlockButton';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { MainParams } from '@/navigation/params';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  AssignPriceFilters,
+  SelectedOption,
+} from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 
-type FilterScreenParams = {
-  onApplyFilters?: (filters: any) => void;
-};
-
-const FilterScreen = () => {
-  //  const { listDepartment, listRequester } = useFilterViewModel();
+const FilterScreen = ({
+  route,
+  navigation,
+}: NativeStackScreenProps<MainParams, 'FilterScreen'>) => {
   const { t } = useTranslation();
-  const navigation = useNavigation();
-  const route = useRoute() as RouteProp<Record<string, FilterScreenParams>, string>;
 
-  const [prNo, setPrNo] = useState('');
-  const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
-  const [toDate, setToDate] = useState<Date | undefined>(undefined);
-  const [department, setDepartment] = useState<TypePickDepartment>({
-    id: '',
-    name: '',
-  });
-  const [requester, setRequester] = useState<ResponseNcc>({
-    id: '',
-    name: '',
-  });
+  // Lấy hàm callback onApplyFilters từ route params
+  const onApplyFiltersCallback = route.params?.onApplyFilters;
 
+  // Lấy các filter hiện tại từ params để khởi tạo state
+  // Đảm bảo default values cho department và requester là { id: '', name: '' }
+  const initialFilters: AssignPriceFilters = route.params?.currentFilters || {};
+
+  const [prNo, setPrNo] = useState<string>(initialFilters.prNo || '');
+  const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.fromDate);
+  const [toDate, setToDate] = useState<Date | undefined>(initialFilters.toDate);
+  const [department, setDepartment] = useState<SelectedOption>(
+    initialFilters.department && initialFilters.department.id !== ''
+      ? initialFilters.department
+      : { id: '', name: '' },
+  );
+  const [requester, setRequester] = useState<SelectedOption>(
+    initialFilters.requester && initialFilters.requester.id !== ''
+      ? initialFilters.requester
+      : { id: '', name: '' },
+  );
+
+  // Ref cho TextInput để quản lý focus (có thể không cần thiết nếu dùng AppTextInput đúng cách)
   const refFromDate = useRef<TextInput>(null);
   const refToDate = useRef<TextInput>(null);
 
-  const onPressFromDate = () => {
+  // --- Handlers cho việc chọn giá trị từ các Modal khác ---
+  const onPressFromDate = useCallback(() => {
+    Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('ModalPickCalendar', {
       isSingleMode: true,
-      onSelectDate: setFromDate,
+      onSelectDate: (date: Date) => setFromDate(date),
+      selectedDate: fromDate, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
-  };
+  }, [fromDate]);
 
-  const onPressToDate = () => {
+  const onPressToDate = useCallback(() => {
+    Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('ModalPickCalendar', {
       isSingleMode: true,
-      onSelectDate: setToDate,
+      onSelectDate: (date: Date) => setToDate(date),
+      selectedDate: toDate, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
-  };
+  }, [toDate]);
 
-  const onPressDepartment = () => {
+  const onPressDepartment = useCallback(() => {
+    Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickDepartmentScreen', {
-      setDepartment: setDepartment,
-      department: department,
+      setDepartment: (dep: SelectedOption) => setDepartment(dep),
+      department: department, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
-  };
+  }, [department]);
 
-  const onPressRequester = () => {
+  const onPressRequester = useCallback(() => {
+    Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickRequesterScreen', {
-      setRequester: setRequester,
-      requester: requester,
+      setRequester: (req: SelectedOption) => setRequester(req),
+      requester: requester, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
-  };
+  }, [requester]);
 
-  const onConfirm = React.useCallback(() => {
-    if (typeof route.params?.onApplyFilters === 'function') {
-      route.params.onApplyFilters({
-        prNo,
-        fromDate,
-        toDate,
-        department,
-        requester,
-      });
+  // --- Xử lý khi người dùng xác nhận bộ lọc ---
+  const onConfirm = useCallback(() => {
+    // Tạo object filters mới từ state cục bộ của FilterScreen
+    const newFilters: AssignPriceFilters = {
+      prNo: prNo.trim() || undefined, // Đảm bảo prNo rỗng thì thành undefined
+      fromDate,
+      toDate,
+      department: department.id ? department : undefined, // Nếu id rỗng thì là undefined
+      requester: requester.id ? requester : undefined, // Nếu id rỗng thì là undefined
+    };
+
+    // Gọi callback từ màn hình trước đó để áp dụng filter
+    if (onApplyFiltersCallback) {
+      onApplyFiltersCallback(newFilters);
     }
     navigation.goBack();
-  }, [prNo, fromDate, toDate, department, requester, navigation, route.params]);
+  }, [prNo, fromDate, toDate, department, requester, onApplyFiltersCallback, navigation]);
+
+  const onReset = useCallback(() => {
+    setPrNo('');
+    setFromDate(undefined);
+    setToDate(undefined);
+    setDepartment({ id: '', name: '' });
+    setRequester({ id: '', name: '' });
+  }, []);
 
   return (
     <ViewContainer>
@@ -91,21 +120,21 @@ const FilterScreen = () => {
 
         <View style={styles.form}>
           <AppTextInput
-            required
             labelStyle={styles.label}
             label={t('filter.prNo')}
             placeholder={t('filter.prNo')}
             placeholderTextColor={light.placeholderTextColor}
-            maxLength={10}
+            maxLength={20} // Tăng maxLength lên một chút nếu cần
             value={prNo}
             onChangeText={setPrNo}
+            onBlur={Keyboard.dismiss}
             inputStyle={styles.input}
           />
-          <AppBlockButton onPress={onPressFromDate}>
+
+          <AppBlockButton style={styles.width100} onPress={onPressFromDate}>
             <AppTextInput
               editable={false}
               refName={refFromDate}
-              required
               labelStyle={styles.label}
               label={t('filter.fromDate')}
               placeholder={t('filter.fromDate')}
@@ -115,11 +144,11 @@ const FilterScreen = () => {
               rightIcon={<IconCalendar fill={'#BABABA'} />}
             />
           </AppBlockButton>
-          <AppBlockButton onPress={onPressToDate}>
+
+          <AppBlockButton style={styles.width100} onPress={onPressToDate}>
             <AppTextInput
               editable={false}
               refName={refToDate}
-              required
               labelStyle={styles.label}
               label={t('filter.toDate')}
               placeholder={t('filter.toDate')}
@@ -129,36 +158,34 @@ const FilterScreen = () => {
               rightIcon={<IconCalendar fill={'#BABABA'} />}
             />
           </AppBlockButton>
-          <AppBlockButton onPress={onPressDepartment}>
+
+          <AppBlockButton style={styles.width100} onPress={onPressDepartment}>
             <AppTextInput
               editable={false}
-              refName={refToDate}
-              required
               labelStyle={styles.label}
               label={t('filter.department')}
               placeholder={t('filter.department')}
               placeholderTextColor={light.placeholderTextColor}
               value={department?.name}
               inputStyle={styles.input}
-              rightIcon={<IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />}
+              rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
           </AppBlockButton>
-          <AppBlockButton onPress={onPressRequester}>
+
+          <AppBlockButton style={styles.width100} onPress={onPressRequester}>
             <AppTextInput
               editable={false}
-              refName={refToDate}
-              required
               labelStyle={styles.label}
               label={t('filter.requester')}
               placeholder={t('filter.requester')}
               placeholderTextColor={light.placeholderTextColor}
               value={requester?.name}
               inputStyle={styles.input}
-              rightIcon={<IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />}
+              rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
           </AppBlockButton>
         </View>
-        <Footer onRightAction={onConfirm} />
+        <Footer onLeftAction={onReset} onRightAction={onConfirm} />
       </AppBlock>
     </ViewContainer>
   );
@@ -167,15 +194,18 @@ const FilterScreen = () => {
 export default FilterScreen;
 
 const styles = StyleSheet.create({
+  width100: { width: '100%' },
   container: {
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: light.background, // Thêm màu nền cho container chính
   },
   form: {
     alignItems: 'center',
     paddingHorizontal: PaddingHorizontal,
     width: '100%',
+    paddingTop: vs(20), // Thêm padding top để không bị sát Status Bar
   },
   label: {
     fontSize: getFontSize(14),
@@ -190,5 +220,9 @@ const styles = StyleSheet.create({
     borderRadius: vs(6),
     backgroundColor: light.backgroundTextInput,
     marginBottom: vs(16),
+    paddingHorizontal: s(12), // Thêm padding ngang cho input
+  },
+  rightArrowIcon: {
+    transform: [{ rotate: '90deg' }], // Icon quay 90 độ
   },
 });

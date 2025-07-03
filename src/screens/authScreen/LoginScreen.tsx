@@ -171,7 +171,6 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   //   DataLocal.setRememberLogin(false);
   // };
 
-  console.log('hotel', hotel);
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="white" />

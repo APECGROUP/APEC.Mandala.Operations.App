@@ -1,7 +1,10 @@
 import { Dispatch, SetStateAction } from 'react';
 import { ResponseImageElement } from '../interface/Verify.interface';
 import { typeHotel } from '../screens/authScreen/LoginScreen';
-import { DataAssignPrice } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
+import {
+  AssignPriceFilters,
+  DataAssignPrice,
+} from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { TypePickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
@@ -33,7 +36,10 @@ export type MainParams = {
   ApprovePrScreen: undefined;
   CreatePriceNccScreen: undefined;
   AccountScreen: undefined;
-  FilterScreen: undefined;
+  FilterScreen: {
+    currentFilters: AssignPriceFilters;
+    onApplyFilters: (filters: AssignPriceFilters) => void;
+  };
   DetailAssignPriceCardScreen: { item: DataAssignPrice };
   DetailApproveCardScreen: { item: TypeApprove };
   InformationItemsScreen: { item: DataAssignPrice };

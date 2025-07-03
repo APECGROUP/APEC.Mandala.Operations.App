@@ -1,5 +1,19 @@
 import axios from 'axios';
 
+// --- (Các interfaces không thay đổi) ---
+export interface SelectedOption {
+  id: string;
+  name: string;
+}
+
+export interface AssignPriceFilters {
+  prNo?: string;
+  fromDate?: Date;
+  toDate?: Date;
+  department?: SelectedOption;
+  requester?: SelectedOption;
+}
+
 export interface DataAssignPrice {
   id: string;
   content: string;
@@ -10,93 +24,114 @@ export interface DataAssignPrice {
     name: string;
     avatar: string;
   };
-}
-
-// Cache để tránh gọi API trùng lặp
-const cache = new Map<string, DataAssignPrice[]>();
-
-/**
- * Tạo URL API lấy danh sách ảnh, có hỗ trợ search (giả lập).
- */
-function buildAssignPriceUrl(page: number, limit: number, key?: string): string {
-  let url = `https://picsum.photos/v2/list?page=${page}&limit=${limit}`;
-  if (key) url += `&search=${encodeURIComponent(key)}`;
-  return url;
+  department: { id: string; name: string };
+  requester: { id: string; name: string };
+  createdAt: string;
+  estimateDate: string;
 }
 
 /**
- * Tạo cache key
+ * Hàm giả lập để tạo dữ liệu DataAssignPrice.
+ * Logic tạo dữ liệu ngẫu nhiên được tách ra để dễ quản lý.
  */
-function getCacheKey(page: number, limit: number, key: string): string {
-  return `${page}_${limit}_${key}`;
+function generateMockAssignPriceData(item: any, prNo?: string): DataAssignPrice {
+  const numberOfImages = Math.floor(Math.random() * 10) + 1;
+  const imageUrls = Array.from(
+    { length: numberOfImages },
+    (_, i) => `https://picsum.photos/id/${item.id + i}/300/300`,
+  );
+
+  let content = `PR20240624#${String(Math.floor(Math.random() * 10000) + 1).padStart(4, '0')}`;
+  if (prNo) {
+    content = `${content} - ${prNo}`; // Thêm prNo để có thể test filter
+  }
+
+  const mockDepartments = [
+    { id: 'dep1', name: 'Phòng Kế toán' },
+    { id: 'dep2', name: 'Phòng IT' },
+    { id: 'dep3', name: 'Phòng Kinh doanh' },
+    { id: 'dep4', name: 'Phòng Nhân sự' },
+    { id: 'dep5', name: 'Phòng Sản xuất' },
+  ];
+  const mockRequesters = [
+    { id: 'req1', name: 'Nguyễn Văn A' },
+    { id: 'req2', name: 'Trần Thị B' },
+    { id: 'req3', name: 'Lê Văn C' },
+    { id: 'req4', name: 'Phạm Thị D' },
+    { id: 'req5', name: 'Hoàng Văn E' },
+  ];
+
+  const randomDepartment = mockDepartments[Math.floor(Math.random() * mockDepartments.length)];
+  const randomRequester = mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
+  return {
+    id: item.id,
+    content,
+    images: imageUrls,
+    videos: [],
+    time: '28/05/2025 - 30/05/2025',
+    user: {
+      name: item.author,
+      avatar: `https://picsum.photos/id/${item.id}/100/100`,
+    },
+    department: randomDepartment,
+    requester: randomRequester,
+    createdAt: '2024-06-25', // Giả định ngày tạo cố định
+    estimateDate: '2024-06-30', // Giả định ngày ước tính cố định
+  };
 }
 
 /**
  * Lấy danh sách DataAssignPrice từ API (giả lập).
+ * Đây là hàm chính bạn sẽ thay thế bằng cuộc gọi API thật của mình.
+ *
+ * @param page Số trang cần lấy.
+ * @param limit Số lượng item trên mỗi trang.
+ * @param filters Đối tượng chứa tất cả các điều kiện lọc.
+ * @returns Promise chứa mảng DataAssignPrice.
  */
 export const fetchAssignPriceData = async (
   page: number,
   limit: number = 50,
-  prNo?: string,
-  fromDate?: Date,
-  toDate?: Date,
-  department?: { id: string },
-  requester?: { id: string },
+  filters: AssignPriceFilters, // Nhận toàn bộ object filters
 ): Promise<DataAssignPrice[]> => {
-  const cacheKey = getCacheKey(page, limit, prNo || '');
-
-  // Kiểm tra cache trước
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey)!;
-  }
-
   try {
-    // Giả lập delay 3 giây
-    await new Promise(resolve => setTimeout(resolve, 800));
+    const apiUrl = `https://picsum.photos/v2/list`;
 
-    const url = buildAssignPriceUrl(page, limit, prNo);
-    const { data } = await axios.get(url);
+    const requestParams: any = {
+      page: page.toString(),
+      limit: limit.toString(),
+    };
 
-    const allImageIds: string[] = data.map((item: any) => item.id);
+    // --- ĐẦU CHỜ CHO CÁC THAM SỐ LỌC THẬT TẾ ---
+    // KHI BẠN CÓ API THẬT HỖ TRỢ LỌC, HÃY UNCOMMENT CÁC DÒNG DƯỚI ĐÂY
+    // VÀ ĐẢM BẢO TÊN THAM SỐ TRÙNG KHỚP VỚI API CỦA BẠN.
+    // Ví dụ: requestParams.pr_number = filters.prNo;
 
-    const result = data.map((item: any) => {
-      const numberOfImages = Math.floor(Math.random() * 10) + 1;
-      const otherIds = allImageIds.filter(id => id !== item.id);
-      const shuffled = [...otherIds].sort(() => 0.5 - Math.random());
-      const selectedImageIds = [item.id, ...shuffled.slice(0, numberOfImages - 1)];
-      const imageUrls = selectedImageIds.map(id => `https://picsum.photos/id/${id}/300/300`);
-      return {
-        id: item.id,
-        content: `PR20240624#${String(Math.floor(Math.random() * 10000) + 1).padStart(4, '0')}`,
-        images: imageUrls,
-        videos: [],
-        time: '28/05/2025 - 30/05/2025',
-        user: {
-          name: item.author,
-          avatar: `https://picsum.photos/id/${item.id}/100/100`,
-        },
-      };
-    });
+    // if (filters.prNo) {
+    //   requestParams.prNo = filters.prNo;
+    // }
+    // if (filters.fromDate) {
+    //   requestParams.fromDate = filters.fromDate.toISOString();
+    // }
+    // if (filters.toDate) {
+    //   requestParams.toDate = filters.toDate.toISOString();
+    // }
+    // if (filters.department?.id) {
+    //   requestParams.departmentId = filters.department.id;
+    // }
+    // if (filters.requester?.id) {
+    //   requestParams.requesterId = filters.requester.id;
+    // }
 
-    // Lưu vào cache
-    cache.set(cacheKey, result);
+    const { data } = await axios.get(apiUrl, { params: requestParams });
 
-    // Giới hạn cache size để tránh memory leak
-    if (cache.size > 100) {
-      const firstKey = cache.keys().next().value;
-      cache.delete(firstKey);
-    }
+    let processedData: DataAssignPrice[] = data.map((item: any) =>
+      generateMockAssignPriceData(item, filters.prNo),
+    );
 
-    return result;
+    return processedData;
   } catch (error) {
-    console.error('Error fetching assign price data:', error);
-    throw error;
+    console.error('Lỗi khi lấy dữ liệu Assign Price:', error);
+    throw error; // Ném lỗi để TanStack Query có thể bắt và xử lý
   }
-};
-
-/**
- * Clear cache khi cần thiết
- */
-export const clearAssignPriceCache = () => {
-  cache.clear();
 };

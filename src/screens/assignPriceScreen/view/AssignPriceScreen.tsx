@@ -1,6 +1,4 @@
-// views/AssignPriceScreen.tsx
-
-import React, { useRef, useCallback, useMemo, useState } from 'react';
+import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -17,10 +15,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+// useFocusEffect không cần thiết nếu logic dùng `applyFilters`
 
 import { getFontSize, SCREEN_WIDTH } from '../../../constants';
-// import {AppText} from '../../elements/text/AppText';
 import { PaddingHorizontal } from '../../../utils/Constans';
 import light from '../../../theme/light';
 import AppBlockButton from '../../../elements/button/AppBlockButton';
@@ -44,52 +41,38 @@ import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { isAndroid } from '@/utils/Utilities';
 
+// Tạo AnimatedButton một lần duy nhất ngoài component
+export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
+
 const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const refToast = useRef<any>(null);
-  console.log('AssignPriceScreen');
-  const navigation = useNavigation();
-  const [filters, setFilters] = useState({
-    prNo: '',
-    fromDate: undefined,
-    toDate: undefined,
-    department: undefined,
-    requester: undefined,
-  });
 
-  // Callback nhận filter từ FilterScreen
-  const onApplyFilters = useCallback(newFilters => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-  }, []);
-
-  // Truyền filters vào viewmodel
-  const viewModel = useAssignPriceViewModel(filters);
-
-  // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
+  // ViewModel MVVM - không cần truyền activeFilters vào đây nữa,
+  // ViewModel sẽ tự quản lý state filter nội bộ và debounce.
+  // currentFilters từ ViewModel sẽ phản ánh trạng thái filter hiện tại của UI.
   const {
-    flatData,
+    data: flatData, // Đổi tên `flatData` thành `data` cho rõ ràng hơn trong component này
     isLoading,
     isRefetching,
     isFetchingNextPage,
     onRefresh,
     onLoadMore,
-    onSearch,
-    searchKey,
+    onSearchPrNo, // Hàm để cập nhật prNo khi gõ vào ô search
+    applyFilters, // Hàm để áp dụng các filter từ FilterScreen
+    currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
+    currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
-  } = viewModel;
+  } = useAssignPriceViewModel({}); // Truyền một object rỗng, ViewModel sẽ khởi tạo internal state của nó
 
-  // ─── Refs và shared values Reanimated ───────────────────────────────────────
+  const refToast = useRef<any>(null);
   const flashListRef = useRef<FlashList<DataAssignPrice> | null>(null);
   const lastOffsetY = useRef<number>(0);
 
-  // show Scroll‐to‐Top khi scroll lên (swipe xuống), 0 = hidden, 1 = visible
   const showScrollToTop = useSharedValue<number>(0);
-  // show Scroll‐to‐Bottom khi scroll xuống (swipe lên), 0 = hidden, 1 = visible
   const showScrollToBottom = useSharedValue<number>(0);
 
-  // Animated styles
+  // Animated styles cho nút cuộn
   const opacityScrollTopStyle = useAnimatedStyle(() => ({
     opacity: withTiming(showScrollToTop.value, { duration: 200 }),
   }));
@@ -99,14 +82,12 @@ const AssignPriceScreen: React.FC = () => {
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
-    console.log('scrollToTop');
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const scrollToBottom = useCallback(() => {
-    console.log('scrollToBottom');
     flashListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,22 +95,24 @@ const AssignPriceScreen: React.FC = () => {
 
   /**
    * onScroll handler:
-   *  - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
-   *  - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
+   * - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
+   * - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
    */
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
     // Scroll xuống (lúc này y > lastOffsetY): hiện scroll‐to‐bottom, ẩn scroll‐to‐top
     if (y > lastOffsetY.current && y > 100) {
+      // Chỉ hiện khi cuộn đủ xa
       showScrollToBottom.value = 1;
       showScrollToTop.value = 0;
     }
     // Scroll lên (y < lastOffsetY): hiện scroll‐to‐top, ẩn scroll‐to‐bottom
     else if (y < lastOffsetY.current && y > 100) {
+      // Chỉ hiện khi cuộn đủ xa
       showScrollToTop.value = 1;
       showScrollToBottom.value = 0;
     } else {
-      // Chưa vượt 100px thì ẩn cả hai
+      // Chưa vượt 100px hoặc ở đầu danh sách thì ẩn cả hai
       showScrollToTop.value = 0;
       showScrollToBottom.value = 0;
     }
@@ -137,26 +120,34 @@ const AssignPriceScreen: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Khi bấm "Tìm kiếm" (submit) hoặc nút "Filter" ───────────────────────
-  const handleSubmitSearch = useCallback(() => {
-    navigation.navigate('FilterScreen', { onApplyFilters });
-  }, [navigation, onApplyFilters]);
-
+  // ─── Khi bấm nút "Filter" ───────────────────────
+  const goToFilterScreen = useCallback(() => {
+    navigate('FilterScreen', {
+      onApplyFilters: applyFilters, // Callback để FilterScreen gọi khi confirm
+      currentFilters: currentFilters, // Filters hiện tại đang hiển thị trên màn hình A
+    });
+  }, [applyFilters, currentFilters]);
   const listEmptyComponent = useMemo(() => {
-    if (isLoading) {
+    if (isLoading && flatData.length === 0) {
+      // Nếu đang loading và chưa có dữ liệu, hiển thị skeleton hoặc indicator
       return (
         <View style={styles.emptyContainer}>
           <ActivityIndicator size="large" color={light.primary} />
         </View>
       );
     }
-    return (
-      <View style={styles.emptyContainer}>
-        <EmptyDataAnimation autoPlay />
-        <AppText style={styles.emptyText}>{t('assignPrice.empty')}</AppText>
-      </View>
-    );
-  }, [isLoading, t]);
+    // Nếu không loading và không có dữ liệu, hiển thị EmptyDataAnimation.
+    // Dữ liệu chỉ thực sự rỗng khi isLoading là false và flatData.length là 0.
+    if (!isLoading && flatData.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <EmptyDataAnimation autoPlay />
+          <AppText style={styles.emptyText}>{t('assignPrice.empty')}</AppText>
+        </View>
+      );
+    }
+    return null;
+  }, [isLoading, flatData.length, t]);
 
   const listFooterComponent = useMemo(() => {
     if (isFetchingNextPage) {
@@ -181,28 +172,38 @@ const AssignPriceScreen: React.FC = () => {
 
   const { infoUser } = useInfoUser();
 
-  // return (
-  //   <ViewContainer>
-  //     <Test />
-  //   </ViewContainer>
-  // );
+  // Xử lý lỗi ban đầu hoặc khi có lỗi API
+  const [hasInitialLoadError, setHasInitialLoadError] = useState(false);
+
+  useEffect(() => {
+    // Nếu có lỗi và không có dữ liệu để hiển thị, đánh dấu là có lỗi tải ban đầu
+    if (isError && flatData.length === 0) {
+      setHasInitialLoadError(true);
+    } else if (!isError && hasInitialLoadError) {
+      // Nếu lỗi đã được giải quyết và không còn lỗi, reset cờ lỗi
+      setHasInitialLoadError(false);
+    }
+  }, [isError, flatData.length, hasInitialLoadError]);
+
   const reLoadData = useCallback(() => {
-    setIsFirstLoad(false);
-    onRefresh();
+    setHasInitialLoadError(false); // Reset cờ lỗi để thử tải lại
+    onRefresh(); // Gọi hàm refresh từ ViewModel
   }, [onRefresh]);
-  console.log('error:', isError);
-  if (isError || (isFirstLoad && !isLoading)) {
+
+  // Hiển thị FallbackComponent nếu có lỗi tải ban đầu và không có dữ liệu
+  if (hasInitialLoadError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
 
-  const total = '60';
+  // Giả lập tổng số lượng item
+  const total = 60; // Có thể lấy từ meta data của API
   return (
     <ViewContainer>
       <View style={styles.container}>
-        {/* <Test /> */}
         <StatusBar
           barStyle={'light-content'}
-          // backgroundColor={primary ? 'white' : 'black'}
+          // backgroundColor="transparent" // Thường đặt transparent nếu có ảnh nền
+          // translucent // Giúp nội dung tràn ra phía sau StatusBar
         />
         {/* ─── Background Image ─────────────────────────────────────────────── */}
         <FastImage
@@ -211,7 +212,7 @@ const AssignPriceScreen: React.FC = () => {
           resizeMode={FastImage.resizeMode.cover}
         />
         {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-        <View style={[styles.headerContainer, { marginTop: top }]}>
+        <View style={[styles.headerContainer, { paddingTop: top + vs(5) }]}>
           <View style={styles.headerLeft}>
             <AppBlockButton onPress={goToAccount}>
               <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
@@ -238,15 +239,15 @@ const AssignPriceScreen: React.FC = () => {
         <View style={styles.searchContainer}>
           <IconSearch width={vs(18)} />
           <TextInput
-            value={searchKey}
-            onChangeText={onSearch}
+            value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
+            onChangeText={onSearchPrNo} // Gọi hàm debounce từ ViewModel
             placeholder={t('assignPrice.searchPlaceholder')}
             placeholderTextColor={light.placeholderTextColor}
             style={styles.searchInput}
-            returnKeyType="search"
-            onSubmitEditing={handleSubmitSearch}
+            // returnKeyType="search"
+            // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
           />
-          <AppBlockButton style={styles.filterButton} onPress={handleSubmitSearch}>
+          <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
             <IconFilter />
           </AppBlockButton>
         </View>
@@ -261,16 +262,22 @@ const AssignPriceScreen: React.FC = () => {
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
         {isLoading && flatData.length === 0 ? (
           <View style={styles.listContent}>
-            {new Array(10).fill(0).map((_, index) => (
-              <SkeletonItem key={index} />
-            ))}
+            {/* Hiển thị Skeleton khi loading lần đầu và chưa có dữ liệu */}
+            {new Array(3).fill(0).map(
+              (
+                _,
+                index, // Giảm số lượng skeleton để demo
+              ) => (
+                <SkeletonItem key={index} />
+              ),
+            )}
           </View>
         ) : (
           <FlashList
             ref={flashListRef}
-            data={flatData || []}
+            data={flatData} // Sử dụng flatData từ ViewModel
             renderItem={renderItem}
-            keyExtractor={item => `${item.id}_${item.content}`}
+            keyExtractor={item => item.id} // Chỉ cần item.id là đủ cho key
             onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
@@ -279,7 +286,7 @@ const AssignPriceScreen: React.FC = () => {
             onRefresh={onRefresh}
             onScroll={handleScroll}
             scrollEventThrottle={16}
-            ListEmptyComponent={listEmptyComponent}
+            ListEmptyComponent={listEmptyComponent} // Chỉ hiện nếu data rỗng sau khi loading
             ListFooterComponent={listFooterComponent}
             estimatedItemSize={100}
             contentContainerStyle={styles.listContent}
@@ -292,16 +299,21 @@ const AssignPriceScreen: React.FC = () => {
         <AnimatedButton
           onPress={scrollToTop}
           style={[
+            styles.scrollButtonBase, // Style chung
             styles.scrollTopContainer,
-            isAndroid() && { bottom: vs(40) },
+            isAndroid() && { bottom: vs(40) }, // Điều chỉnh vị trí cho Android nếu cần
             opacityScrollTopStyle,
           ]}>
-          <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
+          <IconScrollBottom style={styles.rotateIcon} />
         </AnimatedButton>
-        {!isFetchingNextPage && (
+        {!isFetchingNextPage && ( // Chỉ hiển thị scroll to bottom nếu không đang fetching trang tiếp theo
           <AnimatedButton
             onPress={scrollToBottom}
-            style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
+            style={[
+              styles.scrollButtonBase,
+              styles.scrollBottomContainer,
+              opacityScrollBottomStyle,
+            ]}>
             <IconScrollBottom />
           </AnimatedButton>
         )}
@@ -311,7 +323,7 @@ const AssignPriceScreen: React.FC = () => {
 };
 
 export default AssignPriceScreen;
-export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -321,6 +333,7 @@ const styles = StyleSheet.create({
     aspectRatio: 2.66,
     position: 'absolute',
     zIndex: -1,
+    // top: 0, // Đảm bảo ảnh nằm ở top
   },
   headerContainer: {
     flexDirection: 'row',
@@ -395,10 +408,11 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: getFontSize(12),
+    fontSize: getFontSize(14), // Tăng fontSize để dễ đọc
     fontWeight: '500',
     paddingVertical: 0,
     paddingLeft: s(6),
+    color: light.text, // Đảm bảo màu chữ dễ nhìn
   },
   filterButton: {
     borderLeftWidth: 0.3,
@@ -446,36 +460,36 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: getFontSize(14),
     color: '#666666',
+    marginTop: vs(10), // Thêm khoảng cách
   },
   footerLoading: {
     marginVertical: vs(12),
     alignItems: 'center',
   },
 
-  scrollBottomContainer: {
+  // Styles chung cho các nút cuộn
+  scrollButtonBase: {
     position: 'absolute',
     alignSelf: 'center',
-    bottom: vs(20),
+    width: vs(48), // Kích thước nút
+    height: vs(48),
+    borderRadius: vs(24), // Hình tròn
+    backgroundColor: light.white, // Màu nền
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
   },
-  scrollTopContainer: {
-    position: 'absolute',
-    alignSelf: 'center',
+  scrollBottomContainer: {
     bottom: vs(20),
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  },
+  scrollTopContainer: {
+    bottom: vs(80), // Để không chồng lên nút scrollBottom (nếu cả hai cùng hiện)
+  },
+  rotateIcon: {
+    transform: [{ rotate: '180deg' }],
   },
 });
