@@ -225,7 +225,7 @@ const CreatePriceScreen: React.FC = () => {
     });
   }, [applyFilters, currentFilters]);
 
-  const onReject = useCallback(async () => {
+  const onApproved = useCallback(async () => {
     await new Promise(resolve => {
       setTimeout(() => {
         resolve(true);
@@ -235,7 +235,7 @@ const CreatePriceScreen: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onApproved = useCallback(async () => {
+  const onReject = useCallback(async () => {
     await new Promise(resolve => {
       setTimeout(() => {
         resolve(true);

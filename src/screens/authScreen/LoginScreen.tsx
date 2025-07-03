@@ -89,7 +89,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
     if (!removeVietnameseTones(userName.toLocaleLowerCase()).includes('dung')) {
       saveInfoUser({ ...infoUser, isApprove: false });
       return refToast.current?.show(t('auth.login.loginError'), TYPE_TOAST.ERROR);
-    } else if (password === '123') {
+    } else if (password !== '123456') {
       return refToast.current?.show(t('auth.login.loginError'), TYPE_TOAST.ERROR);
     } else {
       setIsLogin(true);

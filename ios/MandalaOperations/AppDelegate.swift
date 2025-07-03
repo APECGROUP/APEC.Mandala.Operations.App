@@ -4,6 +4,8 @@ import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import RNBootSplash // ⬅️ add this import
 import Firebase
+import react_native_ota_hot_update
+
 
 @main
 class AppDelegate: RCTAppDelegate {
@@ -53,7 +55,7 @@ class AppDelegate: RCTAppDelegate {
 #if DEBUG
     RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
 #else
-    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+//    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
                         OtaHotUpdate.getBundle()  // -> Add this line
 
 
