@@ -34,7 +34,12 @@ export interface DataAssignPrice {
  * Hàm giả lập để tạo dữ liệu DataAssignPrice.
  * Logic tạo dữ liệu ngẫu nhiên được tách ra để dễ quản lý.
  */
-function generateMockAssignPriceData(item: any, prNo?: string): DataAssignPrice {
+function generateMockAssignPriceData(
+  item: any,
+  prNo?: string,
+  fromDate?: Date,
+  toDate?: Date,
+): DataAssignPrice {
   const numberOfImages = Math.floor(Math.random() * 10) + 1;
   const imageUrls = Array.from(
     { length: numberOfImages },
@@ -45,6 +50,8 @@ function generateMockAssignPriceData(item: any, prNo?: string): DataAssignPrice 
   if (prNo) {
     content = `${content} - ${prNo}`; // Thêm prNo để có thể test filter
   }
+  const createdAt = fromDate ? fromDate : new Date();
+  const estimateDate = toDate ? toDate : new Date();
 
   const mockDepartments = [
     { id: 'dep1', name: 'Phòng Kế toán' },
@@ -75,8 +82,8 @@ function generateMockAssignPriceData(item: any, prNo?: string): DataAssignPrice 
     },
     department: randomDepartment,
     requester: randomRequester,
-    createdAt: '2024-06-25', // Giả định ngày tạo cố định
-    estimateDate: '2024-06-30', // Giả định ngày ước tính cố định
+    createdAt: createdAt, // Giả định ngày tạo cố định
+    estimateDate: estimateDate, // Giả định ngày ước tính cố định
   };
 }
 
@@ -126,7 +133,7 @@ export const fetchAssignPriceData = async (
     const { data } = await axios.get(apiUrl, { params: requestParams });
 
     let processedData: DataAssignPrice[] = data.map((item: any) =>
-      generateMockAssignPriceData(item, filters.prNo),
+      generateMockAssignPriceData(item, filters.prNo, filters.fromDate, filters.toDate),
     );
 
     return processedData;

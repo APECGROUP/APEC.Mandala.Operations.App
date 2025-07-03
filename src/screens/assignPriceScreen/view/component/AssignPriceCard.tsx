@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
 import { DataAssignPrice } from '../../modal/AssignPriceModal';
+import moment from 'moment';
 
 interface AssignPriceCardProps {
   item: DataAssignPrice;
@@ -46,7 +47,10 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item, index }) => {
             <IconInfomation style={{ marginHorizontal: s(6) }} />
           </AppBlockButton>
         </View>
-        <AppText style={styles.dateText}>{item.time}</AppText>
+        <AppText style={styles.dateText}>
+          {moment(item.createdAt).format('DD/MM/YYYY')} -{' '}
+          {moment(item.estimateDate).format('DD/MM/YYYY')}
+        </AppText>
         {shouldShowWaiting && (
           <View style={styles.blockWaiting}>
             <AppText size={12} color={'#FF7009'} weight="500">

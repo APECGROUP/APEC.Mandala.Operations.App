@@ -471,8 +471,8 @@ const styles = StyleSheet.create({
   scrollButtonBase: {
     position: 'absolute',
     alignSelf: 'center',
-    width: vs(48), // Kích thước nút
-    height: vs(48),
+    width: vs(33), // Kích thước nút
+    height: vs(33),
     borderRadius: vs(24), // Hình tròn
     backgroundColor: light.white, // Màu nền
     justifyContent: 'center',
