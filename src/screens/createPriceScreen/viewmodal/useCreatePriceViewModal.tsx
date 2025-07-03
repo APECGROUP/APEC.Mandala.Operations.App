@@ -5,7 +5,7 @@ import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-
 import {
   TypeCreatePrice,
   fetchCreatePrice,
-  CreatePriceFilters,
+  CreatePriceFilters, // Bạn cần đảm bảo TypeCreatePrice và CreatePriceFilters được cập nhật để sử dụng 'prNo'
   clearCreatePriceCache,
 } from '../modal/CreatePriceModal';
 import debounce from 'lodash/debounce';
@@ -13,57 +13,54 @@ import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 50;
-const DEBOUNCE_DELAY = 300;
+const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
 
-export function useCreatePriceViewModel() {
+// Giả định bạn đã cập nhật CreatePriceFilters trong CreatePriceModal.ts như sau:
+// export interface CreatePriceFilters {
+//   prNo?: string; // Đổi từ searchKey sang prNo
+//   fromDate?: Date;
+//   toDate?: Date;
+//   department?: { id: string; name: string };
+//   requester?: { id: string; name: string };
+// }
+
+export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {}) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  // State giữ giá trị filter hiện tại (đã được áp dụng cho query)
-  const [appliedFilters, setAppliedFilters] = useState<CreatePriceFilters>({});
-  // State giữ giá trị input tìm kiếm trên UI (chưa debounce)
-  const [currentSearchInput, setCurrentSearchInput] = useState<string>('');
+  const [effectiveFilters, setEffectiveFilters] = useState<CreatePriceFilters>(initialFilters);
+  const [currentUiFilters, setCurrentUiFilters] = useState<CreatePriceFilters>(initialFilters);
 
-  // Ref cho hàm debounce để có thể cancel
-  const debouncedSetSearchKeyRef = useRef<ReturnType<
-    typeof debounce<(_val: string) => void>
+  const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
+    typeof debounce<typeof setEffectiveFilters>
   > | null>(null);
 
-  // Khởi tạo debounce và gán vào ref
   useEffect(() => {
-    if (!debouncedSetSearchKeyRef.current) {
-      debouncedSetSearchKeyRef.current = debounce((val: string) => {
-        // Cập nhật searchKey trong appliedFilters, và reset page về 1
-        setAppliedFilters(prev => ({ ...prev, searchKey: val }));
-      }, DEBOUNCE_DELAY);
+    if (!debouncedSetEffectiveFiltersRef.current) {
+      debouncedSetEffectiveFiltersRef.current = debounce(setEffectiveFilters, DEBOUNCE_DELAY);
     }
-    // Cleanup function để hủy debounce khi component unmount
     return () => {
-      debouncedSetSearchKeyRef.current?.cancel();
+      debouncedSetEffectiveFiltersRef.current?.cancel();
     };
-  }, []); // [] đảm bảo debounce chỉ được tạo một lần
-
-  // Hàm xử lý thay đổi text trong ô tìm kiếm
-  const onSearch = useCallback((val: string) => {
-    setCurrentSearchInput(val); // Cập nhật giá trị hiển thị ngay lập tức
-    debouncedSetSearchKeyRef.current?.(val); // Kích hoạt debounce để cập nhật filter thực tế
   }, []);
 
-  // Lắng nghe `appliedFilters` để đảm bảo queryKey thay đổi khi filter được áp dụng
-  // `queryKey` phải là một mảng ổn định, thay đổi khi và chỉ khi các giá trị lọc thay đổi
+  useEffect(() => {
+    debouncedSetEffectiveFiltersRef.current?.(currentUiFilters);
+  }, [currentUiFilters]);
+
+  // queryKey giờ sẽ dùng effectiveFilters.prNo
   const queryKey = useMemo(
     () => [
       'listCreatePrice',
-      appliedFilters.searchKey?.trim() || '',
-      appliedFilters.fromDate?.toISOString() || '',
-      appliedFilters.toDate?.toISOString() || '',
-      appliedFilters.department?.id || '',
-      appliedFilters.requester?.id || '',
+      effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
+      effectiveFilters.fromDate?.toISOString() || '',
+      effectiveFilters.toDate?.toISOString() || '',
+      effectiveFilters.department?.id || '',
+      effectiveFilters.requester?.id || '',
     ],
-    [appliedFilters], // Dependency là appliedFilters để re-memoize khi filter thay đổi
+    [effectiveFilters],
   );
 
-  // Infinite Query cho phân trang + search + filter
   const {
     data,
     isLoading,
@@ -74,63 +71,56 @@ export function useCreatePriceViewModel() {
     hasNextPage,
     isRefetching,
     isError,
+    error,
   } = useInfiniteQuery<TypeCreatePrice[], Error>({
-    queryKey: queryKey, // Sử dụng queryKey đã memoize
-    queryFn: async ({ pageParam = 1 }) => {
-      // Mặc định pageParam là 1 nếu undefined
-      // fetchCreatePrice sẽ nhận trực tiếp appliedFilters
-      return fetchCreatePrice(pageParam as number, ITEMS_PER_PAGE, appliedFilters);
-    },
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: queryKey,
+    queryFn: async ({ pageParam = 1 }) =>
+      fetchCreatePrice(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
-    staleTime: 60 * 1000, // Dữ liệu sẽ được coi là stale sau 1 phút
-    refetchOnWindowFocus: false, // Không tự động refetch khi focus lại cửa sổ
-    refetchOnMount: false, // Không tự động refetch khi component mount lần đầu
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
-  // Gộp data các page lại thành 1 mảng
   const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
 
-  // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
     console.log('onRefresh called from ViewModel. Forcing refetch.');
-    // Luôn gọi clear cache thủ công của bạn trước khi refetch
-    // Điều này đảm bảo API sẽ được gọi lại ngay cả khi TanStack Query cho rằng dữ liệu vẫn còn fresh
     clearCreatePriceCache();
-    // refetch() sẽ kích hoạt lại queryFn, và queryFn sẽ gọi API nếu cache thủ công trống
     refetch();
-  }, [refetch]); // Chỉ phụ thuộc vào refetch từ useInfiniteQuery
+  }, [refetch]);
 
-  // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
     console.log('onLoadMore called.');
-    // Bug fix: chỉ fetchNextPage nếu hasNextPage là true và không đang fetching
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Nhận filter object từ FilterScreen
+  // onSearch bây giờ cập nhật prNo
+  const onSearch = useCallback((val: string) => {
+    setCurrentUiFilters(prev => ({ ...prev, prNo: val })); // Thay searchKey bằng prNo
+  }, []);
+
   const applyFilters = useCallback((newFilter: CreatePriceFilters) => {
-    console.log('Applying filters:', newFilter);
-    // Hủy debounce search trước khi áp dụng bộ lọc mới để tránh xung đột
-    debouncedSetSearchKeyRef.current?.cancel();
-    setCurrentSearchInput(newFilter.searchKey || ''); // Cập nhật input search
-    setAppliedFilters(newFilter); // Áp dụng bộ lọc mới, điều này sẽ kích hoạt refetch
+    debouncedSetEffectiveFiltersRef.current?.cancel();
+    setCurrentUiFilters(newFilter);
+    setEffectiveFilters(newFilter);
   }, []);
 
   const { showAlert } = useAlert();
   const onDelete = useCallback(
     async (id: string, onSuccess?: (deletedId: string) => void) => {
-      // Bug fix: queryKey cho getQueryData phải giống hệt queryKey trong useInfiniteQuery
       const currentQueryKey = [
         'listCreatePrice',
-        appliedFilters.searchKey?.trim() || '',
-        appliedFilters.fromDate?.toISOString() || '',
-        appliedFilters.toDate?.toISOString() || '',
-        appliedFilters.department?.id || '',
-        appliedFilters.requester?.id || '',
+        effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
+        effectiveFilters.fromDate?.toISOString() || '',
+        effectiveFilters.toDate?.toISOString() || '',
+        effectiveFilters.department?.id || '',
+        effectiveFilters.requester?.id || '',
       ];
 
       const cached = queryClient.getQueryData<InfiniteData<TypeCreatePrice[]>>(currentQueryKey);
@@ -141,10 +131,8 @@ export function useCreatePriceViewModel() {
 
       try {
         if (Number(id) % 5 !== 0) {
-          // Giả lập thành công cho các id không chia hết cho 5
           console.log('✅ Deleting item successfully...');
           queryClient.setQueryData(currentQueryKey, {
-            // Sử dụng currentQueryKey đã khớp
             ...cached,
             pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
           });
@@ -152,7 +140,6 @@ export function useCreatePriceViewModel() {
           onSuccess?.(id);
           return true;
         } else {
-          // Simulate failed delete for ids divisible by 5
           await new Promise(resolve => setTimeout(() => resolve(undefined), 500));
           showAlert(t('createPrice.warningRemove'), '', [
             {
@@ -162,12 +149,12 @@ export function useCreatePriceViewModel() {
           ]);
           return false;
         }
-      } catch (error) {
-        console.error('Error deleting item:', error);
+      } catch (err) {
+        console.error('Error deleting item:', err);
         return false;
       }
     },
-    [queryClient, appliedFilters, showAlert, t], // Thêm appliedFilters vào dependencies
+    [queryClient, effectiveFilters, showAlert, t],
   );
 
   const handleDelete = useCallback(
@@ -201,11 +188,12 @@ export function useCreatePriceViewModel() {
     hasNextPage: !!hasNextPage,
     onRefresh,
     onLoadMore,
-    onSearch, // Hàm onSearch để cập nhật input và debounce
+    onSearch,
     applyFilters,
     handleDelete,
-    currentPrNoInput: currentSearchInput, // Giá trị input trên UI
-    currentFilters: appliedFilters, // Filter hiện tại đã được áp dụng
+    currentPrNoInput: currentUiFilters.prNo || '', // Thay searchKey bằng prNo
+    currentFilters: currentUiFilters,
     isError,
+    error,
   };
 }

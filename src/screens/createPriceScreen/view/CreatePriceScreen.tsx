@@ -56,7 +56,6 @@ const CreatePriceScreen: React.FC = () => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const { showToast } = useAlert();
   const route = useRoute() as any;
-
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
     flatData,
@@ -250,13 +249,13 @@ const CreatePriceScreen: React.FC = () => {
   // Bug fix: Ban đầu `isFirstLoad` là true và `isLoading` cũng true, `FallbackComponent` sẽ hiển thị
   // Sau khi load lần đầu xong, `isLoading` thành false, `isFirstLoad` vẫn true,
   // nên cần cập nhật `isFirstLoad` sau khi load thành công.
-  useEffect(() => {
-    if (isFirstLoad && !isLoading && flatData.length > 0) {
-      setIsFirstLoad(false);
-    }
-  }, [isFirstLoad, isLoading, flatData.length]);
+  // useEffect(() => {
+  //   if (isFirstLoad && !isLoading && flatData.length > 0) {
+  //     setIsFirstLoad(false);
+  //   }
+  // }, [isFirstLoad, isLoading, flatData.length]);
 
-  if (isError || (isFirstLoad && isLoading)) {
+  if (isError || (isFirstLoad && !isLoading)) {
     // Bug fix: Nếu là lần đầu load VÀ đang loading thì hiện Fallback
     return <FallbackComponent resetError={reLoadData} />;
   }
@@ -300,13 +299,13 @@ const CreatePriceScreen: React.FC = () => {
         <View style={styles.searchContainer}>
           <IconSearch width={vs(18)} />
           <TextInput
-            value={currentPrNoInput} // Sửa: Sử dụng currentPrNoInput để giữ giá trị trong input
-            onChangeText={onSearch} // Sửa: Gọi onSearch từ ViewModel
+            value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
+            onChangeText={onSearch} // Gọi hàm debounce từ ViewModel
             placeholder={t('assignPrice.searchPlaceholder')}
             placeholderTextColor={light.placeholderTextColor}
             style={styles.searchInput}
-            returnKeyType="search"
-            onSubmitEditing={() => onSearch(currentPrNoInput)} // Sửa: Đảm bảo khi bấm search thì filter được áp dụng
+            // returnKeyType="search"
+            // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
           />
           <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
             <IconFilter />

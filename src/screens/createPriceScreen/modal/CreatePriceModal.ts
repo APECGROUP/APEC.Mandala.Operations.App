@@ -1,12 +1,12 @@
 // views/modal/CreatePriceModal.ts
 
 import axios from 'axios';
-import moment from 'moment'; // Đảm bảo moment được import nếu bạn dùng nó cho Date objects
+// Đảm bảo moment được import nếu bạn dùng nó cho Date objects
 
 export interface TypeCreatePrice {
   id: string;
   name: string;
-  price: string;
+  price: string | number;
   expanded?: boolean;
   time?: string;
   vat?: string;
@@ -14,6 +14,8 @@ export interface TypeCreatePrice {
   end?: string;
   createdAt?: string; // Giả sử là ISO string hoặc Date object
   estimateDate?: string; // Giả sử là ISO string hoặc Date object
+  department?: SelectedOption;
+  requester?: SelectedOption;
 }
 
 export interface SelectedOption {
@@ -22,7 +24,7 @@ export interface SelectedOption {
 }
 
 export interface CreatePriceFilters {
-  searchKey?: string; // Tên cũ là prNo
+  prNo?: string; // Tên cũ là prNo
   fromDate?: Date;
   toDate?: Date;
   department?: SelectedOption;
@@ -37,13 +39,8 @@ const cache = new Map<string, TypeCreatePrice[]>();
  * Logic tạo dữ liệu ngẫu nhiên được tách ra để dễ quản lý.
  */
 function generateMockCreatePriceData(item: any, filters: CreatePriceFilters): TypeCreatePrice {
-  const numberOfImages = Math.floor(Math.random() * 10) + 1;
   // Lưu ý: Picsum Photos không hỗ trợ lọc, nên bạn vẫn sẽ nhận ảnh ngẫu nhiên.
   // Đây là phần bạn sẽ thay thế bằng logic mapping từ API thật.
-  const imageUrls = Array.from(
-    { length: numberOfImages },
-    (_, i) => `https://picsum.photos/id/${item.id + i}/300/300`,
-  );
 
   let contentName = [
     'Táo đỏ phơi khô',
@@ -56,8 +53,8 @@ function generateMockCreatePriceData(item: any, filters: CreatePriceFilters): Ty
 
   // Nếu có searchKey, giả lập rằng tên sản phẩm được lọc theo searchKey
   // (mặc dù API picsum không thực sự lọc)
-  if (filters.searchKey && !contentName.toLowerCase().includes(filters.searchKey.toLowerCase())) {
-    contentName = `${filters.searchKey} - ${contentName}`; // Đảm bảo searchKey xuất hiện trong tên
+  if (filters.prNo && !contentName.toLowerCase().includes(filters.prNo.toLowerCase())) {
+    contentName = `${filters.prNo} - ${contentName}`; // Đảm bảo searchKey xuất hiện trong tên
   }
 
   // Giả lập dữ liệu phòng ban và người yêu cầu
@@ -114,8 +111,8 @@ function generateMockCreatePriceData(item: any, filters: CreatePriceFilters): Ty
  * (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
  */
 function getCacheKey(page: number, limit: number, filters: CreatePriceFilters): string {
-  const { searchKey, fromDate, toDate, department, requester } = filters;
-  return `${page}_${limit}_${searchKey || ''}_${fromDate?.toISOString() || ''}_${
+  const { prNo, fromDate, toDate, department, requester } = filters;
+  return `${page}_${limit}_${prNo || ''}_${fromDate?.toISOString() || ''}_${
     toDate?.toISOString() || ''
   }_${department?.id || ''}_${requester?.id || ''}`;
 }
@@ -168,8 +165,8 @@ export const fetchCreatePrice = async (
     // Ví dụ: requestParams.productName = filters.searchKey;
     // Ví dụ: requestParams.startDate = filters.fromDate.toISOString();
 
-    if (filters.searchKey) {
-      requestParams.searchKey = filters.searchKey; // Đảm bảo tên param khớp với backend của bạn
+    if (filters.prNo) {
+      requestParams.prNo = filters.prNo; // Đảm bảo tên param khớp với backend của bạn
     }
     if (filters.fromDate) {
       requestParams.fromDate = filters.fromDate.toISOString();
@@ -183,14 +180,6 @@ export const fetchCreatePrice = async (
     if (filters.requester?.id) {
       requestParams.requesterId = filters.requester.id;
     }
-
-    console.log(
-      '--- fetchCreatePrice: Making ACTUAL API call to:',
-      apiUrl,
-      'with params:',
-      requestParams,
-      '---',
-    );
 
     // Thực hiện cuộc gọi API bằng Axios
     const { data } = await axios.get(apiUrl, { params: requestParams });
@@ -210,7 +199,7 @@ export const fetchCreatePrice = async (
     // Giới hạn kích thước cache để tránh memory leak (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
     if (cache.size > 100) {
       const firstKey = cache.keys().next().value;
-      cache.delete(firstKey);
+      cache.delete(firstKey || '');
     }
     console.log('--- fetchCreatePrice: API call finished for filters:', filters, '---');
 
@@ -224,13 +213,14 @@ export const fetchCreatePrice = async (
 export const deleteCreatePrice = async (id: string) => {
   try {
     // Luôn trả về true để demo UI update, trong thực tế sẽ gọi API delete
-    return true;
+    return id;
     // const response = await axios.delete(`/create-price/${id}`);
     // if (response.status === 200) {
     //   return true;
     // } else {
     //   return false;
     // }
+     
   } catch (error) {
     console.error('Error deleting item on backend:', error);
     return false;

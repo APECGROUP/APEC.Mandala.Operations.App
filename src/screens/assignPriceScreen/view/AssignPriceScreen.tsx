@@ -79,7 +79,7 @@ const AssignPriceScreen: React.FC = () => {
   const opacityScrollBottomStyle = useAnimatedStyle(() => ({
     opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
   }));
-
+  console.log('assignPrice', currentPrNoInput);
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
