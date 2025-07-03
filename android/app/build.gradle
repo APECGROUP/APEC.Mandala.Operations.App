@@ -78,13 +78,13 @@ android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
-    namespace "com.fourier.mandala.operations"
+    namespace "vn.com.apec.mandala.operations"
     defaultConfig {
-        applicationId "com.fourier.mandala.operations"
+        applicationId "vn.com.apec.mandala.operations"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0.1"
     }
     // splits {
     //     abi {

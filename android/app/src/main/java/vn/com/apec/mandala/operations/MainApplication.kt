@@ -1,4 +1,4 @@
-package com.fourier.mandala.operations
+package vn.com.apec.mandala.operations
 
 import android.app.Application
 import com.facebook.react.PackageList
