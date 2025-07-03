@@ -52,11 +52,11 @@ export const fetchPickItemData = async (
     dateTo: '30/05/2025',
     name:
       [
-        'Táo đỏ khô',
-        'Thịt gà đông tảo',
-        'Thịt chó đông lạnh',
-        'Thịt lợn đông đá',
-        'Thịt chuột đông anh',
+        'Táo đỏ phơi khô',
+        'Thịt gà Đông Tảo',
+        'Thịt cừu Mỹ',
+        'Thịt lợn Bắc Ninh',
+        'Thịt châu Đông Anh',
         'Thịt bò Mỹ Đình',
       ][Math.floor(Math.random() * 6)] +
       ' ' +

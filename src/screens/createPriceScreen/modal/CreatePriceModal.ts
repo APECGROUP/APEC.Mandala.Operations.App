@@ -54,11 +54,11 @@ export const fetchCreatePrice = async (
     const result = data.map((item: any) => ({
       id: item.id,
       name: [
-        'Táo đỏ khô',
-        'Thịt gà đông tảo',
-        'Thịt chó đông lạnh',
-        'Thịt lợn đông đá',
-        'Thịt chuột đông anh',
+        'Táo đỏ phơi khô',
+        'Thịt gà Đông Tảo',
+        'Thịt cừu Mỹ',
+        'Thịt lợn Bắc Ninh',
+        'Thịt châu Đông Anh',
         'Thịt bò Mỹ Đình',
       ][Math.floor(Math.random() * 6)],
       price: Math.floor(Math.random() * 100 + 1) * 1000,

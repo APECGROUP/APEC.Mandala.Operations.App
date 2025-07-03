@@ -15,10 +15,18 @@ import IconCalendar from '@assets/icon/IconCalendar';
 import { vs } from 'react-native-size-matters';
 import Footer from './component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import AppBlockButton from '@/elements/button/AppBlockButton';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+
+type FilterScreenParams = {
+  onApplyFilters?: (filters: any) => void;
+};
 
 const FilterScreen = () => {
   //  const { listDepartment, listRequester } = useFilterViewModel();
   const { t } = useTranslation();
+  const navigation = useNavigation();
+  const route = useRoute() as RouteProp<Record<string, FilterScreenParams>, string>;
 
   const [prNo, setPrNo] = useState('');
   const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
@@ -63,6 +71,19 @@ const FilterScreen = () => {
     });
   };
 
+  const onConfirm = React.useCallback(() => {
+    if (typeof route.params?.onApplyFilters === 'function') {
+      route.params.onApplyFilters({
+        prNo,
+        fromDate,
+        toDate,
+        department,
+        requester,
+      });
+    }
+    navigation.goBack();
+  }, [prNo, fromDate, toDate, department, requester, navigation, route.params]);
+
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
@@ -80,60 +101,64 @@ const FilterScreen = () => {
             onChangeText={setPrNo}
             inputStyle={styles.input}
           />
-          <AppTextInput
-            onPress={onPressFromDate}
-            editable={false}
-            refName={refFromDate}
-            required
-            labelStyle={styles.label}
-            label={t('filter.fromDate')}
-            placeholder={t('filter.fromDate')}
-            placeholderTextColor={light.placeholderTextColor}
-            value={fromDate ? moment(fromDate).format('DD/MM/YYYY') : ''}
-            inputStyle={styles.input}
-            rightIcon={<IconCalendar fill={'#BABABA'} />}
-          />
-          <AppTextInput
-            onPress={onPressToDate}
-            editable={false}
-            refName={refToDate}
-            required
-            labelStyle={styles.label}
-            label={t('filter.toDate')}
-            placeholder={t('filter.toDate')}
-            placeholderTextColor={light.placeholderTextColor}
-            value={toDate ? moment(toDate).format('DD/MM/YYYY') : ''}
-            inputStyle={styles.input}
-            rightIcon={<IconCalendar fill={'#BABABA'} />}
-          />
-          <AppTextInput
-            onPress={onPressDepartment}
-            editable={false}
-            refName={refToDate}
-            required
-            labelStyle={styles.label}
-            label={t('filter.department')}
-            placeholder={t('filter.department')}
-            placeholderTextColor={light.placeholderTextColor}
-            value={department?.name}
-            inputStyle={styles.input}
-            rightIcon={<IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />}
-          />
-          <AppTextInput
-            onPress={onPressRequester}
-            editable={false}
-            refName={refToDate}
-            required
-            labelStyle={styles.label}
-            label={t('filter.requester')}
-            placeholder={t('filter.requester')}
-            placeholderTextColor={light.placeholderTextColor}
-            value={requester?.name}
-            inputStyle={styles.input}
-            rightIcon={<IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />}
-          />
+          <AppBlockButton onPress={onPressFromDate}>
+            <AppTextInput
+              editable={false}
+              refName={refFromDate}
+              required
+              labelStyle={styles.label}
+              label={t('filter.fromDate')}
+              placeholder={t('filter.fromDate')}
+              placeholderTextColor={light.placeholderTextColor}
+              value={fromDate ? moment(fromDate).format('DD/MM/YYYY') : ''}
+              inputStyle={styles.input}
+              rightIcon={<IconCalendar fill={'#BABABA'} />}
+            />
+          </AppBlockButton>
+          <AppBlockButton onPress={onPressToDate}>
+            <AppTextInput
+              editable={false}
+              refName={refToDate}
+              required
+              labelStyle={styles.label}
+              label={t('filter.toDate')}
+              placeholder={t('filter.toDate')}
+              placeholderTextColor={light.placeholderTextColor}
+              value={toDate ? moment(toDate).format('DD/MM/YYYY') : ''}
+              inputStyle={styles.input}
+              rightIcon={<IconCalendar fill={'#BABABA'} />}
+            />
+          </AppBlockButton>
+          <AppBlockButton onPress={onPressDepartment}>
+            <AppTextInput
+              editable={false}
+              refName={refToDate}
+              required
+              labelStyle={styles.label}
+              label={t('filter.department')}
+              placeholder={t('filter.department')}
+              placeholderTextColor={light.placeholderTextColor}
+              value={department?.name}
+              inputStyle={styles.input}
+              rightIcon={<IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />}
+            />
+          </AppBlockButton>
+          <AppBlockButton onPress={onPressRequester}>
+            <AppTextInput
+              editable={false}
+              refName={refToDate}
+              required
+              labelStyle={styles.label}
+              label={t('filter.requester')}
+              placeholder={t('filter.requester')}
+              placeholderTextColor={light.placeholderTextColor}
+              value={requester?.name}
+              inputStyle={styles.input}
+              rightIcon={<IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />}
+            />
+          </AppBlockButton>
         </View>
-        <Footer />
+        <Footer onRightAction={onConfirm} />
       </AppBlock>
     </ViewContainer>
   );

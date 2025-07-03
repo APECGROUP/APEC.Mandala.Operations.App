@@ -6,11 +6,19 @@ import debounce from 'lodash/debounce';
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;
 
-export function useAssignPriceViewModel() {
-  const [searchKey, setSearchKey] = useState<string>('');
-  const debouncedSearchRef = useRef<ReturnType<typeof debounce> | null>(null);
+export function useAssignPriceViewModel(filters) {
+  const queryKey = useMemo(
+    () => [
+      'listAssignPrice',
+      filters?.prNo || '',
+      filters?.fromDate ? filters.fromDate.toISOString() : '',
+      filters?.toDate ? filters.toDate.toISOString() : '',
+      filters?.department?.id || '',
+      filters?.requester?.id || '',
+    ],
+    [filters?.prNo, filters?.fromDate, filters?.toDate, filters?.department, filters?.requester],
+  );
 
-  // Infinite Query cho phân trang + search
   const {
     data,
     isLoading,
@@ -21,55 +29,27 @@ export function useAssignPriceViewModel() {
     hasNextPage,
     isRefetching,
     isError,
-  } = useInfiniteQuery<DataAssignPrice[], Error>({
-    queryKey: ['listAssignPrice', searchKey.trim()],
-    queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
-      const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchAssignPriceData(page, ITEMS_PER_PAGE, searchKey.trim());
+  } = useInfiniteQuery(
+    queryKey,
+    async ({ pageParam = 1 }) => {
+      return fetchAssignPriceData(
+        pageParam,
+        50,
+        filters?.prNo,
+        filters?.fromDate,
+        filters?.toDate,
+        filters?.department,
+        filters?.requester,
+      );
     },
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
-    initialPageParam: 1,
-    staleTime: 60 * 1000,
-  });
-
-  // Gộp data các page lại thành 1 mảng
-  const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
-
-  // Debounce search - chỉ tạo một lần
-  const debouncedSearch = useMemo(() => {
-    if (!debouncedSearchRef.current) {
-      debouncedSearchRef.current = debounce((key: string) => {
-        setSearchKey(key);
-      }, DEBOUNCE_DELAY);
-    }
-    return debouncedSearchRef.current;
-  }, []);
-
-  // Refresh (kéo xuống)
-  const onRefresh = useCallback(() => {
-    console.log('onRefresh');
-    if (isFetching || isRefetching || isLoading) {
-      return;
-    }
-    refetch();
-  }, [isFetching, isLoading, isRefetching, refetch]);
-
-  // Load more (cuộn cuối danh sách)
-  const onLoadMore = useCallback(() => {
-    console.log('loadMore');
-    if (hasNextPage && !isFetchingNextPage && !isLoading) {
-      fetchNextPage();
-    }
-  }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
-
-  // Search
-  const onSearch = useCallback(
-    (key: string) => {
-      debouncedSearch(key);
+    {
+      getNextPageParam: (lastPage, allPages) =>
+        lastPage.length === 50 ? allPages.length + 1 : undefined,
+      staleTime: 60 * 1000,
     },
-    [debouncedSearch],
   );
+
+  const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
 
   return {
     flatData,
@@ -78,10 +58,8 @@ export function useAssignPriceViewModel() {
     isRefetching,
     isFetchingNextPage,
     hasNextPage: !!hasNextPage,
-    onRefresh,
-    onLoadMore,
-    onSearch,
-    searchKey,
+    refetch,
+    fetchNextPage,
     isError,
   };
 }

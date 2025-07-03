@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import { getFontSize, SCREEN_WIDTH } from '../../../constants';
 // import {AppText} from '../../elements/text/AppText';
@@ -47,9 +48,25 @@ const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-
   const refToast = useRef<any>(null);
   console.log('AssignPriceScreen');
+  const navigation = useNavigation();
+  const [filters, setFilters] = useState({
+    prNo: '',
+    fromDate: undefined,
+    toDate: undefined,
+    department: undefined,
+    requester: undefined,
+  });
+
+  // Callback nhận filter từ FilterScreen
+  const onApplyFilters = useCallback(newFilters => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  }, []);
+
+  // Truyền filters vào viewmodel
+  const viewModel = useAssignPriceViewModel(filters);
+
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
     flatData,
@@ -61,7 +78,7 @@ const AssignPriceScreen: React.FC = () => {
     onSearch,
     searchKey,
     isError,
-  } = useAssignPriceViewModel();
+  } = viewModel;
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
   const flashListRef = useRef<FlashList<DataAssignPrice> | null>(null);
@@ -122,8 +139,8 @@ const AssignPriceScreen: React.FC = () => {
 
   // ─── Khi bấm "Tìm kiếm" (submit) hoặc nút "Filter" ───────────────────────
   const handleSubmitSearch = useCallback(() => {
-    navigate('FilterScreen');
-  }, []);
+    navigation.navigate('FilterScreen', { onApplyFilters });
+  }, [navigation, onApplyFilters]);
 
   const listEmptyComponent = useMemo(() => {
     if (isLoading) {
@@ -253,7 +270,7 @@ const AssignPriceScreen: React.FC = () => {
             ref={flashListRef}
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => `${item.id}_${item.content}`}
             onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}

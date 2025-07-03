@@ -37,9 +37,13 @@ function getCacheKey(page: number, limit: number, key: string): string {
 export const fetchAssignPriceData = async (
   page: number,
   limit: number = 50,
-  key: string = '',
+  prNo?: string,
+  fromDate?: Date,
+  toDate?: Date,
+  department?: { id: string },
+  requester?: { id: string },
 ): Promise<DataAssignPrice[]> => {
-  const cacheKey = getCacheKey(page, limit, key);
+  const cacheKey = getCacheKey(page, limit, prNo || '');
 
   // Kiểm tra cache trước
   if (cache.has(cacheKey)) {
@@ -50,7 +54,7 @@ export const fetchAssignPriceData = async (
     // Giả lập delay 3 giây
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    const url = buildAssignPriceUrl(page, limit, key);
+    const url = buildAssignPriceUrl(page, limit, prNo);
     const { data } = await axios.get(url);
 
     const allImageIds: string[] = data.map((item: any) => item.id);

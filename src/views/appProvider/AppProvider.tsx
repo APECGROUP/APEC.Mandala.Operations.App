@@ -63,9 +63,9 @@ export default function AppProvider(props: Props) {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <AlertProvider>
-        <NavigationContainer onStateChange={handleNavigationChange} ref={navigationRef}>
+    <NavigationContainer onStateChange={handleNavigationChange} ref={navigationRef}>
+      <SafeAreaProvider>
+        <AlertProvider>
           <GestureHandlerRootView style={styles.flex1}>
             <PaperProvider>
               <QueryClientProvider client={queryClient}>
@@ -75,9 +75,9 @@ export default function AppProvider(props: Props) {
               <Toast config={toastConfig} />
             </PaperProvider>
           </GestureHandlerRootView>
-        </NavigationContainer>
-      </AlertProvider>
-    </SafeAreaProvider>
+        </AlertProvider>
+      </SafeAreaProvider>
+    </NavigationContainer>
   );
 }
 
