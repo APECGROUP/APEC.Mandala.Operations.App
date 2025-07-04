@@ -206,7 +206,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
         setSelectedIds([]);
       }
       showToast(t('createPrice.approvedSuccess'), 'success');
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
     },
     [queryClient, effectiveFilters, t, showToast],
   );
@@ -234,7 +234,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
         setSelectedIds([]);
       }
       showToast(t('createPrice.rejectSuccess'), 'success');
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
     },
     [queryClient, effectiveFilters, t, showToast],
   );
