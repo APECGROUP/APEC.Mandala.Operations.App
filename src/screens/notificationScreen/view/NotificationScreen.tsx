@@ -10,12 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  FadeInLeft,
-} from 'react-native-reanimated';
+import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { s, vs } from 'react-native-size-matters';
 
@@ -110,17 +105,15 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   // ─── Render mỗi item, với animation FadeInLeft.delay(index * 50) ─────────────────
-  const renderItem = ({ item, index }: { item: ContentNotification; index: number }) => (
-    <Animated.View entering={FadeInLeft.delay(index * 50)}>
-      <ItemNotification
-        item={item}
-        onDetail={() => onDetail(item.id)}
-        toggleRead={() => {
-          // TODO: toggle read status local hoặc gọi API
-        }}
-        handleDelete={() => handleDelete(item.id)}
-      />
-    </Animated.View>
+  const renderItem = ({ item }: { item: ContentNotification }) => (
+    <ItemNotification
+      item={item}
+      onDetail={() => onDetail(item.id)}
+      toggleRead={() => {
+        // TODO: toggle read status local hoặc gọi API
+      }}
+      handleDelete={() => handleDelete(item.id)}
+    />
   );
 
   // ─── Component khi list trống **và** đang không load trang >0 ─────────────

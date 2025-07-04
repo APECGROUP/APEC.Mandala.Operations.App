@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/theme/Config';
 import { PaddingHorizontal } from '@/utils/Constans';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { SlideInDown } from 'react-native-reanimated';
 import Utilities from '../../utils/Utilities';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
@@ -63,7 +62,7 @@ const ModalPhotoOrCamera = ({ navigation, route }: Props) => {
     <ViewContainer>
       <TouchableWithoutFeedback onPress={goBack}>
         <View style={[styles.overlay, { paddingBottom: bottom }]}>
-          <Animated.View entering={SlideInDown.springify().mass(0.5)}>
+          <View>
             <AppBlock background={light.white} style={styles.container}>
               <TouchableOpacity style={styles.option} onPress={() => handlePick(true)}>
                 <AppText size={20} weight="600" color={'#007AFF'}>
@@ -85,7 +84,7 @@ const ModalPhotoOrCamera = ({ navigation, route }: Props) => {
                 {t('account.profile.cancel')}
               </AppText>
             </TouchableOpacity>
-          </Animated.View>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     </ViewContainer>

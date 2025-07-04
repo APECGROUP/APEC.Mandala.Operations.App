@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 import { StyleProp, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 
 import { Colors } from '@/theme/Config';
@@ -139,8 +138,7 @@ const Footer = ({
   }, [onRightAction, showDefaultApprovedAlert]);
 
   return (
-    <Animated.View
-      entering={FadeInDown.delay(200).duration(1000).springify()}
+    <View
       style={[styles.container, { paddingBottom: customBottom ? customBottom : bottom + vs(8) }]}>
       <View style={styles.buttonGroup}>
         {showLeftButton && (
@@ -170,7 +168,7 @@ const Footer = ({
           </View>
         )}
       </View>
-    </Animated.View>
+    </View>
   );
 };
 

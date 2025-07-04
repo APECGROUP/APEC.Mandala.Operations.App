@@ -6,7 +6,6 @@ import { AppText } from '@/elements/text/AppText';
 import IconAutoAssign from '@assets/icon/IconAutoAssign';
 import IconSaveTmp from '@assets/icon/IconSaveTmp';
 import { useTranslation } from 'react-i18next';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { s, vs } from 'react-native-size-matters';
 import { PaddingHorizontal } from '@/utils/Constans';
@@ -78,9 +77,7 @@ const FooterInformationItem = () => {
     showToast(t('Lưu nháp thông tin gắn giá thành công'), TYPE_TOAST.SUCCESS);
   };
   return (
-    <Animated.View
-      entering={FadeInDown.delay(200).duration(1000).springify()}
-      style={[styles.bottomContainer, { paddingBlock: bottom }]}>
+    <View style={[styles.bottomContainer, { paddingBlock: bottom }]}>
       <View style={styles.footerContainer}>
         <AppBlockButton onPress={onAutoAssign} style={styles.footerButton}>
           <IconAutoAssign />
@@ -120,7 +117,7 @@ const FooterInformationItem = () => {
           </AppButton>
         </View>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 

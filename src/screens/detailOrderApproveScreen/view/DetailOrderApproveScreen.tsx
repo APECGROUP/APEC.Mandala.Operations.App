@@ -9,11 +9,10 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import Animated, {
+import {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  FadeInLeft,
 } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
@@ -150,12 +149,7 @@ const DetailOrderApproveScreen = ({
 
   const renderItem = useCallback(
     ({ item, index }: { item: DetailOrderApprove; index: number }) => (
-      <Animated.View
-        entering={FadeInLeft.delay(index * 50)
-          .duration(0)
-          .springify()}>
-        <DetailOrderItemCard item={item} index={index} />
-      </Animated.View>
+      <DetailOrderItemCard item={item} index={index} />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [flatData],

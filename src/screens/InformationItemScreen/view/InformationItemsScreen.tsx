@@ -9,11 +9,10 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import Animated, {
+import {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  FadeInLeft,
 } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
@@ -153,23 +152,18 @@ const InformationItemsScreen = ({
 
   const renderItem = useCallback(
     ({ item, index }: { item: DataInformationItems; index: number }) => (
-      <Animated.View
-        entering={FadeInLeft.delay(index * 10)
-          .duration(0)
-          .springify()}>
-        <InformationItemsCard
-          item={item}
-          index={index}
-          onUpdatePrice={onUpdatePrice}
-          onFocusComment={() => {
-            flashListRef.current?.scrollToIndex({
-              index,
-              animated: true,
-              viewPosition: 0.1, // 0 = top, 0.5 = center, 1 = bottom
-            });
-          }}
-        />
-      </Animated.View>
+      <InformationItemsCard
+        item={item}
+        index={index}
+        onUpdatePrice={onUpdatePrice}
+        onFocusComment={() => {
+          flashListRef.current?.scrollToIndex({
+            index,
+            animated: true,
+            viewPosition: 0.1, // 0 = top, 0.5 = center, 1 = bottom
+          });
+        }}
+      />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [flatData, onUpdatePrice],

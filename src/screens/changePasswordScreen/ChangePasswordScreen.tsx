@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, View, TextInput } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../navigation/params';
 import { useTranslation } from 'react-i18next';
@@ -7,16 +7,15 @@ import { s, vs } from 'react-native-size-matters';
 import { Colors } from '@/theme/Config';
 import { PaddingHorizontal } from '@/utils/Constans';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { AppText } from '@/elements/text/AppText';
 import AppTextInput from '@/elements/textInput/AppTextInput';
 import { AppButton } from '@/elements/button/AppButton';
 import { getFontSize, SCREEN_WIDTH } from '@/constants';
-import IconClose from '@assets/icon/IconClose';
 import { useKeyboard } from '@/hook/keyboardHook';
 import DataLocal from '@/data/DataLocal';
 import { useAutoLogin } from '@/hook/useAutoLogin';
 import Toast from 'react-native-toast-message';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 type Props = NativeStackScreenProps<MainParams, 'ChangePasswordScreen'>;
 
@@ -80,23 +79,19 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <View style={[styles.overlay]}>
-      <Animated.View
-        // entering={SlideInDown.springify().mass(0.5)}
-        entering={FadeInDown.delay(0).duration(0).springify()}
+    <ViewContainer>
+      <View
         style={[
           styles.container,
           { paddingBottom: bottom },
           keyboardVisible && { marginBottom: keyboardHeight },
         ]}>
-        <View style={styles.header}>
-          <AppText size={16} weight="700">
-            {t('account.changePassword.title')}
-          </AppText>
-          <TouchableOpacity style={{ padding: s(20) }} onPress={goBack}>
-            <IconClose />
-          </TouchableOpacity>
-        </View>
+        <AppText ph={16} mb={8} size={20} weight="700">
+          {t('account.changePassword.title')}
+        </AppText>
+        <AppText ph={16} mb={16} size={12} weight="500" color={Colors.TEXT_SECONDARY}>
+          {t('account.changePassword.inputEmail')}
+        </AppText>
         <View style={{ paddingHorizontal: PaddingHorizontal }}>
           <AppTextInput
             refName={refCurrent}
@@ -158,8 +153,8 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
             text={t('account.changePassword.confirm')}
           />
         </View>
-      </Animated.View>
-    </View>
+      </View>
+    </ViewContainer>
   );
 };
 
@@ -172,24 +167,10 @@ const styles = StyleSheet.create({
     fontSize: getFontSize(14),
     fontWeight: '700',
   },
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
   container: {
     backgroundColor: Colors.WHITE,
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
-  },
-  header: {
-    paddingLeft: PaddingHorizontal,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: vs(12),
-    borderBottomColor: Colors.BLACK_100,
-    borderBottomWidth: 0.5,
   },
   input: {
     borderWidth: 0,

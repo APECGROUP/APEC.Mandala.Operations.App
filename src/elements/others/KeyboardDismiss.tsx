@@ -8,17 +8,14 @@ export type KeyboardDismissProps = {
   flex?: boolean;
 };
 
-const KeyboardDismiss: React.FunctionComponent<KeyboardDismissProps> = (
-  props
-) => {
+const KeyboardDismiss: React.FunctionComponent<KeyboardDismissProps> = props => {
   const { keyboardVisible } = useKeyboard();
 
   return (
     <Pressable
       style={props.flex && styles.fill}
       disabled={props.disabled || !keyboardVisible}
-      onPress={Keyboard.dismiss}
-    >
+      onPress={() => Keyboard.dismiss()}>
       {props.children}
     </Pressable>
   );

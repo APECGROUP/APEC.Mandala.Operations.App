@@ -15,7 +15,6 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   useDerivedValue,
-  FadeInLeft,
 } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
@@ -167,17 +166,12 @@ const ApprovePrScreen: React.FC = () => {
     ({ item, index }: { item: TypeApprove; index: number }) => {
       const isSelected = selectedIds.includes(item.id);
       return (
-        <Animated.View
-          entering={FadeInLeft.delay(index * 10)
-            .duration(0)
-            .springify()}>
-          <ApproveCard
-            item={item}
-            index={index}
-            isSelected={isSelected}
-            handleSelect={handleSelect}
-          />
-        </Animated.View>
+        <ApproveCard
+          item={item}
+          index={index}
+          isSelected={isSelected}
+          handleSelect={handleSelect}
+        />
       );
     },
     [handleSelect, selectedIds],

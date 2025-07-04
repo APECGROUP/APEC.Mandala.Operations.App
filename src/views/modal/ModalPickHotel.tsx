@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthParams } from '../../navigation/params';
 import { AppBlock } from '../../elements/block/Block';
@@ -12,7 +12,6 @@ import { PaddingHorizontal } from '../../utils/Constans';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBlockButton from '../../elements/button/AppBlockButton';
 import IconSelectHotel from '../../../assets/icon/IconSelectHotel';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { TYPE_TOAST } from '@/elements/toast/Message';
 type Props = NativeStackScreenProps<AuthParams, 'ModalPickHotel'>;
@@ -76,9 +75,7 @@ const ModalPickHotel = ({ navigation, route }: Props) => {
 
   return (
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
-      <Animated.View
-        entering={FadeInDown.delay(0).duration(0).springify()}
-        style={[styles.container, { paddingBottom: bottom }]}>
+      <View style={[styles.container, { paddingBottom: bottom }]}>
         <AppBlock
           pl={PaddingHorizontal}
           row
@@ -111,7 +108,7 @@ const ModalPickHotel = ({ navigation, route }: Props) => {
             );
           })}
         </ScrollView>
-      </Animated.View>
+      </View>
     </TouchableOpacity>
   );
 };

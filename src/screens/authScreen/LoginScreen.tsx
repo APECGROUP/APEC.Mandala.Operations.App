@@ -33,7 +33,6 @@ export type typeNcc = {
   id: string | undefined;
   name: string | undefined;
 };
-
 // Hàm loại bỏ dấu tiếng Việt
 export const removeVietnameseTones = (str: string) =>
   str

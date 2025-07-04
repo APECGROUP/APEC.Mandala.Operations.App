@@ -3,7 +3,6 @@ import React from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../navigation/params';
 import { useTranslation } from 'react-i18next';
-import Reanimated, { FadeInDown } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { ResponseImageElement } from '../../interface/Verify.interface';
 import { AppText } from '../../elements/text/AppText';
@@ -54,7 +53,6 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
   const onUpdateAvatar = () => {
     navigation.navigate('ModalPhotoOrCamera', { setImageAvatar: onUploadAvatar });
   };
-  const AnimationButton = Reanimated.createAnimatedComponent(TouchableOpacity);
   const data = [
     {
       label: t('account.profile.userName'),
@@ -85,26 +83,17 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
         <StatusBar barStyle={'dark-content'} />
 
         <ScrollView contentContainerStyle={styles.fg1}>
-          <AnimationButton
-            entering={FadeInDown.delay(0).duration(0).springify()}
-            style={styles.avatar}
-            activeOpacity={0.8}
-            onPress={onUpdateAvatar}>
+          <TouchableOpacity style={styles.avatar} activeOpacity={0.8} onPress={onUpdateAvatar}>
             <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
             <IconTakeCamera style={styles.editIcon} />
-          </AnimationButton>
+          </TouchableOpacity>
           <AppText style={styles.textTitle}>{t('account.profile.changePhoto')}</AppText>
 
           {data.map((item, index) => (
-            <Reanimated.View
-              entering={FadeInDown.delay(150 * (index + 1))
-                .duration(0)
-                .springify()}
-              key={index}
-              style={[styles.textRow, index === 0 && styles.borderWidth0]}>
+            <View key={index} style={[styles.textRow, index === 0 && styles.borderWidth0]}>
               <AppText style={styles.textLabel}>{t(item.label)}</AppText>
               <AppText style={styles.textValue}>{String(item.value)}</AppText>
-            </Reanimated.View>
+            </View>
           ))}
         </ScrollView>
       </View>

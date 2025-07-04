@@ -150,6 +150,19 @@ export default function MainNavigator() {
         />
 
         <Screen
+          options={{
+            headerShown: true,
+            headerTitle: '',
+            contentStyle: {
+              paddingHorizontal: 0,
+              backgroundColor: Colors.WHITE,
+            },
+          }}
+          name={'ChangePasswordScreen'}
+          component={ChangePasswordScreen}
+        />
+
+        <Screen
           options={{ headerShown: true, headerTitle: t('account.profile.title') }}
           name="ProfileScreen"
           component={ProfileScreen}
@@ -189,7 +202,6 @@ export default function MainNavigator() {
         <Screen name={'PickDepartmentScreen'} component={PickDepartmentScreen} />
         <Screen name={'PickItemScreen'} component={PickItemScreen} />
         <Screen name={'PickRequesterScreen'} component={PickRequesterScreen} />
-        <Screen name={'ChangePasswordScreen'} component={ChangePasswordScreen} />
       </Group>
     </Navigator>
   );

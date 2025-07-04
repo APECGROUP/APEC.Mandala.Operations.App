@@ -27,6 +27,7 @@
         "pickHotel": "Chọn khách sạn",
         "confirm": "Xác nhận",
         "error": "Tên người dùng hoặc mật khẩu không đúng. Vui lòng kiểm tra lại ",
+        "errorForgotPassword": "Tên người dùng hoạc khách sạn không đúng. Vui lòng kiểm tra lại ",
         "success": "Mật khẩu của bạn đã được gửi ",
         "subSuccess": "Vui lòng check email đã đăng ký",
         "close": "Đóng"
@@ -231,7 +232,8 @@
         "inputConfirmPassword": "Nhập lại mật khẩu mới",
         "changePasswordSuccess": "Đổi mật khẩu thành công",
         "changePasswordFail": "Đổi mật khẩu thất bại",
-        "newPasswordNotMatch": "Mật khẩu mới và xác nhận mật khẩu mới chưa khớp với nhau"
+        "newPasswordNotMatch": "Mật khẩu mới và xác nhận mật khẩu mới chưa khớp với nhau",
+        "inputEmail": "Nhập thông tin email của bạn để đổi mật khẩu"
       },
       "warningLogout": "Bạn có chắc chắn muốn đổi từ đăng xuất tài khoản này?"
     },

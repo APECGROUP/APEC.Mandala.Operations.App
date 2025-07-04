@@ -12,7 +12,6 @@ import { PaddingHorizontal } from '../../../../utils/Constans';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBlockButton from '../../../../elements/button/AppBlockButton';
 import IconSelectHotel from '../../../../../assets/icon/IconSelectHotel';
-import Animated, { FadeInDown, FadeInLeft } from 'react-native-reanimated';
 import { usePickDepartmentViewModel } from '../viewmodal/usePickNCCViewModel';
 import { SCREEN_HEIGHT } from '@/constants';
 import { FlashList } from '@shopify/flash-list';
@@ -75,10 +74,7 @@ const PickDepartmentScreen = ({ navigation, route }: Props) => {
         navigation.goBack();
       };
       return (
-        <Animated.View
-          entering={FadeInLeft.delay(10 * index)
-            .duration(0)
-            .springify()}>
+        <View>
           <AppBlockButton
             key={index}
             onPress={onSelect}
@@ -86,7 +82,7 @@ const PickDepartmentScreen = ({ navigation, route }: Props) => {
             <AppText weight="500">{item.name}</AppText>
             {isFocus && <IconSelectHotel />}
           </AppBlockButton>
-        </Animated.View>
+        </View>
       );
     },
     [navigation, department?.id, setDepartment],
@@ -97,8 +93,7 @@ const PickDepartmentScreen = ({ navigation, route }: Props) => {
   }, [navigation]);
   return (
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
-      <Animated.View
-        entering={FadeInDown.delay(0).duration(0).springify()}
+      <View
         style={[
           styles.container,
           { paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7 },
@@ -150,7 +145,7 @@ const PickDepartmentScreen = ({ navigation, route }: Props) => {
             paddingTop: vs(10),
           }}
         />
-      </Animated.View>
+      </View>
     </TouchableOpacity>
   );
 };

@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import DataLocal from '@/data/DataLocal';
 import { navigate } from '@/navigation/RootNavigation';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import IconAllowNotification from '@assets/icon/IconAllowNotification';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconChangePassword from '@assets/icon/IconChangePassword';
@@ -25,8 +24,6 @@ import { appVersion, useOtaUpdate } from '@/hook/useOtaUpdate';
 import RightItemAccount from './RightItemAccount';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-
-const animatedDelay = (index: number) => FadeInDown.delay(150 * index).springify();
 
 const AccountScreen = () => {
   const { t } = useTranslation();
@@ -78,7 +75,7 @@ const AccountScreen = () => {
       <View style={styles.container}>
         <StatusBar barStyle={'dark-content'} />
         <View>
-          <Animated.View entering={animatedDelay(0)}>
+          <View>
             <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>
               <View style={{ marginTop: vs(20) }}>
                 <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
@@ -98,7 +95,7 @@ const AccountScreen = () => {
                 {infoUser?.userName}
               </AppText>
             </AppBlockButton>
-          </Animated.View>
+          </View>
 
           {[
             {
@@ -144,7 +141,7 @@ const AccountScreen = () => {
               right: <IconArrowRight />,
             },
           ].map((item, index) => (
-            <Animated.View key={item.key} entering={animatedDelay(index + 1)}>
+            <View>
               <AppBlockButton
                 onPress={item.onPress}
                 style={[styles.itemContainer, index === 0 && styles.border0]}>
@@ -160,7 +157,7 @@ const AccountScreen = () => {
                   <View style={styles.row}>{item.right}</View>
                 )}
               </AppBlockButton>
-            </Animated.View>
+            </View>
           ))}
         </View>
         <AppText mb={bottom} size={12} weight="bold" style={styles.center}>

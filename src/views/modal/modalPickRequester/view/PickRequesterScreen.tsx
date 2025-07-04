@@ -12,7 +12,7 @@ import { PaddingHorizontal } from '../../../../utils/Constans';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBlockButton from '../../../../elements/button/AppBlockButton';
 import IconSelectHotel from '../../../../../assets/icon/IconSelectHotel';
-import Animated, { FadeInDown, FadeInLeft } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRequesterViewModel } from '../viewmodal/useRequesterViewModel';
 import { SCREEN_HEIGHT } from '@/constants';
 import { FlashList } from '@shopify/flash-list';
@@ -75,10 +75,7 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
         navigation.goBack();
       };
       return (
-        <Animated.View
-          entering={FadeInLeft.delay(10 * index)
-            .duration(0)
-            .springify()}>
+        <View>
           <AppBlockButton
             key={index}
             onPress={onSelect}
@@ -86,7 +83,7 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
             <AppText weight="500">{item.name}</AppText>
             {isFocus && <IconSelectHotel />}
           </AppBlockButton>
-        </Animated.View>
+        </View>
       );
     },
     [navigation, requester?.id, setRequester],
@@ -98,7 +95,7 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
   return (
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
       <Animated.View
-        entering={FadeInDown.delay(0).duration(0).springify()}
+        entering={FadeInDown.delay(0).duration(0)}
         style={[
           styles.container,
           { paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7 },

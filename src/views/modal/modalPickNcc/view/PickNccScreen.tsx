@@ -12,7 +12,6 @@ import { PaddingHorizontal } from '../../../../utils/Constans';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBlockButton from '../../../../elements/button/AppBlockButton';
 import IconSelectHotel from '../../../../../assets/icon/IconSelectHotel';
-import Animated, { FadeInDown, FadeInLeft } from 'react-native-reanimated';
 import { usePickNCCViewModel } from '../viewmodal/usePickNCCViewModel';
 import { SCREEN_HEIGHT } from '@/constants';
 import { FlashList } from '@shopify/flash-list';
@@ -75,18 +74,13 @@ const PickNccScreen = ({ navigation, route }: Props) => {
         navigation.goBack();
       };
       return (
-        <Animated.View
-          entering={FadeInLeft.delay(10 * index)
-            .duration(0)
-            .springify()}>
-          <AppBlockButton
-            key={index}
-            onPress={onSelect}
-            style={[isFocus ? styles.itemFocus : { padding: vs(10) }]}>
-            <AppText weight="500">{item.name}</AppText>
-            {isFocus && <IconSelectHotel />}
-          </AppBlockButton>
-        </Animated.View>
+        <AppBlockButton
+          key={index}
+          onPress={onSelect}
+          style={[isFocus ? styles.itemFocus : { padding: vs(10) }]}>
+          <AppText weight="500">{item.name}</AppText>
+          {isFocus && <IconSelectHotel />}
+        </AppBlockButton>
       );
     },
     [navigation, ncc?.id, setNcc],
@@ -97,8 +91,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
   }, [navigation]);
   return (
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
-      <Animated.View
-        entering={FadeInDown.delay(0).duration(0).springify()}
+      <View
         style={[
           styles.container,
           { paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7 },
@@ -150,7 +143,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
             paddingTop: vs(10),
           }}
         />
-      </Animated.View>
+      </View>
     </TouchableOpacity>
   );
 };

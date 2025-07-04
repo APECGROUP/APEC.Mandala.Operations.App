@@ -12,8 +12,7 @@ import { goBack } from '@/navigation/RootNavigation';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 import { FlashList } from '@shopify/flash-list';
 import CreateNewItemCard from './CreateNewItemCard';
-import Animated, {
-  FadeInLeft,
+import {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -129,25 +128,20 @@ const CreatePriceNccScreen = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: IPickItem; index: number }) => (
-      <Animated.View
-        entering={FadeInLeft.delay(index * 10)
-          .duration(0)
-          .springify()}>
-        <CreateNewItemCard
-          simultaneousGesture={flashListNativeGesture}
-          handleDelete={handleDelete}
-          item={item}
-          index={index}
-          onUpdateItem={onUpdateItem}
-          onFocusComment={() => {
-            flashListRef.current?.scrollToIndex({
-              index,
-              animated: true,
-              viewPosition: 0.1, // 0 = top, 0.5 = center, 1 = bottom
-            });
-          }}
-        />
-      </Animated.View>
+      <CreateNewItemCard
+        simultaneousGesture={flashListNativeGesture}
+        handleDelete={handleDelete}
+        item={item}
+        index={index}
+        onUpdateItem={onUpdateItem}
+        onFocusComment={() => {
+          flashListRef.current?.scrollToIndex({
+            index,
+            animated: true,
+            viewPosition: 0.1, // 0 = top, 0.5 = center, 1 = bottom
+          });
+        }}
+      />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],

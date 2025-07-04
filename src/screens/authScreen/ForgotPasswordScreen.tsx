@@ -50,7 +50,7 @@ const ForgotPasswordScreen = ({
       ]);
       return;
     }
-    return showToast(t('auth.forgotPassword.error'), TYPE_TOAST.ERROR);
+    return showToast(t('auth.forgotPassword.errorForgotPassword'), TYPE_TOAST.ERROR);
 
     // eslint-disable-next-line no-unreachable
     try {
