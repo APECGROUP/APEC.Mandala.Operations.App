@@ -28,8 +28,11 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
+  const { showToast } = useAlert();
   const [effectiveFilters, setEffectiveFilters] = useState<CreatePriceFilters>(initialFilters);
   const [currentUiFilters, setCurrentUiFilters] = useState<CreatePriceFilters>(initialFilters);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
     typeof debounce<typeof setEffectiveFilters>
@@ -179,7 +182,68 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
     [showAlert, t, onDelete],
   );
 
+  const onApproved = useCallback(
+    async (ids: string[]) => {
+      // Xoá các item có id nằm trong danh sách ids khỏi cache
+      const currentQueryKey = [
+        'listCreatePrice',
+        effectiveFilters.prNo?.trim() || '',
+        effectiveFilters.fromDate?.toISOString() || '',
+        effectiveFilters.toDate?.toISOString() || '',
+        effectiveFilters.department?.id || '',
+        effectiveFilters.requester?.id || '',
+      ];
+      const cached = queryClient.getQueryData(currentQueryKey);
+      if (cached && cached.pages) {
+        // Loại bỏ các item có id nằm trong ids khỏi từng page
+        const newPages = cached.pages.map((page: TypeCreatePrice[]) =>
+          page.filter(item => !ids.includes(item.id)),
+        );
+        queryClient.setQueryData(currentQueryKey, {
+          ...cached,
+          pages: newPages,
+        });
+        setSelectedIds([]);
+      }
+      showToast(t('createPrice.approvedSuccess'), 'success');
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [queryClient, effectiveFilters, t, showToast],
+  );
+  const onReject = useCallback(
+    async (ids: string[]) => {
+      // Xoá các item có id nằm trong danh sách ids khỏi cache
+      const currentQueryKey = [
+        'listCreatePrice',
+        effectiveFilters.prNo?.trim() || '',
+        effectiveFilters.fromDate?.toISOString() || '',
+        effectiveFilters.toDate?.toISOString() || '',
+        effectiveFilters.department?.id || '',
+        effectiveFilters.requester?.id || '',
+      ];
+      const cached = queryClient.getQueryData(currentQueryKey);
+      if (cached && cached.pages) {
+        // Loại bỏ các item có id nằm trong ids khỏi từng page
+        const newPages = cached.pages.map((page: TypeCreatePrice[]) =>
+          page.filter(item => !ids.includes(item.id)),
+        );
+        queryClient.setQueryData(currentQueryKey, {
+          ...cached,
+          pages: newPages,
+        });
+        setSelectedIds([]);
+      }
+      showToast(t('createPrice.rejectSuccess'), 'success');
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [queryClient, effectiveFilters, t, showToast],
+  );
+
   return {
+    onReject,
+    selectedIds,
+    setSelectedIds,
+    onApproved,
     flatData,
     isLoading,
     isFetching,

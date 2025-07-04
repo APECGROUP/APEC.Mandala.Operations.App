@@ -29,8 +29,6 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item, index }) => {
     navigate('DetailAssignPriceCardScreen', { item });
   }, [item]);
 
-  const shouldShowWaiting = useMemo(() => index % 3 === 0, [index]);
-
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={styles.card}>
       <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
@@ -51,13 +49,11 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item, index }) => {
           {moment(item.createdAt).format('DD/MM/YYYY')} -{' '}
           {moment(item.estimateDate).format('DD/MM/YYYY')}
         </AppText>
-        {shouldShowWaiting && (
-          <View style={styles.blockWaiting}>
-            <AppText size={12} color={'#FF7009'} weight="500">
-              {t('notifications.status.waitingAssignPrice')}
-            </AppText>
-          </View>
-        )}
+        <View style={styles.blockWaiting}>
+          <AppText size={12} color={'#FF7009'} weight="500">
+            {t('notifications.status.waitingAssignPrice')}
+          </AppText>
+        </View>
       </View>
     </TouchableOpacity>
   );

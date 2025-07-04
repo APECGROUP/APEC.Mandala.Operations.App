@@ -14,8 +14,9 @@ import { useAlert } from '@/elements/alert/AlertProvider';
 import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
 import { TYPE_TOAST } from '@/elements/toast/Message';
+import { goBack } from '@/navigation/RootNavigation';
 
-const FooterInformationItem = () => {
+const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) => {
   const { t } = useTranslation();
   const [isLoadingReject, setIsLoadingReject] = useState(false);
   const [isLoadingAssign, setIsLoadingAssign] = useState(false);
@@ -26,7 +27,7 @@ const FooterInformationItem = () => {
     await new Promise(resolve => setTimeout(resolve, 300));
     setIsLoadingReject(false);
     showAlert(
-      t('Bạn đã từ chối đơn thành công'),
+      t('informationItem.rejectSuccess'),
       '',
       [
         {
@@ -45,12 +46,14 @@ const FooterInformationItem = () => {
     await new Promise(resolve => setTimeout(resolve, 300));
     setIsLoadingAssign(false);
     showAlert(
-      t('Bạn đã duyệt đơn thành công'),
+      t('informationItem.assignSuccess'),
       '',
       [
         {
           text: t('Trở về'),
-          onPress: () => {},
+          onPress: () => {
+            goBack();
+          },
         },
       ],
       <FastImage
@@ -69,27 +72,28 @@ const FooterInformationItem = () => {
     );
   };
 
-  const onAutoAssign = () => {
-    showToast(t('Tự động gán giá thành công'), TYPE_TOAST.SUCCESS);
+  const onPressAutoAssign = () => {
+    showToast(t('informationItem.autoAssignSuccess'), TYPE_TOAST.SUCCESS);
+    onAutoAssign();
   };
 
   const onSave = () => {
-    showToast(t('Lưu nháp thông tin gắn giá thành công'), TYPE_TOAST.SUCCESS);
+    showToast(t('informationItem.saveDraftSuccess'), TYPE_TOAST.SUCCESS);
   };
   return (
     <View style={[styles.bottomContainer, { paddingBlock: bottom }]}>
       <View style={styles.footerContainer}>
-        <AppBlockButton onPress={onAutoAssign} style={styles.footerButton}>
+        <AppBlockButton onPress={onPressAutoAssign} style={styles.footerButton}>
           <IconAutoAssign />
           <AppText size={14} weight="700" color={Colors.BLACK_900} mt={4}>
-            {t('Tự động gán giá')}
+            {t('informationItem.autoAssign')}
           </AppText>
         </AppBlockButton>
         <View style={styles.footerDivider} />
         <AppBlockButton onPress={onSave} style={styles.footerButton}>
           <IconSaveTmp />
           <AppText size={14} weight="700" color={Colors.BLACK_900} mt={4}>
-            {t('Lưu nháp')}
+            {t('informationItem.saveDraft')}
           </AppText>
         </AppBlockButton>
       </View>
@@ -101,7 +105,7 @@ const FooterInformationItem = () => {
             processing={isLoadingReject}
             style={styles.rejectButton}>
             <AppText size={14} weight="700" color={Colors.WHITE}>
-              {t('Từ chối')}
+              {t('informationItem.reject')}
             </AppText>
           </AppButton>
         </View>
@@ -112,7 +116,7 @@ const FooterInformationItem = () => {
             processing={isLoadingAssign}
             style={styles.buttonAssign}>
             <AppText size={14} weight="700" color={Colors.WHITE}>
-              {t('Gán giá')}
+              {t('informationItem.assign')}
             </AppText>
           </AppButton>
         </View>

@@ -70,6 +70,10 @@ const CreatePriceScreen: React.FC = () => {
     currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
     currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
+    onApproved,
+    onReject,
+    selectedIds,
+    setSelectedIds,
   } = useCreatePriceViewModel();
   const { infoUser } = useInfoUser();
 
@@ -176,8 +180,6 @@ const CreatePriceScreen: React.FC = () => {
     return null;
   }, [isFetchingNextPage]);
 
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
   const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
 
   const handleSelect = useCallback((id: string) => {
@@ -225,25 +227,6 @@ const CreatePriceScreen: React.FC = () => {
     });
   }, [applyFilters, currentFilters]);
 
-  const onApproved = useCallback(async () => {
-    await new Promise(resolve => {
-      setTimeout(() => {
-        resolve(true);
-      }, 1000);
-    });
-    showToast(t('createPrice.approvedSuccess'), 'success');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const onReject = useCallback(async () => {
-    await new Promise(resolve => {
-      setTimeout(() => {
-        resolve(true);
-      }, 1000);
-    });
-    showToast(t('createPrice.rejectSuccess'), 'success');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   console.log('CreatePriceScreen', flatData);
 
   // Bug fix: Ban đầu `isFirstLoad` là true và `isLoading` cũng true, `FallbackComponent` sẽ hiển thị
@@ -346,7 +329,7 @@ const CreatePriceScreen: React.FC = () => {
             data={flatData || []}
             renderItem={renderItem}
             keyExtractor={item => item.id}
-            onEndReached={onLoadMore}
+            // onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
             removeClippedSubviews
@@ -388,8 +371,8 @@ const CreatePriceScreen: React.FC = () => {
       </View>
       {selectedIds.length > 0 && (
         <Footer
-          onLeftAction={onReject}
-          onRightAction={onApproved}
+          onLeftAction={() => onReject(selectedIds)}
+          onRightAction={() => onApproved(selectedIds)}
           leftButtonTitle={t('createPrice.reject')}
           rightButtonTitle={t('createPrice.approvedOrder')}
           customBottom={vs(20)}

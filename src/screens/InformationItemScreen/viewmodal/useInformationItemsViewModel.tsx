@@ -69,8 +69,29 @@ export function useInformationItemsViewModel() {
       ),
     });
   };
+  const onAutoAssign = () => {
+    const cached = queryClient.getQueryData<InfiniteData<DataInformationItems[]>>(key);
+
+    if (!cached) {
+      console.warn('🟥 No cache found for key:', key);
+      return;
+    }
+
+    // Gán giá random (bội 1000) và NCC random cho từng item
+    queryClient.setQueryData(key, {
+      ...cached,
+      pages: cached.pages.map(page =>
+        page.map(item => ({
+          ...item,
+          price: Math.floor(Math.random() * 10 + 1) * 1000, // random 1000-10000
+          ncc: 'NCC_' + Math.floor(Math.random() * 100), // NCC random
+        })),
+      ),
+    });
+  };
 
   return {
+    onAutoAssign,
     flatData,
     isLoading,
     isFetching,

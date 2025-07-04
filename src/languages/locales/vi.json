@@ -33,6 +33,18 @@
         "close": "Đóng"
       }
     },
+
+    "informationItem": {
+      "title": "Thông tin gắn giá",
+      "autoAssign": "Tự động gán giá",
+      "saveDraft": "Lưu nháp",
+      "reject": "Từ chối",
+      "assign": "Gán giá",
+      "rejectSuccess": "Từ chối thành công",
+      "assignSuccess": "Gán giá thành công",
+      "saveDraftSuccess": "Lưu nháp thành công",
+      "autoAssignSuccess": "Tự động gán giá thành công"
+    },
     "assignPrice": {
       "title": "Xin chào",
       "header": "Danh sách báo giá NCC",

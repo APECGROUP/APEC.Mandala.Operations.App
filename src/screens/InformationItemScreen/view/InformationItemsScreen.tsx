@@ -9,11 +9,7 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 
@@ -64,6 +60,7 @@ const InformationItemsScreen = ({
     hasNextPage,
     onUpdatePrice,
     isError,
+    onAutoAssign,
   } = useInformationItemsViewModel();
 
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
@@ -186,6 +183,15 @@ const InformationItemsScreen = ({
     onRefresh();
   }, [onRefresh]);
 
+  // const handleAutoAssign = () => {
+  //   const newItems = items.map(item => ({
+  //     ...item,
+  //     price: Math.floor(Math.random() * 10 + 1) * 1000, // random 1000-10000
+  //     ncc: 'NCC_' + Math.floor(Math.random() * 100), // ví dụ NCC random
+  //   }));
+  //   setItems(newItems);
+  // };
+
   console.log('error:', isError);
   if (isError || (isFirstLoad && !isLoading)) {
     return <FallbackComponent resetError={reLoadData} />;
@@ -251,7 +257,7 @@ const InformationItemsScreen = ({
           </AnimatedButton>
         )}
       </View>
-      {flatData && flatData.length > 0 && <FooterInformationItem />}
+      {flatData && flatData.length > 0 && <FooterInformationItem onAutoAssign={onAutoAssign} />}
     </ViewContainer>
   );
 };
