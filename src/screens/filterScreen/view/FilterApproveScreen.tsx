@@ -66,9 +66,10 @@ const FilterApproveScreen = ({
         setFromDate(start);
         setToDate(end);
       },
-      selectedRange: [fromDate, toDate], // Truyền giá trị đã chọn để Modal có thể hiển thị
+      initialStartDate: fromDate,
+      initialEndDate: toDate,
     });
-  }, [fromDate]);
+  }, [fromDate, toDate]);
   console.log('filter', initialFilters);
 
   const onPressDepartment = useCallback(() => {

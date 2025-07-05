@@ -66,6 +66,11 @@ export type MainParams = {
         isSingleMode: boolean;
         onSelectDate?: Dispatch<SetStateAction<Date | undefined>>;
         onSelectRange?: (start: any, end: any) => void;
+        initialStartDate?: Date | null;
+        initialEndDate?: Date | null;
+        initialDate?: Date | null;
+        minDate?: Date | null;
+        maxDate?: Date | null;
       }
     | undefined;
   OtpMainNavigationScreen: {

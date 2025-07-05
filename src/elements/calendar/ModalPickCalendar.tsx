@@ -18,8 +18,13 @@ type Props = NativeStackScreenProps<MainParams, 'ModalPickCalendar'>;
 
 type ModalPickCalendarParams = {
   isSingleMode?: boolean;
-  onSelectDate?: React.Dispatch<React.SetStateAction<Date | null>>;
-  onSelectRange?: (start: Date, end: Date) => void;
+  onSelectDate?: (date: Date | null) => void;
+  onSelectRange?: (start: Date | null, end: Date | null) => void;
+  initialStartDate?: Date | null;
+  initialEndDate?: Date | null;
+  initialDate?: Date | null;
+  minDate?: Date | null;
+  maxDate?: Date | null;
 };
 
 const ModalPickCalendar = ({ navigation, route }: Props) => {
@@ -27,12 +32,17 @@ const ModalPickCalendar = ({ navigation, route }: Props) => {
     isSingleMode = false,
     onSelectDate,
     onSelectRange,
+    initialDate,
+    initialStartDate,
+    initialEndDate,
+    minDate,
+    maxDate,
   } = route.params as ModalPickCalendarParams;
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
 
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(initialStartDate || initialDate || null);
+  const [endDate, setEndDate] = useState<Date | null>(initialEndDate || null);
 
   const slideAnim = useRef(new Animated.Value(300)).current;
 
@@ -130,6 +140,8 @@ const ModalPickCalendar = ({ navigation, route }: Props) => {
           selectedRangeStyle={styles.rangeBetween}
           selectedStartDate={startDate}
           selectedEndDate={endDate}
+          minDate={minDate}
+          maxDate={maxDate}
           selectYearTitle="Chọn năm "
           selectMonthTitle="Chọn tháng "
           onDateChange={onDateChange}

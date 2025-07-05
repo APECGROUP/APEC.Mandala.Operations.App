@@ -76,7 +76,7 @@ const CreateNewItemCard = ({
   };
 
   const onChangeVat = (itemVat: { id: string; name: string }) => {
-    onUpdateItem({ ...item, vat: itemVat.name });
+    onUpdateItem({ ...item, vat: { id: itemVat.id, name: itemVat.name } });
   };
 
   const isError = useMemo(
@@ -237,7 +237,8 @@ const CreateNewItemCard = ({
             <View style={[styles.detailRow, { marginTop: vs(10) }]}>
               <AppText style={styles.detailLabel}>{t('createPrice.timeFromTo')}</AppText>
               <TouchableOpacity style={styles.datePicker} onPress={onPickTime}>
-                <AppText style={styles.placeholder}>
+                <AppText
+                  style={[styles.placeholder, item.dateFrom && item.dateTo && styles.nccText]}>
                   {item.dateFrom && item.dateTo
                     ? `${moment(item.dateFrom).format('DD/MM/YYYY')} - ${moment(item.dateTo).format(
                         'DD/MM/YYYY',

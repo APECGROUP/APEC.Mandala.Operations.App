@@ -58,7 +58,7 @@ const FilterAssignPriceScreen = ({
     navigate('ModalPickCalendar', {
       isSingleMode: true,
       onSelectDate: (date: Date) => setFromDate(date),
-      selectedDate: fromDate, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      initialDate: fromDate, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [fromDate]);
   console.log('filter', initialFilters);
@@ -67,7 +67,7 @@ const FilterAssignPriceScreen = ({
     navigate('ModalPickCalendar', {
       isSingleMode: true,
       onSelectDate: (date: Date) => setToDate(date),
-      selectedDate: toDate, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      initialDate: toDate,
     });
   }, [toDate]);
 
