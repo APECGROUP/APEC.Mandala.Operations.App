@@ -116,6 +116,10 @@
       "search": "Tìm kiếm",
       "supplier": "Nhà cung cấp",
       "pick": "Chọn",
+      "pickLocal": "Chọn kho",
+
+      "location": "Kho",
+      "time": "Thời gian",
       "nameItem": "Tên mặt hàng",
       "ncc": "NCC",
       "status": "Trạng thái",

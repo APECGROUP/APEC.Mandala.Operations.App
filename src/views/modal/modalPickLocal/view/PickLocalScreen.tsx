@@ -11,20 +11,17 @@ import IconClose from '../../../../../assets/icon/IconClose';
 import { PaddingHorizontal } from '../../../../utils/Constans';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBlockButton from '../../../../elements/button/AppBlockButton';
-import IconSelectHotel from '../../../../../assets/icon/IconSelectHotel';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { useRequesterViewModel } from '../viewmodal/useRequesterViewModel';
+import { usePickLocalViewModel } from '../viewmodal/usePickLocalViewModel';
 import { SCREEN_HEIGHT } from '@/constants';
 import { FlashList } from '@shopify/flash-list';
-import { TypePickRequester } from '../modal/PickRequesterModal';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
 
-type Props = NativeStackScreenProps<MainParams, 'PickRequesterScreen'>;
-const PickRequesterScreen = ({ navigation, route }: Props) => {
+type Props = NativeStackScreenProps<MainParams, 'PickLocalScreen'>;
+const PickLocalScreen = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
-  const { requester, setRequester } = route.params;
+  const { setLocation } = route.params;
   const { bottom } = useSafeAreaInsets();
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
@@ -37,7 +34,7 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
     onLoadMore,
     onSearch,
     searchKey,
-  } = useRequesterViewModel();
+  } = usePickLocalViewModel();
 
   const listFooterComponent = () => {
     if (isFetchingNextPage) {
@@ -68,25 +65,18 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: TypePickRequester; index: number }) => {
-      const isFocus = item?.id === requester?.id;
+    ({ item, index }: { item: any; index: number }) => {
       const onSelect = () => {
-        setRequester({ id: item.id || '', name: item.name || '' });
+        setLocation(item);
         navigation.goBack();
       };
       return (
-        <View>
-          <AppBlockButton
-            key={index}
-            onPress={onSelect}
-            style={[isFocus ? styles.itemFocus : { padding: vs(10) }]}>
-            <AppText weight="500">{item.name}</AppText>
-            {isFocus && <IconSelectHotel />}
-          </AppBlockButton>
-        </View>
+        <AppBlockButton key={index} onPress={onSelect} style={{ padding: vs(10) }}>
+          <AppText weight="500">{item.name}</AppText>
+        </AppBlockButton>
       );
     },
-    [navigation, requester?.id, setRequester],
+    [navigation, setLocation],
   );
 
   const goBack = useCallback(() => {
@@ -94,8 +84,7 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
   }, [navigation]);
   return (
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
-      <Animated.View
-        entering={FadeInDown.delay(0).duration(0)}
+      <View
         style={[
           styles.container,
           { paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7 },
@@ -105,9 +94,9 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
           row
           justifyContent="space-between"
           alignItems="center"
-          style={styles.buttonWith1}>
+          style={styles.borderWidth1}>
           <AppText size={20} weight="bold">
-            {t('filter.selectRequester')}
+            {t('filter.pickLocal')}
           </AppText>
           <TouchableOpacity onPress={goBack} style={{ padding: PaddingHorizontal }}>
             <IconClose />
@@ -116,7 +105,7 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
 
         <View style={{ paddingHorizontal: PaddingHorizontal }}>
           <AppText mt={10} mb={6} weight="700">
-            {t('filter.requester')}
+            {t('filter.pickLocal')}
           </AppText>
           <AppInputSearch
             fill={searchKey ? Colors.PRIMARY : '#BABABA'}
@@ -147,15 +136,15 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
             paddingTop: vs(10),
           }}
         />
-      </Animated.View>
+      </View>
     </TouchableOpacity>
   );
 };
 
-export default PickRequesterScreen;
+export default PickLocalScreen;
 
 const styles = StyleSheet.create({
-  buttonWith1: { borderBottomWidth: 1, borderBottomColor: light.border },
+  borderWidth1: { borderBottomWidth: 1, borderBottomColor: light.border },
   containerInputSearch: {
     borderRadius: 6,
     borderWidth: 0,
@@ -170,13 +159,6 @@ const styles = StyleSheet.create({
   footerLoading: {
     marginVertical: vs(12),
     alignItems: 'center',
-  },
-  itemFocus: {
-    backgroundColor: light.selected,
-    padding: vs(10),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderRadius: 4,
   },
   overlay: {
     flex: 1,

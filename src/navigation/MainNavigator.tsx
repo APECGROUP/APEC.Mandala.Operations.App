@@ -32,6 +32,7 @@ import DetailOrderApproveScreen from '@/screens/detailOrderApproveScreen/view/De
 import PickItemScreen from '@/views/modal/modalPickItem/view/PickItemScreen';
 import FilterApproveScreen from '@/screens/filterScreen/view/FilterApproveScreen';
 import FilterCreatePriceScreen from '@/screens/filterScreen/view/FilterCreatePriceScreen';
+import PickLocalScreen from '@/views/modal/modalPickLocal/view/PickLocalScreen';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -228,6 +229,7 @@ export default function MainNavigator() {
         <Screen name={'PickNccScreen'} component={PickNccScreen} />
         <Screen name={'PickDepartmentScreen'} component={PickDepartmentScreen} />
         <Screen name={'PickItemScreen'} component={PickItemScreen} />
+        <Screen name={'PickLocalScreen'} component={PickLocalScreen} />
         <Screen name={'PickRequesterScreen'} component={PickRequesterScreen} />
       </Group>
     </Navigator>

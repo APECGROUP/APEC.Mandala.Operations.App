@@ -78,6 +78,14 @@ export const fakeData = [
   'Chôm chôm Java Indonesia',
 ];
 
+export const fakeLocal = [
+  { id: '1', name: 'Kho 1' },
+  { id: '2', name: 'Kho 2' },
+  { id: '3', name: 'Kho 3' },
+  { id: '4', name: 'Kho 4' },
+  { id: '5', name: 'Kho 5' },
+];
+
 export const fakeTitleNotification = [
   'Chờ Trưởng bộ phận duyệt',
   'Chờ Kế toán trưởng duyệt',
@@ -127,7 +135,52 @@ export const mockDepartments = [
 export const mockRequesters = [
   { id: 'req1', name: 'Đỗ Nam Trump' }, // Donald Trump
   { id: 'req2', name: 'Tập Cận Bình' }, // Xi Jinping
-  { id: 'req3', name: 'Vờ La Đi Mưa Phúc Tin' }, // Vladimir Putin
-  { id: 'req4', name: 'Kim Chính Ưn' }, // Kim Jong-un
-  { id: 'req5', name: 'Giô Bai Đần' }, // Joe Biden
+  { id: 'req3', name: 'Giô Bai Đần' }, // Joe Biden
+  { id: 'req4', name: 'Vờ La Đi Mưa Phúc Tin' }, // Vladimir Putin
+  { id: 'req5', name: 'Kim Chính Ưn' }, // Kim Jong-un
+  { id: 'req6', name: 'Ê Lon Mắc' }, // Elon Musk
+  { id: 'req7', name: 'Ma Cà Túc Cơ Bớp' }, // Mark Zuckerberg
+  { id: 'req8', name: 'Bi Lờ Ghết' }, // Bill Gates
+  { id: 'req9', name: 'Xờ Ti Vờ Gióp' }, // Steve Jobs
+  { id: 'req10', name: 'Jeff Bèo Dớt' }, // Jeff Bezos
+  { id: 'req11', name: 'Rô Đần Đô' }, // Ronaldo
+  { id: 'req12', name: 'Mê Xi' }, // Messi
+  { id: 'req13', name: 'Nây Ma' }, // Neymar
+  { id: 'req14', name: 'Kông Gà Đê' }, // Kanye West
+  { id: 'req15', name: 'Ri Han Nà' }, // Rihanna
+  { id: 'req16', name: 'Tay Loa Sờ Uy Phơ' }, // Taylor Swift
+  { id: 'req17', name: 'Xi Lê Nà Gô Mết' }, // Selena Gomez
+  { id: 'req18', name: 'Bi Yông Xê' }, // Beyoncé
+  { id: 'req19', name: 'Át Đeo' }, // Adele
+  { id: 'req20', name: 'Sờ Ca Lét Dờ Gió Hăn Xơn' }, // Scarlett Johansson
+  { id: 'req21', name: 'Lê Ô Na Đô Di Cà Pờ Ri Ồ' }, // Leonardo DiCaprio
+  { id: 'req22', name: 'Tom Cờ Rụt' }, // Tom Cruise
+  { id: 'req23', name: 'John Sì Na' }, // John Cena
+  { id: 'req24', name: 'Đờ Uét Gióc Sơn' }, // Dwayne Johnson (The Rock)
+  { id: 'req25', name: 'Chân Ní Đơ' }, // Jennifer Lopez
+  { id: 'req26', name: 'Chơn Ní Phơ Lâu Rần Xơ' }, // Jennifer Lawrence
+  { id: 'req27', name: 'Ơ Ma Quần' }, // Emma Watson
+  { id: 'req28', name: 'Ơ Ma Xờ Tôn' }, // Emma Stone
+  { id: 'req29', name: 'Trờn Đi' }, // Johnny Depp
+  { id: 'req30', name: 'Ờ Vên Cờ Mờ Linh' }, // Evan Carmichael
+  { id: 'req31', name: 'Sờ Đăng Lít' }, // Stanley Tucci
+  { id: 'req32', name: 'Cờ Mê Rung Đi A Dì' }, // Cameron Diaz
+  { id: 'req33', name: 'Ơ Rô Nặc' }, // Arnold Schwarzenegger
+  { id: 'req34', name: 'Văn Đơm Bết Đa Kham Bơ' }, // Vander Betercombe
+  { id: 'req35', name: 'Lý Liên Kiệt' }, // Jet Li
+  { id: 'req36', name: 'Thành Long' }, // Jackie Chan
+  { id: 'req37', name: 'Châu Nhuận Phát' }, // Chow Yun-fat
+  { id: 'req38', name: 'Châu Tinh Trì' }, // Stephen Chow
+  { id: 'req39', name: 'Lý Tiểu Long' }, // Bruce Lee
+  { id: 'req40', name: 'Vương Nhất Bác' }, // Wang Yibo
+  { id: 'req41', name: 'Tiêu Chiến' }, // Xiao Zhan
+  { id: 'req42', name: 'Triệu Lệ Dĩnh' }, // Zhao Liying
+  { id: 'req43', name: 'Dương Mịch' }, // Yang Mi
+  { id: 'req44', name: 'Lưu Diệc Phi' }, // Liu Yifei
+  { id: 'req45', name: 'Phạm Băng Băng' }, // Fan Bingbing
+  { id: 'req46', name: 'Angela Baby' }, // Angela Baby
+  { id: 'req47', name: 'Châu Kiệt Luân' }, // Jay Chou
+  { id: 'req48', name: 'Gờ Đờ Rờ Gờ' }, // G-Dragon (BIGBANG)
+  { id: 'req49', name: 'Lý Hiện' }, // Li Xian
+  { id: 'req50', name: 'Trịnh Sảng' }, // Zheng Shuang
 ];

@@ -1,7 +1,7 @@
-import { mockRequesters } from '@/data/DataFake';
 import axios from 'axios';
+import { fakeLocal } from '@/data/DataFake';
 
-export interface TypePickRequester {
+export interface IPickLocal {
   id: string | undefined;
   name: string | undefined;
 }
@@ -18,16 +18,17 @@ function buildNccUrl(page: number, limit: number, key?: string): string {
 /**
  * Lấy danh sách DataAssignPrice từ API (giả lập).
  */
-export const fetchRequesterData = async (
+export const fetchPickLocalData = async (
   page: number,
   limit: number = 50,
   key: string = '',
-): Promise<TypePickRequester[]> => {
+): Promise<IPickLocal[]> => {
   const url = buildNccUrl(page, limit, key);
   const { data } = await axios.get(url);
 
   return data.map((item: any) => ({
     id: item.id,
-    name: mockRequesters[Math.floor(Math.random() * mockRequesters.length)].name,
+
+    name: fakeLocal[Math.floor(Math.random() * 5)],
   }));
 };

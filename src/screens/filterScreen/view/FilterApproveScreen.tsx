@@ -42,6 +42,11 @@ const FilterApproveScreen = ({
       ? initialFilters.department
       : { id: '', name: '' },
   );
+  const [location, setLocation] = useState<SelectedOption>(
+    initialFilters.location && initialFilters.location.id !== ''
+      ? initialFilters.location
+      : { id: '', name: '' },
+  );
   const [requester, setRequester] = useState<SelectedOption>(
     initialFilters.requester && initialFilters.requester.id !== ''
       ? initialFilters.requester
@@ -51,25 +56,20 @@ const FilterApproveScreen = ({
   // Ref cho TextInput để quản lý focus (có thể không cần thiết nếu dùng AppTextInput đúng cách)
   const refFromDate = useRef<TextInput>(null);
   const refToDate = useRef<TextInput>(null);
-
+  const refLocation = useRef<TextInput>(null);
   // --- Handlers cho việc chọn giá trị từ các Modal khác ---
-  const onPressFromDate = useCallback(() => {
+  const onPressPickTime = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('ModalPickCalendar', {
-      isSingleMode: true,
-      onSelectDate: (date: Date) => setFromDate(date),
-      selectedDate: fromDate, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      isSingleMode: false,
+      onSelectRange: (start: Date, end: Date) => {
+        setFromDate(start);
+        setToDate(end);
+      },
+      selectedRange: [fromDate, toDate], // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [fromDate]);
   console.log('filter', initialFilters);
-  const onPressToDate = useCallback(() => {
-    Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
-    navigate('ModalPickCalendar', {
-      isSingleMode: true,
-      onSelectDate: (date: Date) => setToDate(date),
-      selectedDate: toDate, // Truyền giá trị đã chọn để Modal có thể hiển thị
-    });
-  }, [toDate]);
 
   const onPressDepartment = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
@@ -78,6 +78,13 @@ const FilterApproveScreen = ({
       department: department, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [department]);
+  const onPressLocation = useCallback(() => {
+    Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
+    navigate('PickLocalScreen', {
+      setLocation: (loc: SelectedOption) => setLocation(loc),
+      location: location, // Truyền giá trị đã chọn để Modal có thể hiển thị
+    });
+  }, [location]);
   console.log('filter', initialFilters);
   const onPressRequester = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
@@ -96,6 +103,7 @@ const FilterApproveScreen = ({
       toDate,
       department: department.id ? department : undefined, // Nếu id rỗng thì là undefined
       requester: requester.id ? requester : undefined, // Nếu id rỗng thì là undefined
+      location: location.id ? location : undefined, // Nếu id rỗng thì là undefined
     };
 
     // Gọi callback từ màn hình trước đó để áp dụng filter
@@ -111,8 +119,13 @@ const FilterApproveScreen = ({
     setToDate(undefined);
     setDepartment({ id: '', name: '' });
     setRequester({ id: '', name: '' });
+    setLocation({ id: '', name: '' });
   }, []);
 
+  const valueDate =
+    fromDate && toDate
+      ? moment(fromDate).format('DD/MM/YYYY') + ' - ' + moment(toDate).format('DD/MM/YYYY')
+      : '';
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
@@ -122,7 +135,7 @@ const FilterApproveScreen = ({
           <AppTextInput
             labelStyle={styles.label}
             label={t('filter.prNo')}
-            placeholder={t('filter.prNo')}
+            placeholder={t('filter.pick')}
             placeholderTextColor={light.placeholderTextColor}
             maxLength={20} // Tăng maxLength lên một chút nếu cần
             value={prNo}
@@ -131,29 +144,15 @@ const FilterApproveScreen = ({
             inputStyle={styles.input}
           />
 
-          <AppBlockButton style={styles.width100} onPress={onPressFromDate}>
+          <AppBlockButton style={styles.width100} onPress={onPressPickTime}>
             <AppTextInput
               editable={false}
               refName={refFromDate}
               labelStyle={styles.label}
-              label={t('filter.fromDate')}
-              placeholder={t('filter.fromDate')}
+              label={t('filter.time')}
+              placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={fromDate ? moment(fromDate).format('DD/MM/YYYY') : ''}
-              inputStyle={styles.input}
-              rightIcon={<IconCalendar fill={'#BABABA'} />}
-            />
-          </AppBlockButton>
-
-          <AppBlockButton style={styles.width100} onPress={onPressToDate}>
-            <AppTextInput
-              editable={false}
-              refName={refToDate}
-              labelStyle={styles.label}
-              label={t('filter.toDate')}
-              placeholder={t('filter.toDate')}
-              placeholderTextColor={light.placeholderTextColor}
-              value={toDate ? moment(toDate).format('DD/MM/YYYY') : ''}
+              value={valueDate}
               inputStyle={styles.input}
               rightIcon={<IconCalendar fill={'#BABABA'} />}
             />
@@ -164,9 +163,22 @@ const FilterApproveScreen = ({
               editable={false}
               labelStyle={styles.label}
               label={t('filter.department')}
-              placeholder={t('filter.department')}
+              placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
               value={department?.name}
+              inputStyle={styles.input}
+              rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
+            />
+          </AppBlockButton>
+          <AppBlockButton style={styles.width100} onPress={onPressLocation}>
+            <AppTextInput
+              editable={false}
+              refName={refLocation}
+              labelStyle={styles.label}
+              label={t('filter.location')}
+              placeholder={t('filter.pick')}
+              placeholderTextColor={light.placeholderTextColor}
+              value={location?.name}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
@@ -177,7 +189,7 @@ const FilterApproveScreen = ({
               editable={false}
               labelStyle={styles.label}
               label={t('filter.requester')}
-              placeholder={t('filter.requester')}
+              placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
               value={requester?.name}
               inputStyle={styles.input}

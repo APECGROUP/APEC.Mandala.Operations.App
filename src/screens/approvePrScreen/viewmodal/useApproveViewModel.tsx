@@ -55,6 +55,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
       effectiveFilters.toDate?.toISOString() || '',
       effectiveFilters.department?.id || '',
       effectiveFilters.requester?.id || '',
+      effectiveFilters.location?.id || '',
     ],
     [effectiveFilters],
   );

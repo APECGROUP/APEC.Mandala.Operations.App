@@ -35,7 +35,7 @@ export const fetchPickItemData = async (
   const url = buildNccUrl(page, limit, key);
   const { data } = await axios.get(url);
 
-  return data.map((item: any, index: number) => ({
+  return data.map((item: any) => ({
     id: item.id,
     ncc: 'Công Ty TNHH XNK Thuận Phát',
     supplier: {

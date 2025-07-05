@@ -4,6 +4,7 @@ import { typeHotel } from '../screens/authScreen/LoginScreen';
 import {
   AssignPriceFilters,
   DataAssignPrice,
+  SelectedOption,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
@@ -84,8 +85,12 @@ export type MainParams = {
   };
 
   PickRequesterScreen: {
-    setRequester: Dispatch<SetStateAction<TypePickRequester>>;
-    requester: TypePickRequester;
+    setRequester: Dispatch<SetStateAction<SelectedOption>>;
+    requester: SelectedOption;
+  };
+  PickLocalScreen: {
+    setLocation: Dispatch<SetStateAction<SelectedOption>>;
+    location: SelectedOption;
   };
 };
 

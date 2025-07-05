@@ -1,6 +1,14 @@
 // views/modal/ApproveModal.ts
 
-import { fakeData, fakeDataHotel, fakeEnd, fakeNcc, fakeNote, fakeVat } from '@/data/DataFake';
+import {
+  fakeData,
+  fakeDataHotel,
+  fakeEnd,
+  fakeLocal,
+  fakeNcc,
+  fakeNote,
+  fakeVat,
+} from '@/data/DataFake';
 import axios from 'axios';
 
 export interface IApprove {
@@ -32,6 +40,7 @@ export interface IApproveFilters {
   toDate?: Date;
   department?: SelectedOption;
   requester?: SelectedOption;
+  location?: SelectedOption;
 }
 
 // Cache để tránh gọi API trùng lặp (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
@@ -47,7 +56,7 @@ function generateMockCreatePriceData(item: any, filters: IApproveFilters): IAppr
 
   let contentName = fakeData[Math.floor(Math.random() * 50)];
   let prNo = 'PR20240624#0001';
-
+  let location = { id: '', name: '' };
   // Nếu có searchKey, giả lập rằng tên sản phẩm được lọc theo searchKey
   // (mặc dù API picsum không thực sự lọc)
   if (filters.prNo && !contentName.toLowerCase().includes(filters.prNo.toLowerCase())) {
@@ -77,6 +86,9 @@ function generateMockCreatePriceData(item: any, filters: IApproveFilters): IAppr
     // Nếu filter có department nhưng mock ngẫu nhiên không khớp, chọn department theo filter
     randomDepartment = filters.department;
   }
+  if (filters.location?.id && !fakeLocal.some(l => l.id === filters.location?.id)) {
+    location = filters.location;
+  }
 
   let randomRequester = mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
   if (filters.requester?.id && !mockRequesters.some(r => r.id === filters.requester?.id)) {
@@ -97,7 +109,7 @@ function generateMockCreatePriceData(item: any, filters: IApproveFilters): IAppr
     time: '28/05/2025 - 30/05/2025', // Giả lập
     createdAt: createdAt,
     estimateDate: estimateDate,
-    location: fakeDataHotel[Math.floor(Math.random() * fakeDataHotel.length)],
+    location: location,
 
     vat: fakeVat[Math.floor(Math.random() * 6)],
     ncc: fakeNcc[Math.floor(Math.random() * 10)], // Giả lập
