@@ -210,7 +210,7 @@ const InformationItemsScreen = ({
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
         {isLoading && flatData.length === 0 ? (
           <View style={styles.listContent}>
-            {new Array(10).fill(0).map((_, index) => (
+            {new Array(6).fill(0).map((_, index) => (
               <SkeletonItem key={index} showWaiting={index % 3 === 0} />
             ))}
           </View>

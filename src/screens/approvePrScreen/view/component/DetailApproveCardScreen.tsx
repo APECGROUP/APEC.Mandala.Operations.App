@@ -16,6 +16,7 @@ import Images from '@assets/image/Images';
 import { Colors } from '@/theme/Config';
 import { navigate } from '@/navigation/RootNavigation';
 import moment from 'moment';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface RowItemProps {
   label: string;
@@ -30,8 +31,8 @@ const RowItem: React.FC<RowItemProps> = ({ label, value, icon, onPress }) => (
       {label}
     </AppText>
     <TouchableOpacity onPress={onPress} activeOpacity={1} style={styles.valueContainer}>
-      {icon && <View style={styles.icon}>{icon}</View>}
       {value && <AppText weight="700">{value}</AppText>}
+      {icon && <View style={styles.icon}>{icon}</View>}
     </TouchableOpacity>
   </View>
 );
@@ -43,10 +44,16 @@ const DetailApproveCardScreen = ({
   const { t } = useTranslation();
   const [dateCreate, setDateCreate] = useState<Date | undefined>(undefined);
   const [dateEstimate, setDateEstimate] = useState<Date | undefined>(undefined);
+  const { bottom } = useSafeAreaInsets();
+  const [isCoppied, setIsCoppied] = useState(false);
 
   const onCopy = useCallback(() => {
-    Clipboard.setString(item.content);
-  }, [item.content]);
+    Clipboard.setString(item.prNo);
+    setIsCoppied(true);
+    setTimeout(() => {
+      setIsCoppied(false);
+    }, 2000);
+  }, [item.prNo]);
 
   const onPressDateCreate = useCallback(() => {
     navigate('ModalPickCalendar', {
@@ -61,7 +68,7 @@ const DetailApproveCardScreen = ({
       onSelectDate: setDateEstimate,
     });
   }, []);
-
+  console.log('item', item);
   const formatDate = useCallback((date: Date | undefined) => moment(date).format('DD/MM/YYYY'), []);
 
   return (
@@ -72,7 +79,7 @@ const DetailApproveCardScreen = ({
         <AppText size={12} weight="500" color={light.placeholderTextColor}>
           {t('orderInfo.prNo')}:{' '}
         </AppText>
-        <AppText weight="600">{item.content}</AppText>
+        <AppText weight="600">{item.prNo}</AppText>
         <IconCopy style={styles.copyIcon} />
       </AppBlockButton>
 
@@ -81,29 +88,49 @@ const DetailApproveCardScreen = ({
           onPress={onPressDateCreate}
           label={t('orderInfo.createDate')}
           value={formatDate(dateCreate)}
-          icon={<IconCalendar />}
+          icon={<IconCalendar fill={Colors.TEXT_SECONDARY} />}
         />
         <RowItem
           onPress={onPressDateEstimate}
           label={t('orderInfo.estimateDate')}
           value={formatDate(dateEstimate)}
-          icon={<IconCalendar />}
+          icon={<IconCalendar fill={Colors.TEXT_SECONDARY} />}
         />
-        <RowItem label={t('orderInfo.department')} value="01023-House Keeping" />
-        <RowItem label={t('orderInfo.location')} value="Stock-CAKE SHOP" />
-        <RowItem label={t('orderInfo.requester')} value="Nguyễn Văn A" icon={<IconName />} />
+        <RowItem label={t('orderInfo.department')} value={item.department?.name || ''} />
+        <RowItem label={t('orderInfo.location')} value={item.location?.name || ''} />
+        <RowItem
+          label={t('orderInfo.requester')}
+          value={item.requester?.name || ''}
+          icon={<IconName />}
+        />
         <RowItem label={t('orderInfo.note')} />
         <View style={styles.noteContainer}>
           <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry
+            {item.note}
           </AppText>
         </View>
       </View>
+      {isCoppied && (
+        <View style={[styles.blockTextCoppied, { bottom: bottom + 70 }]}>
+          <AppText size={14} weight="500" color={Colors.TEXT_DEFAULT}>
+            Đã sao chép
+          </AppText>
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  blockTextCoppied: {
+    backgroundColor: Colors.GRAY_100,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: s(3),
+    position: 'absolute',
+    alignSelf: 'center',
+    zIndex: 10,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -139,18 +166,20 @@ const styles = StyleSheet.create({
   valueContainer: {
     minWidth: '60%',
     // paddingVertical: vs(4),
-    height: vs(24),
+    // height: vs(24),
+    paddingVertical: vs(4),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
   icon: {
-    marginRight: s(6),
+    marginLeft: s(6),
   },
   noteContainer: {
     backgroundColor: '#F1F1F1',
     padding: s(12),
     borderRadius: s(8),
+    marginTop: vs(8),
   },
 });
 

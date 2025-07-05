@@ -1,6 +1,7 @@
 // views/modal/CreatePriceModal.ts
 
 import axios from 'axios';
+import { fakeData, fakeNcc, fakeEnd, fakeVat } from '@/data/DataFake';
 // Đảm bảo moment được import nếu bạn dùng nó cho Date objects
 
 export interface TypeCreatePrice {
@@ -42,14 +43,8 @@ function generateMockCreatePriceData(item: any, filters: CreatePriceFilters): Ty
   // Lưu ý: Picsum Photos không hỗ trợ lọc, nên bạn vẫn sẽ nhận ảnh ngẫu nhiên.
   // Đây là phần bạn sẽ thay thế bằng logic mapping từ API thật.
 
-  let contentName = [
-    'Táo đỏ phơi khô',
-    'Thịt gà Đông Tảo',
-    'Thịt cừu Mỹ',
-    'Thịt lợn Bắc Ninh',
-    'Thịt châu Đông Anh',
-    'Thịt bò Mỹ Đình',
-  ][Math.floor(Math.random() * 6)];
+  let contentName = fakeData[Math.floor(Math.random() * 50)];
+  let ncc = fakeNcc[Math.floor(Math.random() * 10)];
 
   // Nếu có searchKey, giả lập rằng tên sản phẩm được lọc theo searchKey
   // (mặc dù API picsum không thực sự lọc)
@@ -98,9 +93,9 @@ function generateMockCreatePriceData(item: any, filters: CreatePriceFilters): Ty
     time: '28/05/2025 - 30/05/2025', // Giả lập
     createdAt: createdAt,
     estimateDate: estimateDate,
-    vat: 'V8',
-    ncc: 'Công Ty TNHH XNK Thuận Phát', // Giả lập
-    end: 'Chai', // Giả lập
+    vat: fakeVat[Math.floor(Math.random() * 6)],
+    ncc: ncc, // Giả lập
+    end: fakeEnd[Math.floor(Math.random() * 5)], // Giả lập
     department: randomDepartment,
     requester: randomRequester,
   };
@@ -143,9 +138,6 @@ export const fetchCreatePrice = async (
   }
 
   try {
-    // Giả lập độ trễ mạng để mô phỏng gọi API thực tế
-    await new Promise<void>(resolve => setTimeout(resolve, 800));
-
     // --- Endpoint API thật của bạn ---
     // THAY THẾ DÒNG NÀY BẰNG ENDPOINT API THẬT CỦA BẠN.
     // Ví dụ: const apiUrl = `https://your-api.com/create-prices`;
@@ -220,7 +212,6 @@ export const deleteCreatePrice = async (id: string) => {
     // } else {
     //   return false;
     // }
-     
   } catch (error) {
     console.error('Error deleting item on backend:', error);
     return false;

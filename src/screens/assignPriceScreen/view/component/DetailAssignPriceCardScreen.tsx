@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useState, useCallback, useMemo, memo } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '@/navigation/params';
@@ -78,13 +78,14 @@ const DetailAssignPriceCardScreen = ({
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle={'dark-content'} />
       <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
 
       <AppBlockButton onPress={onCopy} style={styles.prRow}>
         <AppText size={12} weight="500" color={light.placeholderTextColor}>
           {t('orderInfo.prNo')}:{' '}
         </AppText>
-        <AppText weight="600">{item.content}</AppText>
+        <AppText weight="600">{item.prNo || item.content}</AppText>
         <IconCopy style={styles.copyIcon} />
       </AppBlockButton>
 
@@ -101,13 +102,17 @@ const DetailAssignPriceCardScreen = ({
           value={dateEstimateFormatted}
           icon={<IconCalendar />}
         />
-        <RowItem label={t('orderInfo.department')} value="01023-House Keeping" />
-        <RowItem label={t('orderInfo.location')} value="Stock-CAKE SHOP" />
-        <RowItem label={t('orderInfo.requester')} value="Nguyễn Văn A" icon={<IconName />} />
+        <RowItem label={t('orderInfo.department')} value={item.department?.name || ''} />
+        <RowItem label={t('orderInfo.location')} value={item.location?.name || ''} />
+        <RowItem
+          label={t('orderInfo.requester')}
+          value={item.requester?.name || ''}
+          icon={<IconName />}
+        />
         <RowItem label={t('orderInfo.note')} />
         <View style={styles.noteContainer}>
           <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry
+            {item?.note || ''}
           </AppText>
         </View>
       </View>

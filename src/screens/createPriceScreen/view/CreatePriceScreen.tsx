@@ -314,7 +314,7 @@ const CreatePriceScreen: React.FC = () => {
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
         {isLoading && flatData.length === 0 ? (
           <View style={styles.listContent}>
-            {new Array(3).fill(0).map(
+            {new Array(6).fill(0).map(
               (
                 _,
                 index, // Giảm số lượng skeleton để demo

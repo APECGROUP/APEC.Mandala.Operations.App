@@ -96,7 +96,9 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
                   <IconListPen />
                 </View>
                 <View style={styles.nameWrapper}>
-                  <AppText style={styles.name}>{item.name}</AppText>
+                  <AppText numberOfLines={1} style={styles.name}>
+                    {item.name}
+                  </AppText>
                   <View style={styles.row}>
                     <AppText style={styles.titlePrice}>{t('createPrice.price')}: </AppText>
                     <AppText style={styles.price}>{formattedPrice}</AppText>
@@ -168,7 +170,7 @@ const styles = ScaledSheet.create({
   },
   detailRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'space-between',
     marginVertical: vs(6),
   },
@@ -179,7 +181,9 @@ const styles = ScaledSheet.create({
   },
   detailValue: {
     fontSize: getFontSize(14),
+    maxWidth: '80%',
     fontWeight: '700',
+    textAlign: 'right',
     color: '#141414',
   },
   headerItem: {
@@ -199,10 +203,12 @@ const styles = ScaledSheet.create({
     width: '40@s',
   },
   name: {
+    maxWidth: s(230),
     fontSize: getFontSize(14),
     fontWeight: '700',
   },
   titlePrice: {
+    // maxWidth: '30%',
     fontSize: getFontSize(14),
     fontWeight: '500',
     color: Colors.TEXT_SECONDARY,

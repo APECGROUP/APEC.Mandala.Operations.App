@@ -1,77 +1,62 @@
-import React, { useRef, useCallback, useState, useMemo } from 'react';
+// views/AssignPriceScreen.tsx
+
+import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
   TextInput,
   ActivityIndicator,
+  TouchableOpacity,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  useDerivedValue,
-} from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
+import { useRoute } from '@react-navigation/native';
 
 import { getFontSize, SCREEN_WIDTH } from '../../../constants';
 import { PaddingHorizontal } from '../../../utils/Constans';
 import light from '../../../theme/light';
 import AppBlockButton from '../../../elements/button/AppBlockButton';
-import { AppText } from '@/elements/text/AppText';
-import { AnimatedButton } from '@/screens/assignPriceScreen/view/AssignPriceScreen';
-import Footer from '@/screens/filterScreen/view/component/Footer';
-import { Colors } from '@/theme/Config';
-import ToastContainer from '@/elements/toast/ToastContainer';
-import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
-import SkeletonItem from '@/components/skeleton/SkeletonItem';
-import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 
 import IconNotification from '../../../../assets/icon/IconNotification';
 import IconSearch from '../../../../assets/icon/IconSearch';
 import IconFilter from '../../../../assets/icon/IconFillter';
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
-import Images from '../../../../assets/image/Images';
 
-import { TypeApprove } from '../modal/ApproveModal';
-import { useApproveViewModel } from '../viewmodal/useApproveViewModel';
-import ApproveCard from './component/ApproveCard';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { IApprove } from '../modal/ApproveModal';
+import Images from '../../../../assets/image/Images';
 import { navigate } from '../../../navigation/RootNavigation';
+import { AppText } from '@/elements/text/AppText';
+import { useApproveViewModel } from '../viewmodal/useApproveViewModel';
+import ToastContainer from '@/elements/toast/ToastContainer';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
-
-// Constants
-const BOTTOM_HEIGHT = vs(120);
-const BOTTOM_LOW = vs(20);
-const ANIMATION_DURATION = 300;
-const SCROLL_THRESHOLD = 100;
+import { Colors } from '@/theme/Config';
+import { Gesture } from 'react-native-gesture-handler';
+import IconCreatePrice from '@assets/icon/IconCreatePrice';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import SkeletonItem from '@/components/skeleton/SkeletonItem';
+import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
+import IconPlus from '@assets/icon/IconPlus';
+import Footer from '@/screens/filterScreen/view/component/Footer';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { isAndroid } from '@/utils/Utilities';
+import ApproveCard from './component/ApproveCard';
+import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
+import { FooterComponent } from 'react-native-screens/lib/typescript/components/ScreenFooter';
 
 const ApprovePrScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { infoUser } = useInfoUser();
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-
-  // Refs
   const refToast = useRef<any>(null);
-  const flashListRef = useRef<FlashList<TypeApprove> | null>(null);
-  const lastOffsetY = useRef<number>(0);
-
-  // State
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-  // Shared values for animations
-  const showScrollToTop = useSharedValue<number>(0);
-  const showScrollToBottom = useSharedValue<number>(0);
-  const footerVisible = useSharedValue<number>(0);
-
-  // ViewModel
+  const route = useRoute() as any;
+  // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
     flatData,
     isLoading,
@@ -79,105 +64,88 @@ const ApprovePrScreen: React.FC = () => {
     isFetchingNextPage,
     onRefresh,
     onLoadMore,
-    onSearch,
-    searchKey,
+    onSearch, // Đổi tên từ onSearchPrNo thành onSearch
+    applyFilters,
+    currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
+    currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
+    onApproved,
+    onReject,
+    selectedIds,
+    setSelectedIds,
   } = useApproveViewModel();
+  const { infoUser } = useInfoUser();
 
-  // Update footer visibility when selectedIds changes
-  useDerivedValue(
-    () =>
-      (footerVisible.value = withTiming(selectedIds.length > 0 ? 1 : 0, {
-        duration: ANIMATION_DURATION / 10,
-      })),
-    [selectedIds.length],
-  );
+  // ─── Refs và shared values Reanimated ───────────────────────────────────────
+  const flashListRef = useRef<FlashList<IApprove> | null>(null);
+  const lastOffsetY = useRef<number>(0);
+
+  // show Scroll‐to‐Top khi scroll lên (swipe xuống), 0 = hidden, 1 = visible
+  const showScrollToTop = useSharedValue<number>(0);
+  // show Scroll‐to‐Bottom khi scroll xuống (swipe lên), 0 = hidden, 1 = visible
+  const showScrollToBottom = useSharedValue<number>(0);
 
   // Animated styles
   const opacityScrollTopStyle = useAnimatedStyle(() => ({
     opacity: withTiming(showScrollToTop.value, { duration: 200 }),
   }));
-
   const opacityScrollBottomStyle = useAnimatedStyle(() => ({
     opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
   }));
 
-  const footerAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateY: withTiming(footerVisible.value === 1 ? 0 : 100, {
-          duration: ANIMATION_DURATION,
-        }),
-      },
-    ],
-    opacity: withTiming(footerVisible.value, { duration: ANIMATION_DURATION }),
-  }));
-
-  const positionScrollStyle = useAnimatedStyle(() => ({
-    position: 'absolute' as const,
-    alignSelf: 'center' as const,
-    bottom: footerVisible.value === 1 ? BOTTOM_HEIGHT : BOTTOM_LOW,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  }));
-
-  // Scroll handlers
-  const scrollToTop = () => {
+  // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
+  const scrollToTop = useCallback(() => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
     showScrollToTop.value = 0;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     flashListRef.current?.scrollToEnd({ animated: true });
     showScrollToBottom.value = 0;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  /**
+   * onScroll handler:
+   * - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
+   * - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
+   */
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
-
-    if (y > lastOffsetY.current && y > SCROLL_THRESHOLD) {
+    // Scroll xuống (lúc này y > lastOffsetY): hiện scroll‐to‐bottom, ẩn scroll‐to‐top
+    if (y > lastOffsetY.current && y > 100) {
       showScrollToBottom.value = 1;
       showScrollToTop.value = 0;
-    } else if (y < lastOffsetY.current && y > SCROLL_THRESHOLD) {
+    }
+    // Scroll lên (y < lastOffsetY): hiện scroll‐to‐top, ẩn scroll‐to‐bottom
+    else if (y < lastOffsetY.current && y > 100) {
       showScrollToTop.value = 1;
       showScrollToBottom.value = 0;
     } else {
+      // Chưa vượt 100px thì ẩn cả hai
       showScrollToTop.value = 0;
       showScrollToBottom.value = 0;
     }
     lastOffsetY.current = y;
-  };
-
-  // Navigation handlers
-  const goToNotification = () => navigate('NotificationScreen');
-  const goToAccount = () => navigate('AccountScreen');
-  const handleSubmitSearch = () => navigate('FilterScreen');
-
-  // Selection handler
-  const handleSelect = useCallback((id: string) => {
-    setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Render functions
-  const renderItem = useCallback(
-    ({ item, index }: { item: TypeApprove; index: number }) => {
-      const isSelected = selectedIds.includes(item.id);
-      return (
-        <ApproveCard
-          item={item}
-          index={index}
-          isSelected={isSelected}
-          handleSelect={handleSelect}
-        />
-      );
-    },
-    [handleSelect, selectedIds],
-  );
+  // Lắng nghe params.filters trả về từ FilterScreen
+  useEffect(() => {
+    if (route.params?.filters) {
+      applyFilters(route.params.filters);
+    }
+  }, [route.params?.filters, applyFilters]);
 
-  const listEmptyComponent = () => {
+  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
+  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
+
+  const reLoadData = useCallback(() => {
+    onRefresh();
+  }, [onRefresh]);
+
+  const listEmptyComponent = useMemo(() => {
     if (isLoading) {
       return (
         <View style={styles.emptyContainer}>
@@ -188,12 +156,13 @@ const ApprovePrScreen: React.FC = () => {
     return (
       <View style={styles.emptyContainer}>
         <EmptyDataAnimation autoPlay />
-        <AppText style={styles.emptyText}>{t('assignPrice.empty')}</AppText>
+        <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
       </View>
     );
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, t]);
 
-  const listFooterComponent = () => {
+  const listFooterComponent = useMemo(() => {
     if (isFetchingNextPage) {
       return (
         <View style={styles.footerLoading}>
@@ -201,183 +170,226 @@ const ApprovePrScreen: React.FC = () => {
         </View>
       );
     }
-  };
-  const toggleSelectAll = () => {
+    return null;
+  }, [isFetchingNextPage]);
+
+  const handleSelect = useCallback((id: string) => {
+    setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
     const allIds = flatData.map(item => item.id);
     if (selectedIds.length === flatData.length) {
       setSelectedIds([]); // Bỏ chọn tất cả
     } else {
       setSelectedIds(allIds); // Chọn tất cả
     }
-  };
+  }, [selectedIds.length, flatData]);
+
+  const renderItem = useCallback(
+    ({ item }: { item: IApprove; index: number }) => (
+      <ApproveCard
+        item={item}
+        handleSelect={handleSelect}
+        isSelected={selectedIds.includes(item.id)}
+      />
+    ),
+    [handleSelect, selectedIds],
+  );
 
   const selectedAll = useMemo(
     () => selectedIds.length === flatData.length && flatData.length > 0,
-    [selectedIds, flatData],
+    [selectedIds.length, flatData.length],
   );
 
-  const reLoadData = useCallback(() => {
-    setIsFirstLoad(false);
-    onRefresh();
-  }, [onRefresh]);
+  const goToFilterScreen = useCallback(() => {
+    navigate('FilterScreen', {
+      onApplyFilters: applyFilters, // Callback để FilterScreen gọi khi confirm
+      currentFilters: currentFilters, // Filters hiện tại đang hiển thị trên màn hình A
+    });
+  }, [applyFilters, currentFilters]);
 
-  console.log('error:', isError);
-  if (isError || (isFirstLoad && !isLoading)) {
+  console.log('ApprovePrScreen', flatData);
+
+  // Bug fix: Ban đầu `isFirstLoad` là true và `isLoading` cũng true, `FallbackComponent` sẽ hiển thị
+  // Sau khi load lần đầu xong, `isLoading` thành false, `isFirstLoad` vẫn true,
+  // nên cần cập nhật `isFirstLoad` sau khi load thành công.
+  // useEffect(() => {
+  //   if (isFirstLoad && !isLoading && flatData.length > 0) {
+  //     setIsFirstLoad(false);
+  //   }
+  // }, [isFirstLoad, isLoading, flatData.length]);
+
+  const orderSelected = useMemo(() => selectedIds.length, [selectedIds]);
+
+  if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
 
   return (
-    <View style={styles.container}>
-      {/* Background Image */}
-      <FastImage
-        style={styles.backgroundImage}
-        source={Images.BackgroundAssignPrice}
-        resizeMode={FastImage.resizeMode.cover}
-      />
+    <ViewContainer>
+      <View style={styles.container}>
+        {/* ─── Background Image ─────────────────────────────────────────────── */}
+        <FastImage
+          id="backgroundImage"
+          style={styles.backgroundImage}
+          source={Images.BackgroundAssignPrice}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+        {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
+        <View style={[styles.headerContainer, { marginTop: top }]}>
+          <View style={styles.headerLeft}>
+            <AppBlockButton onPress={goToAccount}>
+              <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
+            </AppBlockButton>
 
-      {/* Header */}
-      <View style={[styles.headerContainer, { marginTop: top }]}>
-        <View style={styles.headerLeft}>
-          <AppBlockButton onPress={goToAccount}>
-            <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
-          </AppBlockButton>
-          <View style={styles.greetingContainer}>
-            <AppText color="#FFFFFF" style={styles.greetingText}>
-              {t('approve.title')}
-            </AppText>
-            <AppText color="#FFFFFF" style={styles.greetingText}>
-              {infoUser.profile.fullName}
-            </AppText>
+            <View style={styles.greetingContainer}>
+              <AppText color="#FFFFFF" style={styles.greetingText}>
+                {t('createPrice.title')}
+              </AppText>
+              <AppText color="#FFFFFF" style={styles.greetingText}>
+                {infoUser.profile.fullName}
+              </AppText>
+            </View>
+          </View>
+          <View style={styles.headerRight}>
+            <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
+              <IconNotification />
+              <View style={styles.notificationBadge}>
+                <AppText style={styles.notificationBadgeText}>3</AppText>
+              </View>
+            </AppBlockButton>
           </View>
         </View>
-        <View style={styles.headerRight}>
-          <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
-            <IconNotification />
-            <View style={styles.notificationBadge}>
-              <AppText style={styles.notificationBadgeText}>3</AppText>
-            </View>
+        {/* ─── Search Bar ────────────────────────────────────────────────────── */}
+        <View style={styles.searchContainer}>
+          <IconSearch width={vs(18)} />
+          <TextInput
+            value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
+            onChangeText={onSearch} // Gọi hàm debounce từ ViewModel
+            placeholder={t('assignPrice.searchPlaceholder')}
+            placeholderTextColor={light.placeholderTextColor}
+            style={styles.searchInput}
+            // returnKeyType="search"
+            // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
+          />
+          <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
+            <IconFilter />
           </AppBlockButton>
         </View>
-      </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <IconSearch width={vs(18)} />
-        <TextInput
-          value={searchKey}
-          onChangeText={onSearch}
-          placeholder={t('approve.searchPlaceholder')}
-          placeholderTextColor={light.placeholderTextColor}
-          style={styles.searchInput}
-          returnKeyType="search"
-          onSubmitEditing={handleSubmitSearch}
-        />
-        <AppBlockButton style={styles.filterButton} onPress={handleSubmitSearch}>
-          <IconFilter />
-        </AppBlockButton>
-      </View>
-
-      {/* Title + Count Badge */}
-      <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>{t('approve.listOfPurchaseOrder')}</AppText>
-        <View style={styles.countBadge}>
-          <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+        {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
+        <View style={styles.titleContainer}>
+          <AppText style={styles.titleText}>{t('createPrice.supplierPriceList')}</AppText>
+          <View style={styles.countBadge}>
+            <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+          </View>
         </View>
-      </View>
-
-      <View style={styles.header}>
-        <AppBlockButton onPress={toggleSelectAll} style={styles.buttonCenter}>
-          {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
-          <AppText style={styles.ml7}>{t('approve.selectAll')}</AppText>
-        </AppBlockButton>
-        <AppText>
-          {selectedIds.length} {t('approve.orderSelected')}
-        </AppText>
-      </View>
-
-      {/* FlashList */}
-      {isLoading && flatData.length === 0 ? (
-        <View style={styles.listContent}>
-          {new Array(10).fill(0).map((_, index) => (
-            <SkeletonItem key={index} showWaiting={index % 3 === 0} />
-          ))}
+        <View style={styles.header}>
+          <AppBlockButton onPress={toggleSelectAll} style={styles.buttonCenter}>
+            {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
+            <AppText style={styles.ml7}>{t('createPrice.pickAll')}</AppText>
+          </AppBlockButton>
+          <AppText>
+            {orderSelected} {t('createPrice.orderSelected')}
+          </AppText>
         </View>
-      ) : (
-        <FlashList
-          ref={flashListRef}
-          data={flatData || []}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          onEndReached={onLoadMore}
-          showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.5}
-          removeClippedSubviews
-          refreshing={isRefetching}
-          onRefresh={onRefresh}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          ListEmptyComponent={listEmptyComponent}
-          ListFooterComponent={listFooterComponent}
-          estimatedItemSize={100}
-          contentContainerStyle={
-            selectedIds.length > 0 ? styles.listContent : styles.listContentNoFooter
-          }
-        />
-      )}
+        {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
+        {isLoading && flatData.length === 0 ? (
+          <View style={styles.listContent}>
+            {new Array(6).fill(0).map(
+              (
+                _,
+                index, // Giảm số lượng skeleton để demo
+              ) => (
+                <SkeletonItem key={index} />
+              ),
+            )}
+          </View>
+        ) : (
+          <FlashList
+            ref={flashListRef}
+            data={flatData || []}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            // onEndReached={onLoadMore}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.5}
+            removeClippedSubviews
+            refreshing={isRefetching}
+            nestedScrollEnabled={true}
+            onRefresh={onRefresh}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            ListEmptyComponent={listEmptyComponent}
+            ListFooterComponent={listFooterComponent}
+            estimatedItemSize={100}
+            contentContainerStyle={styles.listContent}
+          />
+        )}
 
-      {/* Toast Container */}
-      <ToastContainer ref={refToast} />
+        <ToastContainer ref={refToast} />
 
-      {/* Scroll Buttons */}
-      <AnimatedButton onPress={scrollToTop} style={[positionScrollStyle, opacityScrollTopStyle]}>
-        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
-      </AnimatedButton>
-
-      {!isFetchingNextPage && (
+        {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
         <AnimatedButton
-          onPress={scrollToBottom}
-          style={[positionScrollStyle, opacityScrollBottomStyle]}>
-          <IconScrollBottom />
+          onPress={scrollToTop}
+          style={[
+            styles.scrollButtonBase,
+            isAndroid() && { bottom: vs(50) },
+            opacityScrollTopStyle,
+          ]}>
+          <IconScrollBottom style={styles.rotateIcon} />
         </AnimatedButton>
-      )}
-
-      {/* Footer with slide-up animation */}
-      <Animated.View style={[styles.footerContainer, footerAnimatedStyle]}>
+        {!isFetchingNextPage && (
+          <AnimatedButton
+            onPress={scrollToBottom}
+            style={[styles.scrollButtonBase, opacityScrollBottomStyle]}>
+            <IconScrollBottom />
+          </AnimatedButton>
+        )}
+      </View>
+      {selectedIds.length > 0 && (
         <Footer
-          leftButtonTitle={t('approve.reject')}
-          rightButtonTitle={t('approve.approve')}
+          onLeftAction={() => onReject(selectedIds)}
+          onRightAction={() => onApproved(selectedIds)}
+          leftButtonTitle={t('createPrice.reject')}
+          rightButtonTitle={t('createPrice.approvedOrder')}
+          customBottom={vs(20)}
           leftButtonStyle={{ backgroundColor: Colors.ERROR_600 }}
+          rightButtonStyle={{ backgroundColor: Colors.PRIMARY }}
           leftTextStyle={{ color: Colors.WHITE }}
+          rightTextStyle={{ color: Colors.WHITE }}
         />
-      </Animated.View>
-    </View>
+      )}
+    </ViewContainer>
   );
 };
 
 export default ApprovePrScreen;
-
+export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
 const styles = StyleSheet.create({
+  ml7: { marginLeft: s(7) },
   buttonCenter: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  ml7: { marginLeft: s(7) },
-
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingBottom: vs(16),
     paddingHorizontal: s(16),
+
     // borderBottomWidth: 1,
   },
   container: {
+    backgroundColor: Colors.WHITE,
     flex: 1,
   },
   backgroundImage: {
     width: SCREEN_WIDTH,
     aspectRatio: 2.66,
     position: 'absolute',
-    zIndex: -1,
+    zIndex: 0,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -434,6 +446,7 @@ const styles = StyleSheet.create({
     fontSize: getFontSize(8),
     fontWeight: '500',
   },
+
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -464,11 +477,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: s(16),
-    marginBottom: vs(16),
+    marginHorizontal: PaddingHorizontal,
+    marginBottom: vs(12),
   },
   titleText: {
     fontSize: getFontSize(18),
@@ -487,33 +501,43 @@ const styles = StyleSheet.create({
     fontSize: getFontSize(14),
     fontWeight: '700',
   },
-  listContentNoFooter: {
+
+  listContent: {
     paddingHorizontal: PaddingHorizontal,
     paddingBottom: vs(16),
   },
-  listContent: {
-    paddingHorizontal: PaddingHorizontal,
-    paddingBottom: vs(100),
-  },
   emptyContainer: {
     flex: 1,
-    marginTop: vs(40),
+    marginTop: vs(100),
     justifyContent: 'center',
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: getFontSize(14),
-    color: '#666666',
+    fontSize: getFontSize(18),
+    fontWeight: '700',
+    textAlign: 'center',
   },
   footerLoading: {
     marginVertical: vs(12),
     alignItems: 'center',
   },
-  footerContainer: {
+  scrollButtonBase: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
+    alignSelf: 'center',
+    width: vs(33),
+    height: vs(33),
+    borderRadius: vs(24),
+    backgroundColor: light.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    bottom: vs(20),
+  },
+  rotateIcon: {
+    transform: [{ rotate: '180deg' }],
   },
 });

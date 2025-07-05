@@ -14,53 +14,9 @@ import AppBlockButton from '../../elements/button/AppBlockButton';
 import IconSelectHotel from '../../../assets/icon/IconSelectHotel';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { TYPE_TOAST } from '@/elements/toast/Message';
+import { fakeDataHotel } from '@/data/DataFake';
 type Props = NativeStackScreenProps<AuthParams, 'ModalPickHotel'>;
-const fakeData = [
-  {
-    name: 'Mandala Retreats Kim Bôi',
-    id: 1,
-  },
-  {
-    name: 'Mandala Cham Bay Mũi Né',
-    id: 2,
-  },
-  {
-    name: 'Mandala Hotel & Spa Phú Yên',
-    id: 3,
-  },
-  {
-    name: 'Mandala Hotel & Suites Bắc Giang',
-    id: 4,
-  },
-  {
-    name: 'Mandala Hotel & Suites Hải Dương',
-    id: 5,
-  },
-  {
-    name: 'Mandala Hotel & Spa Bắc Ninh',
-    id: 6,
-  },
-  {
-    name: 'Mandala 7',
-    id: 7,
-  },
-  {
-    name: 'Mandala 8',
-    id: 8,
-  },
-  {
-    name: 'Mandala 9',
-    id: 9,
-  },
-  {
-    name: 'Mandala 10',
-    id: 10,
-  },
-  {
-    name: 'Mandala 11',
-    id: 11,
-  },
-];
+
 const ModalPickHotel = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
   const { showToast } = useAlert();
@@ -91,10 +47,10 @@ const ModalPickHotel = ({ navigation, route }: Props) => {
         </AppBlock>
 
         <ScrollView style={[styles.scrollView]} showsVerticalScrollIndicator={false}>
-          {fakeData.map((item, index) => {
+          {fakeDataHotel.map((item, index) => {
             const isFocus = item?.id === hotel?.id;
             const onSelect = () => {
-              setHotel(item);
+              setHotel?.(item);
               navigation.goBack();
             };
             return (

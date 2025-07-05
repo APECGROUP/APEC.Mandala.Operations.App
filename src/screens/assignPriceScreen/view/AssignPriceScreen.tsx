@@ -263,7 +263,7 @@ const AssignPriceScreen: React.FC = () => {
         {isLoading && flatData.length === 0 ? (
           <View style={styles.listContent}>
             {/* Hiển thị Skeleton khi loading lần đầu và chưa có dữ liệu */}
-            {new Array(3).fill(0).map(
+            {new Array(6).fill(0).map(
               (
                 _,
                 index, // Giảm số lượng skeleton để demo

@@ -49,7 +49,8 @@ export default function MainNavigator() {
   }, []);
   return (
     <Navigator
-      initialRouteName={!infoUser?.isApprove ? 'MyTabs' : 'ApprovePrScreen'}
+      initialRouteName={'MyTabs'}
+      // initialRouteName={!infoUser?.isApprove ? 'MyTabs' : 'ApprovePrScreen'}
       screenOptions={{
         // animation: 'simple_push',
         headerShown: false,

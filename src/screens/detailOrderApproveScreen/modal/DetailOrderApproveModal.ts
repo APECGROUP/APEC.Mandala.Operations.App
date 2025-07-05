@@ -1,4 +1,5 @@
 import { typeNcc } from '@/screens/authScreen/LoginScreen';
+import { fakeData, fakeNcc } from '@/data/DataFake';
 import axios from 'axios';
 
 export interface DetailOrderApprove {
@@ -27,18 +28,18 @@ export const fetchDetailOrderApproveData = async (
 
   return data.map((item: any, index: number) => ({
     id: item.id,
-    name: `Táo đỏ khô${(page - 1) * limit + index + 1}`,
-    price: 10000000,
-    end: 'Chai',
-    quantity: 100,
-    approvedQty: 100,
-    ncc: 'Công Ty TNHH XNK Thuận Phát',
+    name: fakeData[Math.floor(Math.random() * 50)],
+    price: Math.floor(Math.random() * 10000) * 1000,
+    end: ['Chai', 'Kg', 'Thùng', 'Hộp', 'Gói'][Math.floor(Math.random() * 5)],
+    quantity: Math.floor(Math.random() * 100),
+    approvedQty: Math.floor(Math.random() * 100),
+    ncc: fakeNcc[Math.floor(Math.random() * 10)],
     nccId: '1',
     supplier: {
       id: '1',
-      name: 'Công Ty TNHH XNK Thuận Phát',
+      name: fakeNcc[Math.floor(Math.random() * 10)],
     },
-    note: 'Lorem Ipsum is simply dummy text of the printing and typese tting industry',
-    approvedAmount: 100000,
+    note: 'Lorem Ipsum is simply dummy text of the printing and typese tting industry',
+    approvedAmount: Math.floor(Math.random() * 100) * 1000,
   }));
 };

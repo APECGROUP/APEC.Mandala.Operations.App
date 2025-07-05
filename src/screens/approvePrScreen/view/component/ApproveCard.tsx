@@ -8,18 +8,17 @@ import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
-import { TypeApprove } from '../../modal/ApproveModal';
+import { IApprove } from '../../modal/ApproveModal';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
+import moment from 'moment';
 
 const ApproveCard = ({
   item,
-  index,
   isSelected,
   handleSelect,
 }: {
-  item: TypeApprove;
-  index: number;
+  item: IApprove;
   isSelected: boolean;
   handleSelect: (id: string) => void;
 }) => {
@@ -30,7 +29,7 @@ const ApproveCard = ({
         onPress={() => {
           handleSelect(item.id);
         }}
-        style={{ paddingRight: s(10) }}>
+        style={styles.styleCheckBox}>
         {/* <AppBlockButton onPress={() => handleSelect(item.id)} style={{ paddingRight: s(10) }}> */}
         {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
       </AppBlockButton>
@@ -42,20 +41,21 @@ const ApproveCard = ({
         <View style={styles.itemInfo}>
           <View style={styles.itemInfoRow}>
             <AppText numberOfLines={1} style={styles.prCodeText}>
-              {item.content}
+              {item.prNo}
             </AppText>
             <AppBlockButton onPress={() => navigate('DetailApproveCardScreen', { item })}>
               <IconInfomation style={{ marginHorizontal: s(0) }} />
             </AppBlockButton>
           </View>
-          <AppText style={styles.dateText}>{item.user.name}</AppText>
-          {index % 3 === 0 && (
-            <View style={styles.noAssign}>
-              <AppText size={12} color={'#FF7009'} weight="500">
-                {t('Chờ gắn giá')}
-              </AppText>
-            </View>
-          )}
+          <AppText style={styles.dateText}>
+            {moment(item.createdAt).format('DD/MM/YYYY')} -{' '}
+            {moment(item.estimateDate).format('DD/MM/YYYY')}
+          </AppText>
+          <View style={styles.noAssign}>
+            <AppText size={12} color={'#FF7009'} weight="500">
+              {t('approve.waitApproval')}
+            </AppText>
+          </View>
         </View>
       </TouchableOpacity>
     </TouchableOpacity>
@@ -65,6 +65,7 @@ const ApproveCard = ({
 export default ApproveCard;
 
 const styles = StyleSheet.create({
+  styleCheckBox: { paddingHorizontal: s(12), paddingVertical: vs(20) },
   buttonDetailOrder: { flexDirection: 'row', alignItems: 'center' },
   noAssign: {
     paddingVertical: vs(2),
@@ -90,7 +91,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderRadius: s(8),
-    padding: s(12),
+    paddingVertical: vs(12),
+    paddingRight: s(12),
     marginBottom: vs(12),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },

@@ -16,7 +16,7 @@ const CreatePoScreen = () => {
   if (isLoading) {
     return (
       <View style={styles.containerLoading}>
-        {new Array(10).fill(0).map((_, index) => (
+        {new Array(6).fill(0).map((_, index) => (
           <SkeletonItem key={index} />
         ))}
       </View>

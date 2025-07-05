@@ -22,8 +22,6 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>2</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Mandala Operations cần truy cập thư viện ảnh để bạn có thể chọn ảnh từ thiết bị.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>

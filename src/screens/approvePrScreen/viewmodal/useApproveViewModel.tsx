@@ -1,16 +1,64 @@
-import { useState, useMemo, useCallback } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+// views/viewmodal/useCreatePriceViewModal.ts
+
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { IApprove, IApproveFilters, fetchApprove, clearApproveCache } from '../modal/ApproveModal';
 import debounce from 'lodash/debounce';
-import { fetchApproveData, TypeApprove } from '../modal/ApproveModal';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 50;
-const DEBOUNCE_DELAY = 300;
+const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
 
-export function useApproveViewModel() {
-  const [searchKey, setSearchKey] = useState<string>('');
-  // const queryClient = useQueryClient();
+// Giả định bạn đã cập nhật CreatePriceFilters trong CreatePriceModal.ts như sau:
+// export interface CreatePriceFilters {
+//   prNo?: string; // Đổi từ searchKey sang prNo
+//   fromDate?: Date;
+//   toDate?: Date;
+//   department?: { id: string; name: string };
+//   requester?: { id: string; name: string };
+// }
 
-  // Infinite Query cho phân trang + search
+export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+
+  const { showToast } = useAlert();
+  const [effectiveFilters, setEffectiveFilters] = useState<IApproveFilters>(initialFilters);
+  const [currentUiFilters, setCurrentUiFilters] = useState<IApproveFilters>(initialFilters);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
+    typeof debounce<typeof setEffectiveFilters>
+  > | null>(null);
+
+  useEffect(() => {
+    if (!debouncedSetEffectiveFiltersRef.current) {
+      debouncedSetEffectiveFiltersRef.current = debounce(setEffectiveFilters, DEBOUNCE_DELAY);
+    }
+    return () => {
+      debouncedSetEffectiveFiltersRef.current?.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
+    debouncedSetEffectiveFiltersRef.current?.(currentUiFilters);
+  }, [currentUiFilters]);
+
+  // queryKey giờ sẽ dùng effectiveFilters.prNo
+  const queryKey = useMemo(
+    () => [
+      'listApprove',
+      effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
+      effectiveFilters.fromDate?.toISOString() || '',
+      effectiveFilters.toDate?.toISOString() || '',
+      effectiveFilters.department?.id || '',
+      effectiveFilters.requester?.id || '',
+    ],
+    [effectiveFilters],
+  );
+
   const {
     data,
     isLoading,
@@ -21,57 +69,174 @@ export function useApproveViewModel() {
     hasNextPage,
     isRefetching,
     isError,
-  } = useInfiniteQuery<TypeApprove[], Error>({
-    queryKey: ['listApprove', searchKey.trim()],
-    queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
-      const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchApproveData(page, ITEMS_PER_PAGE, searchKey.trim());
-    },
+    error,
+  } = useInfiniteQuery<IApprove[], Error>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: queryKey,
+    queryFn: async ({ pageParam = 1 }) =>
+      fetchApprove(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
     staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
-  // Gộp data các page lại thành 1 mảng
   const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
-  // console.log('render useAssignPriceViewModel');
-  // Debounce search
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((key: string) => {
-        setSearchKey(key);
-        // queryClient.removeQueries({queryKey: ['listAssignPrice']});
-      }, DEBOUNCE_DELAY),
-    [],
-  );
 
-  // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
-    console.log('onRefresh');
-    if (isFetching || isRefetching || isLoading) {
-      return;
-    }
+    console.log('onRefresh called from ViewModel. Forcing refetch.');
+    clearApproveCache();
     refetch();
-  }, [isFetching, isLoading, isRefetching, refetch]);
+  }, [refetch]);
 
-  // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
-    console.log('loadMore');
-    if (hasNextPage && !isFetchingNextPage && !isLoading) {
+    console.log('onLoadMore called.');
+    if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Search
-  const onSearch = useCallback(
-    (key: string) => {
-      debouncedSearch(key);
+  // onSearch bây giờ cập nhật prNo
+  const onSearch = useCallback((val: string) => {
+    setCurrentUiFilters(prev => ({ ...prev, prNo: val })); // Thay searchKey bằng prNo
+  }, []);
+
+  const applyFilters = useCallback((newFilter: IApproveFilters) => {
+    debouncedSetEffectiveFiltersRef.current?.cancel();
+    setCurrentUiFilters(newFilter);
+    setEffectiveFilters(newFilter);
+  }, []);
+
+  const { showAlert } = useAlert();
+  const onDelete = useCallback(
+    async (id: string, onSuccess?: (deletedId: string) => void) => {
+      const currentQueryKey = [
+        'listApprove',
+        effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
+        effectiveFilters.fromDate?.toISOString() || '',
+        effectiveFilters.toDate?.toISOString() || '',
+        effectiveFilters.department?.id || '',
+        effectiveFilters.requester?.id || '',
+      ];
+
+      const cached = queryClient.getQueryData<InfiniteData<IApprove[]>>(currentQueryKey);
+      if (!cached) {
+        console.warn('🟥 No cache found for key:', currentQueryKey);
+        return false;
+      }
+
+      try {
+        if (Number(id) % 5 !== 0) {
+          console.log('✅ Deleting item successfully...');
+          queryClient.setQueryData(currentQueryKey, {
+            ...cached,
+            pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
+          });
+
+          onSuccess?.(id);
+          return true;
+        } else {
+          await new Promise(resolve => setTimeout(() => resolve(undefined), 500));
+          showAlert(t('createPrice.warningRemove'), '', [
+            {
+              text: t('createPrice.close'),
+              onPress: () => {},
+            },
+          ]);
+          return false;
+        }
+      } catch (err) {
+        console.error('Error deleting item:', err);
+        return false;
+      }
     },
-    [debouncedSearch],
+    [queryClient, effectiveFilters, showAlert, t],
+  );
+
+  const handleDelete = useCallback(
+    (id: string, onSuccess?: (deletedId: string) => void) => {
+      showAlert(t('createPrice.remove.title'), '', [
+        {
+          text: t('createPrice.remove.cancel'),
+          style: 'cancel',
+          onPress: () => {},
+        },
+        {
+          text: t('createPrice.remove.agree'),
+          onPress: async () => {
+            const success = await onDelete(id, onSuccess);
+            if (!success) {
+              console.log('❌ Delete failed, no action needed');
+            }
+          },
+        },
+      ]);
+    },
+    [showAlert, t, onDelete],
+  );
+
+  const onApproved = useCallback(
+    async (ids: string[]) => {
+      // Xoá các item có id nằm trong danh sách ids khỏi cache
+      const currentQueryKey = [
+        'listApprove',
+        effectiveFilters.prNo?.trim() || '',
+        effectiveFilters.fromDate?.toISOString() || '',
+        effectiveFilters.toDate?.toISOString() || '',
+        effectiveFilters.department?.id || '',
+        effectiveFilters.requester?.id || '',
+      ];
+      const cached = queryClient.getQueryData(currentQueryKey);
+      if (cached && cached.pages) {
+        // Loại bỏ các item có id nằm trong ids khỏi từng page
+        const newPages = cached.pages.map((page: IApprove[]) =>
+          page.filter(item => !ids.includes(item.id)),
+        );
+        queryClient.setQueryData(currentQueryKey, {
+          ...cached,
+          pages: newPages,
+        });
+        setSelectedIds([]);
+      }
+      showToast(t('createPrice.approvedSuccess'), 'success');
+    },
+    [queryClient, effectiveFilters, t, showToast],
+  );
+  const onReject = useCallback(
+    async (ids: string[]) => {
+      // Xoá các item có id nằm trong danh sách ids khỏi cache
+      const currentQueryKey = [
+        'listApprove',
+        effectiveFilters.prNo?.trim() || '',
+        effectiveFilters.fromDate?.toISOString() || '',
+        effectiveFilters.toDate?.toISOString() || '',
+        effectiveFilters.department?.id || '',
+        effectiveFilters.requester?.id || '',
+      ];
+      const cached = queryClient.getQueryData(currentQueryKey);
+      if (cached && cached.pages) {
+        // Loại bỏ các item có id nằm trong ids khỏi từng page
+        const newPages = cached.pages.map((page: IApprove[]) =>
+          page.filter(item => !ids.includes(item.id)),
+        );
+        queryClient.setQueryData(currentQueryKey, {
+          ...cached,
+          pages: newPages,
+        });
+        setSelectedIds([]);
+      }
+      showToast(t('createPrice.rejectSuccess'), 'success');
+    },
+    [queryClient, effectiveFilters, t, showToast],
   );
 
   return {
+    onReject,
+    selectedIds,
+    setSelectedIds,
+    onApproved,
     flatData,
     isLoading,
     isFetching,
@@ -81,7 +246,11 @@ export function useApproveViewModel() {
     onRefresh,
     onLoadMore,
     onSearch,
-    searchKey,
+    applyFilters,
+    handleDelete,
+    currentPrNoInput: currentUiFilters.prNo || '', // Thay searchKey bằng prNo
+    currentFilters: currentUiFilters,
     isError,
+    error,
   };
 }

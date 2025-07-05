@@ -9,11 +9,7 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +29,7 @@ import { Colors } from '@/theme/Config';
 import Header from '@/screens/notificationScreen/view/component/Header';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '@/navigation/params';
-import { navigate } from '@/navigation/RootNavigation';
+import { goBack, navigate } from '@/navigation/RootNavigation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import IconInfomation from '@assets/icon/IconInfomation';
 import { useDetailOrderApproveViewModel } from '../viewmodal/useDetailOrderApproveViewModel';
@@ -41,6 +37,9 @@ import DetailOrderItemCard from './component/DetailOrderItemCard';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import Footer from '@/screens/filterScreen/view/component/Footer';
+import { useApproveViewModel } from '@/screens/approvePrScreen/viewmodal/useApproveViewModel';
+import { isAndroid } from '@/utils/Utilities';
 
 const DetailOrderApproveScreen = ({
   route,
@@ -48,7 +47,6 @@ const DetailOrderApproveScreen = ({
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
   const { content, id } = route.params.item;
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -62,6 +60,7 @@ const DetailOrderApproveScreen = ({
     hasNextPage,
     isError,
   } = useDetailOrderApproveViewModel(id);
+  const { onReject, onApproved } = useApproveViewModel();
 
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
 
@@ -168,12 +167,11 @@ const DetailOrderApproveScreen = ({
   );
 
   const reLoadData = useCallback(() => {
-    setIsFirstLoad(false);
     onRefresh();
   }, [onRefresh]);
 
   console.log('error:', isError);
-  if (isError || (isFirstLoad && !isLoading)) {
+  if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
 
@@ -190,7 +188,7 @@ const DetailOrderApproveScreen = ({
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
         {isLoading && flatData.length === 0 ? (
           <View style={styles.listContent}>
-            {new Array(10).fill(0).map((_, index) => (
+            {new Array(6).fill(0).map((_, index) => (
               <SkeletonItem key={index} showWaiting={index % 3 === 0} />
             ))}
           </View>
@@ -201,7 +199,7 @@ const DetailOrderApproveScreen = ({
             data={flatData || []}
             renderItem={renderItem}
             keyExtractor={item => `${item.id}-${item.price}`}
-            onEndReached={onEndReached}
+            // onEndReached={onEndReached}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
             removeClippedSubviews
@@ -221,19 +219,40 @@ const DetailOrderApproveScreen = ({
         {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
         <AnimatedButton
           onPress={scrollToTop}
-          style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-          <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
+          style={[
+            styles.scrollButtonBase,
+            isAndroid() && { bottom: vs(50) },
+            opacityScrollTopStyle,
+          ]}>
+          <IconScrollBottom style={styles.rotateIcon} />
         </AnimatedButton>
         {!isFetchingNextPage && (
           <AnimatedButton
             onPress={scrollToBottom}
-            style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-            {/* style={[styles.scrollButtonContainer, opacityScrollBottomStyle]}> */}
+            style={[styles.scrollButtonBase, opacityScrollBottomStyle]}>
             <IconScrollBottom />
           </AnimatedButton>
         )}
-        {/* {flatData && flatData.length > 0 && <FooterDetailOrder />} */}
       </View>
+      {flatData && flatData.length > 0 && (
+        <Footer
+          onLeftAction={() => {
+            onReject([id]);
+            goBack();
+          }}
+          onRightAction={() => {
+            onApproved([id]);
+            goBack();
+          }}
+          leftButtonTitle={t('createPrice.reject')}
+          rightButtonTitle={t('createPrice.approvedOrder')}
+          customBottom={vs(20)}
+          leftButtonStyle={{ backgroundColor: Colors.ERROR_600 }}
+          rightButtonStyle={{ backgroundColor: Colors.PRIMARY }}
+          leftTextStyle={{ color: Colors.WHITE }}
+          rightTextStyle={{ color: Colors.WHITE }}
+        />
+      )}
     </ViewContainer>
   );
 };
@@ -275,7 +294,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: PaddingHorizontal,
-    paddingBottom: vs(100),
+    paddingBottom: vs(0),
   },
   emptyContainer: {
     flex: 1,
@@ -292,42 +311,23 @@ const styles = StyleSheet.create({
     paddingVertical: vs(16),
     alignItems: 'center',
   },
-  scrollTopContainer: {
+  scrollButtonBase: {
     position: 'absolute',
-    right: s(16),
-    bottom: vs(100),
-    width: s(40),
-    height: s(40),
-    borderRadius: s(20),
-    backgroundColor: Colors.WHITE,
+    alignSelf: 'center',
+    width: vs(33),
+    height: vs(33),
+    borderRadius: vs(24),
+    backgroundColor: light.white,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    bottom: vs(20),
   },
-  scrollBottomContainer: {
-    position: 'absolute',
-    right: s(16),
-    bottom: vs(50),
-    width: s(40),
-    height: s(40),
-    borderRadius: s(20),
-    backgroundColor: Colors.WHITE,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  rotateIcon: {
+    transform: [{ rotate: '180deg' }],
   },
 });

@@ -21,7 +21,7 @@ import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
 import light from '../../../theme/light';
 import { AnimatedButton } from '../../assignPriceScreen/view/AssignPriceScreen';
-import { ContentNotification } from '../../../interface/Notification.interface';
+import { ContentNotification } from '../modal/notificationModel';
 import { useNotificationViewModel } from '../viewmodal/useNotificationViewModel';
 import ItemNotification from './component/ItemNotification';
 import Header from './component/Header';
@@ -33,6 +33,8 @@ import { PaddingHorizontal } from '@/utils/Constans';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import { isAndroid } from '@/utils/Utilities';
+import { navigate } from '@/navigation/RootNavigation';
 
 type Props = NativeStackScreenProps<MainParams, 'NotificationScreen'>;
 const totalNotification = 100; // Hoặc truyền từ props nếu dynamic
@@ -41,11 +43,18 @@ const ICON_SECTION_WIDTH = s(130);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation();
-
   // ─── ViewModel (MVVM) ────────────────────────────────────────────────
 
-  const { flatData, isLoading, isRefetching, isFetchingNextPage, onRefresh, onLoadMore, isError } =
-    useNotificationViewModel();
+  const {
+    flatData,
+    isLoading,
+    isRefetching,
+    isFetchingNextPage,
+    onRefresh,
+    onLoadMore,
+    isError,
+    onDetail,
+  } = useNotificationViewModel();
 
   // ─── Refs & shared values để show/hide nút cuộn ─────────────────────
   const lastOffsetY = useRef(0);
@@ -93,11 +102,6 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   // ─── Khi user nhấn vào 1 item, chuyển sang detail hoặc đánh dấu đã đọc ─────────────────
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const onDetail = (id: number) => {
-    // TODO: navigation.navigate('NotificationDetail', { id })
-    // hoặc gọi API đánh dấu item "id" thành read = true
-  };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDelete = async (id: number) => {
@@ -108,14 +112,19 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   const renderItem = ({ item }: { item: ContentNotification }) => (
     <ItemNotification
       item={item}
-      onDetail={() => onDetail(item.id)}
+      onDetail={() => {
+        if (!item.read) {
+          onDetail(item.id);
+        }
+        navigate('DetailAssignPriceCardScreen', { item });
+      }}
       toggleRead={() => {
         // TODO: toggle read status local hoặc gọi API
       }}
       handleDelete={() => handleDelete(item.id)}
     />
   );
-
+  console.log('renderItem', flatData);
   // ─── Component khi list trống **và** đang không load trang >0 ─────────────
   const listEmptyComponent = () => {
     if (isLoading) {
@@ -173,7 +182,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
         {isLoading && flatData.length === 0 ? (
           <View style={styles.listContentSkeleton}>
-            {new Array(10).fill(0).map((_, index) => (
+            {new Array(6).fill(0).map((_, index) => (
               <SkeletonItem key={index} />
             ))}
           </View>
@@ -183,6 +192,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
             data={flatData || []}
             renderItem={renderItem}
             keyExtractor={item => `${item.id}_${item.read}`}
+            // extraData={flatData.map(item => item.read).join(',')}
             onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
@@ -200,14 +210,20 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
 
         <AnimatedButton
           onPress={scrollToTop}
-          style={[styles.scrollTopContainer, opacityScrollTopStyle]}>
-          <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
+          style={[
+            styles.scrollButtonBase,
+            isAndroid() && { bottom: vs(100) },
+            opacityScrollTopStyle,
+          ]}>
+          <IconScrollBottom style={styles.rotateIcon} />
         </AnimatedButton>
-        <AnimatedButton
-          onPress={scrollToBottom}
-          style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-          <IconScrollBottom />
-        </AnimatedButton>
+        {!isFetchingNextPage && (
+          <AnimatedButton
+            onPress={scrollToBottom}
+            style={[styles.scrollButtonBase, opacityScrollBottomStyle]}>
+            <IconScrollBottom />
+          </AnimatedButton>
+        )}
       </AppBlock>
     </ViewContainer>
   );
@@ -234,33 +250,24 @@ const styles = StyleSheet.create({
     marginVertical: vs(12),
     alignItems: 'center',
   },
-  scrollBottomContainer: {
+  scrollButtonBase: {
     position: 'absolute',
     alignSelf: 'center',
-    bottom: vs(20),
+    width: vs(33),
+    height: vs(33),
+    borderRadius: vs(24),
+    backgroundColor: light.white,
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    bottom: vs(70),
   },
-  scrollTopContainer: {
-    position: 'absolute',
-    alignSelf: 'center',
-    bottom: vs(20),
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
+  rotateIcon: {
+    transform: [{ rotate: '180deg' }],
   },
   emptyContainer: {
     flex: 1,

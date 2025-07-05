@@ -1,5 +1,15 @@
 // models/notificationModel.ts
 
+import {
+  fakeBodyNotification,
+  fakeData,
+  fakeDataHotel,
+  fakeNote,
+  fakeTitleNotification,
+  mockDepartments,
+  mockRequesters,
+} from '@/data/DataFake';
+
 /**
  * Interface định nghĩa 1 notification.
  */
@@ -9,6 +19,12 @@ export interface ContentNotification {
   body: string;
   read: boolean;
   date: string; // ISO string (ví dụ: '2025-06-02T09:30:00Z')
+  location: { id: string; name: string };
+  department: { id: string; name: string };
+  requester: { id: string; name: string };
+  prNo: string;
+  content: string;
+  note: string;
 }
 
 /**
@@ -33,13 +49,27 @@ const ALL_FAKE_NOTIFICATIONS: ContentNotification[] = Array.from(
       new Date(2025, 4, 1).getTime() + Math.floor(Math.random() * 60) * 24 * 60 * 60 * 1000;
     const date = new Date(randomTimestamp).toISOString();
 
+    // Lấy index từ 0-3 để đảm bảo title và body khớp nhau
+    const notificationIndex = idx % 4;
+    const prNo = `PR20240624#${String(Math.floor(Math.random() * 10000) + 1).padStart(4, '0')}`;
+
+    const randomDepartment = mockDepartments[Math.floor(Math.random() * mockDepartments.length)];
+    const randomRequester = mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
+
     return {
+      prNo: prNo,
       id,
-      title: `Chờ Kế toán trưởng duyệt #${id}`,
-      body: `Bạn có đơn hàng PR20250409#0003 chờ KTT duyệt ${id}.`,
-      content: `Bạn có đơn hàng PR20250409#0003 chờ KTT duyệt ${id}.`,
-      read: false,
+      title: fakeTitleNotification[notificationIndex],
+      body: fakeBodyNotification[notificationIndex],
+      content: fakeBodyNotification[notificationIndex],
+      read: idx % 3 === 0,
       date,
+      note: fakeNote[Math.floor(Math.random() * fakeNote.length)],
+      department: randomDepartment,
+      requester: randomRequester,
+      location: fakeDataHotel[Math.floor(Math.random() * fakeDataHotel.length)],
+      createdAt: date, // Giả định ngày tạo cố định
+      estimateDate: date, // Giả định ngày ước tính cố định
     };
   },
 );

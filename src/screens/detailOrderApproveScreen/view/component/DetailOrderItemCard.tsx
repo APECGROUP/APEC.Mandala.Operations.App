@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     marginBottom: vs(4),
   },
   prCodeText: {
-    flex: 1,
+    maxWidth: s(230),
     fontSize: getFontSize(14),
     fontWeight: '700',
     color: '#333333',

@@ -1,7 +1,11 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { ContentNotification, fetchNotificationData } from '../modal/notificationModel';
+import {
+  clearNotificationCache,
+  ContentNotification,
+  fetchNotificationData,
+} from '../modal/notificationModel';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;
@@ -9,6 +13,7 @@ const DEBOUNCE_DELAY = 300;
 export function useNotificationViewModel() {
   const [searchKey, setSearchKey] = useState<string>('');
   const debouncedSearchRef = useRef<ReturnType<typeof debounce> | null>(null);
+  const queryClient = useQueryClient();
 
   // Infinite Query cho phân trang + search
   const {
@@ -52,6 +57,7 @@ export function useNotificationViewModel() {
     if (isFetching || isRefetching || isLoading) {
       return;
     }
+    clearNotificationCache();
     refetch();
   }, [isFetching, isLoading, isRefetching, refetch]);
 
@@ -71,6 +77,34 @@ export function useNotificationViewModel() {
     [debouncedSearch],
   );
 
+  const onDetail = async (id: number) => {
+    const currentQueryKey = ['listNotification', searchKey.trim()];
+
+    const cached = queryClient.getQueryData<InfiniteData<ContentNotification[]>>(currentQueryKey);
+    if (!cached) {
+      console.warn('🟥 No cache found for key:', currentQueryKey);
+      return false;
+    }
+    try {
+      const updatedData = {
+        ...cached,
+        pages: cached.pages.map(page =>
+          page.map(item => {
+            if (item.id === id) {
+              return { ...item, read: true };
+            }
+            return item;
+          }),
+        ),
+      };
+
+      queryClient.setQueryData(currentQueryKey, updatedData);
+      console.log('updateSuccess');
+    } catch (err) {
+      console.error('Error read item:', err);
+    }
+  };
+
   return {
     flatData,
     isLoading,
@@ -83,5 +117,6 @@ export function useNotificationViewModel() {
     onSearch,
     searchKey,
     isError,
+    onDetail,
   };
 }

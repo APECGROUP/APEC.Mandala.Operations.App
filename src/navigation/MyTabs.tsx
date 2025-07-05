@@ -7,6 +7,7 @@ import AssignPriceScreen from '../screens/assignPriceScreen/view/AssignPriceScre
 import CreatePriceScreen from '@/screens/createPriceScreen/view/CreatePriceScreen';
 import CreatePoScreen from '@/screens/createPoScreen/view/CreatePoScreen';
 import PcPrScreen from '@/screens/pcPrScreen/view/PcPrScreen';
+import ApprovePrScreen from '@/screens/approvePrScreen/view/ApprovePrScreen';
 
 const MyTabs = () => {
   const Tab = createBottomTabNavigator<TabBarParams>();
@@ -35,7 +36,8 @@ const MyTabs = () => {
         // }
       />
       <Tab.Screen name="CreatePriceScreen" component={CreatePriceScreen} />
-      <Tab.Screen name="CreatePoScreen" component={CreatePoScreen} />
+      <Tab.Screen name="CreatePoScreen" component={ApprovePrScreen} />
+      {/* <Tab.Screen name="CreatePoScreen" component={CreatePoScreen} /> */}
       <Tab.Screen name="PcPrScreen" component={PcPrScreen} />
       {/* <Tab.Screen name="PcLogScreen" component={PcLogScreen} /> */}
     </Tab.Navigator>

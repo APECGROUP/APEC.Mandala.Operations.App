@@ -1,3 +1,4 @@
+import { fakeDataHotel, fakeNote, mockDepartments, mockRequesters } from '@/data/DataFake';
 import axios from 'axios';
 
 // --- (Các interfaces không thay đổi) ---
@@ -16,6 +17,7 @@ export interface AssignPriceFilters {
 
 export interface DataAssignPrice {
   id: string;
+  prNo: string;
   content: string;
   images: string[];
   videos: string[];
@@ -27,6 +29,7 @@ export interface DataAssignPrice {
   department: { id: string; name: string };
   requester: { id: string; name: string };
   createdAt: string;
+  location: { id: string; name: string };
   estimateDate: string;
 }
 
@@ -53,26 +56,12 @@ function generateMockAssignPriceData(
   const createdAt = fromDate ? fromDate : new Date();
   const estimateDate = toDate ? toDate : new Date();
 
-  const mockDepartments = [
-    { id: 'dep1', name: 'Phòng Kế toán' },
-    { id: 'dep2', name: 'Phòng IT' },
-    { id: 'dep3', name: 'Phòng Kinh doanh' },
-    { id: 'dep4', name: 'Phòng Nhân sự' },
-    { id: 'dep5', name: 'Phòng Sản xuất' },
-  ];
-  const mockRequesters = [
-    { id: 'req1', name: 'Nguyễn Văn A' },
-    { id: 'req2', name: 'Trần Thị B' },
-    { id: 'req3', name: 'Lê Văn C' },
-    { id: 'req4', name: 'Phạm Thị D' },
-    { id: 'req5', name: 'Hoàng Văn E' },
-  ];
-
   const randomDepartment = mockDepartments[Math.floor(Math.random() * mockDepartments.length)];
   const randomRequester = mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
   return {
     id: item.id,
     content,
+    prNo: content,
     images: imageUrls,
     videos: [],
     time: '28/05/2025 - 30/05/2025',
@@ -80,8 +69,11 @@ function generateMockAssignPriceData(
       name: item.author,
       avatar: `https://picsum.photos/id/${item.id}/100/100`,
     },
+    note: fakeNote[Math.floor(Math.random() * fakeNote.length)],
     department: randomDepartment,
     requester: randomRequester,
+
+    location: fakeDataHotel[Math.floor(Math.random() * fakeDataHotel.length)],
     createdAt: createdAt, // Giả định ngày tạo cố định
     estimateDate: estimateDate, // Giả định ngày ước tính cố định
   };

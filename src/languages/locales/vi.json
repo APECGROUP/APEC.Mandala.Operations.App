@@ -53,6 +53,7 @@
       "searchPlaceholder": "Tìm kiếm PR No"
     },
     "notifications": {
+      "youHave": "Bạn có đơn hàng",
       "title": "Thông báo",
       "seeAll": "Đọc tất cả",
       "status": {

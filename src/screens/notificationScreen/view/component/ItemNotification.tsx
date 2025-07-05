@@ -5,13 +5,15 @@ import React from 'react';
 import { s, vs } from 'react-native-size-matters';
 import { getFontSize } from '../../../../constants';
 import { AppText } from '../../../../elements/text/AppText';
-import { ContentNotification } from '../../../../interface/Notification.interface';
+import { ContentNotification } from '../../modal/notificationModel';
 import { PaddingHorizontal } from '../../../../utils/Constans';
 import AppBlockButton from '../../../../elements/button/AppBlockButton';
 import IconWaitingChiefAccountantApproval from '../../../../../assets/icon/IconWaitingChiefAccountantApproval';
 import IconWaitingAssignPrice from '../../../../../assets/icon/IconWaitingAssignPrice';
 import IconWaitingDeptHeadApproval from '../../../../../assets/icon/IconWaitingDeptHeadApproval';
 import IconWaitingGMOMApproval from '../../../../../assets/icon/IconWaitingGMOMApproval';
+import { Colors } from '@/theme/Config';
+import { useTranslation } from 'react-i18next';
 type props = {
   item: ContentNotification;
   onDetail: (id: number) => void;
@@ -19,35 +21,41 @@ type props = {
   handleDelete: (id: number) => void;
 };
 const ItemNotification = ({ item, onDetail }: props) => {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
   const status = item.id % 4;
   const getIcon = () => {
     switch (status) {
-      case 1:
-        return <IconWaitingAssignPrice />;
       case 2:
         return <IconWaitingChiefAccountantApproval />;
-      case 3:
+      case 1:
         return <IconWaitingDeptHeadApproval />;
 
-      default:
+      case 3:
         return <IconWaitingGMOMApproval />;
+      default:
+        return <IconWaitingAssignPrice />;
     }
   };
   return (
     <AppBlockButton
       onPress={() => onDetail(item.id)}
-      style={[styles.button, { paddingHorizontal: PaddingHorizontal }]}>
+      style={[
+        styles.button,
+        {
+          paddingHorizontal: PaddingHorizontal,
+          backgroundColor: !item.read ? Colors.BLACK_100 : 'white',
+        },
+      ]}>
       {getIcon()}
       <View style={{ width: s(275), marginLeft: s(9) }}>
         <AppText numberOfLines={1} style={styles.title}>
           {item.title}
         </AppText>
         <AppText numberOfLines={2} style={styles.body}>
-          {item.content}
+          {t('notifications.youHave')} {item.prNo} {item.content}
         </AppText>
       </View>
-      <View style={styles.dotBlue} />
+      <View style={[styles.dotBlue, { backgroundColor: !item.read ? '#0059CB' : 'transparent' }]} />
     </AppBlockButton>
   );
 };
