@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ResponseNcc } from '../../modalPickNcc/modal/PickNccModal';
+import { fakeData } from '@/data/DataFake';
 
 export interface IPickItem {
   id: string | undefined;
@@ -50,16 +51,6 @@ export const fetchPickItemData = async (
     end: 'Chai',
     dateFrom: '28/05/2025',
     dateTo: '30/05/2025',
-    name:
-      [
-        'Táo đỏ phơi khô',
-        'Thịt gà Đông Tảo',
-        'Thịt cừu Mỹ',
-        'Thịt lợn Bắc Ninh',
-        'Thịt châu Đông Anh',
-        'Thịt bò Mỹ Đình',
-      ][Math.floor(Math.random() * 6)] +
-      ' ' +
-      index,
+    name: fakeData[Math.floor(Math.random() * 50)],
   }));
 };

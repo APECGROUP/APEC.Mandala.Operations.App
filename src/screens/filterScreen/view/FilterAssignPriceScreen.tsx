@@ -21,10 +21,10 @@ import {
   SelectedOption,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 
-const FilterScreen = ({
+const FilterAssignPriceScreen = ({
   route,
   navigation,
-}: NativeStackScreenProps<MainParams, 'FilterScreen'>) => {
+}: NativeStackScreenProps<MainParams, 'FilterAssignPriceScreen'>) => {
   const { t } = useTranslation();
 
   // Lấy hàm callback onApplyFilters từ route params
@@ -191,7 +191,7 @@ const FilterScreen = ({
   );
 };
 
-export default FilterScreen;
+export default FilterAssignPriceScreen;
 
 const styles = StyleSheet.create({
   width100: { width: '100%' },

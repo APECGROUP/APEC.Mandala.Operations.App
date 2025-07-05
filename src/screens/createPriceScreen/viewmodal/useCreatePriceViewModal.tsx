@@ -60,6 +60,9 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
       effectiveFilters.toDate?.toISOString() || '',
       effectiveFilters.department?.id || '',
       effectiveFilters.requester?.id || '',
+      effectiveFilters.product?.id || '',
+      effectiveFilters.ncc?.id || '',
+      effectiveFilters.status?.id || '',
     ],
     [effectiveFilters],
   );
@@ -206,7 +209,6 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
         setSelectedIds([]);
       }
       showToast(t('createPrice.approvedSuccess'), 'success');
-       
     },
     [queryClient, effectiveFilters, t, showToast],
   );
@@ -234,7 +236,6 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
         setSelectedIds([]);
       }
       showToast(t('createPrice.rejectSuccess'), 'success');
-       
     },
     [queryClient, effectiveFilters, t, showToast],
   );

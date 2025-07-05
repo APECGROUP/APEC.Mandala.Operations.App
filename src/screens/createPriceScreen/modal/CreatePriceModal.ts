@@ -17,6 +17,7 @@ export interface TypeCreatePrice {
   estimateDate?: string; // Giả sử là ISO string hoặc Date object
   department?: SelectedOption;
   requester?: SelectedOption;
+  status?: SelectedOption;
 }
 
 export interface SelectedOption {
@@ -30,6 +31,9 @@ export interface CreatePriceFilters {
   toDate?: Date;
   department?: SelectedOption;
   requester?: SelectedOption;
+  product?: SelectedOption;
+  ncc?: SelectedOption;
+  status?: SelectedOption;
 }
 
 // Cache để tránh gọi API trùng lặp (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
@@ -45,11 +49,18 @@ function generateMockCreatePriceData(item: any, filters: CreatePriceFilters): Ty
 
   let contentName = fakeData[Math.floor(Math.random() * 50)];
   let ncc = fakeNcc[Math.floor(Math.random() * 10)];
+  let status = { id: '', name: '' };
 
   // Nếu có searchKey, giả lập rằng tên sản phẩm được lọc theo searchKey
   // (mặc dù API picsum không thực sự lọc)
-  if (filters.prNo && !contentName.toLowerCase().includes(filters.prNo.toLowerCase())) {
-    contentName = `${filters.prNo} - ${contentName}`; // Đảm bảo searchKey xuất hiện trong tên
+  if (filters.product?.name && filters.product.name !== '') {
+    contentName = filters.product.name; // Đảm bảo searchKey xuất hiện trong tên
+  }
+  if (filters.ncc?.name && filters.ncc.name !== '') {
+    ncc = filters.ncc.name;
+  }
+  if (filters.status?.name && filters.status.name !== '') {
+    status = filters.status;
   }
 
   // Giả lập dữ liệu phòng ban và người yêu cầu
@@ -98,6 +109,7 @@ function generateMockCreatePriceData(item: any, filters: CreatePriceFilters): Ty
     end: fakeEnd[Math.floor(Math.random() * 5)], // Giả lập
     department: randomDepartment,
     requester: randomRequester,
+    status: status,
   };
 }
 
@@ -172,7 +184,16 @@ export const fetchCreatePrice = async (
     if (filters.requester?.id) {
       requestParams.requesterId = filters.requester.id;
     }
-
+    if (filters.product?.id) {
+      requestParams.productId = filters.product.id;
+    }
+    if (filters.ncc?.id) {
+      requestParams.nccId = filters.ncc.id;
+    }
+    if (filters.status?.id) {
+      requestParams.statusId = filters.status.id;
+    }
+    console.log('alo:', requestParams);
     // Thực hiện cuộc gọi API bằng Axios
     const { data } = await axios.get(apiUrl, { params: requestParams });
 

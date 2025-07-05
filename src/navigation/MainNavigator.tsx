@@ -21,7 +21,7 @@ import ChangePasswordScreen from '@/screens/changePasswordScreen/ChangePasswordS
 import InformationItemsScreen from '@/screens/InformationItemScreen/view/InformationItemsScreen';
 import DetailAssignPriceCardScreen from '@/screens/assignPriceScreen/view/component/DetailAssignPriceCardScreen';
 import PickNccScreen from '@/views/modal/modalPickNcc/view/PickNccScreen';
-import FilterScreen from '@/screens/filterScreen/view/FilterScreen';
+import FilterAssignPriceScreen from '@/screens/filterScreen/view/FilterAssignPriceScreen';
 import PickDepartmentScreen from '@/views/modal/modalPickDepartment/view/PickDepartmentScreen';
 import PickRequesterScreen from '@/views/modal/modalPickRequester/view/PickRequesterScreen';
 import CreatePriceNccScreen from '@/screens/createPriceScreen/view/component/CreatePriceNccScreen';
@@ -30,6 +30,8 @@ import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import DetailApproveCardScreen from '@/screens/approvePrScreen/view/component/DetailApproveCardScreen';
 import DetailOrderApproveScreen from '@/screens/detailOrderApproveScreen/view/DetailOrderApproveScreen';
 import PickItemScreen from '@/views/modal/modalPickItem/view/PickItemScreen';
+import FilterApproveScreen from '@/screens/filterScreen/view/FilterApproveScreen';
+import FilterCreatePriceScreen from '@/screens/filterScreen/view/FilterCreatePriceScreen';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -146,8 +148,32 @@ export default function MainNavigator() {
               backgroundColor: Colors.WHITE,
             },
           }}
-          name="FilterScreen"
-          component={FilterScreen}
+          name="FilterAssignPriceScreen"
+          component={FilterAssignPriceScreen}
+        />
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: t('filter.title'),
+            contentStyle: {
+              paddingHorizontal: 0,
+              backgroundColor: Colors.WHITE,
+            },
+          }}
+          name="FilterApproveScreen"
+          component={FilterApproveScreen}
+        />
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: t('filter.title'),
+            contentStyle: {
+              paddingHorizontal: 0,
+              backgroundColor: Colors.WHITE,
+            },
+          }}
+          name="FilterCreatePriceScreen"
+          component={FilterCreatePriceScreen}
         />
 
         <Screen

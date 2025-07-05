@@ -36,7 +36,15 @@ export type MainParams = {
   ApprovePrScreen: undefined;
   CreatePriceNccScreen: undefined;
   AccountScreen: undefined;
-  FilterScreen: {
+  FilterAssignPriceScreen: {
+    currentFilters: AssignPriceFilters;
+    onApplyFilters: (filters: AssignPriceFilters) => void;
+  };
+  FilterApproveScreen: {
+    currentFilters: AssignPriceFilters;
+    onApplyFilters: (filters: AssignPriceFilters) => void;
+  };
+  FilterCreatePriceScreen: {
     currentFilters: AssignPriceFilters;
     onApplyFilters: (filters: AssignPriceFilters) => void;
   };

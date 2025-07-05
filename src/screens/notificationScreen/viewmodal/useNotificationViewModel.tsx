@@ -104,8 +104,29 @@ export function useNotificationViewModel() {
       console.error('Error read item:', err);
     }
   };
+  const readAll = async () => {
+    const currentQueryKey = ['listNotification', searchKey.trim()];
+
+    const cached = queryClient.getQueryData<InfiniteData<ContentNotification[]>>(currentQueryKey);
+    if (!cached) {
+      console.warn('🟥 No cache found for key:', currentQueryKey);
+      return false;
+    }
+    try {
+      const updatedData = {
+        ...cached,
+        pages: cached.pages.map(page => page.map(item => ({ ...item, read: true }))),
+      };
+
+      queryClient.setQueryData(currentQueryKey, updatedData);
+      console.log('updateSuccess');
+    } catch (err) {
+      console.error('Error read item:', err);
+    }
+  };
 
   return {
+    readAll,
     flatData,
     isLoading,
     isFetching,

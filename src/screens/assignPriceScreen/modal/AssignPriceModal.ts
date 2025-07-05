@@ -13,6 +13,9 @@ export interface AssignPriceFilters {
   toDate?: Date;
   department?: SelectedOption;
   requester?: SelectedOption;
+  product?: SelectedOption;
+  ncc?: SelectedOption;
+  status?: SelectedOption;
 }
 
 export interface DataAssignPrice {

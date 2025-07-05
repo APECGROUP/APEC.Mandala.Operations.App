@@ -117,6 +117,7 @@
       "supplier": "Nhà cung cấp",
       "pick": "Chọn",
       "nameItem": "Tên mặt hàng",
+      "ncc": "NCC",
       "status": "Trạng thái",
       "statusFilter": {
         "approved": "Đã duyệt",

@@ -221,7 +221,7 @@ const CreatePriceScreen: React.FC = () => {
   );
 
   const goToFilterScreen = useCallback(() => {
-    navigate('FilterScreen', {
+    navigate('FilterCreatePriceScreen', {
       onApplyFilters: applyFilters, // Callback để FilterScreen gọi khi confirm
       currentFilters: currentFilters, // Filters hiện tại đang hiển thị trên màn hình A
     });

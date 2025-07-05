@@ -54,6 +54,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
     onLoadMore,
     isError,
     onDetail,
+    readAll,
   } = useNotificationViewModel();
 
   // ─── Refs & shared values để show/hide nút cuộn ─────────────────────
@@ -150,7 +151,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   const notificationLabel = formatNotificationCount(totalNotification);
 
   const rightComponent = () => (
-    <TouchableOpacity style={styles.rightButton} onPress={() => {}}>
+    <TouchableOpacity style={styles.rightButton} onPress={readAll}>
       <IconSeeAll />
       <AppText numberOfLines={1} style={styles.rightText}>
         {t('Đọc tất cả')}

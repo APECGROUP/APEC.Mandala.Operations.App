@@ -154,7 +154,6 @@ const ApprovePrScreen: React.FC = () => {
         <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
       </View>
     );
-     
   }, [isLoading, t]);
 
   const listFooterComponent = useMemo(() => {
@@ -198,7 +197,7 @@ const ApprovePrScreen: React.FC = () => {
   );
 
   const goToFilterScreen = useCallback(() => {
-    navigate('FilterScreen', {
+    navigate('FilterApproveScreen', {
       onApplyFilters: applyFilters, // Callback để FilterScreen gọi khi confirm
       currentFilters: currentFilters, // Filters hiện tại đang hiển thị trên màn hình A
     });
