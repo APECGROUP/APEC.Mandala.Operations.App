@@ -233,6 +233,7 @@ const DataLocal = {
     try {
       DataLocal.token = null;
       DataLocal.user = null;
+      DataLocal.rememberLogin = false;
       DataLocal.credentials = null;
 
       // Xóa token từ MMKV
