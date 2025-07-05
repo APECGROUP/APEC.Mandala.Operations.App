@@ -36,9 +36,6 @@ export interface CreatePriceFilters {
   status?: SelectedOption;
 }
 
-// Cache để tránh gọi API trùng lặp (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
-const cache = new Map<string, TypeCreatePrice[]>();
-
 /**
  * Hàm giả lập để tạo dữ liệu TypeCreatePrice.
  * Logic tạo dữ liệu ngẫu nhiên được tách ra để dễ quản lý.
@@ -114,17 +111,6 @@ function generateMockCreatePriceData(item: any, filters: CreatePriceFilters): Ty
 }
 
 /**
- * Tạo cache key duy nhất dựa trên tất cả các tham số ảnh hưởng đến kết quả.
- * (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
- */
-function getCacheKey(page: number, limit: number, filters: CreatePriceFilters): string {
-  const { prNo, fromDate, toDate, department, requester } = filters;
-  return `${page}_${limit}_${prNo || ''}_${fromDate?.toISOString() || ''}_${
-    toDate?.toISOString() || ''
-  }_${department?.id || ''}_${requester?.id || ''}`;
-}
-
-/**
  * Lấy danh sách TypeCreatePrice từ API (giả lập) và áp dụng bộ lọc.
  *
  * @param page Số trang cần lấy.
@@ -137,18 +123,6 @@ export const fetchCreatePrice = async (
   limit: number = 50,
   filters: CreatePriceFilters = {},
 ): Promise<TypeCreatePrice[]> => {
-  const cacheKey = getCacheKey(page, limit, filters);
-
-  // Kiểm tra cache trước để tăng hiệu năng (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
-  if (cache.has(cacheKey)) {
-    console.log(
-      '--- fetchCreatePrice: Returning data from internal cache for key:',
-      cacheKey,
-      '---',
-    );
-    return cache.get(cacheKey)!;
-  }
-
   try {
     // --- Endpoint API thật của bạn ---
     // THAY THẾ DÒNG NÀY BẰNG ENDPOINT API THẬT CỦA BẠN.
@@ -206,14 +180,6 @@ export const fetchCreatePrice = async (
       (item: any) => generateMockCreatePriceData(item, filters), // Truyền toàn bộ filters để generateMock có thể giả lập lọc tốt hơn
     );
 
-    // Lưu vào cache (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
-    cache.set(cacheKey, processedData);
-
-    // Giới hạn kích thước cache để tránh memory leak (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
-    if (cache.size > 100) {
-      const firstKey = cache.keys().next().value;
-      cache.delete(firstKey || '');
-    }
     console.log('--- fetchCreatePrice: API call finished for filters:', filters, '---');
 
     return processedData;
@@ -237,12 +203,4 @@ export const deleteCreatePrice = async (id: string) => {
     console.error('Error deleting item on backend:', error);
     return false;
   }
-};
-
-/**
- * Clear cache khi cần thiết (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
- */
-export const clearCreatePriceCache = () => {
-  cache.clear();
-  console.log('--- Internal Create Price Cache Cleared ---');
 };

@@ -6,7 +6,6 @@ import {
   TypeCreatePrice,
   fetchCreatePrice,
   CreatePriceFilters, // Bạn cần đảm bảo TypeCreatePrice và CreatePriceFilters được cập nhật để sử dụng 'prNo'
-  clearCreatePriceCache,
 } from '../modal/CreatePriceModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
@@ -95,7 +94,6 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
 
   const onRefresh = useCallback(() => {
     console.log('onRefresh called from ViewModel. Forcing refetch.');
-    clearCreatePriceCache();
     refetch();
   }, [refetch]);
 

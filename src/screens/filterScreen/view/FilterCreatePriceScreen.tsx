@@ -1,15 +1,13 @@
-import { Keyboard, StatusBar, StyleSheet, TextInput, View } from 'react-native';
-import React, { useRef, useState, useCallback } from 'react';
+import { Keyboard, StatusBar, StyleSheet, View } from 'react-native';
+import React, { useState, useCallback } from 'react';
 import { getFontSize } from '../../../constants';
 import { AppBlock } from '../../../elements/block/Block';
-import AppTextInput, { AppInputLabel } from '../../../elements/textInput/AppTextInput';
+import AppTextInput from '../../../elements/textInput/AppTextInput';
 import light from '../../../theme/light';
 import { useTranslation } from 'react-i18next';
-import moment from 'moment';
 import { navigate } from '@/navigation/RootNavigation';
 import { PaddingHorizontal } from '@/utils/Constans';
 import IconArrowRight from '@assets/icon/IconArrowRight';
-import IconCalendar from '@assets/icon/IconCalendar';
 import { vs, s } from 'react-native-size-matters'; // Import s
 import Footer from './component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
@@ -22,7 +20,6 @@ import {
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { AppText } from '@/elements/text/AppText';
 import { Colors } from '@/theme/Config';
-import { clearCreatePriceCache } from '@/screens/createPriceScreen/modal/CreatePriceModal';
 
 const FilterCreatePriceScreen = ({
   route,
@@ -70,7 +67,6 @@ const FilterCreatePriceScreen = ({
 
   // --- Xử lý khi người dùng xác nhận bộ lọc ---
   const onConfirm = useCallback(() => {
-    clearCreatePriceCache();
     // Tạo object filters mới từ state cục bộ của FilterScreen
     const newFilters: AssignPriceFilters = {
       ncc: ncc.id ? ncc : undefined, // Nếu id rỗng thì là undefined
