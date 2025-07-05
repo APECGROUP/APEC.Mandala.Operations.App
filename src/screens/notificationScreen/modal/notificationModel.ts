@@ -2,7 +2,6 @@
 
 import {
   fakeBodyNotification,
-  fakeData,
   fakeDataHotel,
   fakeNote,
   fakeTitleNotification,

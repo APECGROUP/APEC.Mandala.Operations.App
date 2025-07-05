@@ -5,7 +5,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MyTabBar from './MyTabBar';
 import AssignPriceScreen from '../screens/assignPriceScreen/view/AssignPriceScreen';
 import CreatePriceScreen from '@/screens/createPriceScreen/view/CreatePriceScreen';
-import CreatePoScreen from '@/screens/createPoScreen/view/CreatePoScreen';
 import PcPrScreen from '@/screens/pcPrScreen/view/PcPrScreen';
 import ApprovePrScreen from '@/screens/approvePrScreen/view/ApprovePrScreen';
 

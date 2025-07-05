@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
+import React, { useRef, useCallback, useMemo, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -37,19 +37,14 @@ import ToastContainer from '@/elements/toast/ToastContainer';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import { Colors } from '@/theme/Config';
-import { Gesture } from 'react-native-gesture-handler';
-import IconCreatePrice from '@assets/icon/IconCreatePrice';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
-import IconPlus from '@assets/icon/IconPlus';
 import Footer from '@/screens/filterScreen/view/component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { useAlert } from '@/elements/alert/AlertProvider';
 import { isAndroid } from '@/utils/Utilities';
 import ApproveCard from './component/ApproveCard';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
-import { FooterComponent } from 'react-native-screens/lib/typescript/components/ScreenFooter';
 
 const ApprovePrScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -159,7 +154,7 @@ const ApprovePrScreen: React.FC = () => {
         <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
       </View>
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isLoading, t]);
 
   const listFooterComponent = useMemo(() => {
