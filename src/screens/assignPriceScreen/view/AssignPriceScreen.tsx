@@ -122,7 +122,7 @@ const AssignPriceScreen: React.FC = () => {
 
   // ─── Khi bấm nút "Filter" ───────────────────────
   const goToFilterScreen = useCallback(() => {
-    navigate('FilterScreen', {
+    navigate('FilterAssignPriceScreen', {
       onApplyFilters: applyFilters, // Callback để FilterScreen gọi khi confirm
       currentFilters: currentFilters, // Filters hiện tại đang hiển thị trên màn hình A
     });
