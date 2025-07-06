@@ -115,6 +115,7 @@ const DetailOrderApproveScreen = ({
     lastOffsetY.current = y;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onEndReached = () => {
     if (!isLoading && !isFetchingNextPage && hasNextPage && !isFetching) {
       onLoadMore();

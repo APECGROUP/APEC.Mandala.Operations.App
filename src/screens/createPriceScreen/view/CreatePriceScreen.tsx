@@ -46,7 +46,6 @@ import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import IconPlus from '@assets/icon/IconPlus';
 import Footer from '@/screens/filterScreen/view/component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { useAlert } from '@/elements/alert/AlertProvider';
 import { isAndroid } from '@/utils/Utilities';
 
 const CreatePriceScreen: React.FC = () => {
@@ -54,7 +53,6 @@ const CreatePriceScreen: React.FC = () => {
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const { showToast } = useAlert();
   const route = useRoute() as any;
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -63,7 +61,7 @@ const CreatePriceScreen: React.FC = () => {
     isRefetching,
     isFetchingNextPage,
     onRefresh,
-    onLoadMore,
+    // onLoadMore,
     onSearch, // Đổi tên từ onSearchPrNo thành onSearch
     applyFilters,
     handleDelete,
@@ -182,16 +180,22 @@ const CreatePriceScreen: React.FC = () => {
 
   const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
 
-  const handleSelect = useCallback((id: string) => {
-    setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
-  }, []);
+  const handleSelect = useCallback(
+    (id: string) => {
+      setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+    },
+    [setSelectedIds],
+  );
 
   // Callback để xử lý khi xóa thành công
-  const handleDeleteSuccess = useCallback((deletedId: string) => {
-    // Nếu item đã được selected thì trừ đi 1 số lượng
-    setSelectedIds(prev => prev.filter(id => id !== deletedId));
-    console.log(`✅ Item ${deletedId} deleted successfully and removed from selection`);
-  }, []);
+  const handleDeleteSuccess = useCallback(
+    (deletedId: string) => {
+      // Nếu item đã được selected thì trừ đi 1 số lượng
+      setSelectedIds(prev => prev.filter(id => id !== deletedId));
+      console.log(`✅ Item ${deletedId} deleted successfully and removed from selection`);
+    },
+    [setSelectedIds],
+  );
 
   const toggleSelectAll = useCallback(() => {
     const allIds = flatData.map(item => item.id);
@@ -200,7 +204,7 @@ const CreatePriceScreen: React.FC = () => {
     } else {
       setSelectedIds(allIds); // Chọn tất cả
     }
-  }, [selectedIds.length, flatData]);
+  }, [selectedIds.length, flatData, setSelectedIds]);
 
   const renderItem = useCallback(
     ({ item }: { item: TypeCreatePrice; index: number }) => (

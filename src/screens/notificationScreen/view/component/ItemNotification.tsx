@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import { StyleSheet, View } from 'react-native';
 import React from 'react';
 // import {Menu} from 'react-native-paper';

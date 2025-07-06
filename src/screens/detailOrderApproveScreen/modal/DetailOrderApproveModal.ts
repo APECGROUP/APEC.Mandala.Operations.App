@@ -26,7 +26,7 @@ export const fetchDetailOrderApproveData = async (
 ): Promise<DetailOrderApprove[]> => {
   const { data } = await axios.get(`https://picsum.photos/v2/list?page=${page}&limit=${limit}`);
 
-  return data.map((item: any, index: number) => ({
+  return data.map((item: any) => ({
     id: item.id,
     name: fakeData[Math.floor(Math.random() * 50)],
     price: Math.floor(Math.random() * 10000) * 1000,

@@ -58,7 +58,7 @@ const ApprovePrScreen: React.FC = () => {
     isRefetching,
     isFetchingNextPage,
     onRefresh,
-    onLoadMore,
+    // onLoadMore,
     onSearch, // Đổi tên từ onSearchPrNo thành onSearch
     applyFilters,
     currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
@@ -167,9 +167,12 @@ const ApprovePrScreen: React.FC = () => {
     return null;
   }, [isFetchingNextPage]);
 
-  const handleSelect = useCallback((id: string) => {
-    setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
-  }, []);
+  const handleSelect = useCallback(
+    (id: string) => {
+      setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+    },
+    [setSelectedIds],
+  );
 
   const toggleSelectAll = useCallback(() => {
     const allIds = flatData.map(item => item.id);
@@ -178,7 +181,7 @@ const ApprovePrScreen: React.FC = () => {
     } else {
       setSelectedIds(allIds); // Chọn tất cả
     }
-  }, [selectedIds.length, flatData]);
+  }, [selectedIds.length, flatData, setSelectedIds]);
 
   const renderItem = useCallback(
     ({ item }: { item: IApprove; index: number }) => (

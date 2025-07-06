@@ -8,7 +8,6 @@ import {
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
-import { TypePickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 import { TypeApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
 
 // ─────────────────────────────────────────────────────────────

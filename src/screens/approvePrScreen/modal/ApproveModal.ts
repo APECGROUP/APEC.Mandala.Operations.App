@@ -2,7 +2,6 @@
 
 import {
   fakeData,
-  fakeDataHotel,
   fakeEnd,
   fakeLocal,
   fakeNcc,

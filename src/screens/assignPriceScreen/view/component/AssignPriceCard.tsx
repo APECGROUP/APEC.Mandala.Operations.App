@@ -18,7 +18,7 @@ interface AssignPriceCardProps {
   index: number;
 }
 
-const AssignPriceCard = memo<AssignPriceCardProps>(({ item, index }) => {
+const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
   const { t } = useTranslation();
 
   const handlePress = useCallback(() => {

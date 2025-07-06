@@ -69,8 +69,8 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
   },
 
   updateAvatar: async (source: string) => {
-    const newAvatar = `${source}&v=${Date.now()}`;
-
+    const newAvatar = source;
+    // const newAvatar = `${source}&v=${Date.now()}`;
     const updatedUser: TypeUser = {
       ...get().infoUser,
       profile: {
@@ -78,7 +78,7 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
         avatar: newAvatar,
       },
     };
-
+    console.log('xử lý update', updatedUser);
     set({ infoUser: updatedUser });
     try {
       storage.set(USER_KEY, JSON.stringify(updatedUser));

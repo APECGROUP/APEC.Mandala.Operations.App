@@ -17,10 +17,9 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
   const { t } = useTranslation();
   const { infoUser, updateAvatar } = useInfoUser();
 
+  // eslint-disable-next-line arrow-body-style, @typescript-eslint/no-unused-vars
   const onUploadAvatar = async (imageAvatar: ResponseImageElement) => {
-    if (imageAvatar) {
-      return updateAvatar('https://mdbcdn.b-cdn.net/img/new/avatars/2.webp');
-    }
+    return updateAvatar('https://i.pinimg.com/736x/9c/2e/5e/9c2e5e3d63454104bdee33258fca0a28.jpg');
     // try {
     //   const uri = imageAvatar?.path || imageAvatar?.sourceURL || imageAvatar?.uri;
     //   let formData: any = new FormData();

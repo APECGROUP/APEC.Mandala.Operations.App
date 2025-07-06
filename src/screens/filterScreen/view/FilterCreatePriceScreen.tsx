@@ -52,7 +52,7 @@ const FilterCreatePriceScreen = ({
   const onPressNcc = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickNccScreen', {
-      setNcc: (ncc: SelectedOption) => setNcc(ncc),
+      setNcc: (v: SelectedOption) => setNcc(v),
       ncc: ncc, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [ncc]);
@@ -63,7 +63,7 @@ const FilterCreatePriceScreen = ({
       setItem: (_item: SelectedOption) => setProduct(_item),
       item: product, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
-  }, []);
+  }, [product]);
 
   // --- Xử lý khi người dùng xác nhận bộ lọc ---
   const onConfirm = useCallback(() => {
@@ -124,9 +124,7 @@ const FilterCreatePriceScreen = ({
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
           </AppBlockButton>
-          <AppText style={[styles.label, { alignSelf: 'flex-start', marginBottom: vs(12) }]}>
-            {t('filter.status')}
-          </AppText>
+          <AppText style={[styles.label, styles.labelStatus]}>{t('filter.status')}</AppText>
           <View style={styles.statusContainer}>
             {statusList.map((sub: { id: string; name: string }) => {
               const isSelect = status.id === sub.id;
@@ -158,6 +156,7 @@ const FilterCreatePriceScreen = ({
 export default FilterCreatePriceScreen;
 
 const styles = StyleSheet.create({
+  labelStatus: { alignSelf: 'flex-start', marginBottom: vs(12) },
   textButton: { fontSize: getFontSize(12), fontWeight: '500' },
   textButtonSelected: {
     fontSize: getFontSize(12),

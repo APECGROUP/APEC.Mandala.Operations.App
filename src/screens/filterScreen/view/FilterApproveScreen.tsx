@@ -55,7 +55,6 @@ const FilterApproveScreen = ({
 
   // Ref cho TextInput để quản lý focus (có thể không cần thiết nếu dùng AppTextInput đúng cách)
   const refFromDate = useRef<TextInput>(null);
-  const refToDate = useRef<TextInput>(null);
   const refLocation = useRef<TextInput>(null);
   // --- Handlers cho việc chọn giá trị từ các Modal khác ---
   const onPressPickTime = useCallback(() => {
@@ -112,7 +111,7 @@ const FilterApproveScreen = ({
       onApplyFiltersCallback(newFilters);
     }
     navigation.goBack();
-  }, [prNo, fromDate, toDate, department, requester, onApplyFiltersCallback, navigation]);
+  }, [prNo, fromDate, toDate, department, requester, location, onApplyFiltersCallback, navigation]);
 
   const onReset = useCallback(() => {
     setPrNo('');
