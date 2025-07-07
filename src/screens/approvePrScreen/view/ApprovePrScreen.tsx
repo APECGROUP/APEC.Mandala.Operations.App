@@ -34,8 +34,6 @@ import { navigate } from '../../../navigation/RootNavigation';
 import { AppText } from '@/elements/text/AppText';
 import { useApproveViewModel } from '../viewmodal/useApproveViewModel';
 import ToastContainer from '@/elements/toast/ToastContainer';
-import IconCheckBox from '@assets/icon/IconCheckBox';
-import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import { Colors } from '@/theme/Config';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
@@ -174,14 +172,14 @@ const ApprovePrScreen: React.FC = () => {
     [setSelectedIds],
   );
 
-  const toggleSelectAll = useCallback(() => {
-    const allIds = flatData.map(item => item.id);
-    if (selectedIds.length === flatData.length) {
-      setSelectedIds([]); // Bỏ chọn tất cả
-    } else {
-      setSelectedIds(allIds); // Chọn tất cả
-    }
-  }, [selectedIds.length, flatData, setSelectedIds]);
+  // const toggleSelectAll = useCallback(() => {
+  //   const allIds = flatData.map(item => item.id);
+  //   if (selectedIds.length === flatData.length) {
+  //     setSelectedIds([]); // Bỏ chọn tất cả
+  //   } else {
+  //     setSelectedIds(allIds); // Chọn tất cả
+  //   }
+  // }, [selectedIds.length, flatData, setSelectedIds]);
 
   const renderItem = useCallback(
     ({ item }: { item: IApprove; index: number }) => (
@@ -194,10 +192,10 @@ const ApprovePrScreen: React.FC = () => {
     [handleSelect, selectedIds],
   );
 
-  const selectedAll = useMemo(
-    () => selectedIds.length === flatData.length && flatData.length > 0,
-    [selectedIds.length, flatData.length],
-  );
+  // const selectedAll = useMemo(
+  //   () => selectedIds.length === flatData.length && flatData.length > 0,
+  //   [selectedIds.length, flatData.length],
+  // );
 
   const goToFilterScreen = useCallback(() => {
     navigate('FilterApproveScreen', {
@@ -208,16 +206,7 @@ const ApprovePrScreen: React.FC = () => {
 
   console.log('ApprovePrScreen', flatData);
 
-  // Bug fix: Ban đầu `isFirstLoad` là true và `isLoading` cũng true, `FallbackComponent` sẽ hiển thị
-  // Sau khi load lần đầu xong, `isLoading` thành false, `isFirstLoad` vẫn true,
-  // nên cần cập nhật `isFirstLoad` sau khi load thành công.
-  // useEffect(() => {
-  //   if (isFirstLoad && !isLoading && flatData.length > 0) {
-  //     setIsFirstLoad(false);
-  //   }
-  // }, [isFirstLoad, isLoading, flatData.length]);
-
-  const orderSelected = useMemo(() => selectedIds.length, [selectedIds]);
+  // const orderSelected = useMemo(() => selectedIds.length, [selectedIds]);
 
   if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
@@ -282,7 +271,7 @@ const ApprovePrScreen: React.FC = () => {
             <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
           </View>
         </View>
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <AppBlockButton onPress={toggleSelectAll} style={styles.buttonCenter}>
             {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
             <AppText style={styles.ml7}>{t('createPrice.pickAll')}</AppText>
@@ -290,7 +279,7 @@ const ApprovePrScreen: React.FC = () => {
           <AppText>
             {orderSelected} {t('createPrice.orderSelected')}
           </AppText>
-        </View>
+        </View> */}
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
         {isLoading && flatData.length === 0 ? (
           <View style={styles.listContent}>
@@ -322,6 +311,7 @@ const ApprovePrScreen: React.FC = () => {
             ListFooterComponent={listFooterComponent}
             estimatedItemSize={100}
             contentContainerStyle={styles.listContent}
+            style={styles.containerFlashList}
           />
         )}
 
@@ -365,19 +355,19 @@ const ApprovePrScreen: React.FC = () => {
 export default ApprovePrScreen;
 export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
 const styles = StyleSheet.create({
-  ml7: { marginLeft: s(7) },
-  buttonCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingBottom: vs(16),
-    paddingHorizontal: s(16),
+  // ml7: { marginLeft: s(7) },
+  // buttonCenter: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  // },
+  // header: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   paddingBottom: vs(16),
+  //   paddingHorizontal: s(16),
 
-    // borderBottomWidth: 1,
-  },
+  //   // borderBottomWidth: 1,
+  // },
   container: {
     backgroundColor: Colors.WHITE,
     flex: 1,
@@ -502,6 +492,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: PaddingHorizontal,
     paddingBottom: vs(16),
+    paddingTop: vs(12),
   },
   emptyContainer: {
     flex: 1,
@@ -536,5 +527,8 @@ const styles = StyleSheet.create({
   },
   rotateIcon: {
     transform: [{ rotate: '180deg' }],
+  },
+  containerFlashList: {
+    backgroundColor: '#F2F3F5',
   },
 });

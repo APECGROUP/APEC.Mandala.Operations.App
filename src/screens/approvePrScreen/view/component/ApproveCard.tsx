@@ -33,6 +33,7 @@ const ApproveCard = ({
         {/* <AppBlockButton onPress={() => handleSelect(item.id)} style={{ paddingRight: s(10) }}> */}
         {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
       </AppBlockButton>
+
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => navigate('DetailOrderApproveScreen', { item })}
@@ -44,7 +45,7 @@ const ApproveCard = ({
               {item.prNo}
             </AppText>
             <AppBlockButton onPress={() => navigate('DetailApproveCardScreen', { item })}>
-              <IconInfomation style={{ marginHorizontal: s(0) }} />
+              <IconInfomation style={{ marginHorizontal: s(6), marginBottom: s(0) }} />
             </AppBlockButton>
           </View>
           <AppText style={styles.dateText}>
@@ -65,8 +66,17 @@ const ApproveCard = ({
 export default ApproveCard;
 
 const styles = StyleSheet.create({
-  styleCheckBox: { paddingHorizontal: s(12), paddingVertical: vs(20) },
-  buttonDetailOrder: { flexDirection: 'row', alignItems: 'center' },
+  styleCheckBox: {
+    paddingHorizontal: s(12),
+    // paddingVertical: vs(20),
+    paddingTop: vs(15),
+    height: '100%',
+  },
+  buttonDetailOrder: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    flex: 1,
+  },
   noAssign: {
     paddingVertical: vs(2),
     paddingHorizontal: s(4),
@@ -100,6 +110,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
     alignItems: 'center',
+    // alignContent: 'flex-start',
   },
   itemIcon: {
     width: s(40),

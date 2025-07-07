@@ -147,7 +147,7 @@ const AssignPriceScreen: React.FC = () => {
       );
     }
     return null;
-  }, [isLoading, flatData.length, t]);
+  }, [isLoading, t]);
 
   const listFooterComponent = useMemo(() => {
     if (isFetchingNextPage) {

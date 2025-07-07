@@ -346,7 +346,7 @@ const CreatePriceScreen: React.FC = () => {
             ListFooterComponent={listFooterComponent}
             estimatedItemSize={100}
             contentContainerStyle={styles.listContent}
-            style={{ backgroundColor: '#F2F3F5' }}
+            style={styles.containerFlashList}
           />
         )}
 
@@ -595,5 +595,8 @@ const styles = StyleSheet.create({
   },
   rotateIcon: {
     transform: [{ rotate: '180deg' }],
+  },
+  containerFlashList: {
+    backgroundColor: '#F2F3F5',
   },
 });
