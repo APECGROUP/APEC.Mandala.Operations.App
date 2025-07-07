@@ -45,7 +45,10 @@ function generateMockAssignPriceData(
   prNo?: string,
   fromDate?: Date,
   toDate?: Date,
+  department?: SelectedOption,
+  requester?: SelectedOption,
 ): DataAssignPrice {
+  console.log('fakeData ne:', department, requester);
   const numberOfImages = Math.floor(Math.random() * 10) + 1;
   const imageUrls = Array.from(
     { length: numberOfImages },
@@ -59,8 +62,12 @@ function generateMockAssignPriceData(
   const createdAt = fromDate ? fromDate : new Date();
   const estimateDate = toDate ? toDate : new Date();
 
-  const randomDepartment = mockDepartments[Math.floor(Math.random() * mockDepartments.length)];
-  const randomRequester = mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
+  const randomDepartment = department
+    ? department
+    : mockDepartments[Math.floor(Math.random() * mockDepartments.length)];
+  const randomRequester = requester
+    ? requester
+    : mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
   return {
     id: item.id,
     content,
@@ -128,7 +135,14 @@ export const fetchAssignPriceData = async (
     const { data } = await axios.get(apiUrl, { params: requestParams });
 
     let processedData: DataAssignPrice[] = data.map((item: any) =>
-      generateMockAssignPriceData(item, filters.prNo, filters.fromDate, filters.toDate),
+      generateMockAssignPriceData(
+        item,
+        filters.prNo,
+        filters.fromDate,
+        filters.toDate,
+        filters.department,
+        filters.requester,
+      ),
     );
 
     return processedData;

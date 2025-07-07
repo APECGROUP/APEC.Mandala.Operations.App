@@ -3,10 +3,10 @@ import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-
 import { DataInformationItems, fetchInformationItemsData } from '../modal/InformationItemsModal';
 
 const ITEMS_PER_PAGE = 50;
-const key = ['informationItems'];
 
-export function useInformationItemsViewModel() {
+export function useInformationItemsViewModel(id: number) {
   const queryClient = useQueryClient();
+  const key = ['informationItems', id];
 
   // Infinite Query cho phân trang + search
   const {
@@ -23,7 +23,7 @@ export function useInformationItemsViewModel() {
     queryKey: key,
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchInformationItemsData(page, ITEMS_PER_PAGE);
+      return fetchInformationItemsData(page, ITEMS_PER_PAGE, id);
     },
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
@@ -53,7 +53,7 @@ export function useInformationItemsViewModel() {
     }
   }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
-  const onUpdatePrice = (id: number | string, price: number) => {
+  const onUpdatePrice = (idItem: string, price: number) => {
     const cached = queryClient.getQueryData<InfiniteData<DataInformationItems[]>>(key);
 
     if (!cached) {
@@ -65,7 +65,7 @@ export function useInformationItemsViewModel() {
     queryClient.setQueryData(key, {
       ...cached,
       pages: cached.pages.map(page =>
-        page.map(item => (item.id === id ? { ...item, price } : item)),
+        page.map(item => (item.id === idItem ? { ...item, price } : item)),
       ),
     });
   };

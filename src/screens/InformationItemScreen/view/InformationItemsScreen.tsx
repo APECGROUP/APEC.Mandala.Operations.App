@@ -1,6 +1,6 @@
 // views/AssignPriceScreen.tsx
 
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -45,8 +45,7 @@ const InformationItemsScreen = ({
 }: NativeStackScreenProps<MainParams, 'InformationItemsScreen'>) => {
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
-  const { content } = route.params.item;
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const { content, id } = route.params.item;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -61,8 +60,8 @@ const InformationItemsScreen = ({
     onUpdatePrice,
     isError,
     onAutoAssign,
-  } = useInformationItemsViewModel();
-
+  } = useInformationItemsViewModel(id);
+  console.log('id: ', id);
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
@@ -179,7 +178,6 @@ const InformationItemsScreen = ({
   );
 
   const reLoadData = useCallback(() => {
-    setIsFirstLoad(false);
     onRefresh();
   }, [onRefresh]);
 
@@ -192,8 +190,7 @@ const InformationItemsScreen = ({
   //   setItems(newItems);
   // };
 
-  console.log('error:', isError);
-  if (isError || (isFirstLoad && !isLoading)) {
+  if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
 

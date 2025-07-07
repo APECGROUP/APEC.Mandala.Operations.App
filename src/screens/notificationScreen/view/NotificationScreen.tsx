@@ -283,6 +283,7 @@ const styles = StyleSheet.create({
   listContentSkeleton: {
     flexGrow: 1,
     paddingBottom: vs(50),
+    marginTop: vs(10),
     paddingHorizontal: PaddingHorizontal,
   },
 });

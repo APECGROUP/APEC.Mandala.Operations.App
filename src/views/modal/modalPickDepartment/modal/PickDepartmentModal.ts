@@ -1,3 +1,4 @@
+import { mockDepartments } from '@/data/DataFake';
 import axios from 'axios';
 
 export interface TypePickDepartment {
@@ -23,10 +24,11 @@ export const fetchDepartmentData = async (
   key: string = '',
 ): Promise<TypePickDepartment[]> => {
   const url = buildNccUrl(page, limit, key);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data } = await axios.get(url);
 
-  return data.map((item: any) => ({
+  return mockDepartments.map(item => ({
     id: item.id,
-    name: 'Bộ phận Công Nghiệp',
+    name: item.name,
   }));
 };
