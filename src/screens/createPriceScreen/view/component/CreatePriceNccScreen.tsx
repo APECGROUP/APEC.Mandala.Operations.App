@@ -1,4 +1,4 @@
-import { NativeScrollEvent, NativeSyntheticEvent, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import Header from '@/screens/notificationScreen/view/component/Header';
 import { useTranslation } from 'react-i18next';
@@ -12,8 +12,6 @@ import { goBack } from '@/navigation/RootNavigation';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 import { FlashList } from '@shopify/flash-list';
 import CreateNewItemCard from './CreateNewItemCard';
-import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { AnimatedButton } from '@/screens/assignPriceScreen/view/AssignPriceScreen';
 import IconScrollBottom from '@assets/icon/IconScrollBottom';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 import moment from 'moment';

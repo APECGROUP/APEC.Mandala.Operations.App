@@ -5,11 +5,8 @@ import {
   StyleSheet,
   View,
   ActivityIndicator,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 
@@ -24,7 +21,6 @@ import { DetailOrderApprove } from '../modal/DetailOrderApproveModal';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
 import ToastContainer from '@/elements/toast/ToastContainer';
-import { AnimatedButton } from '@/screens/assignPriceScreen/view/AssignPriceScreen';
 import { Colors } from '@/theme/Config';
 import Header from '@/screens/notificationScreen/view/component/Header';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

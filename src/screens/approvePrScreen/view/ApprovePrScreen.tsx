@@ -7,13 +7,11 @@ import {
   TextInput,
   ActivityIndicator,
   TouchableOpacity,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 import { useRoute } from '@react-navigation/native';
@@ -40,7 +38,6 @@ import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import Footer from '@/screens/filterScreen/view/component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { isAndroid } from '@/utils/Utilities';
 import ApproveCard from './component/ApproveCard';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 

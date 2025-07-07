@@ -5,12 +5,9 @@ import {
   ActivityIndicator,
   StyleSheet,
   View,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
   TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { s, vs } from 'react-native-size-matters';
 
@@ -20,7 +17,6 @@ import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
 import light from '../../../theme/light';
-import { AnimatedButton } from '../../assignPriceScreen/view/AssignPriceScreen';
 import { ContentNotification } from '../modal/notificationModel';
 import { useNotificationViewModel } from '../viewmodal/useNotificationViewModel';
 import ItemNotification from './component/ItemNotification';
@@ -33,7 +29,6 @@ import { PaddingHorizontal } from '@/utils/Constans';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { isAndroid } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 
