@@ -212,7 +212,7 @@ const AssignPriceScreen: React.FC = () => {
           resizeMode={FastImage.resizeMode.cover}
         />
         {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-        <View style={[styles.headerContainer, { paddingTop: top + vs(5) }]}>
+        <View style={[styles.headerContainer, { paddingTop: top }]}>
           <View style={styles.headerLeft}>
             <AppBlockButton onPress={goToAccount}>
               <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
@@ -277,7 +277,7 @@ const AssignPriceScreen: React.FC = () => {
             ref={flashListRef}
             data={flatData} // Sử dụng flatData từ ViewModel
             renderItem={renderItem}
-            keyExtractor={item => item.id} // Chỉ cần item.id là đủ cho key
+            keyExtractor={item => item?.id} // Chỉ cần item.id là đủ cho key
             onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}

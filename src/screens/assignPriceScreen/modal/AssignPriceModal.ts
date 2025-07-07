@@ -59,6 +59,7 @@ function generateMockAssignPriceData(
   if (prNo) {
     content = `${content} - ${prNo}`; // Thêm prNo để có thể test filter
   }
+
   const createdAt = fromDate ? fromDate : new Date();
   const estimateDate = toDate ? toDate : new Date();
 
@@ -68,6 +69,7 @@ function generateMockAssignPriceData(
   const randomRequester = requester
     ? requester
     : mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
+
   return {
     id: item.id,
     content,
@@ -105,12 +107,14 @@ export const fetchAssignPriceData = async (
 ): Promise<DataAssignPrice[]> => {
   try {
     const apiUrl = `https://picsum.photos/v2/list`;
-
+    console.log('goij api fet: ', filters);
     const requestParams: any = {
       page: page.toString(),
       limit: limit.toString(),
     };
-
+    if (filters?.prNo?.trim().toLowerCase() === 'empty') {
+      return [];
+    }
     // --- ĐẦU CHỜ CHO CÁC THAM SỐ LỌC THẬT TẾ ---
     // KHI BẠN CÓ API THẬT HỖ TRỢ LỌC, HÃY UNCOMMENT CÁC DÒNG DƯỚI ĐÂY
     // VÀ ĐẢM BẢO TÊN THAM SỐ TRÙNG KHỚP VỚI API CỦA BẠN.

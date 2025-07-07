@@ -1,7 +1,14 @@
 // views/modal/CreatePriceModal.ts
 
 import axios from 'axios';
-import { fakeData, fakeNcc, fakeEnd, fakeVat } from '@/data/DataFake';
+import {
+  fakeData,
+  fakeNcc,
+  fakeEnd,
+  fakeVat,
+  mockRequesters,
+  mockDepartments,
+} from '@/data/DataFake';
 // Đảm bảo moment được import nếu bạn dùng nó cho Date objects
 
 export interface TypeCreatePrice {
@@ -59,22 +66,6 @@ function generateMockCreatePriceData(item: any, filters: CreatePriceFilters): Ty
   if (filters.status?.name && filters.status.name !== '') {
     status = filters.status;
   }
-
-  // Giả lập dữ liệu phòng ban và người yêu cầu
-  const mockDepartments = [
-    { id: 'dep1', name: 'Phòng Kế toán' },
-    { id: 'dep2', name: 'Phòng IT' },
-    { id: 'dep3', name: 'Phòng Kinh doanh' },
-    { id: 'dep4', name: 'Phòng Nhân sự' },
-    { id: 'dep5', name: 'Phòng Sản xuất' },
-  ];
-  const mockRequesters = [
-    { id: 'req1', name: 'Nguyễn Văn A' },
-    { id: 'req2', name: 'Trần Thị B' },
-    { id: 'req3', name: 'Lê Văn C' },
-    { id: 'req4', name: 'Phạm Thị D' },
-    { id: 'req5', name: 'Hoàng Văn E' },
-  ];
 
   // Giả lập việc department/requester khớp với filter nếu có
   let randomDepartment = mockDepartments[Math.floor(Math.random() * mockDepartments.length)];
@@ -143,29 +134,32 @@ export const fetchCreatePrice = async (
     // Ví dụ: requestParams.productName = filters.searchKey;
     // Ví dụ: requestParams.startDate = filters.fromDate.toISOString();
 
-    if (filters.prNo) {
-      requestParams.prNo = filters.prNo; // Đảm bảo tên param khớp với backend của bạn
-    }
-    if (filters.fromDate) {
-      requestParams.fromDate = filters.fromDate.toISOString();
-    }
-    if (filters.toDate) {
-      requestParams.toDate = filters.toDate.toISOString();
-    }
-    if (filters.department?.id) {
-      requestParams.departmentId = filters.department.id;
-    }
-    if (filters.requester?.id) {
-      requestParams.requesterId = filters.requester.id;
-    }
-    if (filters.product?.id) {
-      requestParams.productId = filters.product.id;
-    }
-    if (filters.ncc?.id) {
-      requestParams.nccId = filters.ncc.id;
-    }
-    if (filters.status?.id) {
-      requestParams.statusId = filters.status.id;
+    // if (filters.prNo) {
+    //   requestParams.prNo = filters.prNo; // Đảm bảo tên param khớp với backend của bạn
+    // }
+    // if (filters.fromDate) {
+    //   requestParams.fromDate = filters.fromDate.toISOString();
+    // }
+    // if (filters.toDate) {
+    //   requestParams.toDate = filters.toDate.toISOString();
+    // }
+    // if (filters.department?.id) {
+    //   requestParams.departmentId = filters.department.id;
+    // }
+    // if (filters.requester?.id) {
+    //   requestParams.requesterId = filters.requester.id;
+    // }
+    // if (filters.product?.id) {
+    //   requestParams.productId = filters.product.id;
+    // }
+    // if (filters.ncc?.id) {
+    //   requestParams.nccId = filters.ncc.id;
+    // }
+    // if (filters.status?.id) {
+    //   requestParams.statusId = filters.status.id;
+    // }
+    if (filters?.prNo?.trim().toLowerCase() === 'empty') {
+      return [];
     }
     console.log('alo:', requestParams);
     // Thực hiện cuộc gọi API bằng Axios

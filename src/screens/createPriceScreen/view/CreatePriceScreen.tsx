@@ -346,6 +346,7 @@ const CreatePriceScreen: React.FC = () => {
             ListFooterComponent={listFooterComponent}
             estimatedItemSize={100}
             contentContainerStyle={styles.listContent}
+            style={{ backgroundColor: '#F2F3F5' }}
           />
         )}
 
@@ -559,6 +560,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: PaddingHorizontal,
     paddingBottom: vs(16),
+    paddingTop: vs(12),
   },
   emptyContainer: {
     flex: 1,

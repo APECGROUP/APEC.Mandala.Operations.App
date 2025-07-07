@@ -135,6 +135,9 @@ export const fetchApprove = async (
       page: page.toString(),
       limit: limit.toString(),
     };
+    if (filters?.prNo?.trim().toLowerCase() === 'empty') {
+      return [];
+    }
 
     // --- ĐẦU CHỜ CHO CÁC THAM SỐ LỌC THẬT TẾ ---
     // KHI BẠN CÓ API THẬT HỖ TRỢ LỌC, HÃY UNCOMMENT CÁC DÒNG DƯỚI ĐÂY
@@ -142,21 +145,21 @@ export const fetchApprove = async (
     // Ví dụ: requestParams.productName = filters.searchKey;
     // Ví dụ: requestParams.startDate = filters.fromDate.toISOString();
 
-    if (filters.prNo) {
-      requestParams.prNo = filters.prNo; // Đảm bảo tên param khớp với backend của bạn
-    }
-    if (filters.fromDate) {
-      requestParams.fromDate = filters.fromDate.toISOString();
-    }
-    if (filters.toDate) {
-      requestParams.toDate = filters.toDate.toISOString();
-    }
-    if (filters.department?.id) {
-      requestParams.departmentId = filters.department.id;
-    }
-    if (filters.requester?.id) {
-      requestParams.requesterId = filters.requester.id;
-    }
+    // if (filters.prNo) {
+    //   requestParams.prNo = filters.prNo; // Đảm bảo tên param khớp với backend của bạn
+    // }
+    // if (filters.fromDate) {
+    //   requestParams.fromDate = filters.fromDate.toISOString();
+    // }
+    // if (filters.toDate) {
+    //   requestParams.toDate = filters.toDate.toISOString();
+    // }
+    // if (filters.department?.id) {
+    //   requestParams.departmentId = filters.department.id;
+    // }
+    // if (filters.requester?.id) {
+    //   requestParams.requesterId = filters.requester.id;
+    // }
 
     // Thực hiện cuộc gọi API bằng Axios
     const { data } = await axios.get(apiUrl, { params: requestParams });

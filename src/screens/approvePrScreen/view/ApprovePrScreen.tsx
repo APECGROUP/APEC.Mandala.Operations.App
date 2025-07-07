@@ -151,7 +151,7 @@ const ApprovePrScreen: React.FC = () => {
     return (
       <View style={styles.emptyContainer}>
         <EmptyDataAnimation autoPlay />
-        <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
+        <AppText style={styles.emptyText}>{t('approve.detail.empty')}</AppText>
       </View>
     );
   }, [isLoading, t]);
