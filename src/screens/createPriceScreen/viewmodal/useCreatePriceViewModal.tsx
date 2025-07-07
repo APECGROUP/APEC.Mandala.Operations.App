@@ -188,11 +188,14 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
       // Xoá các item có id nằm trong danh sách ids khỏi cache
       const currentQueryKey = [
         'listCreatePrice',
-        effectiveFilters.prNo?.trim() || '',
+        effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
         effectiveFilters.fromDate?.toISOString() || '',
         effectiveFilters.toDate?.toISOString() || '',
         effectiveFilters.department?.id || '',
         effectiveFilters.requester?.id || '',
+        effectiveFilters.product?.id || '',
+        effectiveFilters.ncc?.id || '',
+        effectiveFilters.status?.id || '',
       ];
       const cached = queryClient.getQueryData(currentQueryKey);
       if (cached && cached.pages) {
@@ -215,11 +218,14 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
       // Xoá các item có id nằm trong danh sách ids khỏi cache
       const currentQueryKey = [
         'listCreatePrice',
-        effectiveFilters.prNo?.trim() || '',
+        effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
         effectiveFilters.fromDate?.toISOString() || '',
         effectiveFilters.toDate?.toISOString() || '',
         effectiveFilters.department?.id || '',
         effectiveFilters.requester?.id || '',
+        effectiveFilters.product?.id || '',
+        effectiveFilters.ncc?.id || '',
+        effectiveFilters.status?.id || '',
       ];
       const cached = queryClient.getQueryData(currentQueryKey);
       if (cached && cached.pages) {

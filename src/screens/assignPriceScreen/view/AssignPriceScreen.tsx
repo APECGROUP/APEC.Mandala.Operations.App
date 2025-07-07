@@ -128,7 +128,7 @@ const AssignPriceScreen: React.FC = () => {
     });
   }, [applyFilters, currentFilters]);
   const listEmptyComponent = useMemo(() => {
-    if (isLoading && flatData.length === 0) {
+    if (isLoading) {
       // Nếu đang loading và chưa có dữ liệu, hiển thị skeleton hoặc indicator
       return (
         <View style={styles.emptyContainer}>
@@ -138,7 +138,7 @@ const AssignPriceScreen: React.FC = () => {
     }
     // Nếu không loading và không có dữ liệu, hiển thị EmptyDataAnimation.
     // Dữ liệu chỉ thực sự rỗng khi isLoading là false và flatData.length là 0.
-    if (!isLoading && flatData.length === 0) {
+    if (!isLoading) {
       return (
         <View style={styles.emptyContainer}>
           <EmptyDataAnimation autoPlay />
@@ -453,8 +453,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: getFontSize(14),
-    color: '#666666',
+    fontSize: getFontSize(18),
+    fontWeight: '700',
     marginTop: vs(10), // Thêm khoảng cách
   },
   footerLoading: {
