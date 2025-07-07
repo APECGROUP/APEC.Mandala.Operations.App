@@ -12,17 +12,14 @@ import { goBack } from '@/navigation/RootNavigation';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 import { FlashList } from '@shopify/flash-list';
 import CreateNewItemCard from './CreateNewItemCard';
-import {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { AnimatedButton } from '@/screens/assignPriceScreen/view/AssignPriceScreen';
 import IconScrollBottom from '@assets/icon/IconScrollBottom';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 import moment from 'moment';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { Gesture } from 'react-native-gesture-handler';
+import AppBlockButton from '@/elements/button/AppBlockButton';
 
 const CreatePriceNccScreen = () => {
   const { t } = useTranslation();
@@ -56,53 +53,10 @@ const CreatePriceNccScreen = () => {
   // };
 
   const flashListRef = useRef<FlashList<IPickItem> | null>(null);
-  const lastOffsetY = useRef<number>(0);
-
-  // show Scroll‐to‐Top khi scroll lên (swipe xuống), 0 = hidden, 1 = visible
-  const showScrollToTop = useSharedValue<number>(0);
-  // show Scroll‐to‐Bottom khi scroll xuống (swipe lên), 0 = hidden, 1 = visible
-  const showScrollToBottom = useSharedValue<number>(0);
-
-  // Animated styles
-  const opacityScrollTopStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToTop.value, { duration: 200 }),
-  }));
-  const opacityScrollBottomStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
-  }));
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = () => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
-    showScrollToTop.value = 0;
-  };
-  const scrollToBottom = () => {
-    flashListRef.current?.scrollToEnd({ animated: true });
-    showScrollToBottom.value = 0;
-  };
-
-  /**
-   * onScroll handler:
-   *  - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
-   *  - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
-   */
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = event.nativeEvent.contentOffset.y;
-    // Scroll xuống (lúc này y > lastOffsetY): hiện scroll‐to‐bottom, ẩn scroll‐to‐top
-    if (y > lastOffsetY.current && y > 100) {
-      showScrollToBottom.value = 1;
-      showScrollToTop.value = 0;
-    }
-    // Scroll lên (y < lastOffsetY): hiện scroll‐to‐top, ẩn scroll‐to‐bottom
-    else if (y < lastOffsetY.current && y > 100) {
-      showScrollToTop.value = 1;
-      showScrollToBottom.value = 0;
-    } else {
-      // Chưa vượt 100px thì ẩn cả hai
-      showScrollToTop.value = 0;
-      showScrollToBottom.value = 0;
-    }
-    lastOffsetY.current = y;
   };
 
   const listEmptyComponent = useCallback(
@@ -178,23 +132,14 @@ const CreatePriceNccScreen = () => {
         showsVerticalScrollIndicator={false}
         onEndReachedThreshold={0.5}
         removeClippedSubviews
-        onScroll={handleScroll}
         scrollEventThrottle={16}
         ListEmptyComponent={listEmptyComponent}
         estimatedItemSize={100}
         contentContainerStyle={styles.listContent}
       />
-      <AnimatedButton
-        onPress={scrollToTop}
-        style={[styles.scrollBottomContainer, opacityScrollTopStyle]}>
+      <AppBlockButton onPress={scrollToTop} style={[styles.scrollBottomContainer]}>
         <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
-      </AnimatedButton>
-      <AnimatedButton
-        onPress={scrollToBottom}
-        style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-        {/* style={[styles.scrollButtonContainer, opacityScrollBottomStyle]}> */}
-        <IconScrollBottom />
-      </AnimatedButton>
+      </AppBlockButton>
       <Footer
         onLeftAction={onAddNewItemToList}
         onRightAction={onSaveInfo}

@@ -39,7 +39,6 @@ import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import Footer from '@/screens/filterScreen/view/component/Footer';
 import { useApproveViewModel } from '@/screens/approvePrScreen/viewmodal/useApproveViewModel';
-import { isAndroid } from '@/utils/Utilities';
 
 const DetailOrderApproveScreen = ({
   route,
@@ -66,55 +65,9 @@ const DetailOrderApproveScreen = ({
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
   const flashListRef = useRef<FlashList<DetailOrderApprove> | null>(null);
-  const lastOffsetY = useRef<number>(0);
-
-  // show Scroll‐to‐Top khi scroll lên (swipe xuống), 0 = hidden, 1 = visible
-  const showScrollToTop = useSharedValue<number>(0);
-  // show Scroll‐to‐Bottom khi scroll xuống (swipe lên), 0 = hidden, 1 = visible
-  const showScrollToBottom = useSharedValue<number>(0);
-
-  // Animated styles
-  const opacityScrollTopStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToTop.value, { duration: 200 }),
-  }));
-  const opacityScrollBottomStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
-  }));
-
-  // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = () => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
-    showScrollToTop.value = 0;
   };
-  const scrollToBottom = () => {
-    flashListRef.current?.scrollToEnd({ animated: true });
-    showScrollToBottom.value = 0;
-  };
-
-  /**
-   * onScroll handler:
-   *  - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
-   *  - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
-   */
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = event.nativeEvent.contentOffset.y;
-    // Scroll xuống (lúc này y > lastOffsetY): hiện scroll‐to‐bottom, ẩn scroll‐to‐top
-    if (y > lastOffsetY.current && y > 100) {
-      showScrollToBottom.value = 1;
-      showScrollToTop.value = 0;
-    }
-    // Scroll lên (y < lastOffsetY): hiện scroll‐to‐top, ẩn scroll‐to‐bottom
-    else if (y < lastOffsetY.current && y > 100) {
-      showScrollToTop.value = 1;
-      showScrollToBottom.value = 0;
-    } else {
-      // Chưa vượt 100px thì ẩn cả hai
-      showScrollToTop.value = 0;
-      showScrollToBottom.value = 0;
-    }
-    lastOffsetY.current = y;
-  };
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onEndReached = () => {
     if (!isLoading && !isFetchingNextPage && hasNextPage && !isFetching) {
@@ -206,7 +159,6 @@ const DetailOrderApproveScreen = ({
             removeClippedSubviews
             refreshing={isRefetching}
             onRefresh={onRefresh}
-            onScroll={handleScroll}
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent}
             ListFooterComponent={listFooterComponent}
@@ -218,22 +170,9 @@ const DetailOrderApproveScreen = ({
         <ToastContainer ref={refToast} />
 
         {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
-        <AnimatedButton
-          onPress={scrollToTop}
-          style={[
-            styles.scrollButtonBase,
-            isAndroid() && { bottom: vs(50) },
-            opacityScrollTopStyle,
-          ]}>
+        <AppBlockButton onPress={scrollToTop} style={[styles.scrollButtonBase]}>
           <IconScrollBottom style={styles.rotateIcon} />
-        </AnimatedButton>
-        {!isFetchingNextPage && (
-          <AnimatedButton
-            onPress={scrollToBottom}
-            style={[styles.scrollButtonBase, opacityScrollBottomStyle]}>
-            <IconScrollBottom />
-          </AnimatedButton>
-        )}
+        </AppBlockButton>
       </View>
       {flatData && flatData.length > 0 && (
         <Footer

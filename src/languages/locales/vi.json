@@ -47,7 +47,7 @@
     },
     "assignPrice": {
       "title": "Xin chào",
-      "header": "Danh sách gán giá NCC",
+      "header": "Danh sách PR",
       "empty": "Không có kết quả phù hợp",
 
       "searchPlaceholder": "Tìm kiếm PR No"

@@ -1,18 +1,8 @@
 import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  View,
-  TextInput,
-  ActivityIndicator,
-  TouchableOpacity,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  StatusBar,
-} from 'react-native';
+import { StyleSheet, View, TextInput, ActivityIndicator, StatusBar } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 // useFocusEffect không cần thiết nếu logic dùng `applyFilters`
@@ -39,10 +29,6 @@ import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
-import { isAndroid } from '@/utils/Utilities';
-
-// Tạo AnimatedButton một lần duy nhất ngoài component
-export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
 
 const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -67,57 +53,10 @@ const AssignPriceScreen: React.FC = () => {
 
   const refToast = useRef<any>(null);
   const flashListRef = useRef<FlashList<DataAssignPrice> | null>(null);
-  const lastOffsetY = useRef<number>(0);
 
-  const showScrollToTop = useSharedValue<number>(0);
-  const showScrollToBottom = useSharedValue<number>(0);
-
-  // Animated styles cho nút cuộn
-  const opacityScrollTopStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToTop.value, { duration: 200 }),
-  }));
-  const opacityScrollBottomStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
-  }));
-  console.log('assignPrice', currentPrNoInput);
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
-    showScrollToTop.value = 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const scrollToBottom = useCallback(() => {
-    flashListRef.current?.scrollToEnd({ animated: true });
-    showScrollToBottom.value = 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /**
-   * onScroll handler:
-   * - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
-   * - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
-   */
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = event.nativeEvent.contentOffset.y;
-    // Scroll xuống (lúc này y > lastOffsetY): hiện scroll‐to‐bottom, ẩn scroll‐to‐top
-    if (y > lastOffsetY.current && y > 100) {
-      // Chỉ hiện khi cuộn đủ xa
-      showScrollToBottom.value = 1;
-      showScrollToTop.value = 0;
-    }
-    // Scroll lên (y < lastOffsetY): hiện scroll‐to‐top, ẩn scroll‐to‐bottom
-    else if (y < lastOffsetY.current && y > 100) {
-      // Chỉ hiện khi cuộn đủ xa
-      showScrollToTop.value = 1;
-      showScrollToBottom.value = 0;
-    } else {
-      // Chưa vượt 100px hoặc ở đầu danh sách thì ẩn cả hai
-      showScrollToTop.value = 0;
-      showScrollToBottom.value = 0;
-    }
-    lastOffsetY.current = y;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ─── Khi bấm nút "Filter" ───────────────────────
@@ -284,7 +223,6 @@ const AssignPriceScreen: React.FC = () => {
             removeClippedSubviews
             refreshing={isRefetching}
             onRefresh={onRefresh}
-            onScroll={handleScroll}
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent} // Chỉ hiện nếu data rỗng sau khi loading
             ListFooterComponent={listFooterComponent}
@@ -296,22 +234,9 @@ const AssignPriceScreen: React.FC = () => {
         <ToastContainer ref={refToast} />
 
         {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
-        <AnimatedButton
-          onPress={scrollToTop}
-          style={[
-            styles.scrollButtonBase, // Style chung
-            isAndroid() && { bottom: vs(50) }, // Điều chỉnh vị trí cho Android nếu cần
-            opacityScrollTopStyle,
-          ]}>
+        <AppBlockButton onPress={scrollToTop} style={[styles.scrollButtonBase]}>
           <IconScrollBottom style={styles.rotateIcon} />
-        </AnimatedButton>
-        {!isFetchingNextPage && ( // Chỉ hiển thị scroll to bottom nếu không đang fetching trang tiếp theo
-          <AnimatedButton
-            onPress={scrollToBottom}
-            style={[styles.scrollButtonBase, opacityScrollBottomStyle]}>
-            <IconScrollBottom />
-          </AnimatedButton>
-        )}
+        </AppBlockButton>
       </View>
     </ViewContainer>
   );

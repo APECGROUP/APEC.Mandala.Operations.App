@@ -1,15 +1,8 @@
 // views/AssignPriceScreen.tsx
 
 import React, { useRef, useCallback } from 'react';
-import {
-  StyleSheet,
-  View,
-  ActivityIndicator,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from 'react-native';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 
@@ -24,7 +17,6 @@ import { DataInformationItems } from '../modal/InformationItemsModal';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
 import ToastContainer from '@/elements/toast/ToastContainer';
-import { AnimatedButton } from '@/screens/assignPriceScreen/view/AssignPriceScreen';
 import { useInformationItemsViewModel } from '../viewmodal/useInformationItemsViewModel';
 import InformationItemsCard from './component/InformationItemsCard';
 import { Colors } from '@/theme/Config';
@@ -38,7 +30,6 @@ import IconInfomation from '@assets/icon/IconInfomation';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { isAndroid } from '@/utils/Utilities';
 
 const InformationItemsScreen = ({
   route,
@@ -66,53 +57,10 @@ const InformationItemsScreen = ({
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
   const flashListRef = useRef<FlashList<DataInformationItems> | null>(null);
-  const lastOffsetY = useRef<number>(0);
-
-  // show Scroll‐to‐Top khi scroll lên (swipe xuống), 0 = hidden, 1 = visible
-  const showScrollToTop = useSharedValue<number>(0);
-  // show Scroll‐to‐Bottom khi scroll xuống (swipe lên), 0 = hidden, 1 = visible
-  const showScrollToBottom = useSharedValue<number>(0);
-
-  // Animated styles
-  const opacityScrollTopStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToTop.value, { duration: 200 }),
-  }));
-  const opacityScrollBottomStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
-  }));
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = () => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
-    showScrollToTop.value = 0;
-  };
-  const scrollToBottom = () => {
-    flashListRef.current?.scrollToEnd({ animated: true });
-    showScrollToBottom.value = 0;
-  };
-
-  /**
-   * onScroll handler:
-   *  - Nếu người dùng scroll xuống (y mới > y cũ) → hiện nút scroll‐to‐bottom, ẩn scroll‐to‐top.
-   *  - Nếu người dùng scroll lên (y mới < y cũ)   → hiện nút scroll‐to‐top,    ẩn scroll‐to‐bottom.
-   */
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = event.nativeEvent.contentOffset.y;
-    // Scroll xuống (lúc này y > lastOffsetY): hiện scroll‐to‐bottom, ẩn scroll‐to‐top
-    if (y > lastOffsetY.current && y > 100) {
-      showScrollToBottom.value = 1;
-      showScrollToTop.value = 0;
-    }
-    // Scroll lên (y < lastOffsetY): hiện scroll‐to‐top, ẩn scroll‐to‐bottom
-    else if (y < lastOffsetY.current && y > 100) {
-      showScrollToTop.value = 1;
-      showScrollToBottom.value = 0;
-    } else {
-      // Chưa vượt 100px thì ẩn cả hai
-      showScrollToTop.value = 0;
-      showScrollToBottom.value = 0;
-    }
-    lastOffsetY.current = y;
   };
 
   const onEndReached = () => {
@@ -224,7 +172,6 @@ const InformationItemsScreen = ({
             removeClippedSubviews
             refreshing={isRefetching}
             onRefresh={onRefresh}
-            onScroll={handleScroll}
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent}
             ListFooterComponent={listFooterComponent}
@@ -236,23 +183,9 @@ const InformationItemsScreen = ({
         <ToastContainer ref={refToast} />
 
         {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
-        <AnimatedButton
-          onPress={scrollToTop}
-          style={[
-            styles.scrollBottomContainer,
-            isAndroid() && { bottom: vs(50) },
-            opacityScrollTopStyle,
-          ]}>
+        <AppBlockButton onPress={scrollToTop} style={[styles.scrollBottomContainer]}>
           <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
-        </AnimatedButton>
-        {!isFetchingNextPage && (
-          <AnimatedButton
-            onPress={scrollToBottom}
-            style={[styles.scrollBottomContainer, opacityScrollBottomStyle]}>
-            {/* style={[styles.scrollButtonContainer, opacityScrollBottomStyle]}> */}
-            <IconScrollBottom />
-          </AnimatedButton>
-        )}
+        </AppBlockButton>
       </View>
       {flatData && flatData.length > 0 && <FooterInformationItem onAutoAssign={onAutoAssign} />}
     </ViewContainer>

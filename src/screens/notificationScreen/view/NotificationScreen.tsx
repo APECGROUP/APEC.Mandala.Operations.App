@@ -35,6 +35,7 @@ import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { isAndroid } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
+import AppBlockButton from '@/elements/button/AppBlockButton';
 
 type Props = NativeStackScreenProps<MainParams, 'NotificationScreen'>;
 const totalNotification = 100; // Hoặc truyền từ props nếu dynamic
@@ -58,48 +59,11 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   } = useNotificationViewModel();
 
   // ─── Refs & shared values để show/hide nút cuộn ─────────────────────
-  const lastOffsetY = useRef(0);
-  const showScrollToTop = useSharedValue(0);
-  const showScrollToBottom = useSharedValue(0);
-
-  const opacityScrollTopStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToTop.value, { duration: 200 }),
-  }));
-  const opacityScrollBottomStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(showScrollToBottom.value, { duration: 200 }),
-  }));
 
   const flatListRef = useRef<FlashList<ContentNotification> | null>(null);
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = event.nativeEvent.contentOffset.y;
-
-    // Scroll xuống (y tăng) → show "scroll-to-bottom", ẩn "scroll-to-top"
-    if (y > lastOffsetY.current && y > 100) {
-      showScrollToBottom.value = 1;
-      showScrollToTop.value = 0;
-    }
-    // Scroll lên (y giảm) → show "scroll-to-top", ẩn "scroll-to-bottom"
-    else if (y < lastOffsetY.current && y > 100) {
-      showScrollToTop.value = 1;
-      showScrollToBottom.value = 0;
-    } else {
-      // Nếu y <= 100, ẩn cả 2
-      showScrollToTop.value = 0;
-      showScrollToBottom.value = 0;
-    }
-
-    lastOffsetY.current = y;
-  };
-
   const scrollToTop = () => {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-    showScrollToTop.value = 0;
-  };
-
-  const scrollToBottom = () => {
-    flatListRef.current?.scrollToEnd({ animated: true });
-    showScrollToBottom.value = 0;
   };
 
   // ─── Khi user nhấn vào 1 item, chuyển sang detail hoặc đánh dấu đã đọc ─────────────────
@@ -200,7 +164,6 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
             removeClippedSubviews
             refreshing={isRefetching}
             onRefresh={onRefresh}
-            onScroll={handleScroll}
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent}
             ListFooterComponent={listFooterComponent}
@@ -209,22 +172,9 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
           />
         )}
 
-        <AnimatedButton
-          onPress={scrollToTop}
-          style={[
-            styles.scrollButtonBase,
-            isAndroid() && { bottom: vs(100) },
-            opacityScrollTopStyle,
-          ]}>
+        <AppBlockButton onPress={scrollToTop} style={[styles.scrollButtonBase]}>
           <IconScrollBottom style={styles.rotateIcon} />
-        </AnimatedButton>
-        {!isFetchingNextPage && (
-          <AnimatedButton
-            onPress={scrollToBottom}
-            style={[styles.scrollButtonBase, opacityScrollBottomStyle]}>
-            <IconScrollBottom />
-          </AnimatedButton>
-        )}
+        </AppBlockButton>
       </AppBlock>
     </ViewContainer>
   );
