@@ -167,7 +167,8 @@ const ApprovePrScreen: React.FC = () => {
 
   const handleSelect = useCallback(
     (id: string) => {
-      setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+      setSelectedIds([id]);
+      // setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
     },
     [setSelectedIds],
   );
