@@ -1,13 +1,6 @@
 // views/modal/ApproveModal.ts
 
-import {
-  fakeData,
-  fakeEnd,
-  fakeLocal,
-  fakeNcc,
-  fakeNote,
-  fakeVat,
-} from '@/data/DataFake';
+import { fakeData, fakeEnd, fakeLocal, fakeNcc, fakeNote, fakeVat } from '@/data/DataFake';
 import axios from 'axios';
 
 export interface IApprove {
@@ -41,9 +34,6 @@ export interface IApproveFilters {
   requester?: SelectedOption;
   location?: SelectedOption;
 }
-
-// Cache để tránh gọi API trùng lặp (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
-const cache = new Map<string, IApprove[]>();
 
 /**
  * Hàm giả lập để tạo dữ liệu TypeCreatePrice.
@@ -120,17 +110,6 @@ function generateMockCreatePriceData(item: any, filters: IApproveFilters): IAppr
 }
 
 /**
- * Tạo cache key duy nhất dựa trên tất cả các tham số ảnh hưởng đến kết quả.
- * (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
- */
-function getCacheKey(page: number, limit: number, filters: IApproveFilters): string {
-  const { prNo, fromDate, toDate, department, requester } = filters;
-  return `${page}_${limit}_${prNo || ''}_${fromDate?.toISOString() || ''}_${
-    toDate?.toISOString() || ''
-  }_${department?.id || ''}_${requester?.id || ''}`;
-}
-
-/**
  * Lấy danh sách TypeCreatePrice từ API (giả lập) và áp dụng bộ lọc.
  *
  * @param page Số trang cần lấy.
@@ -143,13 +122,6 @@ export const fetchApprove = async (
   limit: number = 50,
   filters: IApproveFilters = {},
 ): Promise<IApprove[]> => {
-  const cacheKey = getCacheKey(page, limit, filters);
-
-  // Kiểm tra cache trước để tăng hiệu năng (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey)!;
-  }
-
   try {
     // --- Endpoint API thật của bạn ---
     // THAY THẾ DÒNG NÀY BẰNG ENDPOINT API THẬT CỦA BẠN.
@@ -198,14 +170,6 @@ export const fetchApprove = async (
       (item: any) => generateMockCreatePriceData(item, filters), // Truyền toàn bộ filters để generateMock có thể giả lập lọc tốt hơn
     );
 
-    // Lưu vào cache (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
-    cache.set(cacheKey, processedData);
-
-    // Giới hạn kích thước cache để tránh memory leak (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
-    if (cache.size > 100) {
-      const firstKey = cache.keys().next().value;
-      cache.delete(firstKey || '');
-    }
     console.log('--- fetchCreatePrice: API call finished for filters:', filters, '---');
 
     return processedData;
@@ -229,11 +193,4 @@ export const deleteApprove = async (id: string) => {
     console.error('Error deleting item on backend:', error);
     return false;
   }
-};
-
-/**
- * Clear cache khi cần thiết (GIỮ NGUYÊN THEO YÊU CẦU CỦA BẠN)
- */
-export const clearApproveCache = () => {
-  cache.clear();
 };

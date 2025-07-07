@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { IApprove, IApproveFilters, fetchApprove, clearApproveCache } from '../modal/ApproveModal';
+import { IApprove, IApproveFilters, fetchApprove } from '../modal/ApproveModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
@@ -88,7 +88,6 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
 
   const onRefresh = useCallback(() => {
     console.log('onRefresh called from ViewModel. Forcing refetch.');
-    clearApproveCache();
     refetch();
   }, [refetch]);
 
@@ -120,6 +119,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
         effectiveFilters.toDate?.toISOString() || '',
         effectiveFilters.department?.id || '',
         effectiveFilters.requester?.id || '',
+        effectiveFilters.location?.id || '',
       ];
 
       const cached = queryClient.getQueryData<InfiniteData<IApprove[]>>(currentQueryKey);
@@ -188,9 +188,12 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
         effectiveFilters.toDate?.toISOString() || '',
         effectiveFilters.department?.id || '',
         effectiveFilters.requester?.id || '',
+        effectiveFilters.location?.id || '',
       ];
       const cached = queryClient.getQueryData(currentQueryKey);
+      console.log('cached:', cached);
       if (cached && cached.pages) {
+        console.log('bấm on approved');
         // Loại bỏ các item có id nằm trong ids khỏi từng page
         const newPages = cached.pages.map((page: IApprove[]) =>
           page.filter(item => !ids.includes(item.id)),
@@ -215,10 +218,13 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
         effectiveFilters.toDate?.toISOString() || '',
         effectiveFilters.department?.id || '',
         effectiveFilters.requester?.id || '',
+        effectiveFilters.location?.id || '',
       ];
       const cached = queryClient.getQueryData(currentQueryKey);
+      console.log('bấm reject');
       if (cached && cached.pages) {
         // Loại bỏ các item có id nằm trong ids khỏi từng page
+        console.log('có cache reject:', cached);
         const newPages = cached.pages.map((page: IApprove[]) =>
           page.filter(item => !ids.includes(item.id)),
         );

@@ -151,7 +151,7 @@ const ApprovePrScreen: React.FC = () => {
     return (
       <View style={styles.emptyContainer}>
         <EmptyDataAnimation autoPlay />
-        <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
+        <AppText style={styles.emptyText}>{t('approve.detail.empty')}</AppText>
       </View>
     );
   }, [isLoading, t]);
@@ -277,7 +277,7 @@ const ApprovePrScreen: React.FC = () => {
 
         {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
         <View style={styles.titleContainer}>
-          <AppText style={styles.titleText}>{t('createPrice.supplierPriceList')}</AppText>
+          <AppText style={styles.titleText}>{t('approve.listOfPurchaseOrder')}</AppText>
           <View style={styles.countBadge}>
             <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
           </View>

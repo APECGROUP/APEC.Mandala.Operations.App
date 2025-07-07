@@ -199,7 +199,8 @@
         "number": "số lượng",
         "ncc": "NCC",
         "moneyOfApproval": "Số tiền duyệt",
-        "note": "Ghi chú"
+        "note": "Ghi chú",
+        "empty": "Hiện chưa có phiếu yêu cầu mua hàng"
       }
     },
     "update": {
