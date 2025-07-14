@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
+import { StyleSheet, View, TextInput, Platform, KeyboardAvoidingView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MainParams } from '../../navigation/params';
+import { MainParams, RootStackParams } from '../../navigation/params';
 import { useTranslation } from 'react-i18next';
 import { s, vs } from 'react-native-size-matters';
 import { Colors } from '@/theme/Config';
@@ -17,9 +17,9 @@ import { useAutoLogin } from '@/hook/useAutoLogin';
 import Toast from 'react-native-toast-message';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
-type Props = NativeStackScreenProps<MainParams, 'ChangePasswordScreen'>;
+type Props = NativeStackScreenProps<RootStackParams, 'ChangePasswordScreen'>;
 
-const ChangePasswordScreen = ({ navigation }: Props) => {
+const ChangePasswordScreen = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
   const { keyboardHeight, keyboardVisible } = useKeyboard();
@@ -28,13 +28,13 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [processing, setProcessing] = useState<boolean | undefined>(false);
-
+  const type = route.params.type;
   const refCurrent = useRef<TextInput>(null);
   const refNew = useRef<TextInput>(null);
   const refConfirm = useRef<TextInput>(null);
 
   const disabled = !currentPassword || !confirmPassword || newPassword !== confirmPassword;
-
+  console.log('change password: ', type);
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
@@ -80,7 +80,8 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
 
   return (
     <ViewContainer>
-      <View
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={[
           styles.container,
           { paddingBottom: bottom },
@@ -153,7 +154,7 @@ const ChangePasswordScreen = ({ navigation }: Props) => {
             text={t('account.changePassword.confirm')}
           />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </ViewContainer>
   );
 };

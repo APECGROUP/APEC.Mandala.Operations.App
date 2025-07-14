@@ -24,6 +24,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DataLocal from '@/data/DataLocal';
 import { useAutoLogin } from '@/hook/useAutoLogin';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { navigate } from '@/navigation/RootNavigation';
 
 export type typeHotel = {
   id: number | string | undefined;
@@ -53,6 +55,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   const [hotel, setHotel] = useState<typeHotel>({} as typeHotel);
   const { isRememberLogin, setIsRememberLogin } = useIsLogin();
   const [processing, setProcessing] = useState<boolean | undefined>(false);
+  const { showAlert } = useAlert();
 
   // Tự động điền thông tin đăng nhập nếu có
   useEffect(() => {
@@ -75,6 +78,23 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
     await new Promise<void>(resolve => setTimeout(() => resolve(), 2000));
     setProcessing(false);
 
+    if (removeVietnameseTones(userName.toLocaleLowerCase()).includes('reset')) {
+      await DataLocal.saveLoginCredentials(userName, password, hotel);
+
+      return showAlert(
+        t('auth.login.resetPassword'),
+        t('auth.login.subResetPassword'),
+        [
+          {
+            text: t('auth.login.changePassword'),
+            onPress: () => navigate('ChangePasswordScreen', { type: 'reset' }),
+          },
+        ],
+        undefined,
+        undefined,
+        true,
+      );
+    }
     if (removeVietnameseTones(userName.toLocaleLowerCase()).includes('duyet')) {
       saveInfoUser({ ...infoUser, isApprove: true });
       setIsLogin(true);
@@ -165,6 +185,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   //   // Refresh form khi xóa credentials
   //   setUserName('');
   //   setPassword('');
+
   //   setHotel({} as typeHotel);
   //   setIsRememberLogin(false);
   //   DataLocal.setRememberLogin(false);

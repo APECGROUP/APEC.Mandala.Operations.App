@@ -59,7 +59,9 @@ export type MainParams = {
   ModalPhotoOrCamera: {
     setImageAvatar: (v: ResponseImageElement) => void;
   };
-  ChangePasswordScreen: undefined;
+  ChangePasswordScreen: {
+    type: 'reset' | 'change';
+  };
   ModalPickCalendar:
     | {
         isSingleMode: boolean;
@@ -105,8 +107,11 @@ export type MainParams = {
 export type AuthParams = {
   LoginScreen: undefined;
   ForgotPasswordScreen: undefined;
+  ChangePasswordScreen: {
+    type: 'reset' | 'change';
+  };
   ModalPickHotel: {
-    setHotel: Dispatch<SetStateAction<typeHotel>>;
+    setHotel: (hotel: typeHotel) => void;
     hotel: typeHotel;
   };
 };

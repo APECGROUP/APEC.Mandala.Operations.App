@@ -12,6 +12,7 @@ import AppBlockButton from '../elements/button/AppBlockButton';
 import { goBack } from './RootNavigation';
 import { StyleSheet } from 'react-native';
 import { Colors } from '@/theme/Config';
+import ChangePasswordScreen from '@/screens/changePasswordScreen/ChangePasswordScreen';
 
 const { Navigator, Screen, Group } = createNativeStackNavigator<AuthParams>();
 export const HeaderLeft = () => (
@@ -56,6 +57,19 @@ export default function AuthNavigator() {
           }}
           name="ForgotPasswordScreen"
           component={ForgotPasswordScreen}
+        />
+
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: '',
+            contentStyle: {
+              paddingHorizontal: 0,
+              backgroundColor: Colors.WHITE,
+            },
+          }}
+          name={'ChangePasswordScreen'}
+          component={ChangePasswordScreen}
         />
       </Group>
 

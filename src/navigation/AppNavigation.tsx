@@ -9,7 +9,7 @@ import { AppBlock } from '../elements/block/Block';
 import AuthNavigator from './AuthNavigator';
 import FastImage from 'react-native-fast-image';
 // BootSplash.hide();
-LogBox.ignoreAllLogs();
+// LogBox.ignoreAllLogs();
 const AppNavigation = () => {
   const { isLogin } = useIsLogin();
   const [splashVisible, setSplashVisible] = useState(true);

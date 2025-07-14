@@ -13,6 +13,7 @@ import { getFontSize, SCREEN_WIDTH } from '../../constants';
 import { PaddingHorizontal } from '@/utils/Constans';
 import { AppText } from '../text/AppText';
 import { Colors } from '@/theme/Config';
+import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 
 interface ButtonType {
   text: string;
@@ -28,6 +29,7 @@ interface CustomAlertProps {
   animated?: React.ReactNode;
   buttons: ButtonType[];
   onClose: () => void;
+  cancelButton?: boolean;
 }
 
 const parseText = (text: string) => {
@@ -43,7 +45,7 @@ const parseText = (text: string) => {
 };
 
 const CustomAlert: React.FC<CustomAlertProps> = memo(
-  ({ visible, title, content, buttons, onClose, icon, animated }) => {
+  ({ visible, title, content, buttons, onClose, icon, animated, cancelButton }) => {
     const [shouldRender, setShouldRender] = useState(false);
     const opacity = useSharedValue(0);
     const translateY = useSharedValue(300);
@@ -88,7 +90,10 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(
     return (
       <>
         <StatusBar barStyle="light-content" translucent backgroundColor="rgba(0, 0, 0, 0.3)" />
-        <Animated.View style={[styles.backdrop, animatedStyle]}>
+        <AnimatedButton
+          disabled={!cancelButton}
+          style={[styles.backdrop, animatedStyle]}
+          onPress={onClose}>
           <Animated.View style={[styles.modalView, !icon && animatedModalStyle]}>
             <View style={styles.body}>
               {icon}
@@ -118,7 +123,7 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(
             </View>
             {animated}
           </Animated.View>
-        </Animated.View>
+        </AnimatedButton>
       </>
     );
   },

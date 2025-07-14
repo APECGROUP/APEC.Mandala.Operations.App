@@ -59,7 +59,7 @@ const AccountScreen = () => {
   //   ]);
   // };
 
-  const goToChangePassword = () => navigate('ChangePasswordScreen');
+  const goToChangePassword = () => navigate('ChangePasswordScreen', { type: 'change' });
 
   const onLogout = () => {
     showAlert(t('account.logout'), t('account.warningLogout'), [

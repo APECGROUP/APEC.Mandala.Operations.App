@@ -20,6 +20,7 @@ interface AlertContextType {
     buttons: AlertButton[],
     icon?: React.ReactNode,
     animatedProp?: React.ReactNode,
+    cancelButton?: boolean,
   ) => void;
   hideAlert: () => void;
   showToast: (message: string, type: string) => void;
@@ -54,6 +55,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = React.memo(({ childre
   const [alertButtons, setAlertButtons] = useState<AlertButton[]>([]);
   const [icon, setIcon] = useState<React.ReactNode>(null);
   const [animated, setAnimated] = useState<React.ReactNode>(null);
+  const [cancelButton, setCancelButton] = useState(false);
   const [loading, setLoading] = useState(false);
   const toastRef = useRef<ToastAction>(null);
 
@@ -65,12 +67,14 @@ export const AlertProvider: React.FC<AlertProviderProps> = React.memo(({ childre
       buttons: AlertButton[],
       iconTitleProp?: React.ReactNode,
       animatedProp?: React.ReactNode,
+      cancelButtonProp?: boolean,
     ) => {
       setAlertTitle(title);
       setAlertContent(content);
       setAlertButtons(buttons);
       setIcon(iconTitleProp || null);
       setAnimated(animatedProp || null);
+      setCancelButton(cancelButtonProp || false);
       setModalVisible(true);
     },
     [],
@@ -114,6 +118,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = React.memo(({ childre
           content={alertContent}
           buttons={alertButtons}
           onClose={hideAlert}
+          cancelButton={cancelButton}
         />
       )}
       <ToastContainer ref={toastRef} />

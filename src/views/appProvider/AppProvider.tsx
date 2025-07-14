@@ -19,6 +19,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 LogBox.ignoreAllLogs(true);
+LogBox.ignoreLogs(['Warning: ...']); //Hide warnings
 
 type Props = {
   children: ReactNode;
