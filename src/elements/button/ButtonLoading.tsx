@@ -11,7 +11,7 @@ import { AppBlock } from '../block/Block';
 import { handleButtonStarlingStyle } from '../../helper/styleHelper';
 
 const AnimatedText = Animated.createAnimatedComponent(AppText);
-const AnimatedButton = Animated.createAnimatedComponent(Ripple);
+export const AnimatedButton = Animated.createAnimatedComponent(Ripple);
 
 export default function ButtonLoading(props: ButtonLoadingProps) {
   const {

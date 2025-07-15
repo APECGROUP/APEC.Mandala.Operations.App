@@ -11,11 +11,11 @@ import IconTrashPrice from '@assets/icon/IconTrashPrice';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import ReanimatedSwipeable from './ReanimatedSwipeable';
 import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { AnimatedButton } from '../CreatePriceScreen';
 import { Colors } from '@/theme/Config';
 import { moneyFormat } from '@/utils/Utilities';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
+import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 
 interface CreatePriceCardProps {
   item: TypeCreatePrice;

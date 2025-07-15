@@ -48,7 +48,6 @@ function generateMockAssignPriceData(
   department?: SelectedOption,
   requester?: SelectedOption,
 ): DataAssignPrice {
-  console.log('fakeData ne:', department, requester);
   const numberOfImages = Math.floor(Math.random() * 10) + 1;
   const imageUrls = Array.from(
     { length: numberOfImages },

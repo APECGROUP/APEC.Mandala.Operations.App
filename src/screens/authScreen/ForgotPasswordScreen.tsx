@@ -1,5 +1,5 @@
 import { Keyboard, StatusBar, StyleSheet, View } from 'react-native';
-import React, { useState } from 'react';
+import React from 'react';
 import light from '../../theme/light';
 import { s, vs } from 'react-native-size-matters';
 import { AppText } from '../../elements/text/AppText';
@@ -10,83 +10,42 @@ import { AppBlock } from '../../elements/block/Block';
 import { AppButton } from '../../elements/button/AppButton';
 import IconArrowRight from '../../../assets/icon/IconArrowRight';
 import { PaddingHorizontal } from '../../utils/Constans';
-import { removeVietnameseTones, typeHotel } from './LoginScreen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthParams } from '../../navigation/params';
 import { Colors } from '@/theme/Config';
 import { TYPE_TOAST } from '@/elements/toast/Message';
-import { useAlert } from '@/elements/alert/AlertProvider';
-import { goBack } from '@/navigation/RootNavigation';
-import DeviceInfo from 'react-native-device-info';
-import api from '@/utils/setup-axios';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import AppBlockButton from '@/elements/button/AppBlockButton';
+import { useAuthViewModel } from './viewmodel/AuthViewModel';
+import { useAlert } from '@/elements/alert/AlertProvider';
 
 const ForgotPasswordScreen = ({
   navigation,
 }: NativeStackScreenProps<AuthParams, 'ForgotPasswordScreen'>) => {
   const { t } = useTranslation();
-  const { showToast, showAlert } = useAlert();
-  const [userName, setUserName] = useState('');
-  const [processing, setProcessing] = useState<boolean | undefined>(false);
-  const [hotel, setHotel] = useState<typeHotel>({} as typeHotel);
   const { bottom } = useSafeAreaInsets();
+  const { showToast } = useAlert();
+  const { forgotPasswordForm, processing, setForgotPasswordForm, forgotPassword } =
+    useAuthViewModel();
+
+  const { userName, hotel } = forgotPasswordForm;
   const disabled = !userName || !hotel.id;
-  const onPickHotel = () => {
-    Keyboard.dismiss();
-    navigation.navigate('ModalPickHotel', { hotel, setHotel });
-  };
-
-  const onSubmit = async () => {
-    if (userName.toLocaleLowerCase() === 'dung') {
-      showAlert(t('auth.forgotPassword.success'), t('auth.forgotPassword.subSuccess'), [
-        {
-          text: t('auth.forgotPassword.close'),
-          onPress: () => {
-            goBack();
-          },
-        },
-      ]);
-      return;
-    }
-    return showToast(t('auth.forgotPassword.errorForgotPassword'), TYPE_TOAST.ERROR);
-
-    // eslint-disable-next-line no-unreachable
-    try {
-      setProcessing(true);
-
-      const body = {
-        email: userName,
-        deviceId: DeviceInfo.getDeviceId(),
-        deviceName:
-          typeof DeviceInfo.getDeviceName() === 'string' ? DeviceInfo.getDeviceName() : 'simulator',
-        deviceInfo: DeviceInfo.getSystemVersion(),
-      };
-
-      const resp = await api.post('user/check-login', body, { noAuth: true });
-      setProcessing(false);
-
-      if (resp.status !== 200) {
-        throw new Error();
-      }
-    } catch (err: any) {
-      setProcessing(false);
-      // refToast.current?.show(t('auth.login.loginError'), TYPE_TOAST.ERROR);
-    } finally {
-      setProcessing(false);
-    }
-  };
 
   const onBlurUserName = () => {
     if (!userName.trim()) {
       showToast(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
-      return;
-    }
-    if (!removeVietnameseTones(userName.toLocaleLowerCase()).includes('dung')) {
-      showToast(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
     }
   };
+
+  const onPickHotel = () => {
+    Keyboard.dismiss();
+    navigation.navigate('ModalPickHotel', {
+      hotel,
+      setHotel: newHotel => setForgotPasswordForm({ hotel: newHotel }),
+    });
+  };
+
   return (
     <ViewContainer>
       <View style={[styles.container, { paddingBottom: bottom }]}>
@@ -109,20 +68,19 @@ const ForgotPasswordScreen = ({
             maxLength={20}
             inputStyle={styles.inputStyle}
             onBlur={onBlurUserName}
-            onChangeText={setUserName}
+            onChangeText={text => setForgotPasswordForm({ userName: text })}
             onSubmitEditing={onPickHotel}
             placeholder={t('auth.forgotPassword.inputUserName')}
           />
           <AppBlockButton onPress={onPickHotel}>
             <AppTextInput
-              disabled
               required
               editable={false}
               labelStyle={styles.labelPassword}
               label={t('auth.forgotPassword.hotel')}
               placeholderTextColor={light.placeholderTextColor}
               noBorder
-              value={hotel?.name}
+              value={hotel?.name?.toString()}
               placeholder={t('auth.forgotPassword.pickHotel')}
               rightIcon={
                 <IconArrowRight stroke="#D8D8D8" style={{ transform: [{ rotate: '90deg' }] }} />
@@ -138,7 +96,7 @@ const ForgotPasswordScreen = ({
         <AppButton
           width={SCREEN_WIDTH - s(32)}
           height={vs(45)}
-          onPress={onSubmit}
+          onPress={forgotPassword}
           disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
           disabled={disabled}
           primary
@@ -157,12 +115,10 @@ export default ForgotPasswordScreen;
 
 const styles = StyleSheet.create({
   textStyleButton: { fontWeight: '700', fontSize: getFontSize(14) },
-
   container: {
     flex: 1,
     backgroundColor: light.white,
     paddingTop: vs(16),
-    // justifyContent: 'space-between',
   },
   labelPassword: {
     fontSize: getFontSize(14),

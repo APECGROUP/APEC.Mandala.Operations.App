@@ -91,6 +91,7 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(
       <>
         <StatusBar barStyle="light-content" translucent backgroundColor="rgba(0, 0, 0, 0.3)" />
         <AnimatedButton
+          activeOpacity={1}
           disabled={!cancelButton}
           style={[styles.backdrop, animatedStyle]}
           onPress={onClose}>

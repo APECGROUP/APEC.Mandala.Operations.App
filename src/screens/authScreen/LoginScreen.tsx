@@ -1,5 +1,5 @@
 import { ImageBackground, Keyboard, StyleSheet, TextInput, View, StatusBar } from 'react-native';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { s, vs } from 'react-native-size-matters';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ToastContainer from '@/elements/toast/ToastContainer';
@@ -12,29 +12,27 @@ import AppTextInput from '@/elements/textInput/AppTextInput';
 import { AuthParams } from '@/navigation/params';
 import light from '@/theme/light';
 import { PaddingHorizontal } from '@/utils/Constans';
-import { useIsLogin } from '@/zustand/store/useIsLogin/useIsLogin';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import Images from '@assets/image/Images';
 import { useTranslation } from 'react-i18next';
 import { TYPE_TOAST } from '@/elements/toast/Message';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import DataLocal from '@/data/DataLocal';
 import { useAutoLogin } from '@/hook/useAutoLogin';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { useAlert } from '@/elements/alert/AlertProvider';
-import { navigate } from '@/navigation/RootNavigation';
+import { useAuthViewModel } from './viewmodel/AuthViewModel';
 
 export type typeHotel = {
   id: number | string | undefined;
   name: number | string | undefined;
 };
+
 export type typeNcc = {
   id: string | undefined;
   name: string | undefined;
 };
+
 // Hàm loại bỏ dấu tiếng Việt
 export const removeVietnameseTones = (str: string) =>
   str
@@ -45,115 +43,28 @@ export const removeVietnameseTones = (str: string) =>
 
 const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginScreen'>) => {
   const { t } = useTranslation();
-  const { setIsLogin } = useIsLogin();
-  const { saveInfoUser, infoUser } = useInfoUser();
-  const { credentials, loading: loadingCredentials } = useAutoLogin();
   const refToast = useRef<any>(null);
   const refPassword = useRef<TextInput>(null);
-  const [userName, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const [hotel, setHotel] = useState<typeHotel>({} as typeHotel);
-  const { isRememberLogin, setIsRememberLogin } = useIsLogin();
-  const [processing, setProcessing] = useState<boolean | undefined>(false);
-  const { showAlert } = useAlert();
+  const { credentials, loading: loadingCredentials } = useAutoLogin();
+  const { bottom } = useSafeAreaInsets();
+
+  const { loginForm, processing, setLoginForm, login, toggleRememberLogin } = useAuthViewModel();
+
+  const { userName, password, hotel, isRememberLogin } = loginForm;
 
   // Tự động điền thông tin đăng nhập nếu có
   useEffect(() => {
     if (credentials && !loadingCredentials) {
-      setUserName(credentials.username);
-      setPassword(credentials.password);
-      if (credentials.hotel && credentials.hotel.id) {
-        setHotel(credentials.hotel);
-      }
-      setIsRememberLogin(true);
-      DataLocal.setRememberLogin(true);
+      setLoginForm({
+        userName: credentials.username,
+        password: credentials.password,
+        hotel: credentials.hotel,
+        isRememberLogin: true,
+      });
     }
-  }, [credentials, loadingCredentials, setIsRememberLogin]);
+  }, [credentials, loadingCredentials, setLoginForm]);
 
   const disabled = !userName || !password || !hotel.id;
-  const { bottom } = useSafeAreaInsets();
-
-  const onSubmit = async () => {
-    setProcessing(true);
-    await new Promise<void>(resolve => setTimeout(() => resolve(), 2000));
-    setProcessing(false);
-
-    if (removeVietnameseTones(userName.toLocaleLowerCase()).includes('reset')) {
-      await DataLocal.saveLoginCredentials(userName, password, hotel);
-
-      return showAlert(
-        t('auth.login.resetPassword'),
-        t('auth.login.subResetPassword'),
-        [
-          {
-            text: t('auth.login.changePassword'),
-            onPress: () => navigate('ChangePasswordScreen', { type: 'reset' }),
-          },
-        ],
-        undefined,
-        undefined,
-        true,
-      );
-    }
-    if (removeVietnameseTones(userName.toLocaleLowerCase()).includes('duyet')) {
-      saveInfoUser({ ...infoUser, isApprove: true });
-      setIsLogin(true);
-      // Luôn lưu thông tin đăng nhập
-      await DataLocal.saveLoginCredentials(userName, password, hotel);
-      // Chỉ hiện thông báo khi user tích "Nhớ đăng nhập"
-      if (isRememberLogin) {
-        refToast.current?.show('Đã lưu thông tin đăng nhập', TYPE_TOAST.SUCCESS);
-      }
-    }
-    if (!removeVietnameseTones(userName.toLocaleLowerCase()).includes('dung')) {
-      saveInfoUser({ ...infoUser, isApprove: false });
-      return refToast.current?.show(t('auth.login.loginError'), TYPE_TOAST.ERROR);
-    } else if (password !== '123456') {
-      return refToast.current?.show(t('auth.login.loginError'), TYPE_TOAST.ERROR);
-    } else {
-      setIsLogin(true);
-      // Luôn lưu thông tin đăng nhập
-      await DataLocal.saveLoginCredentials(userName, password, hotel);
-      // Chỉ hiện thông báo khi user tích "Nhớ đăng nhập"
-      if (isRememberLogin) {
-        refToast.current?.show('Đã lưu thông tin đăng nhập', TYPE_TOAST.SUCCESS);
-      }
-    }
-
-    // try {
-    //   setProcessing(true);
-    //   const body = {
-    //     userName: phone,
-    //     deviceId: DeviceInfo.getDeviceId(),
-    //     deviceName:
-    //       typeof DeviceInfo.getDeviceName() === 'string'
-    //         ? DeviceInfo.getDeviceName()
-    //         : 'simulator',
-    //     deviceInfo: DeviceInfo.getSystemVersion(),
-    //   };
-
-    //   const resp = await api.post('user/check-login', body, {noAuth: true});
-    //   setProcessing(false);
-    //   await DataLocal.saveAll(resp);
-    //   DataLocal.setRememberLogin(isRememberLogin);
-    //   // Luôn lưu credentials
-    //   await DataLocal.saveLoginCredentials(userName, password, hotel);
-    //   // Chỉ hiện thông báo khi user tích "Nhớ đăng nhập"
-    //   if (isRememberLogin) {
-    //     refToast.current?.show('Đã lưu thông tin đăng nhập', TYPE_TOAST.SUCCESS);
-    //   }
-    //   if (resp.status !== 200) {
-    //     throw new Error();
-    //   }
-    // } catch (err: any) {
-    //   setProcessing(false);
-    //   Toast.show({
-    //     type: 'error',
-    //     text2: t(LanguageType.errorTryAgain),
-    //   });
-    // } finally {
-    // }
-  };
 
   const onBlurUserName = () => {
     if (!userName.trim()) {
@@ -169,27 +80,15 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
 
   const onPickHotel = () => {
     Keyboard.dismiss();
-    navigation.navigate('ModalPickHotel', { hotel, setHotel });
-  };
-
-  const onSave = () => {
-    setIsRememberLogin(!isRememberLogin);
-    DataLocal.setRememberLogin(!isRememberLogin);
+    navigation.navigate('ModalPickHotel', {
+      hotel,
+      setHotel: (newHotel: typeHotel) => setLoginForm({ hotel: newHotel }),
+    });
   };
 
   const onForgotPassword = () => {
     navigation.navigate('ForgotPasswordScreen');
   };
-
-  // const handleClearCredentials = () => {
-  //   // Refresh form khi xóa credentials
-  //   setUserName('');
-  //   setPassword('');
-
-  //   setHotel({} as typeHotel);
-  //   setIsRememberLogin(false);
-  //   DataLocal.setRememberLogin(false);
-  // };
 
   return (
     <>
@@ -206,8 +105,6 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
               </AppText>
             </ImageBackground>
 
-            {/* Hiển thị thông tin credentials đã lưu */}
-
             <AppTextInput
               required
               labelStyle={styles.labelUser}
@@ -215,7 +112,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
               placeholderTextColor={light.placeholderTextColor}
               value={userName}
               maxLength={20}
-              onChangeText={setUserName}
+              onChangeText={text => setLoginForm({ userName: text })}
               onBlur={onBlurUserName}
               placeholder={t('auth.login.inputUserName')}
               onSubmitEditing={() => refPassword.current?.focus()}
@@ -234,8 +131,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
               secureTextEntry
               value={password}
               maxLength={20}
-              onChangeText={setPassword}
-              // onSubmitEditing={onPickHotel}
+              onChangeText={text => setLoginForm({ password: text })}
               onBlur={onBlurPassword}
               placeholder={t('auth.login.inputPassword')}
               inputStyle={styles.inputStyle}
@@ -260,14 +156,13 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
                     style={{ transform: [{ rotate: '90deg' }], marginRight: s(2) }}
                   />
                 }
-                // onPress={onPickHotel}
                 inputStyle={styles.inputStyle}
                 containerStyle={{
                   width: SCREEN_WIDTH - PaddingHorizontal * 2,
                 }}
               />
             </AppBlockButton>
-            <AppBlockButton onPress={onSave} style={styles.buttonSave}>
+            <AppBlockButton onPress={toggleRememberLogin} style={styles.buttonSave}>
               {isRememberLogin ? <IconCheckBox /> : <IconUnCheckBox />}
 
               <AppText ml={s(5)} size={12} weight="500">
@@ -280,7 +175,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
             <AppButton
               width={SCREEN_WIDTH - s(32)}
               height={vs(45)}
-              onPress={onSubmit}
+              onPress={login}
               mt={vs(16)}
               disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
               disabled={disabled}
@@ -341,7 +236,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // justifyContent: 'space-between',
     alignItems: 'center',
   },
 });

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Animated, LogBox, StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
 import { useIsLogin } from '../zustand/store/useIsLogin/useIsLogin';
 import MainNavigator from './MainNavigator';

@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { StyleSheet, View, TextInput, Platform, KeyboardAvoidingView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MainParams, RootStackParams } from '../../navigation/params';
+import { RootStackParams } from '../../navigation/params';
 import { useTranslation } from 'react-i18next';
 import { s, vs } from 'react-native-size-matters';
 import { Colors } from '@/theme/Config';
