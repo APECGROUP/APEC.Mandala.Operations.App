@@ -1,22 +1,17 @@
 // views/NotificationScreen.tsx
 
 import React, { useRef, useMemo } from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-} from 'react-native';
+import { ActivityIndicator, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { s, vs } from 'react-native-size-matters';
 
-import { MainParams } from '../../../navigation/params';
-import { AppBlock } from '../../../elements/block/Block';
-import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
-import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
+import { MainParams } from '@/navigation/params';
+import { AppBlock } from '@/elements/block/Block';
+import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
+import IconScrollBottom from '@assets/icon/IconScrollBottom';
 
-import light from '../../../theme/light';
+import light from '@/theme/light';
 import { ContentNotification } from '../modal/notificationModel';
 import { useNotificationViewModel } from '../viewmodal/useNotificationViewModel';
 import ItemNotification from './component/ItemNotification';

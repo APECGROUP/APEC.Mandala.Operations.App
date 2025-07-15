@@ -55,7 +55,7 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
   const toggleRememberLogin = useCallback(() => {
     setLoginForm({ isRememberLogin: !loginForm.isRememberLogin });
     DataLocal.setRememberLogin(!loginForm.isRememberLogin);
-  }, [loginForm.isRememberLogin]);
+  }, [loginForm.isRememberLogin, setLoginForm]);
 
   const login = useCallback(async () => {
     setProcessing(true);

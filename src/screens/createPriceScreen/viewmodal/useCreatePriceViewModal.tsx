@@ -2,26 +2,13 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  TypeCreatePrice,
-  fetchCreatePrice,
-  CreatePriceFilters, // Bạn cần đảm bảo TypeCreatePrice và CreatePriceFilters được cập nhật để sử dụng 'prNo'
-} from '../modal/CreatePriceModal';
+import { TypeCreatePrice, fetchCreatePrice, CreatePriceFilters } from '../modal/CreatePriceModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
-
-// Giả định bạn đã cập nhật CreatePriceFilters trong CreatePriceModal.ts như sau:
-// export interface CreatePriceFilters {
-//   prNo?: string; // Đổi từ searchKey sang prNo
-//   fromDate?: Date;
-//   toDate?: Date;
-//   department?: { id: string; name: string };
-//   requester?: { id: string; name: string };
-// }
 
 export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {}) {
   const { t } = useTranslation();
@@ -51,7 +38,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
   }, [currentUiFilters]);
 
   // queryKey giờ sẽ dùng effectiveFilters.prNo
-  const queryKey = useMemo(
+  const currentQueryKey = useMemo(
     () => [
       'listCreatePrice',
       effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
@@ -79,7 +66,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
     error,
   } = useInfiniteQuery<TypeCreatePrice[], Error>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: queryKey,
+    queryKey: currentQueryKey,
     queryFn: async ({ pageParam = 1 }) =>
       fetchCreatePrice(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
     getNextPageParam: (lastPage, allPages) =>
@@ -118,15 +105,6 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
   const { showAlert } = useAlert();
   const onDelete = useCallback(
     async (id: string, onSuccess?: (deletedId: string) => void) => {
-      const currentQueryKey = [
-        'listCreatePrice',
-        effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-        effectiveFilters.fromDate?.toISOString() || '',
-        effectiveFilters.toDate?.toISOString() || '',
-        effectiveFilters.department?.id || '',
-        effectiveFilters.requester?.id || '',
-      ];
-
       const cached = queryClient.getQueryData<InfiniteData<TypeCreatePrice[]>>(currentQueryKey);
       if (!cached) {
         console.warn('🟥 No cache found for key:', currentQueryKey);
@@ -140,6 +118,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
             ...cached,
             pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
           });
+          setSelectedIds(prev => prev.filter(v => v !== id));
 
           onSuccess?.(id);
           return true;
@@ -158,7 +137,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
         return false;
       }
     },
-    [queryClient, effectiveFilters, showAlert, t],
+    [queryClient, currentQueryKey, showAlert, t],
   );
 
   const handleDelete = useCallback(
@@ -183,86 +162,80 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
     [showAlert, t, onDelete],
   );
 
-  const onApproved = useCallback(
-    async (ids: string[]) => {
-      // Xoá các item có id nằm trong danh sách ids khỏi cache
-      const currentQueryKey = [
-        'listCreatePrice',
-        effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-        effectiveFilters.fromDate?.toISOString() || '',
-        effectiveFilters.toDate?.toISOString() || '',
-        effectiveFilters.department?.id || '',
-        effectiveFilters.requester?.id || '',
-        effectiveFilters.product?.id || '',
-        effectiveFilters.ncc?.id || '',
-        effectiveFilters.status?.id || '',
-      ];
-      const cached = queryClient.getQueryData(currentQueryKey);
-      if (cached && cached.pages) {
-        // Loại bỏ các item có id nằm trong ids khỏi từng page
-        const newPages = cached.pages.map((page: TypeCreatePrice[]) =>
-          page.filter(item => !ids.includes(item.id)),
-        );
-        queryClient.setQueryData(currentQueryKey, {
-          ...cached,
-          pages: newPages,
-        });
-        setSelectedIds([]);
-      }
-      showToast(t('createPrice.approvedSuccess'), 'success');
+  const onApproved = useCallback(async () => {
+    // Xoá các item có id nằm trong danh sách ids khỏi cache
+    const cached = queryClient.getQueryData(currentQueryKey);
+    if (cached && cached.pages) {
+      // Loại bỏ các item có id nằm trong ids khỏi từng page
+      const newPages = cached.pages.map((page: TypeCreatePrice[]) =>
+        page.filter(item => !selectedIds.includes(item.id)),
+      );
+      queryClient.setQueryData(currentQueryKey, {
+        ...cached,
+        pages: newPages,
+      });
+      setSelectedIds([]);
+    }
+    showToast(t('createPrice.approvedSuccess'), 'success');
+  }, [queryClient, currentQueryKey, showToast, t, selectedIds]);
+  const onReject = useCallback(async () => {
+    // Xoá các item có id nằm trong danh sách ids khỏi cache
+    const cached = queryClient.getQueryData(currentQueryKey);
+    if (cached && cached.pages) {
+      // Loại bỏ các item có id nằm trong ids khỏi từng page
+      const newPages = cached.pages.map((page: TypeCreatePrice[]) =>
+        page.filter(item => !selectedIds.includes(item.id)),
+      );
+      queryClient.setQueryData(currentQueryKey, {
+        ...cached,
+        pages: newPages,
+      });
+      setSelectedIds([]);
+    }
+    showToast(t('createPrice.rejectSuccess'), 'success');
+  }, [queryClient, currentQueryKey, showToast, t, selectedIds]);
+  const toggleSelectAll = useCallback(() => {
+    const allIds = flatData.map(item => item.id);
+    if (selectedIds.length === flatData.length) {
+      setSelectedIds([]); // Bỏ chọn tất cả
+    } else {
+      setSelectedIds(allIds); // Chọn tất cả
+    }
+  }, [selectedIds.length, flatData, setSelectedIds]);
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
     },
-    [queryClient, effectiveFilters, t, showToast],
-  );
-  const onReject = useCallback(
-    async (ids: string[]) => {
-      // Xoá các item có id nằm trong danh sách ids khỏi cache
-      const currentQueryKey = [
-        'listCreatePrice',
-        effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-        effectiveFilters.fromDate?.toISOString() || '',
-        effectiveFilters.toDate?.toISOString() || '',
-        effectiveFilters.department?.id || '',
-        effectiveFilters.requester?.id || '',
-        effectiveFilters.product?.id || '',
-        effectiveFilters.ncc?.id || '',
-        effectiveFilters.status?.id || '',
-      ];
-      const cached = queryClient.getQueryData(currentQueryKey);
-      if (cached && cached.pages) {
-        // Loại bỏ các item có id nằm trong ids khỏi từng page
-        const newPages = cached.pages.map((page: TypeCreatePrice[]) =>
-          page.filter(item => !ids.includes(item.id)),
-        );
-        queryClient.setQueryData(currentQueryKey, {
-          ...cached,
-          pages: newPages,
-        });
-        setSelectedIds([]);
-      }
-      showToast(t('createPrice.rejectSuccess'), 'success');
-    },
-    [queryClient, effectiveFilters, t, showToast],
+    [setSelectedIds],
   );
 
+  const selectedAll = useMemo(
+    () => selectedIds.length === flatData.length && flatData.length > 0,
+    [selectedIds.length, flatData.length],
+  );
   return {
-    onReject,
     selectedIds,
-    setSelectedIds,
-    onApproved,
     flatData,
     isLoading,
     isFetching,
     isRefetching,
     isFetchingNextPage,
     hasNextPage: !!hasNextPage,
+    currentPrNoInput: currentUiFilters.prNo || '', // Thay searchKey bằng prNo
+    currentFilters: currentUiFilters,
+    isError,
+    error,
+    selectedAll,
+    onReject,
+    setSelectedIds,
+    onApproved,
     onRefresh,
     onLoadMore,
     onSearch,
     applyFilters,
     handleDelete,
-    currentPrNoInput: currentUiFilters.prNo || '', // Thay searchKey bằng prNo
-    currentFilters: currentUiFilters,
-    isError,
-    error,
+    toggleSelectAll,
+    handleSelect,
   };
 }
