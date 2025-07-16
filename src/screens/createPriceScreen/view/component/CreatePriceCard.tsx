@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, memo } from 'react';
+import React, { useCallback, useMemo, memo, useRef } from 'react';
 import { View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
 import IconListPen from '@assets/icon/IconListPen';
@@ -9,29 +9,29 @@ import { AppText } from '@/elements/text/AppText';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconTrashPrice from '@assets/icon/IconTrashPrice';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
-import ReanimatedSwipeable from './ReanimatedSwipeable';
+import ReanimatedSwipeable, { ReanimatedSwipeableRef } from './ReanimatedSwipeable';
 import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { Colors } from '@/theme/Config';
 import { moneyFormat } from '@/utils/Utilities';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
+import { useCreatePriceViewModel } from '../../viewmodal/useCreatePriceViewModal';
 
 interface CreatePriceCardProps {
   item: TypeCreatePrice;
   isSelected: boolean;
-  handleDelete: (id: string) => void;
   handleSelect: (id: string) => void;
   simultaneousGesture: any;
 }
 
 const CreatePriceCard = memo<CreatePriceCardProps>(
-  ({ item, isSelected, handleDelete, handleSelect, simultaneousGesture }) => {
+  ({ item, isSelected, handleSelect, simultaneousGesture }) => {
     const { t } = useTranslation();
-
+    const swipeableRef = useRef<ReanimatedSwipeableRef>(null);
     // SharedValue để đồng bộ chiều cao cho delete button
     const heightAction = useSharedValue(0);
-
+    const { handleDelete } = useCreatePriceViewModel();
     // Animate delete button theo heightAction
     const animatedDeleteStyle = useAnimatedStyle(() => ({
       height: heightAction.value,
@@ -44,18 +44,27 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const onCloseSwipe = useCallback(() => {
+      console.log('close swipe callback triggered');
+      swipeableRef.current?.closeSwipe();
+    }, []);
+
+    const handleDeleteWithClose = useCallback(() => {
+      handleDelete(item.id, undefined, onCloseSwipe);
+    }, [handleDelete, onCloseSwipe, item.id]);
+
     // Phần render nút delete
-    const renderRightActions = useCallback(
-      (id: string) => (
+    const renderRightActions = useCallback(() => {
+      console.log('Rendering delete button with onCloseSwipe:', !!onCloseSwipe);
+      return (
         <AnimatedButton
           activeOpacity={1}
           style={[styles.deleteBtn, animatedDeleteStyle]}
-          onPress={() => handleDelete(id)}>
+          onPress={handleDeleteWithClose}>
           <IconTrashPrice />
         </AnimatedButton>
-      ),
-      [animatedDeleteStyle, handleDelete],
-    );
+      );
+    }, [animatedDeleteStyle, handleDeleteWithClose, onCloseSwipe]);
 
     const handleSelectPress = useCallback(() => {
       handleSelect(item.id);
@@ -79,11 +88,16 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
       [t, item.createdAt, item.estimateDate, item.ncc],
     );
 
+    const onSwipe = useCallback(() => {
+      handleDelete(item.id, undefined, onCloseSwipe);
+    }, [handleDelete, item.id, onCloseSwipe]);
+
     return (
       <ReanimatedSwipeable
-        renderRightActions={() => renderRightActions(item.id)}
+        ref={swipeableRef}
+        renderRightActions={renderRightActions}
         simultaneousGesture={simultaneousGesture}
-        onSwipe={() => {}}>
+        onSwipe={onSwipe}>
         <View style={[styles.itemContainer, styles.itemExpanded]} onLayout={onItemLayout}>
           <View style={styles.headerItem}>
             <AppBlockButton onPress={handleSelectPress} style={styles.left}>

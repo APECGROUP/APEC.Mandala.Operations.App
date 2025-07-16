@@ -105,6 +105,16 @@ export default function MainNavigator() {
           name="InformationItemsScreen"
           component={InformationItemsScreen}
           options={{
+            // animation: 'fade',
+            // animation: 'fade_from_bottom' ,
+            // animation: 'flip',
+            // animation: 'ios_from_left',
+            // animation: 'ios_from_right',
+            // animation: 'none',
+            // animation: 'simple_push',
+            // animation: 'slide_from_bottom',
+            // animation:'slide_from_left' ,
+            // animation:'slide_from_right' ,
             headerShown: false,
             contentStyle: {
               paddingHorizontal: 0,

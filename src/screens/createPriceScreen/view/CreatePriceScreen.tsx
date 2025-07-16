@@ -58,7 +58,6 @@ const CreatePriceScreen: React.FC = () => {
     onRefresh,
     // onLoadMore,
     applyFilters,
-    handleDelete,
     onApproved,
     onReject,
     toggleSelectAll,
@@ -129,13 +128,12 @@ const CreatePriceScreen: React.FC = () => {
     ({ item }: { item: TypeCreatePrice; index: number }) => (
       <CreatePriceCard
         item={item}
-        handleDelete={id => handleDelete(id)}
         handleSelect={handleSelect}
         isSelected={selectedIds.includes(item.id)}
         simultaneousGesture={flashListNativeGesture}
       />
     ),
-    [handleDelete, handleSelect, selectedIds, flashListNativeGesture],
+    [handleSelect, selectedIds, flashListNativeGesture],
   );
 
   const goToFilterScreen = useCallback(() => {

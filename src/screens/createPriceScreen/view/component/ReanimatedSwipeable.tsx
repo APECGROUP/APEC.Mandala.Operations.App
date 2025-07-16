@@ -34,10 +34,12 @@ const ReanimatedSwipeable = forwardRef<ReanimatedSwipeableRef, Props>(
     // Export closeSwipe function through ref
     useImperativeHandle(ref, () => ({
       closeSwipe: () => {
+        'worklet';
         translateX.value = withSpring(0, {
           damping: 25,
           stiffness: 90,
         });
+        opacity.value = withTiming(0, { duration: 300 });
       },
     }));
 

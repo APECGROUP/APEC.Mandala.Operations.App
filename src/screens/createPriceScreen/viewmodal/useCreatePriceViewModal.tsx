@@ -141,12 +141,17 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
   );
 
   const handleDelete = useCallback(
-    (id: string, onSuccess?: (deletedId: string) => void) => {
+    (id: string, onSuccess?: (deletedId: string) => void, onCancel?: () => void) => {
+      console.log('handleDelete called with onCancel:', !!onCancel);
       showAlert(t('createPrice.remove.title'), '', [
         {
           text: t('createPrice.remove.cancel'),
           style: 'cancel',
-          onPress: () => {},
+          onPress: () => {
+            console.log('Cancel button pressed, onCancel exists:', !!onCancel);
+            console.log('onCancel type:', typeof onCancel);
+            onCancel?.();
+          },
         },
         {
           text: t('createPrice.remove.agree'),
