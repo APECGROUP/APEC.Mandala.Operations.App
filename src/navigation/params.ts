@@ -20,6 +20,7 @@ export type TabBarParams = {
   CreatePoScreen: undefined;
   PcLogScreen: undefined;
   PcPrScreen: undefined;
+  HomeScreen: undefined;
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -52,6 +53,7 @@ export type MainParams = {
   DetailApproveCardScreen: { item: TypeApprove };
   InformationItemsScreen: { item: DataAssignPrice };
   MyTabs: undefined;
+  MyTabsHk: undefined;
   NotificationScreen: undefined;
   DetailOrderApproveScreen: { item: DataAssignPrice };
 

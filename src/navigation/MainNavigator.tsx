@@ -26,13 +26,14 @@ import PickDepartmentScreen from '@/views/modal/modalPickDepartment/view/PickDep
 import PickRequesterScreen from '@/views/modal/modalPickRequester/view/PickRequesterScreen';
 import CreatePriceNccScreen from '@/screens/createPriceScreen/view/component/CreatePriceNccScreen';
 import ApprovePrScreen from '@/screens/approvePrScreen/view/ApprovePrScreen';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+// import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import DetailApproveCardScreen from '@/screens/approvePrScreen/view/component/DetailApproveCardScreen';
 import DetailOrderApproveScreen from '@/screens/detailOrderApproveScreen/view/DetailOrderApproveScreen';
 import PickItemScreen from '@/views/modal/modalPickItem/view/PickItemScreen';
 import FilterApproveScreen from '@/screens/filterScreen/view/FilterApproveScreen';
 import FilterCreatePriceScreen from '@/screens/filterScreen/view/FilterCreatePriceScreen';
 import PickLocalScreen from '@/views/modal/modalPickLocal/view/PickLocalScreen';
+import MyTabsHk from '@/screens/routerHk/MyTabsHk';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -43,7 +44,7 @@ export default function MainNavigator() {
     await Utilities.requestNotificationPermission(showAlert);
   };
 
-  const { infoUser } = useInfoUser();
+  // const { infoUser } = useInfoUser();
 
   useEffect(() => {
     // fetData();
@@ -52,8 +53,8 @@ export default function MainNavigator() {
   }, []);
   return (
     <Navigator
-      // initialRouteName={'MyTabs'}
-      initialRouteName={!infoUser?.isApprove ? 'MyTabs' : 'ApprovePrScreen'}
+      initialRouteName={'MyTabsHk'}
+      // initialRouteName={!infoUser?.isApprove ? 'MyTabs' : 'ApprovePrScreen'}
       screenOptions={{
         // animation: 'simple_push',
         headerShown: false,
@@ -149,6 +150,14 @@ export default function MainNavigator() {
           }}
           name="MyTabs"
           component={MyTabs}
+        />
+        <Screen
+          options={{
+            headerShown: false,
+            contentStyle: { paddingHorizontal: s(0) },
+          }}
+          name="MyTabsHk"
+          component={MyTabsHk}
         />
         <Screen
           options={{
