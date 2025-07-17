@@ -4,7 +4,6 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { Colors } from '@/theme/Config';
 import HeaderHome from './component/HeaderHome';
 import { FlashList } from '@shopify/flash-list';
-import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { AppText } from '@/elements/text/AppText';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 import { vs } from 'react-native-size-matters';
@@ -15,6 +14,7 @@ import { FloorData } from '../modal/HomeModal';
 import { useHomeViewModal } from '../viewmodal/useHomeViewModal';
 import ItemHome from './component/ItemHome';
 import ButtonBottomHome from './component/ButtonBottomHome';
+import SkeletonItemHome from './component/SkeletonItemHome';
 
 const HomeScreen = () => {
   const { data, isLoading, isRefetching, onLoadMore, onRefresh, isFetchingNextPage } =
@@ -58,25 +58,19 @@ const HomeScreen = () => {
     return null;
   }, [isFetchingNextPage]);
 
-  const renderItem = useCallback(({ item }: { item: FloorData }) => <ItemHome item={item} />, []);
+  const renderItem = useCallback(
+    ({ item, index }: { item: FloorData; index: number }) => <ItemHome index={index} item={item} />,
+    [],
+  );
   console.log('home: ', data);
   return (
     <ViewContainer>
       <SafeAreaView style={styles.safeArea}>
         <HeaderHome />
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
+
         {isLoading && data.length === 0 ? (
-          <View style={styles.listContent}>
-            {/* Hiển thị Skeleton khi loading lần đầu và chưa có dữ liệu */}
-            {new Array(6).fill(0).map(
-              (
-                _,
-                index, // Giảm số lượng skeleton để demo
-              ) => (
-                <SkeletonItem key={index} />
-              ),
-            )}
-          </View>
+          <SkeletonItemHome />
         ) : (
           <FlashList
             ref={flashListRef}

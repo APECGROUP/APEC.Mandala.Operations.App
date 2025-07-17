@@ -108,8 +108,8 @@ const RoomCard: React.FC<RoomCardProps> = React.memo(({ room, isSelected, onPres
 
 // --- Component chính: ItemHome ---
 // Chịu trách nhiệm hiển thị một tầng và FlashList các phòng của nó
-const ItemHome = ({ item }: { item: FloorData }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const ItemHome = ({ item, index }: { item: FloorData; index: number }) => {
+  const [isOpen, setIsOpen] = useState(index === 0 ? true : false);
   const { selectedRoom, setSelectedRoom } = useHomeViewModal();
 
   const onToggle = () => {
