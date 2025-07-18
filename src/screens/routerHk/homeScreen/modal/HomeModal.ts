@@ -97,10 +97,7 @@ export interface PaginatedFloorResponse {
 function generateSingleRoom(floorNumber: number, roomIndex: number): RoomData {
   const floorName = `Tầng ${floorNumber}`;
   // Tạo số phòng dạng "F01-R01" để đảm bảo duy nhất và dễ đọc
-  const roomNumberUnique = `F${String(floorNumber).padStart(2, '0')}-R${String(
-    roomIndex + 1,
-  ).padStart(2, '0')}`;
-  const id = `${floorName.replace(' ', '')}-${roomNumberUnique}`;
+  const id = `${floorNumber}${roomIndex < 10 ? '0' : ''}${roomIndex + 1}`;
 
   // Chọn ngẫu nhiên các trạng thái từ các enum
   const cleaningStatus =

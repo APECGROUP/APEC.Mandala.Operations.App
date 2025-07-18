@@ -32,6 +32,7 @@ import { FlashList } from '@shopify/flash-list';
 // Import ViewModel (đảm bảo đường dẫn chính xác)
 import { useHomeViewModal } from '../../viewmodal/useHomeViewModal';
 import { Colors } from '@/theme/Config';
+import { navigate } from '@/navigation/RootNavigation';
 
 // --- Component con: RoomCard ---
 // Chịu trách nhiệm render một thẻ phòng duy nhất
@@ -120,7 +121,11 @@ const ItemHome = ({ item, index }: { item: FloorData; index: number }) => {
   const renderRoomItem = useCallback(
     ({ item: roomItem }: { item: RoomData }) => {
       const isSelected = selectedRoom?.id === roomItem.id;
-      return <RoomCard room={roomItem} isSelected={isSelected} onPress={setSelectedRoom} />;
+      const onPress = () => {
+        setSelectedRoom(roomItem);
+        navigate('InformationRoomScreen', { id: roomItem.id });
+      };
+      return <RoomCard room={roomItem} isSelected={isSelected} onPress={onPress} />;
     },
     [selectedRoom?.id, setSelectedRoom], // Dependencies: chỉ render lại khi selectedRoom thay đổi
   );
@@ -131,6 +136,7 @@ const ItemHome = ({ item, index }: { item: FloorData; index: number }) => {
         <AppText size={14} weight="600">
           {item.floorName}
         </AppText>
+
         <IconDropDown style={isOpen ? null : styles.rotatedIcon} />
       </AppBlockButton>
 

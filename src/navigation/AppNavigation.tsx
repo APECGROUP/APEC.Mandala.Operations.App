@@ -38,7 +38,7 @@ const AppNavigation = () => {
     <AppBlock style={styles.flex}>
       <View style={[styles.flex]}>
         {/* <View style={[styles.flex, {paddingBottom: bottom || vs(5)}]}> */}
-        {isLogin ? <MainNavigator /> : <AuthNavigator />}
+        {!isLogin ? <MainNavigator /> : <AuthNavigator />}
       </View>
       {splashVisible && (
         <Animated.View style={[styles.splashContainer, { opacity }]}>

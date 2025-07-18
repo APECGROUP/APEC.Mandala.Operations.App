@@ -1,7 +1,14 @@
-import React, { useCallback, useRef, useEffect, useState } from 'react';
-import { Animated, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+  useSharedValue,
+  runOnJS,
+  Easing,
+} from 'react-native-reanimated';
 import { MainParams } from '../../navigation/params';
 import { AppText } from '../../elements/text/AppText';
 import AppBlockButton from '../button/AppBlockButton';
@@ -41,34 +48,36 @@ const ModalPickCalendar = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
 
-  const [startDate, setStartDate] = useState<Date | null>(initialStartDate || initialDate || null);
-  const [endDate, setEndDate] = useState<Date | null>(initialEndDate || null);
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    initialStartDate || initialDate || undefined,
+  );
+  const [endDate, setEndDate] = useState<Date | undefined>(initialEndDate || undefined);
 
-  const slideAnim = useRef(new Animated.Value(300)).current;
+  const translateY = useSharedValue(500);
 
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  React.useEffect(() => {
+    translateY.value = withTiming(0, {
+      duration: 500,
+    });
+  }, [translateY]);
 
   const goBack = useCallback(() => {
-    Animated.timing(slideAnim, {
-      toValue: 700,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
-      navigation.goBack();
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigation]);
+    translateY.value = withTiming(
+      500,
+      {
+        duration: 500,
+      },
+      finished => {
+        if (finished) {
+          runOnJS(navigation.goBack)();
+        }
+      },
+    );
+  }, [navigation, translateY]);
 
   const handleReset = () => {
-    setStartDate(null);
-    setEndDate(null);
+    setStartDate(undefined);
+    setEndDate(undefined);
   };
 
   const handleSave = () => {
@@ -85,24 +94,26 @@ const ModalPickCalendar = ({ navigation, route }: Props) => {
     } else {
       if (type === 'START_DATE') {
         setStartDate(date);
-        setEndDate(null);
+        setEndDate(undefined);
       } else {
         setEndDate(date);
       }
     }
   };
-  const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
 
   return (
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
-      <AnimatedTouchable
-        activeOpacity={1}
+      <Animated.View
         style={[
           styles.container,
           {
             paddingBottom: bottom,
-            transform: [{ translateY: slideAnim }],
           },
+          animatedStyle,
         ]}>
         <View style={styles.header}>
           <AppText size={20} weight="bold" textAlign="center">
@@ -140,8 +151,8 @@ const ModalPickCalendar = ({ navigation, route }: Props) => {
           selectedRangeStyle={styles.rangeBetween}
           selectedStartDate={startDate}
           selectedEndDate={endDate}
-          minDate={minDate}
-          maxDate={maxDate}
+          minDate={minDate || undefined}
+          maxDate={maxDate || undefined}
           selectYearTitle="Chọn năm "
           selectMonthTitle="Chọn tháng "
           onDateChange={onDateChange}
@@ -161,7 +172,7 @@ const ModalPickCalendar = ({ navigation, route }: Props) => {
             </TouchableOpacity>
           </View>
         )}
-      </AnimatedTouchable>
+      </Animated.View>
     </TouchableOpacity>
   );
 };
@@ -178,7 +189,6 @@ const styles = ScaledSheet.create({
     backgroundColor: light.white,
     borderTopLeftRadius: s(12),
     borderTopRightRadius: s(12),
-    // paddingTop: vs(12),
   },
   header: {
     flexDirection: 'row',

@@ -78,24 +78,52 @@ const HeaderHome = () => {
         {/* Right Group: "Tất cả" and "Ưu tiên" buttons */}
         <View style={styles.actionButtonGroup}>
           {/* "Tất cả" Button */}
-          <AppBlockButton onPress={onPressAll} style={styles.actionButton}>
-            <View
-              style={[
-                styles.actionButtonInner,
-                isAll ? styles.actionButtonPrimary : styles.actionButtonSecondary,
-              ]}>
-              <AppText color={isAll ? Colors.WHITE : Colors.TEXT_DEFAULT}>Tất cả</AppText>
+          <AppBlockButton
+            onPress={onPressAll}
+            style={[
+              {
+                backgroundColor: Colors.PRIMARY,
+                padding: 2,
+                borderRadius: s(10),
+                marginHorizontal: s(4),
+              },
+              isAll ? { backgroundColor: Colors.PRIMARY } : { backgroundColor: Colors.WHITE },
+            ]}>
+            <View style={{ backgroundColor: Colors.WHITE, padding: 2, borderRadius: s(8) }}>
+              <View style={styles.actionButton}>
+                <View
+                  style={[
+                    styles.actionButtonInner,
+                    isAll ? styles.actionButtonPrimary : styles.actionButtonSecondary,
+                  ]}>
+                  <AppText color={isAll ? Colors.WHITE : Colors.TEXT_DEFAULT}>Tất cả</AppText>
+                </View>
+              </View>
             </View>
           </AppBlockButton>
 
           {/* "Ưu tiên" Button */}
-          <AppBlockButton onPress={onPressPriority} style={styles.actionButton}>
-            <View
-              style={[
-                styles.actionButtonInner,
-                !isAll ? styles.actionButtonPrimary : styles.actionButtonSecondary,
-              ]}>
-              <AppText color={!isAll ? Colors.WHITE : Colors.TEXT_DEFAULT}>Ưu tiên</AppText>
+
+          <AppBlockButton
+            onPress={onPressPriority}
+            style={[
+              {
+                backgroundColor: Colors.PRIMARY,
+                padding: 2,
+                borderRadius: s(10),
+              },
+              !isAll ? { backgroundColor: Colors.PRIMARY } : { backgroundColor: Colors.WHITE },
+            ]}>
+            <View style={{ backgroundColor: Colors.WHITE, padding: 2, borderRadius: s(8) }}>
+              <View style={styles.actionButton}>
+                <View
+                  style={[
+                    styles.actionButtonInner,
+                    !isAll ? styles.actionButtonPrimary : styles.actionButtonSecondary,
+                  ]}>
+                  <AppText color={!isAll ? Colors.WHITE : Colors.TEXT_DEFAULT}>Ưu tiên</AppText>
+                </View>
+              </View>
             </View>
           </AppBlockButton>
         </View>
@@ -182,24 +210,25 @@ const styles = StyleSheet.create({
     width: 1,
     height: vs(24),
     backgroundColor: '#CACACA',
-    marginLeft: s(16),
+    marginLeft: s(12),
     marginRight: s(8),
     // marginHorizontal: s(8),
   },
   actionButtonGroup: {
     flexDirection: 'row',
+    alignItems: 'center',
     // Removed marginLeft: 'auto' as justifyContent: 'space-between' handles spacing
   },
   actionButton: {
-    paddingVertical: vs(18),
-    paddingHorizontal: s(5),
+    // paddingVertical: vs(18),
+    // paddingHorizontal: s(5),
   },
   actionButtonInner: {
     paddingVertical: vs(7),
     paddingHorizontal: s(8),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: s(8),
   },
   actionButtonPrimary: {
     backgroundColor: Colors.PRIMARY,

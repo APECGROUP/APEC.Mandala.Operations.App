@@ -61,6 +61,8 @@ export type MainParams = {
   ModalPhotoOrCamera: {
     setImageAvatar: (v: ResponseImageElement) => void;
   };
+  DetailRoomScreen: { id: string };
+  InformationRoomScreen: { id: string };
   ChangePasswordScreen: {
     type: 'reset' | 'change';
   };
