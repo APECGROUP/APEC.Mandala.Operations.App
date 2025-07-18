@@ -5,12 +5,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import moment from 'moment';
 import { ScaledSheet, s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
-import Animated, {
+import {
   useAnimatedStyle,
   withTiming,
   useSharedValue,
   runOnJS,
-  Easing,
 } from 'react-native-reanimated';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { AppText } from '@/elements/text/AppText';

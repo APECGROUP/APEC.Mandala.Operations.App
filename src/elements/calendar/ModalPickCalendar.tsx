@@ -7,7 +7,6 @@ import Animated, {
   withTiming,
   useSharedValue,
   runOnJS,
-  Easing,
 } from 'react-native-reanimated';
 import { MainParams } from '../../navigation/params';
 import { AppText } from '../../elements/text/AppText';
