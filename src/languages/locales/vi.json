@@ -52,8 +52,13 @@
       "title": "Xin chào",
       "header": "Danh sách PR",
       "empty": "Không có kết quả phù hợp",
-
-      "searchPlaceholder": "Tìm kiếm PR No"
+      "rejectAssign": "Từ chối gắn giá",
+      "searchPlaceholder": "Tìm kiếm PR No",
+      "reason": "Lý do",
+      "inputReason": "Nhập lý do",
+      "confirm": "Xác nhận",
+      "cancel": "Hủy",
+      "close": "Đóng"
     },
     "notifications": {
       "youHave": "Bạn có đơn hàng",
@@ -183,6 +188,7 @@
       "saveInfoSuccess": "Lưu thông tin thành công"
     },
     "approve": {
+      "rejectApprove": "Từ chối duyệt đơn hàng",
       "title": "Xin chào",
       "searchPlaceholder": "Tìm kiếm PR NO",
       "listOfPurchaseOrder": "Danh sách phiếu yêu cầu mua hàng",

@@ -126,6 +126,7 @@ export enum COLORS_DEFAULT {
   TEXT_SECONDARY = '#727272',
 
   ICON_SECONDARY = '#BABABA',
+  COLOR_CLOSE = '#FBEAE9',
 }
 
 export enum COLORS_DARK {
@@ -255,4 +256,5 @@ export enum COLORS_DARK {
   TEXT_SECONDARY = '#727272',
 
   ICON_SECONDARY = '#BABABA',
+  COLOR_CLOSE = '#FBEAE9',
 }

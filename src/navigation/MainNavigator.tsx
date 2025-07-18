@@ -33,6 +33,8 @@ import PickItemScreen from '@/views/modal/modalPickItem/view/PickItemScreen';
 import FilterApproveScreen from '@/screens/filterScreen/view/FilterApproveScreen';
 import FilterCreatePriceScreen from '@/screens/filterScreen/view/FilterCreatePriceScreen';
 import PickLocalScreen from '@/views/modal/modalPickLocal/view/PickLocalScreen';
+import ModalInputRejectAssign from '@/views/modal/modalInputRejectAssign/ModalInputRejectAssign';
+import ModalInputRejectApprove from '@/views/modal/modalInputRejectApprove/ModalInputRejectApprove';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -241,6 +243,8 @@ export default function MainNavigator() {
         <Screen name={'PickItemScreen'} component={PickItemScreen} />
         <Screen name={'PickLocalScreen'} component={PickLocalScreen} />
         <Screen name={'PickRequesterScreen'} component={PickRequesterScreen} />
+        <Screen name={'ModalInputRejectAssign'} component={ModalInputRejectAssign} />
+        <Screen name={'ModalInputRejectApprove'} component={ModalInputRejectApprove} />
       </Group>
     </Navigator>
   );

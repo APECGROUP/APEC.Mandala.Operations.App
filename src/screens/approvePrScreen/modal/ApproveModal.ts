@@ -44,7 +44,8 @@ function generateMockCreatePriceData(item: any, filters: IApproveFilters): IAppr
   // Đây là phần bạn sẽ thay thế bằng logic mapping từ API thật.
 
   let contentName = fakeData[Math.floor(Math.random() * 50)];
-  let prNo = 'PR20240624#0001';
+  let prNo = `PR20${Math.floor(Math.random() * 1000000)}#${Math.floor(Math.random() * 10000)}`;
+  // let prNo = 'PR20240624#0001';
   let location = { id: '', name: '' };
   // Nếu có searchKey, giả lập rằng tên sản phẩm được lọc theo searchKey
   // (mặc dù API picsum không thực sự lọc)

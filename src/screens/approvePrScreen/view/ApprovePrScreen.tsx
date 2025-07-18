@@ -1,13 +1,7 @@
 // views/AssignPriceScreen.tsx
 
 import React, { useRef, useCallback, useMemo, useEffect } from 'react';
-import {
-  StyleSheet,
-  View,
-  TextInput,
-  ActivityIndicator,
-  TouchableOpacity,
-} from 'react-native';
+import { StyleSheet, View, TextInput, ActivityIndicator, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -60,7 +54,6 @@ const ApprovePrScreen: React.FC = () => {
     currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
     onApproved,
-    onReject,
     selectedIds,
     setSelectedIds,
   } = useApproveViewModel();
@@ -276,7 +269,7 @@ const ApprovePrScreen: React.FC = () => {
       </View>
       {selectedIds.length > 0 && (
         <Footer
-          onLeftAction={() => onReject(selectedIds)}
+          onLeftAction={() => navigate('ModalInputRejectApprove', { id: selectedIds[0] })}
           onRightAction={() => onApproved(selectedIds)}
           leftButtonTitle={t('createPrice.reject')}
           rightButtonTitle={t('createPrice.approvedOrder')}

@@ -6,6 +6,10 @@ import { IApprove, IApproveFilters, fetchApprove } from '../modal/ApproveModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
+import FastImage from 'react-native-fast-image';
+import Images from '@assets/image/Images';
+import { s } from 'react-native-size-matters';
+import { goBack } from '@/navigation/RootNavigation';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
@@ -28,7 +32,9 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
   const [currentUiFilters, setCurrentUiFilters] = useState<IApproveFilters>(initialFilters);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
+  const [isLoadingConfirm, setIsLoadingConfirm] = useState(false);
+  const [textReason, setTextReason] = useState('');
+  const isDisableButtonReject = useMemo(() => textReason.trim() === '', [textReason]);
   const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
     typeof debounce<typeof setEffectiveFilters>
   > | null>(null);
@@ -208,9 +214,28 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     },
     [queryClient, effectiveFilters, t, showToast],
   );
+
+  const onRejectSuccess = () => {
+    showAlert(
+      t('informationItem.rejectSuccess'),
+      '',
+      [
+        {
+          text: t('Trở về'),
+          onPress: goBack,
+        },
+      ],
+      <FastImage
+        source={Images.ModalApprovedError}
+        style={{ width: s(285), aspectRatio: 285 / 187 }}
+      />,
+    );
+  };
+
   const onReject = useCallback(
-    async (ids: string[]) => {
-      // Xoá các item có id nằm trong danh sách ids khỏi cache
+    async (ids: string[], func?: () => void) => {
+      setIsLoadingConfirm(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
       const currentQueryKey = [
         'listApprove',
         effectiveFilters.prNo?.trim() || '',
@@ -233,10 +258,30 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
           pages: newPages,
         });
         setSelectedIds([]);
+
+        setIsLoadingConfirm(false);
+        if (func) {
+          func();
+        }
+        onRejectSuccess();
       }
       showToast(t('createPrice.rejectSuccess'), 'success');
+      console.log('text: ', textReason);
+      // Xoá các item có id nằm trong danh sách ids khỏi cache
     },
-    [queryClient, effectiveFilters, t, showToast],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      effectiveFilters.prNo,
+      effectiveFilters.fromDate,
+      effectiveFilters.toDate,
+      effectiveFilters.department?.id,
+      effectiveFilters.requester?.id,
+      effectiveFilters.location?.id,
+      queryClient,
+      showToast,
+      t,
+      textReason,
+    ],
   );
 
   return {
@@ -259,5 +304,9 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     currentFilters: currentUiFilters,
     isError,
     error,
+    isLoadingConfirm,
+    textReason,
+    setTextReason,
+    isDisableButtonReject,
   };
 }

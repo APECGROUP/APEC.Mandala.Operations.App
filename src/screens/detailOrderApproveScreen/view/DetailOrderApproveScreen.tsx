@@ -1,11 +1,7 @@
 // views/AssignPriceScreen.tsx
 
 import React, { useRef, useCallback } from 'react';
-import {
-  StyleSheet,
-  View,
-  ActivityIndicator,
-} from 'react-native';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
@@ -55,7 +51,7 @@ const DetailOrderApproveScreen = ({
     hasNextPage,
     isError,
   } = useDetailOrderApproveViewModel(id);
-  const { onReject, onApproved } = useApproveViewModel();
+  const { onApproved } = useApproveViewModel();
 
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
 
@@ -173,8 +169,7 @@ const DetailOrderApproveScreen = ({
       {flatData && flatData.length > 0 && (
         <Footer
           onLeftAction={() => {
-            onReject([id]);
-            goBack();
+            navigate('ModalInputRejectApprove', { id });
           }}
           onRightAction={() => {
             onApproved([id]);
