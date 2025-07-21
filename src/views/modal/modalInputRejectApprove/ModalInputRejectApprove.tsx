@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import { ScaledSheet, s, vs } from 'react-native-size-matters';
@@ -21,6 +21,7 @@ import AppTextInput from '@/elements/textInput/AppTextInput';
 import { Colors } from '@/theme/Config';
 import { AppButton } from '@/elements/button/AppButton';
 import { useApproveViewModel } from '@/screens/approvePrScreen/viewmodal/useApproveViewModel';
+import { isAndroid } from '@/utils/Utilities';
 
 moment.locale('vi');
 
@@ -71,7 +72,7 @@ const ModalInputRejectApprove = ({ route }: Props) => {
 
   return (
     <ViewContainer>
-      <TouchableOpacity disabled activeOpacity={1} style={styles.overlay} onPress={onGoBack}>
+      <KeyboardAvoidingView behavior={isAndroid() ? 'height' : 'padding'} style={styles.overlay}>
         <Animated.View style={[styles.container, animatedStyle]}>
           <AppText size={18} weight="700" alignSelf="center" mb={16}>
             {t('approve.rejectApprove')}
@@ -113,7 +114,7 @@ const ModalInputRejectApprove = ({ route }: Props) => {
             </View>
           </View>
         </Animated.View>
-      </TouchableOpacity>
+      </KeyboardAvoidingView>
     </ViewContainer>
   );
 };

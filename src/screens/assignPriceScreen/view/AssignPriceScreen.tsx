@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
-import { View, TextInput, ActivityIndicator, StatusBar } from 'react-native';
+import { View, TextInput, ActivityIndicator, StatusBar, ImageBackground } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -143,52 +143,53 @@ const AssignPriceScreen: React.FC = () => {
           // backgroundColor="transparent" // Thường đặt transparent nếu có ảnh nền
           // translucent // Giúp nội dung tràn ra phía sau StatusBar
         />
+
         {/* ─── Background Image ─────────────────────────────────────────────── */}
-        <FastImage
-          style={styles.backgroundImage}
+        <ImageBackground
           source={Images.BackgroundAssignPrice}
           resizeMode={FastImage.resizeMode.cover}
-        />
-        {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-        <View style={[styles.headerContainer, { paddingTop: top }]}>
-          <View style={styles.headerLeft}>
-            <AppBlockButton onPress={goToAccount}>
-              <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
-            </AppBlockButton>
-            <View style={styles.greetingContainer}>
-              <AppText color="#FFFFFF" style={styles.greetingText}>
-                {t('assignPrice.title')}
-              </AppText>
-              <AppText color="#FFFFFF" style={styles.greetingText}>
-                {infoUser.profile.fullName}
-              </AppText>
+          style={styles.imageBackground}>
+          {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
+          <View style={[styles.headerContainer, { paddingTop: top }]}>
+            <View style={styles.headerLeft}>
+              <AppBlockButton onPress={goToAccount}>
+                <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
+              </AppBlockButton>
+              <View style={styles.greetingContainer}>
+                <AppText color="#FFFFFF" style={styles.greetingText}>
+                  {t('assignPrice.title')}
+                </AppText>
+                <AppText color="#FFFFFF" style={styles.greetingText}>
+                  {infoUser.profile.fullName}
+                </AppText>
+              </View>
+            </View>
+            <View style={styles.headerRight}>
+              <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
+                <IconNotification />
+                <View style={styles.notificationBadge}>
+                  <AppText style={styles.notificationBadgeText}>3</AppText>
+                </View>
+              </AppBlockButton>
             </View>
           </View>
-          <View style={styles.headerRight}>
-            <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
-              <IconNotification />
-              <View style={styles.notificationBadge}>
-                <AppText style={styles.notificationBadgeText}>3</AppText>
-              </View>
+          {/* ─── Search Bar ────────────────────────────────────────────────────── */}
+          <View style={styles.searchContainer}>
+            <IconSearch width={vs(18)} />
+            <TextInput
+              value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
+              onChangeText={onSearchPrNo} // Gọi hàm debounce từ ViewModel
+              placeholder={t('assignPrice.searchPlaceholder')}
+              placeholderTextColor={light.placeholderTextColor}
+              style={styles.searchInput}
+              // returnKeyType="search"
+              // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
+            />
+            <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
+              <IconFilter />
             </AppBlockButton>
           </View>
-        </View>
-        {/* ─── Search Bar ────────────────────────────────────────────────────── */}
-        <View style={styles.searchContainer}>
-          <IconSearch width={vs(18)} />
-          <TextInput
-            value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
-            onChangeText={onSearchPrNo} // Gọi hàm debounce từ ViewModel
-            placeholder={t('assignPrice.searchPlaceholder')}
-            placeholderTextColor={light.placeholderTextColor}
-            style={styles.searchInput}
-            // returnKeyType="search"
-            // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
-          />
-          <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
-            <IconFilter />
-          </AppBlockButton>
-        </View>
+        </ImageBackground>
 
         {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
         <View style={styles.titleContainer}>
