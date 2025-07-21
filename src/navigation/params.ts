@@ -55,12 +55,14 @@ export type MainParams = {
   MyTabs: undefined;
   MyTabsHk: undefined;
   NotificationScreen: undefined;
+  NotificationHkScreen: undefined;
   DetailOrderApproveScreen: { item: DataAssignPrice };
 
   // Modals
   ModalPhotoOrCamera: {
     setImageAvatar: (v: ResponseImageElement) => void;
   };
+  NoteScreen: undefined;
   DetailRoomScreen: { id: string };
   InformationRoomScreen: { id: string };
   ChangePasswordScreen: {

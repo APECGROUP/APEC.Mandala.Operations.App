@@ -94,7 +94,7 @@ export interface PaginatedFloorResponse {
  * @param roomIndex Index của phòng trên tầng (0 đến roomsPerFloor - 1)
  * @returns Một đối tượng RoomData được tạo ra.
  */
-function generateSingleRoom(floorNumber: number, roomIndex: number): RoomData {
+export function generateSingleRoom(floorNumber: number, roomIndex: number): RoomData {
   const floorName = `Tầng ${floorNumber}`;
   // Tạo số phòng dạng "F01-R01" để đảm bảo duy nhất và dễ đọc
   const id = `${floorNumber}${roomIndex < 10 ? '0' : ''}${roomIndex + 1}`;

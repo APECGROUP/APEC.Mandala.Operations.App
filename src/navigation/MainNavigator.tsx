@@ -38,6 +38,8 @@ import InformationRoomScreen from '@/screens/routerHk/DetailRooomScreen/view/Inf
 import DetailRoomScreen from '@/screens/routerHk/DetailRooomScreen/view/component/DetailRoomScreen';
 import ModalInputRejectAssign from '@/views/modal/modalInputRejectAssign/ModalInputRejectAssign';
 import ModalInputRejectApprove from '@/views/modal/modalInputRejectApprove/ModalInputRejectApprove';
+import NotificationHkScreen from '@/screens/routerHk/notificationHkScreen/view/NotificationHkScreen';
+import NoteScreen from '@/screens/routerHk/homeScreen/view/component/NoteScreen';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -238,6 +240,17 @@ export default function MainNavigator() {
           name="NotificationScreen"
           component={NotificationScreen}
         />
+        <Screen
+          options={{
+            headerShown: false,
+            contentStyle: {
+              paddingHorizontal: s(0),
+              backgroundColor: light.white,
+            },
+          }}
+          name="NotificationHkScreen"
+          component={NotificationHkScreen}
+        />
       </Group>
 
       {/* modal */}
@@ -258,6 +271,7 @@ export default function MainNavigator() {
         <Screen name={'DetailRoomScreen'} component={DetailRoomScreen} />
         <Screen name={'ModalInputRejectAssign'} component={ModalInputRejectAssign} />
         <Screen name={'ModalInputRejectApprove'} component={ModalInputRejectApprove} />
+        <Screen name={'NoteScreen'} component={NoteScreen} />
       </Group>
     </Navigator>
   );

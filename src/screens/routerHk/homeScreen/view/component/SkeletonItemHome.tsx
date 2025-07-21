@@ -20,6 +20,7 @@ const SkeletonItemHome = () => {
       -1,
       true,
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -27,7 +28,8 @@ const SkeletonItemHome = () => {
   }));
 
   // Component cho một phòng
-  const RoomSkeleton = () => (
+  // eslint-disable-next-line react/no-unstable-nested-components
+  const RoomSkeleton = React.memo(() => (
     <View style={styles.roomCard}>
       {/* Số phòng */}
       <Animated.View style={[styles.roomNumber, animatedStyle]} />
@@ -44,7 +46,7 @@ const SkeletonItemHome = () => {
       {/* Flag icon (góc trái trên) */}
       <Animated.View style={[styles.flagIcon, animatedStyle]} />
     </View>
-  );
+  ));
 
   return (
     <View style={styles.container}>

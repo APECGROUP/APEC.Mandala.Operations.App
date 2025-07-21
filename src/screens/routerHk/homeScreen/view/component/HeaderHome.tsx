@@ -13,6 +13,7 @@ import IconNotificationHk from '@assets/icon/IconNotificationHk';
 import FastImage from 'react-native-fast-image';
 import { Colors } from '@/theme/Config';
 import { useHomeViewModal } from '../../viewmodal/useHomeViewModal';
+import { navigate } from '@/navigation/RootNavigation';
 
 const HeaderHome = () => {
   const { infoUser } = useInfoUser();
@@ -41,10 +42,12 @@ const HeaderHome = () => {
 
         {/* Notification Icons */}
         <View style={styles.iconGroup}>
-          <AppBlockButton style={styles.iconButton}>
+          <AppBlockButton
+            style={styles.iconButton}
+            onPress={() => navigate('NotificationHkScreen')}>
             <IconNotificationHk />
           </AppBlockButton>
-          <AppBlockButton style={styles.iconButton}>
+          <AppBlockButton style={styles.iconButton} onPress={() => navigate('NoteScreen')}>
             <IconNoteHk />
           </AppBlockButton>
         </View>
@@ -81,15 +84,11 @@ const HeaderHome = () => {
           <AppBlockButton
             onPress={onPressAll}
             style={[
-              {
-                backgroundColor: Colors.PRIMARY,
-                padding: 2,
-                borderRadius: s(10),
-                marginHorizontal: s(4),
-              },
+              styles.blockButton,
+              { marginHorizontal: s(4) },
               isAll ? { backgroundColor: Colors.PRIMARY } : { backgroundColor: Colors.WHITE },
             ]}>
-            <View style={{ backgroundColor: Colors.WHITE, padding: 2, borderRadius: s(8) }}>
+            <View style={styles.appBlockButtonStyle}>
               <View style={styles.actionButton}>
                 <View
                   style={[
@@ -107,14 +106,10 @@ const HeaderHome = () => {
           <AppBlockButton
             onPress={onPressPriority}
             style={[
-              {
-                backgroundColor: Colors.PRIMARY,
-                padding: 2,
-                borderRadius: s(10),
-              },
+              styles.blockButton,
               !isAll ? { backgroundColor: Colors.PRIMARY } : { backgroundColor: Colors.WHITE },
             ]}>
-            <View style={{ backgroundColor: Colors.WHITE, padding: 2, borderRadius: s(8) }}>
+            <View style={styles.appBlockButtonStyle}>
               <View style={styles.actionButton}>
                 <View
                   style={[
@@ -135,6 +130,7 @@ const HeaderHome = () => {
 export default HeaderHome;
 
 const styles = StyleSheet.create({
+  appBlockButtonStyle: { backgroundColor: Colors.WHITE, padding: 2, borderRadius: s(8) },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -235,5 +231,10 @@ const styles = StyleSheet.create({
   },
   actionButtonSecondary: {
     backgroundColor: '#E8E8E8',
+  },
+  blockButton: {
+    backgroundColor: Colors.PRIMARY,
+    padding: 2,
+    borderRadius: s(10),
   },
 });

@@ -4,13 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import moment from 'moment';
 import { ScaledSheet, s, vs } from 'react-native-size-matters';
-import { useTranslation } from 'react-i18next';
-import {
-  useAnimatedStyle,
-  withTiming,
-  useSharedValue,
-  runOnJS,
-} from 'react-native-reanimated';
+import { useAnimatedStyle, withTiming, useSharedValue, runOnJS } from 'react-native-reanimated';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { AppText } from '@/elements/text/AppText';
 import { MainParams } from '@/navigation/params';
@@ -20,6 +14,13 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 import { goBack } from '@/navigation/RootNavigation';
 import IconBack from '@assets/icon/IconBack';
+import { PaddingHorizontal } from '@/utils/Constans';
+import IconBuilding from '@assets/icon/IconBuilding';
+import IconClear from '@assets/icon/IconClear';
+import IconStar from '@assets/icon/IconStar';
+import IconFloor from '@assets/icon/IconFloor';
+import RoomInfoRow from './RoomInfoRow';
+import { ROOM_STATUSES } from './constants';
 
 moment.locale('vi');
 
@@ -27,7 +28,6 @@ type Props = NativeStackScreenProps<MainParams, 'DetailRoomScreen'>;
 
 const DetailRoomScreen = ({ navigation, route }: Props) => {
   const { id } = route.params;
-  const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
 
   const translateY = useSharedValue(500);
@@ -69,6 +69,13 @@ const DetailRoomScreen = ({ navigation, route }: Props) => {
     transform: [{ translateY: translateY.value }],
   }));
 
+  // Helper to get status info (for demo, hardcoded to 'Dirty')
+  const status = ROOM_STATUSES[0]; // Replace with real status if available
+
+  // Style cho các view động
+  const statusViewStyle = [styles.statusView, { backgroundColor: status.color }];
+  const headerLeftStyle = styles.headerLeft;
+
   return (
     <ViewContainer>
       <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={onGoBack}>
@@ -78,13 +85,13 @@ const DetailRoomScreen = ({ navigation, route }: Props) => {
           style={[
             styles.container,
             {
-              paddingBottom: bottom,
+              paddingBottom: bottom + vs(10),
             },
             animatedStyle,
           ]}>
           <View style={styles.header}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <AppBlockButton onPress={onInformation}>
+            <View style={headerLeftStyle}>
+              <AppBlockButton style={{ padding: PaddingHorizontal }} onPress={onInformation}>
                 <IconBack />
               </AppBlockButton>
               <AppText size={20} weight="bold" textAlign="center">
@@ -95,7 +102,22 @@ const DetailRoomScreen = ({ navigation, route }: Props) => {
               <IconClose />
             </AppBlockButton>
           </View>
-          <AppText>Chọn một trong các chức năng dưới đây</AppText>
+
+          {/* Room Info Rows */}
+          <RoomInfoRow icon={<IconBuilding />} label="Toà nhà" value="Toà Diamond" />
+          <RoomInfoRow icon={<IconStar />} label="Hạng phòng" value="Deluxe" />
+          <RoomInfoRow icon={<IconFloor />} label="Tầng" value="Tầng 1" />
+          <RoomInfoRow
+            icon={<IconClear fill={'#0D0D0D'} />}
+            label="Trạng thái dọn phòng"
+            value={
+              <View style={statusViewStyle}>
+                <AppText weight="600" color={'#fff'}>
+                  {status.name}
+                </AppText>
+              </View>
+            }
+          />
         </AnimatedButton>
       </TouchableOpacity>
     </ViewContainer>
@@ -119,8 +141,16 @@ const styles = ScaledSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: s(16),
-    marginBottom: vs(10),
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusView: {
+    height: vs(30),
+    justifyContent: 'center',
+    borderRadius: 100,
+    paddingHorizontal: s(10),
   },
   rangeStart: {
     backgroundColor: '#228b22',

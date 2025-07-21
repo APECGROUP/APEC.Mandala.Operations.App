@@ -82,49 +82,51 @@ const CustomAlert: React.FC<CustomAlertProps> = memo(
           }
         });
       },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [onClose],
+      [onClose, opacity, translateY],
     );
 
     if (!shouldRender) return null;
+
     return (
       <>
         <StatusBar barStyle="light-content" translucent backgroundColor="rgba(0, 0, 0, 0.3)" />
-        <AnimatedButton
-          activeOpacity={1}
-          disabled={!cancelButton}
-          style={[styles.backdrop, animatedStyle]}
-          onPress={onClose}>
-          <Animated.View style={[styles.modalView, !icon && animatedModalStyle]}>
-            <View style={styles.body}>
-              {icon}
-              <AppText style={styles.title}>{title}</AppText>
-              <View style={styles.blockTextContent}>{parseText(content)}</View>
-            </View>
-            <View style={[styles.footer, buttons.length === 1 && styles.justifyCenter]}>
-              {buttons.map((button, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handlePress(button)}
-                  style={[
-                    styles.button,
-                    index !== buttons.length - 1 && {
-                      marginRight: PaddingHorizontal,
-                    },
-                    button.style === 'cancel' && {
-                      backgroundColor: light.selected,
-                    },
-                  ]}>
-                  <AppText
-                    style={[styles.buttonText, button.style === 'cancel' && styles.cancelButton]}>
-                    {button.text}
-                  </AppText>
-                </TouchableOpacity>
-              ))}
-            </View>
-            {animated}
-          </Animated.View>
-        </AnimatedButton>
+        <View style={StyleSheet.absoluteFill}>
+          <AnimatedButton
+            activeOpacity={1}
+            disabled={!cancelButton}
+            style={[styles.backdrop, animatedStyle]}
+            onPress={onClose}>
+            <Animated.View style={[styles.modalView, !icon && animatedModalStyle]}>
+              <View style={styles.body}>
+                {icon}
+                <AppText style={styles.title}>{title}</AppText>
+                <View style={styles.blockTextContent}>{parseText(content)}</View>
+              </View>
+              <View style={[styles.footer, buttons.length === 1 && styles.justifyCenter]}>
+                {buttons.map((button, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => handlePress(button)}
+                    style={[
+                      styles.button,
+                      index !== buttons.length - 1 && {
+                        marginRight: PaddingHorizontal,
+                      },
+                      button.style === 'cancel' && {
+                        backgroundColor: light.selected,
+                      },
+                    ]}>
+                    <AppText
+                      style={[styles.buttonText, button.style === 'cancel' && styles.cancelButton]}>
+                      {button.text}
+                    </AppText>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              {animated}
+            </Animated.View>
+          </AnimatedButton>
+        </View>
       </>
     );
   },
@@ -143,15 +145,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   backdrop: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 1000,
   },
   modalView: {
     backgroundColor: 'white',

@@ -4,13 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import moment from 'moment';
 import { ScaledSheet, s, vs } from 'react-native-size-matters';
-import { useTranslation } from 'react-i18next';
-import Animated, {
-  useAnimatedStyle,
-  withTiming,
-  useSharedValue,
-  runOnJS,
-} from 'react-native-reanimated';
+import { useAnimatedStyle, withTiming, useSharedValue, runOnJS } from 'react-native-reanimated';
 import { AppText } from '@/elements/text/AppText';
 import { MainParams } from '@/navigation/params';
 import light from '@/theme/light';
@@ -20,6 +14,8 @@ import { goBack } from '@/navigation/RootNavigation';
 import { getFontSize } from '@/constants';
 import IconArrowTopRight from '@assets/icon/IconArrowTopRight';
 import { PaddingHorizontal } from '@/utils/Constans';
+import RenderStatusComponent from './component/RenderStatusComponent';
+import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 
 moment.locale('vi');
 
@@ -27,7 +23,6 @@ type Props = NativeStackScreenProps<MainParams, 'InformationRoomScreen'>;
 
 const InformationRoomScreen = ({ navigation, route }: Props) => {
   const { id } = route.params;
-  const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
 
   const translateY = useSharedValue(500);
@@ -77,7 +72,9 @@ const InformationRoomScreen = ({ navigation, route }: Props) => {
   return (
     <ViewContainer>
       <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={onGoBack}>
-        <Animated.View
+        <AnimatedButton
+          activeOpacity={1}
+          onPress={() => {}}
           style={[
             styles.container,
             {
@@ -99,32 +96,16 @@ const InformationRoomScreen = ({ navigation, route }: Props) => {
           {renderMainButton('XEM CHI TIẾT', onSeeDetail)}
           {renderMainButton('XÁC NHẬN CHECK OUT', () => {})}
 
-          <TouchableOpacity activeOpacity={1} onPress={() => {}} style={styles.section}>
-            <AppText style={styles.sectionTitle}>THAY ĐỔI TRẠNG THÁI ĐƠN PHÒNG</AppText>
-            <View style={styles.statusContainer}>
-              <TouchableOpacity style={[styles.statusButton, { backgroundColor: '#FF3B30' }]}>
-                <AppText style={[styles.statusText, { color: 'white' }]}>Dirty</AppText>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.statusButton, { backgroundColor: '#F2F2F2' }]}>
-                <AppText style={[styles.statusText, { color: '#007AFF' }]}>Clean</AppText>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.statusButton, { backgroundColor: '#F2F2F2' }]}>
-                <AppText style={[styles.statusText, { color: '#34C759' }]}>Inspected</AppText>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.statusButton, { backgroundColor: '#F2F2F2' }]}>
-                <AppText style={[styles.statusText, { color: '#FF9500' }]}>Pick - up</AppText>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
+          <RenderStatusComponent onGoBack={onGoBack} id={id} />
 
-          <View style={[styles.section, { borderBottomWidth: 0 }]}>
+          <TouchableOpacity activeOpacity={1} style={[styles.section]} onPress={() => {}}>
             <AppText style={styles.sectionTitle}>CHỨC NĂNG</AppText>
             <View style={styles.functionContainer}>
               <TouchableOpacity style={styles.functionButton}>
                 <AppText style={styles.functionText}>Post Minibar</AppText>
               </TouchableOpacity>
               <TouchableOpacity style={styles.functionButton}>
-                <AppText style={styles.functionText}>Đổ vỏ</AppText>
+                <AppText style={styles.functionText}>Đổ vỡ</AppText>
               </TouchableOpacity>
               <TouchableOpacity style={styles.functionButton}>
                 <AppText style={styles.functionText}>Khóa phòng</AppText>
@@ -132,9 +113,12 @@ const InformationRoomScreen = ({ navigation, route }: Props) => {
               <TouchableOpacity style={styles.functionButton}>
                 <AppText style={styles.functionText}>Đổ thất lạc</AppText>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.functionButton}>
+                <AppText style={styles.functionText}>Post giặt là</AppText>
+              </TouchableOpacity>
             </View>
-          </View>
-        </Animated.View>
+          </TouchableOpacity>
+        </AnimatedButton>
       </TouchableOpacity>
     </ViewContainer>
   );
@@ -195,15 +179,11 @@ const styles = ScaledSheet.create({
   section: {
     marginTop: vs(20),
     paddingHorizontal: PaddingHorizontal,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F2',
     paddingBottom: vs(8),
   },
   sectionTitle: {
-    fontSize: 13,
-    color: '#666',
     marginBottom: vs(12),
-    fontWeight: '500',
+    fontWeight: '600',
   },
   statusContainer: {
     flexDirection: 'row',
@@ -224,18 +204,16 @@ const styles = ScaledSheet.create({
   functionContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -s(4),
+    marginHorizontal: -s(8),
   },
   functionButton: {
     paddingHorizontal: s(12),
     paddingVertical: vs(6),
-    backgroundColor: '#F2F2F2',
     borderRadius: s(16),
-    marginHorizontal: s(4),
-    marginBottom: vs(8),
   },
   functionText: {
-    fontSize: 14,
-    color: '#000',
+    color: '#44921F',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });

@@ -7,7 +7,13 @@ export const getRoomDetail = async (id: string) => {
     if (response.status !== 200) {
       throw new Error();
     }
-    return response.data;
+    // return response.data;
+    return {
+      id: '1',
+      roomNumber: '101 - DL1',
+      floor: 'Tầng 1',
+      numberOfGuests: '02',
+    };
   } catch (error) {
     throw error;
   }
