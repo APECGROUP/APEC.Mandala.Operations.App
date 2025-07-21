@@ -36,6 +36,8 @@ import PickLocalScreen from '@/views/modal/modalPickLocal/view/PickLocalScreen';
 import MyTabsHk from '@/screens/routerHk/MyTabsHk';
 import InformationRoomScreen from '@/screens/routerHk/DetailRooomScreen/view/InformationRoomScreen';
 import DetailRoomScreen from '@/screens/routerHk/DetailRooomScreen/view/component/DetailRoomScreen';
+import ModalInputRejectAssign from '@/views/modal/modalInputRejectAssign/ModalInputRejectAssign';
+import ModalInputRejectApprove from '@/views/modal/modalInputRejectApprove/ModalInputRejectApprove';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -254,6 +256,8 @@ export default function MainNavigator() {
         <Screen name={'PickLocalScreen'} component={PickLocalScreen} />
         <Screen name={'PickRequesterScreen'} component={PickRequesterScreen} />
         <Screen name={'DetailRoomScreen'} component={DetailRoomScreen} />
+        <Screen name={'ModalInputRejectAssign'} component={ModalInputRejectAssign} />
+        <Screen name={'ModalInputRejectApprove'} component={ModalInputRejectApprove} />
       </Group>
     </Navigator>
   );

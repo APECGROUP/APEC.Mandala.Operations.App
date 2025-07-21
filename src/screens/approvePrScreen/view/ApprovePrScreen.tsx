@@ -7,6 +7,8 @@ import {
   TextInput,
   ActivityIndicator,
   TouchableOpacity,
+  StatusBar,
+  ImageBackground,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
@@ -60,7 +62,6 @@ const ApprovePrScreen: React.FC = () => {
     currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
     onApproved,
-    onReject,
     selectedIds,
     setSelectedIds,
   } = useApproveViewModel();
@@ -168,54 +169,54 @@ const ApprovePrScreen: React.FC = () => {
   return (
     <ViewContainer>
       <View style={styles.container}>
+        <StatusBar barStyle="light-content" />
         {/* ─── Background Image ─────────────────────────────────────────────── */}
-        <FastImage
-          id="backgroundImage"
-          style={styles.backgroundImage}
+        <ImageBackground
           source={Images.BackgroundAssignPrice}
           resizeMode={FastImage.resizeMode.cover}
-        />
-        {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-        <View style={[styles.headerContainer, { marginTop: top }]}>
-          <View style={styles.headerLeft}>
-            <AppBlockButton onPress={goToAccount}>
-              <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
-            </AppBlockButton>
+          style={styles.imageBackground}>
+          {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
+          <View style={[styles.headerContainer, { marginTop: top }]}>
+            <View style={styles.headerLeft}>
+              <AppBlockButton onPress={goToAccount}>
+                <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
+              </AppBlockButton>
 
-            <View style={styles.greetingContainer}>
-              <AppText color="#FFFFFF" style={styles.greetingText}>
-                {t('createPrice.title')}
-              </AppText>
-              <AppText color="#FFFFFF" style={styles.greetingText}>
-                {infoUser.profile.fullName}
-              </AppText>
+              <View style={styles.greetingContainer}>
+                <AppText color="#FFFFFF" style={styles.greetingText}>
+                  {t('createPrice.title')}
+                </AppText>
+                <AppText color="#FFFFFF" style={styles.greetingText}>
+                  {infoUser.profile.fullName}
+                </AppText>
+              </View>
+            </View>
+            <View style={styles.headerRight}>
+              <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
+                <IconNotification />
+                <View style={styles.notificationBadge}>
+                  <AppText style={styles.notificationBadgeText}>3</AppText>
+                </View>
+              </AppBlockButton>
             </View>
           </View>
-          <View style={styles.headerRight}>
-            <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
-              <IconNotification />
-              <View style={styles.notificationBadge}>
-                <AppText style={styles.notificationBadgeText}>3</AppText>
-              </View>
+          {/* ─── Search Bar ────────────────────────────────────────────────────── */}
+          <View style={styles.searchContainer}>
+            <IconSearch width={vs(18)} />
+            <TextInput
+              value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
+              onChangeText={onSearch} // Gọi hàm debounce từ ViewModel
+              placeholder={t('assignPrice.searchPlaceholder')}
+              placeholderTextColor={light.placeholderTextColor}
+              style={styles.searchInput}
+              // returnKeyType="search"
+              // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
+            />
+            <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
+              <IconFilter />
             </AppBlockButton>
           </View>
-        </View>
-        {/* ─── Search Bar ────────────────────────────────────────────────────── */}
-        <View style={styles.searchContainer}>
-          <IconSearch width={vs(18)} />
-          <TextInput
-            value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
-            onChangeText={onSearch} // Gọi hàm debounce từ ViewModel
-            placeholder={t('assignPrice.searchPlaceholder')}
-            placeholderTextColor={light.placeholderTextColor}
-            style={styles.searchInput}
-            // returnKeyType="search"
-            // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
-          />
-          <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
-            <IconFilter />
-          </AppBlockButton>
-        </View>
+        </ImageBackground>
 
         {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
         <View style={styles.titleContainer}>
@@ -276,7 +277,7 @@ const ApprovePrScreen: React.FC = () => {
       </View>
       {selectedIds.length > 0 && (
         <Footer
-          onLeftAction={() => onReject(selectedIds)}
+          onLeftAction={() => navigate('ModalInputRejectApprove', { id: selectedIds[0] })}
           onRightAction={() => onApproved(selectedIds)}
           leftButtonTitle={t('createPrice.reject')}
           rightButtonTitle={t('createPrice.approvedOrder')}
@@ -294,6 +295,11 @@ const ApprovePrScreen: React.FC = () => {
 export default ApprovePrScreen;
 export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
 const styles = StyleSheet.create({
+  imageBackground: {
+    width: SCREEN_WIDTH,
+    aspectRatio: 2.66,
+    justifyContent: 'space-between',
+  },
   // ml7: { marginLeft: s(7) },
   // buttonCenter: {
   //   flexDirection: 'row',
@@ -311,18 +317,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.WHITE,
     flex: 1,
   },
-  backgroundImage: {
-    width: SCREEN_WIDTH,
-    aspectRatio: 2.66,
-    position: 'absolute',
-    zIndex: 0,
-  },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: s(16),
-    paddingBottom: vs(12),
+    // paddingBottom: vs(12),
   },
   headerLeft: {
     flexDirection: 'row',
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: PaddingHorizontal,
-    marginBottom: vs(12),
+    marginBottom: vs(-14),
     backgroundColor: light.white,
     borderRadius: s(8),
     paddingLeft: s(12),
@@ -409,6 +409,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: PaddingHorizontal,
     marginBottom: vs(12),
+    marginTop: vs(30),
   },
   titleText: {
     fontSize: getFontSize(18),

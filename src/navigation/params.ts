@@ -102,6 +102,12 @@ export type MainParams = {
     setLocation: Dispatch<SetStateAction<SelectedOption>>;
     location: SelectedOption;
   };
+  ModalInputRejectAssign: {
+    id: string;
+  };
+  ModalInputRejectApprove: {
+    id: string;
+  };
 };
 
 // ─────────────────────────────────────────────────────────────

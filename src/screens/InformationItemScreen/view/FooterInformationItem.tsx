@@ -14,7 +14,7 @@ import { useAlert } from '@/elements/alert/AlertProvider';
 import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
 import { TYPE_TOAST } from '@/elements/toast/Message';
-import { goBack } from '@/navigation/RootNavigation';
+import { goBack, navigate } from '@/navigation/RootNavigation';
 
 const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) => {
   const { t } = useTranslation();
@@ -22,17 +22,15 @@ const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) =
   const [isLoadingAssign, setIsLoadingAssign] = useState(false);
   const { bottom } = useSafeAreaInsets();
   const { showAlert, showToast } = useAlert();
-  const onReject = async () => {
-    setIsLoadingReject(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
-    setIsLoadingReject(false);
+
+  const onRejectSuccess = () => {
     showAlert(
       t('informationItem.rejectSuccess'),
       '',
       [
         {
           text: t('Trở về'),
-          onPress: () => {},
+          onPress: goBack,
         },
       ],
       <FastImage
@@ -40,6 +38,13 @@ const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) =
         style={{ width: s(285), aspectRatio: 285 / 187 }}
       />,
     );
+  };
+
+  const onReject = async () => {
+    setIsLoadingReject(true);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    navigate('ModalInputRejectAssign', { id: '123', onRejectSuccess: onRejectSuccess });
+    setIsLoadingReject(false);
   };
   const onAssign = async () => {
     setIsLoadingAssign(true);

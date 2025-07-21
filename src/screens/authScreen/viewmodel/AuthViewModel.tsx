@@ -93,7 +93,6 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
     }
 
     if (!removeVietnameseTones(userName.toLowerCase()).includes('dung')) {
-      saveInfoUser({ ...infoUser, isApprove: false });
       return showToast(t('auth.login.loginError'), TYPE_TOAST.ERROR);
     }
 
@@ -101,6 +100,7 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
       return showToast(t('auth.login.loginError'), TYPE_TOAST.ERROR);
     }
 
+    saveInfoUser({ ...infoUser, isApprove: false });
     setIsLogin(true);
     await DataLocal.saveLoginCredentials(userName, password, hotel);
     // if (isRememberLogin) {

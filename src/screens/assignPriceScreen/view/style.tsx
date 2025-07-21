@@ -5,6 +5,11 @@ import { StyleSheet } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
+  imageBackground: {
+    width: SCREEN_WIDTH,
+    aspectRatio: 2.66,
+    justifyContent: 'space-between',
+  },
   container: {
     flex: 1,
   },
@@ -108,6 +113,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: s(16),
     marginBottom: vs(16),
+    marginTop: vs(28),
   },
   titleText: {
     fontSize: getFontSize(18),

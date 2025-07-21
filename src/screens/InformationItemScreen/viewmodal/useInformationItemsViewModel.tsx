@@ -1,13 +1,20 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { DataInformationItems, fetchInformationItemsData } from '../modal/InformationItemsModal';
+import { s } from 'react-native-size-matters';
+import FastImage from 'react-native-fast-image';
+import { goBack } from '@/navigation/RootNavigation';
+import Images from '@assets/image/Images';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 50;
 
-export function useInformationItemsViewModel(id: number) {
+export function useInformationItemsViewModel(id: string) {
   const queryClient = useQueryClient();
   const key = ['informationItems', id];
-
+  const { showAlert } = useAlert();
+  const { t } = useTranslation();
   // Infinite Query cho phân trang + search
   const {
     data,
@@ -36,6 +43,8 @@ export function useInformationItemsViewModel(id: number) {
   const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
   // console.log('render useInformationItemsViewModel');
 
+  const [isLoadingConfirm, setIsLoadingConfirm] = useState(false);
+  const [textReason, setTextReason] = useState('');
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
     console.log('onRefresh');
@@ -44,7 +53,7 @@ export function useInformationItemsViewModel(id: number) {
     }
     refetch();
   }, [isFetching, isLoading, isRefetching, refetch]);
-
+  const isDisableButtonReject = useMemo(() => textReason.trim(), [textReason]);
   // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
     console.log('loadMore');
@@ -90,17 +99,56 @@ export function useInformationItemsViewModel(id: number) {
     });
   };
 
+  const onRejectSuccess = () => {
+    showAlert(
+      t('informationItem.rejectSuccess'),
+      '',
+      [
+        {
+          text: t('Trở về'),
+          onPress: goBack,
+        },
+      ],
+      <FastImage
+        source={Images.ModalApprovedError}
+        style={{ width: s(285), aspectRatio: 285 / 187 }}
+      />,
+    );
+  };
+  const onReject = useCallback(
+    async (func?: () => void) => {
+      try {
+        setIsLoadingConfirm(true);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('text: ', textReason);
+        setIsLoadingConfirm(false);
+
+        if (func) {
+          func();
+        }
+        onRejectSuccess();
+      } catch (error) {}
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [textReason],
+  );
+
   return {
-    onAutoAssign,
     flatData,
     isLoading,
     isFetching,
     isRefetching,
     isFetchingNextPage,
     hasNextPage: !!hasNextPage,
+    isError,
+    isLoadingConfirm,
+    textReason,
+    isDisableButtonReject,
+    onAutoAssign,
     onRefresh,
     onLoadMore,
     onUpdatePrice,
-    isError,
+    onReject,
+    setTextReason,
   };
 }
