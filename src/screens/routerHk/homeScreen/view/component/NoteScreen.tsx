@@ -47,6 +47,12 @@ const GUEST_STATUSES = [
 const LOCK_STATUS = { label: 'Phòng khóa', icon: <IconLock /> };
 const FLAG_STATUS = { label: 'Phòng chờ check out', icon: <IconFlag /> };
 
+const StatusItemTop = ({ label, icon }: { label: string; icon: React.ReactNode }) => (
+  <View style={styles.statusItem50}>
+    {icon}
+    <AppText ml={8}>{label}</AppText>
+  </View>
+);
 const StatusItem = ({ label, icon }: { label: string; icon: React.ReactNode }) => (
   <View style={styles.statusItem}>
     {icon}
@@ -113,18 +119,19 @@ const NoteScreen = () => {
               <AppText size={20} weight="bold" textAlign="center">
                 Chú thích
               </AppText>
-              <AppBlockButton onPress={onGoBack} style={{ padding: vs(12) }}>
+              <AppBlockButton onPress={onGoBack} style={{ padding: vs(16) }}>
                 <IconClose />
               </AppBlockButton>
             </View>
+
             {/* 1. Trạng thái dọn phòng của HK */}
-            <View style={styles.contentContainer}>
+            <View style={[styles.contentContainer, { paddingTop: vs(0) }]}>
               <AppText weight="600" mt={8} mb={4}>
                 1. Trạng thái dọn phòng của HK
               </AppText>
               <View style={styles.statusesContainer}>
                 {CLEANING_STATUSES.map(status => (
-                  <StatusItem key={status.label} label={status.label} icon={status.icon} />
+                  <StatusItemTop key={status.label} label={status.label} icon={status.icon} />
                 ))}
               </View>
             </View>
@@ -133,7 +140,7 @@ const NoteScreen = () => {
               <AppText weight="600" mt={8} mb={4}>
                 2. Trạng thái phòng
               </AppText>
-              <View style={styles.statusesContainer}>
+              <View style={[styles.statusesContainer, styles.justifyContent]}>
                 {ROOM_STATUSES.map(status => (
                   <RoomStatusItem key={status.label} label={status.label} color={status.color} />
                 ))}
@@ -178,6 +185,7 @@ const NoteScreen = () => {
 export default NoteScreen;
 
 const styles = ScaledSheet.create({
+  justifyContent: { justifyContent: 'space-between' },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.1)',
@@ -193,8 +201,6 @@ const styles = ScaledSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingLeft: PaddingHorizontal,
-    paddingTop: PaddingHorizontal,
-    paddingBottom: PaddingHorizontal,
   },
   contentContainer: {
     paddingHorizontal: PaddingHorizontal,
@@ -212,6 +218,11 @@ const styles = ScaledSheet.create({
     paddingLeft: PaddingHorizontal,
   },
   statusItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: vs(8),
+  },
+  statusItem50: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: vs(8),
