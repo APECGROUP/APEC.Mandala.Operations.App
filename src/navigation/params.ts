@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
 import { ResponseImageElement } from '../interface/Verify.interface';
-import { typeHotel } from '../screens/authScreen/LoginScreen';
 import {
   AssignPriceFilters,
   DataAssignPrice,
@@ -9,6 +8,10 @@ import {
 import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { TypeApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
+import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
+import { DataPcPr, PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';
+import { IPickStatus } from '@/views/modal/modalPickStatus/modal/PickStatusModal';
+import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 
 // ─────────────────────────────────────────────────────────────
 // Bottom Tab Navigation
@@ -40,6 +43,14 @@ export type MainParams = {
     currentFilters: AssignPriceFilters;
     onApplyFilters: (filters: AssignPriceFilters) => void;
   };
+  FilterCreatePoScreen: {
+    currentFilters: AssignPriceFilters;
+    onApplyFilters: (filters: AssignPriceFilters) => void;
+  };
+  FilterPcPrScreen: {
+    currentFilters: PcPrFilters;
+    onApplyFilters: (filters: PcPrFilters) => void;
+  };
   FilterApproveScreen: {
     currentFilters: AssignPriceFilters;
     onApplyFilters: (filters: AssignPriceFilters) => void;
@@ -49,8 +60,10 @@ export type MainParams = {
     onApplyFilters: (filters: AssignPriceFilters) => void;
   };
   DetailAssignPriceCardScreen: { item: DataAssignPrice };
+  DetailPcPrCardScreen: { item: DataPcPr };
   DetailApproveCardScreen: { item: TypeApprove };
   InformationItemsScreen: { item: DataAssignPrice };
+  InformationItemsPcPrScreen: { item: DataAssignPrice };
   MyTabs: undefined;
   NotificationScreen: undefined;
   DetailOrderApproveScreen: { item: DataAssignPrice };
@@ -94,9 +107,13 @@ export type MainParams = {
     setRequester: Dispatch<SetStateAction<SelectedOption>>;
     requester: SelectedOption;
   };
+  PickStatusScreen: {
+    setStatus: Dispatch<SetStateAction<IPickStatus>>;
+    status: IPickStatus;
+  };
   PickLocalScreen: {
-    setLocation: Dispatch<SetStateAction<SelectedOption>>;
-    location: SelectedOption;
+    setLocation: Dispatch<SetStateAction<IPickLocal>>;
+    location: IPickLocal;
   };
   ModalInputRejectAssign: {
     id: string;
@@ -117,8 +134,8 @@ export type AuthParams = {
     type: 'reset' | 'change';
   };
   ModalPickHotel: {
-    setHotel: (hotel: typeHotel) => void;
-    hotel: typeHotel;
+    hotel: IDataListHotel | undefined;
+    setHotel: (i: IDataListHotel | undefined) => void;
   };
 };
 

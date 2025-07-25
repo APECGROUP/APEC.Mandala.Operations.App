@@ -161,7 +161,7 @@ const CreatePriceScreen: React.FC = () => {
           <View style={[styles.headerContainer, { marginTop: top }]}>
             <View style={styles.headerLeft}>
               <AppBlockButton onPress={goToAccount}>
-                <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
+                <FastImage source={{ uri: infoUser?.signature }} style={styles.avatar} />
               </AppBlockButton>
 
               <View style={styles.greetingContainer}>
@@ -169,7 +169,7 @@ const CreatePriceScreen: React.FC = () => {
                   {t('createPrice.title')}
                 </AppText>
                 <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {infoUser.profile.fullName}
+                  {infoUser?.displayName}
                 </AppText>
               </View>
             </View>

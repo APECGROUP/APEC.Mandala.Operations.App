@@ -17,6 +17,7 @@ import { useInfoUser } from '../zustand/store/useInfoUser/useInfoUser';
 import { Strings } from '../languages/FunctionLanguage';
 import { storage } from '../views/appProvider/AppProvider';
 import i18n from '../languages/i18n';
+import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 
 export const TOKEN_KEY = 'ACCESS_TOKEN';
 export const USER_KEY = 'USER_INFO';
@@ -34,10 +35,7 @@ export type TokenType = {
 export type CredentialsType = {
   username: string;
   password: string;
-  hotel: {
-    id: number | string | undefined;
-    name: number | string | undefined;
-  };
+  hotel: IDataListHotel;
 };
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
@@ -59,7 +57,7 @@ const DataLocal = {
   saveLoginCredentials: async (
     username: string,
     password: string,
-    hotel: { id: number | string | undefined; name: number | string | undefined },
+    hotel: IDataListHotel | undefined,
   ): Promise<void> => {
     await DataLocal.saveCredentials(username, password, hotel);
   },
@@ -68,7 +66,7 @@ const DataLocal = {
   saveCredentials: async (
     username: string,
     password: string,
-    hotel: { id: number | string | undefined; name: number | string | undefined },
+    hotel: IDataListHotel | undefined,
   ): Promise<void> => {
     try {
       const credentials: CredentialsType = { username, password, hotel };

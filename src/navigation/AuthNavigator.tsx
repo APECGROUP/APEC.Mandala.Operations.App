@@ -6,7 +6,7 @@ import LoginScreen from '../screens/authScreen/LoginScreen';
 import { s } from 'react-native-size-matters';
 import { getFontSize } from '../constants';
 import light from '../theme/light';
-import ModalPickHotel from '../views/modal/ModalPickHotel';
+import ModalPickHotel from '../views/modal/modalPickHotel/view/ModalPickHotel';
 import IconBack from '../../assets/icon/IconBack';
 import AppBlockButton from '../elements/button/AppBlockButton';
 import { goBack } from './RootNavigation';

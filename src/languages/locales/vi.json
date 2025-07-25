@@ -46,7 +46,8 @@
       "rejectSuccess": "Từ chối thành công",
       "assignSuccess": "Gán giá thành công",
       "saveDraftSuccess": "Lưu nháp thành công",
-      "autoAssignSuccess": "Tự động gán giá thành công"
+      "autoAssignSuccess": "Tự động gán giá thành công",
+      "unit": "Đơn vị"
     },
     "assignPrice": {
       "title": "Xin chào",
@@ -54,6 +55,20 @@
       "empty": "Không có kết quả phù hợp",
       "rejectAssign": "Từ chối gắn giá",
       "searchPlaceholder": "Tìm kiếm PR No",
+      "reason": "Lý do",
+      "inputReason": "Nhập lý do",
+      "confirm": "Xác nhận",
+      "cancel": "Hủy",
+      "close": "Đóng"
+    },
+
+    "pcPr": {
+      "title": "Xin chào",
+      "header": "Danh sách PR",
+      "empty": "Không có kết quả phù hợp",
+      "listEmpty": "Hiện chưa có danh sách PR",
+      "rejectAssign": "Từ chối gắn giá",
+      "searchPlaceholder": "Tìm kiếm PR No, PO",
       "reason": "Lý do",
       "inputReason": "Nhập lý do",
       "confirm": "Xác nhận",
@@ -68,7 +83,9 @@
         "waitingAssignPrice": "Chờ gán giá",
         "waitingGMOMApproval": "Chờ GM/OM duyệt",
         "waitingDeptHeadApproval": "Chờ trưởng bộ phận duyệt",
-        "waitingChiefAccountantApproval": "Chờ kế toán trưởng duyệt"
+        "waitingChiefAccountantApproval": "Chờ kế toán trưởng duyệt",
+        "createdPo": "Đã tạo PO",
+        "waitingDeptHeadApprovalShort": "Chờ TBP duyệt"
       },
       "viewDetail": "Xem chi tiết"
     },
@@ -77,13 +94,15 @@
       "title": "Thông tin đơn hàng",
       "prNo": "prNo",
       "createDate": "Ngày tạo đơn",
+      "requestDate": "Ngày yêu cầu",
+      "poNo": "PO NO",
       "estimateDate": "Ngày dự kiến",
       "department": "Bộ phận",
       "location": "Kho",
       "requester": "Người yêu cầu",
       "note": "Ghi chú"
     },
-    "calendar": {
+    " ": {
       "selectTime": "Chọn thời gian"
     },
     "orderDetail": {
@@ -92,6 +111,7 @@
       "price": "Giá",
       "quantity": "Số lượng",
       "numberOfApproval": "Số lượng duyệt",
+      "numberOfApprovaled": "Số lượng đã duyệt",
       "moneyOfApproval": "Số tiền duyệt",
       "supplier": "NCC",
       "reason": "Ghi chú",
@@ -114,6 +134,7 @@
       "confirm": "Xác nhận",
       "prNo": "PR NO",
       "fromDate": "Ngày tạo đơn",
+      "timePo": "Thời gian PO",
       "toDate": "Ngày dự kiến",
       "department": "Bộ phận",
       "requester": "Người yêu cầu",
@@ -125,7 +146,7 @@
       "supplier": "Nhà cung cấp",
       "pick": "Chọn",
       "pickLocal": "Chọn kho",
-
+      "selectPickStatus": "Chọn trạng thái",
       "location": "Kho",
       "time": "Thời gian",
       "nameItem": "Tên mặt hàng",
@@ -145,6 +166,52 @@
     },
     "createPrice": {
       "title": "Xin chào",
+      "searchPlaceholder": "Tìm kiếm tên mặt hàng",
+      "supplierPriceList": "Bảng giá NCC",
+      "empty": "Hiện chưa có bảng giá nhà \n cung cấp",
+      "create": "Tạo bảng giá NCC",
+      "orderSelected": "đơn đã chọn",
+      "time": "Thời gian",
+      "ncc": "NCC",
+      "price": "Giá",
+      "createPrice": "Tạo giá",
+      "pickAll": "Chọn tất cả",
+      "createNew": "Tạo mới",
+      "warningRemove": "Mặt hàng đã được duyệt không được xoá",
+      "createPriceNcc": "Tạo giá nhà cung cấp",
+      "close": "Đóng",
+      "cancel": "Hủy",
+      "agree": "Đồng ý",
+      "reject": "Từ chối",
+      "approvedOrder": "Duyệt đơn",
+      "approvedSuccess": "Duyệt đơn thành công",
+      "rejectSuccess": "Từ chối đơn thành công",
+      "approvedFail": "Duyệt đơn thất bại",
+      "listPrice": "Danh sách giá",
+      "vat": "VAT",
+      "validateVat": "VAT không được bỏ trống",
+      "timeFromTo": "Từ ngày - đến ngày",
+      "pickTime": "Chọn ngày",
+      "notInputeInfo": "Chưa nhập thông tin",
+      "createMoreItem": "Tạo thêm mặt hàng",
+      "saveInfo": "Lưu thông tin",
+      "remove": {
+        "title": "Bạn có muốn xóa mặt \n hàng này không",
+        "subtitle": "Nếu bạn xóa thông tin mặt hàng của bạn sẽ không được lưu",
+        "agree": "Đồng ý",
+        "cancel": "Hủy"
+      },
+      "createNcc": "Tạo bảng giá NCC",
+      "pickItem": "Chọn mặt hàng",
+      "pickNcc": "Chọn nhà cung cấp",
+      "pickVat": "Chọn VAT",
+      "error": "Chưa nhập đủ thông tin",
+      "saveInfoSuccess": "Lưu thông tin thành công"
+    },
+    "CreatePo": {
+      "title": "Xin chào",
+      "requester": "Người yêu cầu",
+      "department": "Bộ phận",
       "searchPlaceholder": "Tìm kiếm tên mặt hàng",
       "supplierPriceList": "Bảng giá NCC",
       "empty": "Hiện chưa có bảng giá nhà \n cung cấp",

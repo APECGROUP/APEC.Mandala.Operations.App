@@ -35,6 +35,11 @@ import FilterCreatePriceScreen from '@/screens/filterScreen/view/FilterCreatePri
 import PickLocalScreen from '@/views/modal/modalPickLocal/view/PickLocalScreen';
 import ModalInputRejectAssign from '@/views/modal/modalInputRejectAssign/ModalInputRejectAssign';
 import ModalInputRejectApprove from '@/views/modal/modalInputRejectApprove/ModalInputRejectApprove';
+import FilterPcPrScreen from '@/screens/filterScreen/view/FilterPcPrScreen';
+import DetailPcPrCardScreen from '@/screens/pcPrScreen/view/component/DetailPcPrCardScreen';
+import InformationItemsPcPrScreen from '@/screens/InformationItemPcPrScreen/view/InformationItemsPcPrScreen';
+import PickStatusScreen from '@/views/modal/modalPickStatus/view/PickStatusScreen';
+import FilterCreatePoScreen from '@/screens/filterScreen/view/FilterCreatePoScreen';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -91,6 +96,14 @@ export default function MainNavigator() {
             headerShown: true,
             headerTitle: t('orderInfo.title'),
           }}
+          name="DetailPcPrCardScreen"
+          component={DetailPcPrCardScreen}
+        />
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: t('orderInfo.title'),
+          }}
           name="DetailApproveCardScreen"
           component={DetailApproveCardScreen}
         />
@@ -117,6 +130,16 @@ export default function MainNavigator() {
             // animation: 'slide_from_bottom',
             // animation:'slide_from_left' ,
             // animation:'slide_from_right' ,
+            headerShown: false,
+            contentStyle: {
+              paddingHorizontal: 0,
+            },
+          }}
+        />
+        <Screen
+          name="InformationItemsPcPrScreen"
+          component={InformationItemsPcPrScreen}
+          options={{
             headerShown: false,
             contentStyle: {
               paddingHorizontal: 0,
@@ -163,6 +186,30 @@ export default function MainNavigator() {
           }}
           name="FilterAssignPriceScreen"
           component={FilterAssignPriceScreen}
+        />
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: t('filter.title'),
+            contentStyle: {
+              paddingHorizontal: 0,
+              backgroundColor: Colors.WHITE,
+            },
+          }}
+          name="FilterCreatePoScreen"
+          component={FilterCreatePoScreen}
+        />
+        <Screen
+          options={{
+            headerShown: true,
+            headerTitle: t('filter.title'),
+            contentStyle: {
+              paddingHorizontal: 0,
+              backgroundColor: Colors.WHITE,
+            },
+          }}
+          name="FilterPcPrScreen"
+          component={FilterPcPrScreen}
         />
         <Screen
           options={{
@@ -243,6 +290,7 @@ export default function MainNavigator() {
         <Screen name={'PickItemScreen'} component={PickItemScreen} />
         <Screen name={'PickLocalScreen'} component={PickLocalScreen} />
         <Screen name={'PickRequesterScreen'} component={PickRequesterScreen} />
+        <Screen name={'PickStatusScreen'} component={PickStatusScreen} />
         <Screen name={'ModalInputRejectAssign'} component={ModalInputRejectAssign} />
         <Screen name={'ModalInputRejectApprove'} component={ModalInputRejectApprove} />
       </Group>

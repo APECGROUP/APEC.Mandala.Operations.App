@@ -20,6 +20,7 @@ import {
   AssignPriceFilters,
   SelectedOption,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
+import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 
 const FilterApproveScreen = ({
   route,
@@ -42,10 +43,10 @@ const FilterApproveScreen = ({
       ? initialFilters.department
       : { id: '', name: '' },
   );
-  const [location, setLocation] = useState<SelectedOption>(
-    initialFilters.location && initialFilters.location.id !== ''
+  const [location, setLocation] = useState<IPickLocal>(
+    initialFilters.location && initialFilters.location.code !== ''
       ? initialFilters.location
-      : { id: '', name: '' },
+      : { code: '', name: '' },
   );
   const [requester, setRequester] = useState<SelectedOption>(
     initialFilters.requester && initialFilters.requester.id !== ''
@@ -81,8 +82,8 @@ const FilterApproveScreen = ({
   const onPressLocation = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickLocalScreen', {
-      setLocation: (loc: SelectedOption) => setLocation(loc),
-      location: location, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      setLocation,
+      location, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [location]);
   console.log('filter', initialFilters);
@@ -103,7 +104,7 @@ const FilterApproveScreen = ({
       toDate,
       department: department.id ? department : undefined, // Nếu id rỗng thì là undefined
       requester: requester.id ? requester : undefined, // Nếu id rỗng thì là undefined
-      location: location.id ? location : undefined, // Nếu id rỗng thì là undefined
+      location: location.code ? location : undefined, // Nếu id rỗng thì là undefined
     };
 
     // Gọi callback từ màn hình trước đó để áp dụng filter
@@ -119,7 +120,7 @@ const FilterApproveScreen = ({
     setToDate(undefined);
     setDepartment({ id: '', name: '' });
     setRequester({ id: '', name: '' });
-    setLocation({ id: '', name: '' });
+    setLocation({ code: '', name: '' });
   }, []);
 
   const valueDate =

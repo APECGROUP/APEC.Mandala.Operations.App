@@ -6,59 +6,22 @@ import { t } from 'i18next';
 import { LanguageType } from '../../../languages/locales/type';
 import { USER_KEY } from '../../../data/DataLocal';
 import { storage } from '../../../views/appProvider/AppProvider';
-
-const fakeUser: TypeUser = {
-  isApprove: false,
-  id: 1,
-  userName: 'Tuan',
-  authId: 'auth_abc123xyz',
-  status: 'active',
-  profile: {
-    id: 101,
-    email: 'tuanphamnd99@gmail.com',
-    mobile: '0949328231',
-    firstName: 'Phạm',
-    lastName: 'Tuấn',
-    fullName: 'Phạm Văn Tuấn',
-    gender: 'male',
-    address: 'Xuân Kiên, Xuân Trường, Nam Định',
-    emailVerificationDate: null,
-    profileVerificationDate: new Date('2023-06-15T10:30:00Z'),
-    dob: '2000-01-20',
-    occupation: 'Software Engineer',
-    avatar:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1BQqwCLUL_IUt5_tm6kIhnfDXcQE-AX325yTtwdlgxxQJRng-aJkCDo8SCi5RTJShlOGyZlQpqqDpNGMRFO3sxA',
-    jobPosition: 'Senior Developer',
-    emailVerified: true,
-    verified: true,
-    pinSet: true,
-    ssn: '036200004079',
-    ssnIssueDate: new Date('2010-01-15T00:00:00Z'),
-    ssnIssuePlace: 'TP.HCM',
-    language: null,
-    district: null,
-    city: null,
-    country: 'Vietnam',
-    postalCode: null,
-    currency: null,
-    ssnType: null,
-  },
-};
+import { IDataApiLogin, IUser } from '@/screens/authScreen/modal/AuthModal';
 
 interface typeInfo {
-  infoUser: TypeUser;
-  saveInfoUser: (val: TypeUser) => void;
+  infoUser: IUser | undefined;
+  saveInfoUser: (val: IUser) => void;
   fetData: () => Promise<void>;
   updateAvatar: (source: string) => Promise<void>;
 }
 
 export const useInfoUser = create<typeInfo>((set, get) => ({
-  infoUser: fakeUser as TypeUser,
+  infoUser: undefined,
 
-  saveInfoUser: (val: TypeUser) => {
+  saveInfoUser: (val: IUser) => {
     console.log('saveInfoUser', val);
     // TODO:bỏ check điều kiện đi
-    if (val.id) {
+    if (val.userName) {
       set({ infoUser: val });
     }
     // try {

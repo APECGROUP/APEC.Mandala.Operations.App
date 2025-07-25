@@ -22,11 +22,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAutoLogin } from '@/hook/useAutoLogin';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { useAuthViewModel } from './viewmodel/AuthViewModel';
-
-export type typeHotel = {
-  id: number | string | undefined;
-  name: number | string | undefined;
-};
+import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 
 export type typeNcc = {
   id: string | undefined;
@@ -55,6 +51,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   // Tự động điền thông tin đăng nhập nếu có
   useEffect(() => {
     if (credentials && !loadingCredentials) {
+      console.log('chạy lại');
       setLoginForm({
         userName: credentials.username,
         password: credentials.password,
@@ -64,7 +61,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
     }
   }, [credentials, loadingCredentials, setLoginForm]);
 
-  const disabled = !userName || !password || !hotel.id;
+  const disabled = !userName || !password || !hotel?.code;
 
   const onBlurUserName = () => {
     if (!userName.trim()) {
@@ -81,15 +78,14 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   const onPickHotel = () => {
     Keyboard.dismiss();
     navigation.navigate('ModalPickHotel', {
-      hotel,
-      setHotel: (newHotel: typeHotel) => setLoginForm({ hotel: newHotel }),
+      hotel: hotel,
+      setHotel: (newHotel: IDataListHotel | undefined) => setLoginForm({ hotel: newHotel }),
     });
   };
 
   const onForgotPassword = () => {
     navigation.navigate('ForgotPasswordScreen');
   };
-
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="white" />

@@ -17,6 +17,7 @@ const AppNavigation = () => {
   const init = useCallback(async () => {
     await DataLocal.checkAuthStatus();
   }, []);
+
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     init().finally(() => {

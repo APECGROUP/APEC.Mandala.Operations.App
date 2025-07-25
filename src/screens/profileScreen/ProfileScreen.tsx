@@ -59,7 +59,7 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
     },
     {
       label: t('account.profile.fullName'),
-      value: infoUser?.profile?.fullName || '',
+      value: infoUser?.displayName || '',
     },
     {
       label: t('account.profile.rank'),
@@ -83,7 +83,7 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
 
         <ScrollView contentContainerStyle={styles.fg1}>
           <TouchableOpacity style={styles.avatar} activeOpacity={0.8} onPress={onUpdateAvatar}>
-            <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
+            <AppImage style={styles.avatar} source={{ uri: infoUser?.signature }} />
             <IconTakeCamera style={styles.editIcon} />
           </TouchableOpacity>
           <AppText style={styles.textTitle}>{t('account.profile.changePhoto')}</AppText>

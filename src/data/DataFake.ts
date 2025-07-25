@@ -79,11 +79,11 @@ export const fakeData = [
 ];
 
 export const fakeLocal = [
-  { id: '1', name: 'Kho 1' },
-  { id: '2', name: 'Kho 2' },
-  { id: '3', name: 'Kho 3' },
-  { id: '4', name: 'Kho 4' },
-  { id: '5', name: 'Kho 5' },
+  { code: '1', name: 'Kho 1' },
+  { code: '2', name: 'Kho 2' },
+  { code: '3', name: 'Kho 3' },
+  { code: '4', name: 'Kho 4' },
+  { code: '5', name: 'Kho 5' },
 ];
 
 export const fakeTitleNotification = [

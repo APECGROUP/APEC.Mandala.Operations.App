@@ -2,7 +2,7 @@ import axios from 'axios';
 import { fakeLocal } from '@/data/DataFake';
 
 export interface IPickLocal {
-  id: string | undefined;
+  code: string | undefined;
   name: string | undefined;
 }
 
@@ -26,9 +26,5 @@ export const fetchPickLocalData = async (
   const url = buildNccUrl(page, limit, key);
   const { data } = await axios.get(url);
 
-  return data.map((item: any) => ({
-    id: item.id,
-
-    name: fakeLocal[Math.floor(Math.random() * 5)],
-  }));
+  return fakeLocal;
 };

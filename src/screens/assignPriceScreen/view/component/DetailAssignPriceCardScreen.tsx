@@ -151,7 +151,8 @@ const styles = StyleSheet.create({
   prRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: vs(8),
+    paddingTop: vs(8),
+    paddingHorizontal: s(16),
   },
   copyIcon: {
     marginLeft: s(6),

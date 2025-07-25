@@ -40,10 +40,7 @@ const ForgotPasswordScreen = ({
 
   const onPickHotel = () => {
     Keyboard.dismiss();
-    navigation.navigate('ModalPickHotel', {
-      hotel,
-      setHotel: newHotel => setForgotPasswordForm({ hotel: newHotel }),
-    });
+    navigation.navigate('ModalPickHotel');
   };
 
   return (

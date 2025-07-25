@@ -1,21 +1,50 @@
-import { typeHotel } from '../LoginScreen';
+import {
+  IDataListHotel,
+  IResponseListHotel,
+} from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 
 export interface LoginFormData {
   userName: string;
   password: string;
-  hotel: typeHotel;
+  hotel: IDataListHotel | undefined;
   isRememberLogin: boolean;
 }
 
 export interface ForgotPasswordFormData {
   userName: string;
-  hotel: typeHotel;
+  hotel: IDataListHotel | undefined;
 }
 
 export interface AuthState {
   loginForm: LoginFormData;
   forgotPasswordForm: ForgotPasswordFormData;
   processing: boolean;
+  data: IResponseListHotel | undefined;
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export interface IResponseAPILogin {
+  data: IDataApiLogin;
+  pagination: null;
+  isSuccess: boolean;
+  errors: null;
+}
+
+export interface IDataApiLogin {
+  user: IUser;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface IUser {
+  userName: string;
+  displayName: string;
+  email: string;
+  signature: null;
+  department: string;
+  language: null;
+  isNotification: null;
 }
 
 export interface AuthActions {
@@ -27,4 +56,5 @@ export interface AuthActions {
   clearLoginForm: () => void;
   clearForgotPasswordForm: () => void;
   toggleRememberLogin: () => void;
+  refetch: () => void;
 }

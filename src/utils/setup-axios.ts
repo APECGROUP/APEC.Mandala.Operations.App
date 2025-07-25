@@ -1,12 +1,16 @@
 import axios from 'axios';
 import DataLocal from '../data/DataLocal';
-import {refreshTokenAPI} from './AuthService';
-import {BASE_URL} from '../env';
+import { refreshTokenAPI } from './AuthService';
+import { BASE_URL } from '../env';
 import Toast from 'react-native-toast-message';
-
+import { DeviceEventEmitter } from 'react-native';
 const api = axios.create({
   baseURL: BASE_URL,
   timeout: 60000,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: '*/*',
+  },
 });
 
 declare module 'axios' {
@@ -64,7 +68,7 @@ api.interceptors.response.use(
       // 🚫 Nếu không có refresh token → đăng xuất
       await DataLocal.getToken();
       if (!DataLocal.token?.refreshToken) {
-        Toast.show({type: 'error', text2: 'Không có refresh token'});
+        Toast.show({ type: 'error', text2: 'Không có refresh token' });
         DataLocal.removeAll(); // Đăng xuất
         return Promise.reject(error);
       }
@@ -87,7 +91,7 @@ api.interceptors.response.use(
             newToken.refreshExpiresIn,
           );
 
-          Toast.show({type: 'success', text2: 'Làm mới token thành công'});
+          Toast.show({ type: 'success', text2: 'Làm mới token thành công' });
 
           isRefreshing = false;
           onTokenRefreshed(newToken.accessToken); // 🔁 Gọi lại các request đã đợi
@@ -117,6 +121,11 @@ api.interceptors.response.use(
 
     // ❌ Lỗi mạng
     if (error.message === 'Network Error') {
+      // Toast.show({ type: 'error', text1: 'Kết nối mạng không ổn định!' });
+      DeviceEventEmitter.emit('showToast', {
+        type: 'error',
+        text: 'Kết nối mạng không ổn định!',
+      });
       return Promise.reject({
         message: 'Kết nối mạng không ổn định!',
         status: 0,

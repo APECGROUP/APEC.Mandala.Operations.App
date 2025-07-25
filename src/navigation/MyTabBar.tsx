@@ -10,6 +10,8 @@ import IconTab1 from '@assets/icon/IconTab1';
 import IconTab2 from '@assets/icon/IconTab2';
 import { Colors } from '@/theme/Config';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import IconTab3 from '@assets/icon/IconTab3';
+import IconTab4 from '@assets/icon/IconTab4';
 const MyTabBar = ({ state, descriptors, navigation }: any) => {
   const { t } = useTranslation();
   const { buildHref } = useLinkBuilder();
@@ -26,13 +28,13 @@ const MyTabBar = ({ state, descriptors, navigation }: any) => {
       label: t('myTabs.tab2'),
     },
     {
-      icon: <IconTab2 />,
-      iconActive: <IconTab2 fill={light.primary} />,
+      icon: <IconTab3 />,
+      iconActive: <IconTab3 fill={light.primary} />,
       label: t('myTabs.tab3'),
     },
     {
-      icon: <IconTab2 />,
-      iconActive: <IconTab2 fill={light.primary} />,
+      icon: <IconTab4 />,
+      iconActive: <IconTab4 fill={light.primary} />,
       label: t('myTabs.tab4'),
     },
     // {

@@ -153,14 +153,14 @@ const AssignPriceScreen: React.FC = () => {
           <View style={[styles.headerContainer, { paddingTop: top }]}>
             <View style={styles.headerLeft}>
               <AppBlockButton onPress={goToAccount}>
-                <FastImage source={{ uri: infoUser.profile.avatar }} style={styles.avatar} />
+                <FastImage source={{ uri: infoUser?.signature }} style={styles.avatar} />
               </AppBlockButton>
               <View style={styles.greetingContainer}>
                 <AppText color="#FFFFFF" style={styles.greetingText}>
                   {t('assignPrice.title')}
                 </AppText>
                 <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {infoUser.profile.fullName}
+                  {infoUser?.displayName}
                 </AppText>
               </View>
             </View>

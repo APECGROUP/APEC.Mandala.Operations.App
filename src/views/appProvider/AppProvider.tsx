@@ -17,6 +17,7 @@ import { useNameScreen } from '../../zustand/store/useNameScreen/useNameScreen';
 import { MMKV } from 'react-native-mmkv';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import ToastNotification from './ToastNotification';
 
 LogBox.ignoreAllLogs(true);
 LogBox.ignoreLogs(['Warning: ...']); //Hide warnings
@@ -73,6 +74,7 @@ export default function AppProvider(props: Props) {
                 <I18nextProvider i18n={i18n}>{props.children}</I18nextProvider>
               </QueryClientProvider>
               {__DEV__ && <NameScreen />}
+              <ToastNotification />
               <Toast config={toastConfig} />
             </PaperProvider>
           </GestureHandlerRootView>

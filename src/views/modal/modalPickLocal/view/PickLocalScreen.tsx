@@ -17,11 +17,13 @@ import { FlashList } from '@shopify/flash-list';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
+import { IPickLocal } from '../modal/PickLocalModal';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 type Props = NativeStackScreenProps<MainParams, 'PickLocalScreen'>;
 const PickLocalScreen = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
-  const { setLocation } = route.params;
+  const { setLocation, location } = route.params;
   const { bottom } = useSafeAreaInsets();
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
@@ -65,79 +67,82 @@ const PickLocalScreen = ({ navigation, route }: Props) => {
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: any; index: number }) => {
+    ({ item, index }: { item: IPickLocal; index: number }) => {
       const onSelect = () => {
         setLocation(item);
         navigation.goBack();
       };
+      const isFocus = item?.code === location?.code;
       return (
         <AppBlockButton key={index} onPress={onSelect} style={{ padding: vs(10) }}>
           <AppText weight="500">{item.name}</AppText>
         </AppBlockButton>
       );
     },
-    [navigation, setLocation],
+    [location?.code, navigation, setLocation],
   );
-
+  console.log('data: ', flatData);
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
   return (
-    <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
-      <View
-        style={[
-          styles.container,
-          { paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7 },
-        ]}>
-        <AppBlock
-          pl={PaddingHorizontal}
-          row
-          justifyContent="space-between"
-          alignItems="center"
-          style={styles.borderWidth1}>
-          <AppText size={20} weight="bold">
-            {t('filter.pickLocal')}
-          </AppText>
-          <TouchableOpacity onPress={goBack} style={{ padding: PaddingHorizontal }}>
-            <IconClose />
-          </TouchableOpacity>
-        </AppBlock>
+    <ViewContainer>
+      <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
+        <View
+          style={[
+            styles.container,
+            { paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7 },
+          ]}>
+          <AppBlock
+            pl={PaddingHorizontal}
+            row
+            justifyContent="space-between"
+            alignItems="center"
+            style={styles.borderWidth1}>
+            <AppText size={20} weight="bold">
+              {t('filter.pickLocal')}
+            </AppText>
+            <TouchableOpacity onPress={goBack} style={{ padding: PaddingHorizontal }}>
+              <IconClose />
+            </TouchableOpacity>
+          </AppBlock>
 
-        <View style={{ paddingHorizontal: PaddingHorizontal }}>
-          <AppText mt={10} mb={6} weight="700">
-            {t('filter.pickLocal')}
-          </AppText>
-          <AppInputSearch
-            fill={searchKey ? Colors.PRIMARY : '#BABABA'}
-            showIconRemove
-            containerStyle={styles.containerInputSearch}
-            value={searchKey}
-            onChangeText={onSearch}
-            placeholder={t('filter.search')}
+          <View style={{ paddingHorizontal: PaddingHorizontal }}>
+            <AppText mt={10} mb={6} weight="700">
+              {t('filter.pickLocal')}
+            </AppText>
+            <AppInputSearch
+              fill={searchKey ? Colors.PRIMARY : '#BABABA'}
+              showIconRemove
+              containerStyle={styles.containerInputSearch}
+              value={searchKey}
+              onChangeText={onSearch}
+              placeholder={t('filter.search')}
+            />
+          </View>
+
+          <FlashList
+            data={flatData || []}
+            renderItem={renderItem}
+            keyExtractor={item => item?.code?.toString() || ''}
+            onEndReached={onLoadMore}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.5}
+            removeClippedSubviews
+            refreshing={isRefetching}
+            onRefresh={onRefresh}
+            scrollEventThrottle={16}
+            ListEmptyComponent={listEmptyComponent}
+            ListFooterComponent={listFooterComponent}
+            contentContainerStyle={{
+              paddingHorizontal: PaddingHorizontal,
+              paddingBottom: bottom || vs(10),
+              paddingTop: vs(10),
+            }}
           />
         </View>
-
-        <FlashList
-          data={flatData || []}
-          renderItem={renderItem}
-          keyExtractor={item => item.id?.toString() || ''}
-          onEndReached={onLoadMore}
-          showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.5}
-          removeClippedSubviews
-          refreshing={isRefetching}
-          onRefresh={onRefresh}
-          scrollEventThrottle={16}
-          ListEmptyComponent={listEmptyComponent}
-          ListFooterComponent={listFooterComponent}
-          contentContainerStyle={{
-            paddingHorizontal: PaddingHorizontal,
-            paddingBottom: bottom || vs(10),
-            paddingTop: vs(10),
-          }}
-        />
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </ViewContainer>
   );
 };
 

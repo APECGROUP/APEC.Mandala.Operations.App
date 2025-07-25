@@ -35,7 +35,7 @@ const AccountScreen = () => {
   // const [isHasUpdate, setIsHasUpdate] = useState(false);
   // const { isHasUpdate, isCheckingUpdate, isDone, isSuccess, isError } = useCheckUpdate();
   const { checkForOtaUpdate } = useOtaUpdate();
-  const [allowNotification, setAllowNotification] = useState(false);
+  const [allowNotification, setAllowNotification] = useState(infoUser?.isNotification);
 
   const toggleAllowNotification = () => {
     if (!allowNotification) {
@@ -78,11 +78,11 @@ const AccountScreen = () => {
           <View>
             <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>
               <View style={{ marginTop: vs(20) }}>
-                <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
+                <AppImage style={styles.avatar} source={{ uri: infoUser?.signature }} />
                 <IconEditAvatar style={styles.editIcon} />
               </View>
               <AppText weight="700" size={18} mb={2}>
-                {infoUser?.profile?.fullName}
+                {infoUser?.displayName}
               </AppText>
               <AppText
                 pv={2}

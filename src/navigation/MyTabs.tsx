@@ -3,14 +3,18 @@ import { TabBarParams } from './params';
 import light from '../theme/light';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MyTabBar from './MyTabBar';
-import AssignPriceScreen from '../screens/assignPriceScreen/view/AssignPriceScreen';
-import CreatePriceScreen from '@/screens/createPriceScreen/view/CreatePriceScreen';
-import PcPrScreen from '@/screens/pcPrScreen/view/PcPrScreen';
-import CreatePoScreen from '@/screens/createPoScreen/view/CreatePoScreen';
 
 const MyTabs = () => {
   const Tab = createBottomTabNavigator<TabBarParams>();
   const tabBar = (props: any) => <MyTabBar {...props} />;
+  const AssignPriceScreen = React.lazy(
+    () => import('../screens/assignPriceScreen/view/AssignPriceScreen'),
+  );
+  const CreatePriceScreen = React.lazy(
+    () => import('@/screens/createPriceScreen/view/CreatePriceScreen'),
+  );
+  const PcPrScreen = React.lazy(() => import('@/screens/pcPrScreen/view/PcPrScreen'));
+  const CreatePoScreen = React.lazy(() => import('@/screens/createPoScreen/view/CreatePoScreen'));
   return (
     <Tab.Navigator
       screenOptions={{
