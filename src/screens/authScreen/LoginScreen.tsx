@@ -86,6 +86,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   const onForgotPassword = () => {
     navigation.navigate('ForgotPasswordScreen');
   };
+  console.log('render màn hình login');
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="white" />
@@ -111,6 +112,8 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
               onChangeText={text => setLoginForm({ userName: text })}
               onBlur={onBlurUserName}
               placeholder={t('auth.login.inputUserName')}
+              // returnKeyType="next"
+              // keyboardType="number-pad"
               onSubmitEditing={() => refPassword.current?.focus()}
               inputStyle={styles.inputStyle}
               containerStyle={{

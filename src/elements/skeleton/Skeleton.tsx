@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Platform, type StyleProp, type ViewStyle, StyleSheet } from 'react-native';
+import { type StyleProp, type ViewStyle, StyleSheet } from 'react-native';
 
 import { useThemeContext } from '../../hook/contextHook';
 import { AppBlock } from '../block/Block';

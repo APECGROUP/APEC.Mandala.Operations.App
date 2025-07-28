@@ -19,6 +19,7 @@ import {
   fetchListHotel,
 } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 import api from '@/utils/setup-axios';
+import { ENDPOINT } from '@/utils/Constans';
 
 export const useAuthViewModel = (): AuthState & AuthActions => {
   const { t } = useTranslation();
@@ -91,7 +92,7 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
         password: loginForm.password,
         hotelCode: loginForm.hotel?.code,
       };
-      const response = await api.post<IResponseAPILogin>('/api/spc/user/login', params, {
+      const response = await api.post<IResponseAPILogin>(ENDPOINT.LOGIN, params, {
         headers: { hotelCode: loginForm.hotel?.code },
       });
       console.log('response login:', response);
