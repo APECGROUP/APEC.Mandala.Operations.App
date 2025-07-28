@@ -51,6 +51,7 @@ export interface AuthActions {
   setLoginForm: (form: Partial<LoginFormData>) => void;
   setForgotPasswordForm: (form: Partial<ForgotPasswordFormData>) => void;
   login: () => Promise<void>;
+  checkVersion: () => Promise<void>;
   forgotPassword: () => Promise<void>;
   setProcessing: (processing: boolean) => void;
   clearLoginForm: () => void;

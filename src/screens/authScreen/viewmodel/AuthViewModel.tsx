@@ -20,6 +20,7 @@ import {
 } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 import api from '@/utils/setup-axios';
 import { ENDPOINT } from '@/utils/Constans';
+import { Linking, Platform } from 'react-native';
 
 export const useAuthViewModel = (): AuthState & AuthActions => {
   const { t } = useTranslation();
@@ -28,6 +29,7 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
   const { saveInfoUser } = useInfoUser();
 
   const [processing, setProcessing] = useState(false);
+
   const [loginForm, setLoginFormState] = useState<LoginFormData>({
     userName: '',
     password: '',
@@ -208,6 +210,7 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
     loginForm,
     forgotPasswordForm,
     processing,
+    checkVersion,
     setLoginForm,
     setForgotPasswordForm,
     login,

@@ -16,12 +16,14 @@ import Animated, {
   withTiming,
   runOnJS,
 } from 'react-native-reanimated';
+import useCheckVersion from '@/hook/useCheckVersion';
 
 // BootSplash.hide(); // Commented out as it's handled within the animation
 // LogBox.ignoreAllLogs(); // If you need to ignore logs, keep this uncommented
 
 const AppNavigation = () => {
   const { isLogin } = useIsLogin();
+  useCheckVersion();
   const [splashVisible, setSplashVisible] = useState(true);
   // Sử dụng useSharedValue thay cho Animated.Value để kiểm soát opacity
   const animatedOpacity = useSharedValue(1); // 1: hiện, 0: ẩn
