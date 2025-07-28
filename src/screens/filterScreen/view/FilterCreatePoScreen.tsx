@@ -47,7 +47,6 @@ const FilterCreatePoScreen = ({
 
   // Ref cho TextInput để quản lý focus (có thể không cần thiết nếu dùng AppTextInput đúng cách)
   const refFromDate = useRef<TextInput>(null);
-  const refToDate = useRef<TextInput>(null);
 
   // --- Handlers cho việc chọn giá trị từ các Modal khác ---
   const onPressPickTime = useCallback(() => {

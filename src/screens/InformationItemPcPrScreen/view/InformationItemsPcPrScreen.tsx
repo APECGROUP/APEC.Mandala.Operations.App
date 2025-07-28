@@ -49,7 +49,6 @@ const InformationItemsPcPrScreen = ({
     hasNextPage,
     onUpdatePrice,
     isError,
-    onAutoAssign,
   } = useInformationItemsPcPrViewModel(id);
   console.log('id: ', id);
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────

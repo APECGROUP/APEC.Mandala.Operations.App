@@ -7,26 +7,16 @@ import { useState } from 'react';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/theme/Config';
-import { navigate } from '@/navigation/RootNavigation';
-import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { DataInformationItemsPcPr } from '../../modal/InformationItemsPcPrModal';
 import IconDropDown from '@assets/icon/IconDropDown';
 
 const InformationItemsPcPrCard = ({ item }: { item: DataInformationItemsPcPr; index: number }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
-  const [ncc, setNcc] = useState<ResponseNcc>(item.supplier);
   const handleShowDetail = () => {
     console.log('onPress');
     setIsShow(i => !i);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  };
-
-  const onPickNcc = () => {
-    navigate('PickNccScreen', {
-      setNcc: setNcc,
-      ncc: item.supplier,
-    });
   };
 
   return (
@@ -38,7 +28,7 @@ const InformationItemsPcPrCard = ({ item }: { item: DataInformationItemsPcPr; in
             <AppText numberOfLines={1} style={styles.prCodeText}>
               {item.name}
             </AppText>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={styles.center}>
               <AppText color={Colors.TEXT_SECONDARY}>{t('informationItem.unit')}:</AppText>
               <AppText weight="700" ml={6}>
                 {item.end}
@@ -77,10 +67,8 @@ const InformationItemsPcPrCard = ({ item }: { item: DataInformationItemsPcPr; in
 
           <View style={[styles.row]}>
             <AppText style={styles.label}>{t('NCC')}</AppText>
-            <AppText
-              style={[styles.nccText, { maxWidth: '55%', textAlign: 'right' }]}
-              numberOfLines={2}>
-              {ncc.name}
+            <AppText style={[styles.nccText, styles.nameSupplier]} numberOfLines={2}>
+              {item.supplier.name}
             </AppText>
           </View>
           <View>
@@ -100,6 +88,8 @@ const InformationItemsPcPrCard = ({ item }: { item: DataInformationItemsPcPr; in
 export default InformationItemsPcPrCard;
 
 const styles = StyleSheet.create({
+  center: { flexDirection: 'row', alignItems: 'center' },
+  nameSupplier: { maxWidth: '55%', textAlign: 'right' },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: s(8),

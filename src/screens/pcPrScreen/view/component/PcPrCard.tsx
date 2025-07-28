@@ -1,10 +1,8 @@
 import { AppText } from '@/elements/text/AppText';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { s, vs } from 'react-native-size-matters';
 import IconInfomation from '../../../../../assets/icon/IconInfomation';
 import IconNote from '../../../../../assets/icon/IconNote';
-import Images from '../../../../../assets/image/Images';
 import { memo, useCallback } from 'react';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';

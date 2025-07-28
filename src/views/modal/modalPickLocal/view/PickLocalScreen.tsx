@@ -23,7 +23,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 type Props = NativeStackScreenProps<MainParams, 'PickLocalScreen'>;
 const PickLocalScreen = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
-  const { setLocation, location } = route.params;
+  const { setLocation } = route.params;
   const { bottom } = useSafeAreaInsets();
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
@@ -72,14 +72,13 @@ const PickLocalScreen = ({ navigation, route }: Props) => {
         setLocation(item);
         navigation.goBack();
       };
-      const isFocus = item?.code === location?.code;
       return (
         <AppBlockButton key={index} onPress={onSelect} style={{ padding: vs(10) }}>
           <AppText weight="500">{item.name}</AppText>
         </AppBlockButton>
       );
     },
-    [location?.code, navigation, setLocation],
+    [navigation, setLocation],
   );
   console.log('data: ', flatData);
   const goBack = useCallback(() => {

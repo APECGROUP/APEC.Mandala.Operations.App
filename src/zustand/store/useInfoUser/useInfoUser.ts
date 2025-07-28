@@ -6,7 +6,7 @@ import { t } from 'i18next';
 import { LanguageType } from '../../../languages/locales/type';
 import { USER_KEY } from '../../../data/DataLocal';
 import { storage } from '../../../views/appProvider/AppProvider';
-import { IDataApiLogin, IUser } from '@/screens/authScreen/modal/AuthModal';
+import { IUser } from '@/screens/authScreen/modal/AuthModal';
 
 interface typeInfo {
   infoUser: IUser | undefined;

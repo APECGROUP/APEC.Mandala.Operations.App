@@ -6,6 +6,15 @@ import { StyleSheet } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
+  buttonCreate: {
+    backgroundColor: Colors.WHITE,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: PaddingHorizontal,
+    paddingVertical: vs(12),
+  },
   imageBackground: {
     width: SCREEN_WIDTH,
     aspectRatio: 2.66,

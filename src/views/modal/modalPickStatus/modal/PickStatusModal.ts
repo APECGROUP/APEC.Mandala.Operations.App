@@ -10,6 +10,7 @@ export const fetchStatusData = async (
   limit: number = 50,
   key: string = '',
 ): Promise<IPickStatus[]> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data } = await axios.get('https://picsum.photos/v2/list', {
     params: {
       page: page.toString(),

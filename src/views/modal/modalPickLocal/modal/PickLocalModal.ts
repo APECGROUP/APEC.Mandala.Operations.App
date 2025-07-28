@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { fakeLocal } from '@/data/DataFake';
+import axios from 'axios';
 
 export interface IPickLocal {
   code: string | undefined;
@@ -24,6 +24,7 @@ export const fetchPickLocalData = async (
   key: string = '',
 ): Promise<IPickLocal[]> => {
   const url = buildNccUrl(page, limit, key);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data } = await axios.get(url);
 
   return fakeLocal;

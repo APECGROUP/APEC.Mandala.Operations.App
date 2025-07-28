@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { vs } from 'react-native-size-matters';
-import Svg, { SvgProps, G, Path, Defs, ClipPath, Rect } from 'react-native-svg';
+import Svg, { SvgProps, Path } from 'react-native-svg';
 const IconTab2 = (props: SvgProps) => (
   <Svg width={vs(21)} height={vs(20)} viewBox="0 0 21 20" fill="none" {...props}>
     <Path

@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, memo } from 'react';
 import { View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
-import IconListPen from '@assets/icon/IconListPen';
 import { TypeCreatePo } from '../../modal/CreatePoModal';
 import { getFontSize } from '@/constants';
 import AppBlockButton from '@/elements/button/AppBlockButton';
@@ -9,9 +8,7 @@ import { AppText } from '@/elements/text/AppText';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import { Colors } from '@/theme/Config';
-import { moneyFormat } from '@/utils/Utilities';
 import { useTranslation } from 'react-i18next';
-import moment from 'moment';
 import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
 

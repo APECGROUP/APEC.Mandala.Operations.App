@@ -17,10 +17,8 @@ import AppBlockButton from '@/elements/button/AppBlockButton';
 import { MainParams } from '@/navigation/params';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
-  AssignPriceFilters,
   SelectedOption,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
-import { usePcPrViewModel } from '@/screens/pcPrScreen/viewmodal/usePcPrViewModel';
 import { IPickStatus } from '@/views/modal/modalPickStatus/modal/PickStatusModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';

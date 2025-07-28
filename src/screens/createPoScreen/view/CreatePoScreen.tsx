@@ -7,7 +7,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 
 import light from '@/theme/light';
 import AppBlockButton from '@/elements/button/AppBlockButton';
@@ -23,21 +23,15 @@ import { navigate } from '@/navigation/RootNavigation';
 import { AppText } from '@/elements/text/AppText';
 import { useCreatePoViewModel } from '../viewmodal/useCreatePoViewModal';
 import ToastContainer from '@/elements/toast/ToastContainer';
-import IconCheckBox from '@assets/icon/IconCheckBox';
-import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import { Colors } from '@/theme/Config';
-import { Gesture } from 'react-native-gesture-handler';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import IconPlus from '@assets/icon/IconPlus';
-import Footer from '@/screens/filterScreen/view/component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { styles } from './style';
 import CreatePoCard from './component/CreatePoCard';
 import { AppButton } from '@/elements/button/AppButton';
-import { pad } from 'lodash';
-import { PaddingHorizontal } from '@/utils/Constans';
 
 const CreatePoScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -60,14 +54,9 @@ const CreatePoScreen: React.FC = () => {
     onRefresh,
     // onLoadMore,
     applyFilters,
-    onApproved,
-    onReject,
-    toggleSelectAll,
     handleSelect,
-    selectedAll,
   } = useCreatePoViewModel();
   const { infoUser } = useInfoUser();
-  const { bottom } = useSafeAreaInsets();
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
   const flashListRef = useRef<FlashList<TypeCreatePo> | null>(null);
@@ -264,16 +253,7 @@ const CreatePoScreen: React.FC = () => {
         </AppBlockButton>
       </View>
       {length > 0 && (
-        <View
-          style={{
-            backgroundColor: Colors.WHITE,
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            paddingHorizontal: PaddingHorizontal,
-            paddingVertical: vs(12),
-          }}>
+        <View style={styles.buttonCreate}>
           <AppButton style={{ backgroundColor: Colors.PRIMARY }}>
             <AppText weight="bold" color={Colors.WHITE}>
               {t('myTabs.tab3')}

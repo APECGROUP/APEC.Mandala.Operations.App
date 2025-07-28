@@ -24,7 +24,7 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
   const { t } = useTranslation();
   const { showAlert, showToast } = useAlert();
   const { setIsLogin } = useIsLogin();
-  const { saveInfoUser, infoUser } = useInfoUser();
+  const { saveInfoUser } = useInfoUser();
 
   const [processing, setProcessing] = useState(false);
   const [loginForm, setLoginFormState] = useState<LoginFormData>({
@@ -116,6 +116,7 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
           showToast(t('auth.login.loginError'), TYPE_TOAST.ERROR);
         }
       }
+      // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
     } catch (error) {
       showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
     } finally {

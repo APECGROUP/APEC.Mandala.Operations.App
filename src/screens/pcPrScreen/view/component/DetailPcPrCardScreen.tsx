@@ -17,7 +17,6 @@ import { Colors } from '@/theme/Config';
 import { navigate } from '@/navigation/RootNavigation';
 import moment from 'moment';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FlashList } from '@shopify/flash-list';
 
 interface RowItemProps {
   label: string;
@@ -77,12 +76,13 @@ const DetailPcPrCardScreen = ({
   const dateCreateFormatted = useMemo(() => formatDate(dateCreate), [dateCreate, formatDate]);
   const dateEstimateFormatted = useMemo(() => formatDate(dateEstimate), [dateEstimate, formatDate]);
   const renderItemPo = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-shadow
     ({ item, index }: { item: any; index: number }) => (
-      <AppText size={12} weight="500" pv={5} style={{ flex: 1 }}>
+      <AppText size={12} weight="500" pv={5} style={styles.flex1}>
         PR20240624#0001
       </AppText>
     ),
-    [t],
+    [],
   );
 
   return (
@@ -124,7 +124,7 @@ const DetailPcPrCardScreen = ({
           data={new Array(20).fill(0)}
           keyExtractor={(_, index) => index.toString()}
           renderItem={renderItemPo}
-          style={{ backgroundColor: Colors.WHITE, borderRadius: s(8), maxHeight: 145 }}
+          style={{ backgroundColor: Colors.WHITE, borderRadius: s(8), maxHeight: vs(145) }}
           showsVerticalScrollIndicator={false}
         />
         <RowItem label={t('orderInfo.note')} />
@@ -146,6 +146,7 @@ const DetailPcPrCardScreen = ({
 };
 
 const styles = StyleSheet.create({
+  flex1: { flex: 1 },
   blockTextCoppied: {
     backgroundColor: Colors.GRAY_100,
     paddingVertical: vs(4),
