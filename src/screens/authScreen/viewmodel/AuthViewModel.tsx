@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+// screens/authScreen/viewmodel/AuthViewModel.ts
+import { useState, useCallback, useRef, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { TYPE_TOAST } from '@/elements/toast/Message';
@@ -6,13 +7,7 @@ import { useIsLogin } from '@/zustand/store/useIsLogin/useIsLogin';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import DataLocal from '@/data/DataLocal';
 import { goBack } from '@/navigation/RootNavigation';
-import {
-  AuthState,
-  AuthActions,
-  LoginFormData,
-  ForgotPasswordFormData,
-  IResponseAPILogin,
-} from '../modal/AuthModal';
+import { LoginFormData, ForgotPasswordFormData, IResponseAPILogin } from '../modal/AuthModal';
 import { useQuery } from '@tanstack/react-query';
 import {
   IResponseListHotel,
@@ -20,9 +15,8 @@ import {
 } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 import api from '@/utils/setup-axios';
 import { ENDPOINT } from '@/utils/Constans';
-import { Linking, Platform } from 'react-native';
 
-export const useAuthViewModel = (): AuthState & AuthActions => {
+export const useAuthViewModel = () => {
   const { t } = useTranslation();
   const { showAlert, showToast } = useAlert();
   const { setIsLogin } = useIsLogin();
@@ -30,94 +24,121 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
 
   const [processing, setProcessing] = useState(false);
 
-  const [loginForm, setLoginFormState] = useState<LoginFormData>({
+  // Dùng useReducer để ép re-render khi cần cập nhật UI từ useRef
+  const [_, forceUpdate] = useReducer(x => x + 1, 0);
+
+  const loginFormRef = useRef<LoginFormData>({
     userName: '',
     password: '',
     hotel: undefined,
     isRememberLogin: false,
   });
 
-  const [forgotPasswordForm, setForgotPasswordFormState] = useState<ForgotPasswordFormData>({
+  const forgotPasswordFormRef = useRef<ForgotPasswordFormData>({
     userName: '',
     hotel: undefined,
   });
 
+  // Trả về giá trị hiện tại của ref
+  const loginForm = loginFormRef.current;
+  const forgotPasswordForm = forgotPasswordFormRef.current;
+
   const { data, isLoading, error, refetch } = useQuery<IResponseListHotel>({
     queryKey: ['getListHotel'],
     queryFn: fetchListHotel,
-    staleTime: 1000 * 60, // 1 phút
+    staleTime: 1000 * 60,
   });
 
-  console.log('render  auth: ', loginForm, forgotPasswordForm);
-  useEffect(() => {
-    console.log('LoginForm updated:', loginForm);
-  }, [loginForm]);
+  // setLoginForm KHÔNG forceUpdate khi userName/password thay đổi (chỉ update ref)
   const setLoginForm = useCallback((form: Partial<LoginFormData>) => {
-    setLoginFormState(prev => {
-      const newState = { ...prev, ...form };
-      console.log('set nê: newState sau khi cập nhật:', newState); // Log newState
-      return newState;
-    });
+    loginFormRef.current = { ...loginFormRef.current, ...form };
+    // Chỉ forceUpdate khi có sự thay đổi KHÔNG PHẢI TỪ VIỆC GÕ (như chọn khách sạn, bật/tắt checkbox, auto-fill)
+    // hoặc khi ViewModel muốn chủ động kích hoạt re-render (ví dụ: khi blur input)
+    if (form.hotel !== undefined || form.isRememberLogin !== undefined) {
+      forceUpdate();
+    }
   }, []);
 
+  // setForgotPasswordForm KHÔNG forceUpdate khi userName thay đổi (chỉ update ref)
   const setForgotPasswordForm = useCallback((form: Partial<ForgotPasswordFormData>) => {
-    setForgotPasswordFormState(prev => ({ ...prev, ...form }));
+    forgotPasswordFormRef.current = { ...forgotPasswordFormRef.current, ...form };
+    if (form.hotel !== undefined) {
+      forceUpdate();
+    }
   }, []);
+
+  // Logic onBlur cho UserName trong LoginScreen
+  const handleBlurLoginUserName = useCallback(() => {
+    forceUpdate(); // Kích hoạt re-render để cập nhật UI nếu có thông báo lỗi
+    if (!loginFormRef.current.userName.trim()) {
+      showToast(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
+    }
+  }, [t, showToast]);
+
+  // Logic onBlur cho Password trong LoginScreen
+  const handleBlurLoginPassword = useCallback(() => {
+    forceUpdate(); // Kích hoạt re-render để cập nhật UI nếu có thông báo lỗi
+    if (!loginFormRef.current.password.trim()) {
+      showToast(t('auth.login.emptyPassword'), TYPE_TOAST.ERROR);
+    }
+  }, [t, showToast]);
+
+  // Logic onBlur cho UserName trong ForgotPasswordScreen
+  const handleBlurForgotPasswordUserName = useCallback(() => {
+    forceUpdate(); // Kích hoạt re-render để cập nhật UI nếu có thông báo lỗi
+    if (!forgotPasswordFormRef.current.userName.trim()) {
+      showToast(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
+    }
+  }, [t, showToast]);
 
   const clearLoginForm = useCallback(() => {
-    console.log('clearLoginForm');
-    setLoginFormState({
+    loginFormRef.current = {
       userName: '',
       password: '',
       hotel: undefined,
       isRememberLogin: false,
-    });
+    };
+    forceUpdate();
   }, []);
 
   const clearForgotPasswordForm = useCallback(() => {
-    setForgotPasswordFormState({
+    forgotPasswordFormRef.current = {
       userName: '',
       hotel: undefined,
-    });
+    };
+    forceUpdate();
   }, []);
 
   const toggleRememberLogin = useCallback(() => {
-    setLoginForm({ isRememberLogin: !loginForm.isRememberLogin });
-    DataLocal.setRememberLogin(!loginForm.isRememberLogin);
-  }, [loginForm.isRememberLogin, setLoginForm]);
+    loginFormRef.current.isRememberLogin = !loginFormRef.current.isRememberLogin;
+    DataLocal.setRememberLogin(loginFormRef.current.isRememberLogin);
+    forceUpdate();
+  }, []);
 
   const login = useCallback(async () => {
+    setProcessing(true);
     try {
-      setProcessing(true);
       const params = {
-        userName: loginForm.userName,
-        password: loginForm.password,
-        hotelCode: loginForm.hotel?.code,
+        userName: loginFormRef.current.userName,
+        password: loginFormRef.current.password,
+        hotelCode: loginFormRef.current.hotel?.code,
       };
       const response = await api.post<IResponseAPILogin>(ENDPOINT.LOGIN, params, {
-        headers: { hotelCode: loginForm.hotel?.code },
+        headers: { hotelCode: loginFormRef.current.hotel?.code },
       });
-      console.log('response login:', response);
-      if (response.status !== 200) {
-        setProcessing(false);
-        throw new Error();
-      } else {
-        const dataApi = response.data;
-        if (dataApi.isSuccess) {
-          console.log('success', dataApi);
-          if (loginForm.isRememberLogin) {
-            await DataLocal.saveLoginCredentials(
-              loginForm.userName,
-              loginForm.password,
-              loginForm.hotel,
-            );
-          }
-          setProcessing(false);
-          saveInfoUser(dataApi.data.user);
-          setIsLogin(true);
-        } else {
-          showToast(t('auth.login.loginError'), TYPE_TOAST.ERROR);
+
+      if (response.status === 200 && response.data.isSuccess) {
+        if (loginFormRef.current.isRememberLogin) {
+          await DataLocal.saveLoginCredentials(
+            loginFormRef.current.userName,
+            loginFormRef.current.password,
+            loginFormRef.current.hotel,
+          );
         }
+        saveInfoUser(response.data.data.user);
+        setIsLogin(true);
+      } else {
+        showToast(t('auth.login.loginError'), TYPE_TOAST.ERROR);
       }
       // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
     } catch (error) {
@@ -125,69 +146,10 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
     } finally {
       setProcessing(false);
     }
-  }, [
-    loginForm.hotel,
-    loginForm.isRememberLogin,
-    loginForm.password,
-    loginForm.userName,
-    saveInfoUser,
-    setIsLogin,
-    showToast,
-    t,
-  ]);
-  // const login = useCallback(async () => {
-  //   setProcessing(true);
-  //   await new Promise<void>(resolve => setTimeout(() => resolve(), 2000));
-  //   setProcessing(false);
-
-  //   const { userName, password, hotel } = loginForm;
-
-  //   if (removeVietnameseTones(userName.toLowerCase()).includes('reset')) {
-  //     await DataLocal.saveLoginCredentials(userName, password, hotel);
-
-  //     return showAlert(
-  //       t('auth.login.resetPassword'),
-  //       t('auth.login.subResetPassword'),
-  //       [
-  //         {
-  //           text: t('auth.login.changePassword'),
-  //           onPress: () => navigate('ChangePasswordScreen', { type: 'reset' }),
-  //         },
-  //       ],
-  //       undefined,
-  //       undefined,
-  //       true,
-  //     );
-  //   }
-
-  //   if (removeVietnameseTones(userName.toLowerCase()).includes('duyet')) {
-  //     saveInfoUser({ ...infoUser, isApprove: true });
-  //     setIsLogin(true);
-  //     await DataLocal.saveLoginCredentials(userName, password, hotel);
-  //     // if (isRememberLogin) {
-  //     //   showToast('Đã lưu thông tin đăng nhập', TYPE_TOAST.SUCCESS);
-  //     // }
-  //     return;
-  //   }
-
-  //   if (!removeVietnameseTones(userName.toLowerCase()).includes('dung')) {
-  //     return showToast(t('auth.login.loginError'), TYPE_TOAST.ERROR);
-  //   }
-
-  //   if (password !== '123456') {
-  //     return showToast(t('auth.login.loginError'), TYPE_TOAST.ERROR);
-  //   }
-
-  //   saveInfoUser({ ...infoUser, isApprove: false });
-  //   setIsLogin(true);
-  //   await DataLocal.saveLoginCredentials(userName, password, hotel);
-  //   // if (isRememberLogin) {
-  //   //   showToast('Đã lưu thông tin đăng nhập', TYPE_TOAST.SUCCESS);
-  //   // }
-  // }, [loginForm, showAlert, showToast, t, saveInfoUser, infoUser, setIsLogin]);
+  }, [saveInfoUser, setIsLogin, showToast, t]);
 
   const forgotPassword = useCallback(async () => {
-    const { userName } = forgotPasswordForm;
+    const { userName } = forgotPasswordFormRef.current;
 
     if (userName.toLowerCase() === 'dung') {
       showAlert(t('auth.forgotPassword.success'), t('auth.forgotPassword.subSuccess'), [
@@ -198,10 +160,10 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
           },
         },
       ]);
-      return;
+    } else {
+      showToast(t('auth.forgotPassword.errorForgotPassword'), TYPE_TOAST.ERROR);
     }
-    return showToast(t('auth.forgotPassword.errorForgotPassword'), TYPE_TOAST.ERROR);
-  }, [forgotPasswordForm, showAlert, showToast, t]);
+  }, [showAlert, showToast, t]);
 
   return {
     data,
@@ -210,7 +172,6 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
     loginForm,
     forgotPasswordForm,
     processing,
-    checkVersion,
     setLoginForm,
     setForgotPasswordForm,
     login,
@@ -219,6 +180,9 @@ export const useAuthViewModel = (): AuthState & AuthActions => {
     clearLoginForm,
     clearForgotPasswordForm,
     toggleRememberLogin,
+    handleBlurLoginUserName, // Export hàm onBlur mới
+    handleBlurLoginPassword, // Export hàm onBlur mới
+    handleBlurForgotPasswordUserName, // Export hàm onBlur mới
     refetch,
   };
 };

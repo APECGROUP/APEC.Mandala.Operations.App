@@ -30,13 +30,13 @@ const useCheckVersion = () => {
           undefined,
         );
       }
-      // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
     } catch (error) {
       console.log('Error checking version:', error);
     }
   };
   useEffect(() => {
     checkVersion();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
 
