@@ -63,7 +63,7 @@ const AppNavigation = () => {
     <AppBlock style={styles.flex}>
       <View style={[styles.flex]}>
         {/* Render MainNavigator nếu đã đăng nhập, ngược lại là AuthNavigator */}
-        {isLogin ? <MainNavigator /> : <AuthNavigator />}
+        {!isLogin ? <MainNavigator /> : <AuthNavigator />}
       </View>
       {/* Hiển thị splash screen chỉ khi splashVisible là true */}
       {splashVisible && (

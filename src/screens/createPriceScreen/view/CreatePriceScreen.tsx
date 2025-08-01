@@ -189,7 +189,7 @@ const CreatePriceScreen: React.FC = () => {
               value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
               onChangeText={onSearch} // Gọi hàm debounce từ ViewModel
               placeholder={t('assignPrice.searchPlaceholder')}
-              placeholderTextColor={light.placeholderTextColor}
+              placeholderTextColor={Colors.TEXT_SECONDARY}
               style={styles.searchInput}
               // returnKeyType="search"
               // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen

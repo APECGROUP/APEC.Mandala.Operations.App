@@ -28,6 +28,7 @@ import { styles } from './style';
 import { usePcPrViewModel } from '../viewmodal/usePcPrViewModel';
 import { DataPcPr } from '../modal/PcPrModal';
 import PcPrCard from './component/PcPrCard';
+import { Colors } from '@/theme/Config';
 
 const PcPrScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -178,7 +179,7 @@ const PcPrScreen: React.FC = () => {
               value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
               onChangeText={onSearchPrNo} // Gọi hàm debounce từ ViewModel
               placeholder={t('assignPrice.searchPlaceholder')}
-              placeholderTextColor={light.placeholderTextColor}
+              placeholderTextColor={Colors.TEXT_SECONDARY}
               style={styles.searchInput}
               // returnKeyType="search"
               // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen

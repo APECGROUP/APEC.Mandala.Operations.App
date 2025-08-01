@@ -28,6 +28,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { styles } from './style';
+import { Colors } from '@/theme/Config';
 
 const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -180,7 +181,7 @@ const AssignPriceScreen: React.FC = () => {
               value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
               onChangeText={onSearchPrNo} // Gọi hàm debounce từ ViewModel
               placeholder={t('assignPrice.searchPlaceholder')}
-              placeholderTextColor={light.placeholderTextColor}
+              placeholderTextColor={Colors.TEXT_SECONDARY}
               style={styles.searchInput}
               // returnKeyType="search"
               // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
