@@ -15,7 +15,7 @@ import IconSelectHotel from '../../../../../assets/icon/IconSelectHotel';
 import { usePickNCCViewModel } from '../viewmodal/usePickNCCViewModel';
 import { SCREEN_HEIGHT } from '@/constants';
 import { FlashList } from '@shopify/flash-list';
-import { ResponseNcc } from '../modal/PickNccModal';
+import { IItemSupplier, ResponseNcc } from '../modal/PickNccModal';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
@@ -67,7 +67,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: ResponseNcc; index: number }) => {
+    ({ item, index }: { item: IItemSupplier; index: number }) => {
       const isFocus = item?.id === ncc?.id;
       const onSelect = () => {
         setNcc(item);
@@ -78,7 +78,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
           key={index}
           onPress={onSelect}
           style={[isFocus ? styles.itemFocus : { padding: vs(10) }]}>
-          <AppText weight="500">{item.name}</AppText>
+          <AppText weight="500">{item.invoiceName}</AppText>
           {isFocus && <IconSelectHotel />}
         </AppBlockButton>
       );

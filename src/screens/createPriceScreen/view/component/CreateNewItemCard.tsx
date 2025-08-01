@@ -6,7 +6,7 @@ import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/theme/Config';
 import { navigate } from '@/navigation/RootNavigation';
-import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IItemSupplier, ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 import IconPenEdit from '@assets/icon/IconPenEdit';
 import IconCalendar from '@assets/icon/IconCalendar';
@@ -38,7 +38,7 @@ const CreateNewItemCard = ({
 }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(true);
-  const [ncc, setNcc] = useState<ResponseNcc>(item.supplier);
+  const [ncc, setNcc] = useState<IItemSupplier>(item.supplier);
   const [price, setPrice] = useState(item.price);
   const { showAlert } = useAlert();
 

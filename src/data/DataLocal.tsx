@@ -11,13 +11,13 @@ import * as Keychain from 'react-native-keychain';
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
 import { refreshTokenAPI } from '../utils/AuthService';
-import { ResponseAPILogin, TypeUser } from '../interface/Authen.interface';
 import { useIsLogin } from '../zustand/store/useIsLogin/useIsLogin';
 import { useInfoUser } from '../zustand/store/useInfoUser/useInfoUser';
 import { Strings } from '../languages/FunctionLanguage';
 import { storage } from '../views/appProvider/AppProvider';
 import i18n from '../languages/i18n';
 import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
+import { IResponseAPILogin, IUser } from '@/screens/authScreen/modal/AuthModal';
 
 export const TOKEN_KEY = 'ACCESS_TOKEN';
 export const USER_KEY = 'USER_INFO';
@@ -42,13 +42,14 @@ type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 const DataLocal = {
   token: null as TokenType | null,
-  user: null as TypeUser | null,
+  user: null as IUser | null,
   credentials: null as CredentialsType | null,
   authStatus: 'loading' as AuthStatus,
   rememberLogin: false,
   currentLanguage: 'vi' as string, // Mặc định là tiếng Việt
 
   setAuthStatus: (status: AuthStatus) => {
+    console.log('setAuthStatus', status);
     DataLocal.authStatus = status;
     useIsLogin.getState().setIsLogin(status === 'authenticated');
   },
@@ -114,7 +115,7 @@ const DataLocal = {
 
       DataLocal.token = tokenData;
       storage.set(TOKEN_KEY, JSON.stringify(tokenData));
-
+      console.log(1111111111111);
       DataLocal.setAuthStatus('authenticated');
     } catch (error) {
       Toast.show({ type: 'error', text2: 'Lưu token thất bại' });
@@ -135,6 +136,7 @@ const DataLocal = {
 
         if (currentTime < parsedToken.expiresAt) {
           DataLocal.token = parsedToken;
+          console.log(2222222222);
           DataLocal.setAuthStatus('authenticated');
           return parsedToken;
         } else if (currentTime < parsedToken.refreshExpiresAt) {
@@ -150,13 +152,13 @@ const DataLocal = {
     } catch (error) {
       Toast.show({ type: 'error', text2: 'Lấy token thất bại' });
     }
-
+    console.log(33333333333);
     DataLocal.setAuthStatus('unauthenticated');
     return null;
   },
 
   // ✅ Lưu user bằng storage
-  saveUser: async (user: TypeUser): Promise<void> => {
+  saveUser: async (user: IUser): Promise<void> => {
     try {
       DataLocal.user = user;
       await useInfoUser.getState().saveInfoUser(user);
@@ -166,7 +168,7 @@ const DataLocal = {
     }
   },
 
-  getUser: async (): Promise<TypeUser | null> => {
+  getUser: async (): Promise<IUser | null> => {
     if (DataLocal.user) {
       return DataLocal.user;
     }
@@ -174,7 +176,7 @@ const DataLocal = {
     try {
       const storedUser = storage.getString(USER_KEY);
       if (storedUser) {
-        const parsedUser: TypeUser = JSON.parse(storedUser);
+        const parsedUser: IUser = JSON.parse(storedUser);
         DataLocal.user = parsedUser;
         await useInfoUser.getState().saveInfoUser(parsedUser);
         return parsedUser;
@@ -243,7 +245,8 @@ const DataLocal = {
       // Xóa credentials từ Keychain
       await Keychain.resetGenericPassword();
 
-      await useInfoUser.getState().saveInfoUser({} as TypeUser);
+      await useInfoUser.getState().saveInfoUser({} as IUser);
+      console.log(44444444444);
       DataLocal.setAuthStatus('unauthenticated');
     } catch (error) {
       Toast.show({
@@ -254,11 +257,11 @@ const DataLocal = {
   },
 
   // ✅ Lưu token và user sau khi login thành công
-  saveAll: async (res: ResponseAPILogin): Promise<void> => {
+  saveAll: async (res: IResponseAPILogin): Promise<void> => {
     try {
       await DataLocal.saveUser(res.data?.user || {});
       await DataLocal.saveToken(
-        res.data.token,
+        res.data.accessToken,
         res.data.refreshToken,
         res.data.expiresIn,
         res.data.refreshExpiresIn,

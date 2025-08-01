@@ -16,12 +16,12 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { MainParams } from '@/navigation/params';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  SelectedOption,
-} from '@/screens/assignPriceScreen/modal/AssignPriceModal';
+import { SelectedOption } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { IPickStatus } from '@/views/modal/modalPickStatus/modal/PickStatusModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';
+import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 const FilterPcPrScreen = ({
   route,
@@ -40,20 +40,18 @@ const FilterPcPrScreen = ({
   const [po, setPo] = useState<string>(initialFilters.prNo || initialFilters?.searchKey || '');
   const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.fromDate);
   const [toDate, setToDate] = useState<Date | undefined>(initialFilters.toDate);
-  const [department, setDepartment] = useState<SelectedOption>(
-    initialFilters.department && initialFilters.department.id !== ''
+  const [department, setDepartment] = useState<IPickDepartment | undefined>(
+    initialFilters.department && initialFilters.department.id
       ? initialFilters.department
-      : { id: '', name: '' },
+      : undefined,
   );
-  const [location, setLocation] = useState<IPickLocal>(
-    initialFilters.location && initialFilters.location.code !== ''
-      ? initialFilters.location
-      : { code: '', name: '' },
+  const [location, setLocation] = useState<IPickLocal | undefined>(
+    initialFilters.location && initialFilters.location.id ? initialFilters.location : undefined,
   );
-  const [status, setStatus] = useState<IPickStatus>(
-    initialFilters.status && initialFilters.status.code !== ''
+  const [status, setStatus] = useState<IStausGlobal | undefined>(
+    initialFilters.status && initialFilters.status.status !== ''
       ? initialFilters.status
-      : { code: '', name: '' },
+      : undefined,
   );
 
   // Ref cho TextInput để quản lý focus (có thể không cần thiết nếu dùng AppTextInput đúng cách)
@@ -78,8 +76,8 @@ const FilterPcPrScreen = ({
   const onPressDepartment = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickDepartmentScreen', {
-      setDepartment: (dep: SelectedOption) => setDepartment(dep),
-      department: department, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      setDepartment,
+      department, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [department]);
   console.log('filter', initialFilters);
@@ -106,9 +104,9 @@ const FilterPcPrScreen = ({
       pO: po.trim() || undefined, // Đảm bảo po rỗng thì thành undefined
       fromDate,
       toDate,
-      department: department.id ? department : undefined, // Nếu id rỗng thì là undefined
-      location: location.code ? location : undefined, // Nếu id rỗng thì là undefined
-      status: status.code ? status : undefined, // Nếu code rỗng thì là undefined
+      department: department?.id ? department : undefined, // Nếu id rỗng thì là undefined
+      location: location?.id ? location : undefined, // Nếu id rỗng thì là undefined
+      status: status?.status ? status : undefined, // Nếu code rỗng thì là undefined
     };
 
     // Gọi callback từ màn hình trước đó để áp dụng filter
@@ -132,9 +130,9 @@ const FilterPcPrScreen = ({
     setPrNo('');
     setFromDate(undefined);
     setToDate(undefined);
-    setDepartment({ id: '', name: '' });
-    setStatus({ code: '', name: '' });
-    setLocation({ code: '', name: '' });
+    setDepartment(undefined);
+    setStatus(undefined);
+    setLocation(undefined);
     setPo('');
   }, []);
   const valueDate =
@@ -191,7 +189,7 @@ const FilterPcPrScreen = ({
               label={t('filter.department')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={department?.name}
+              value={department?.departmentName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
@@ -204,7 +202,7 @@ const FilterPcPrScreen = ({
               label={t('filter.location')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={location?.name}
+              value={location?.storeName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
@@ -216,7 +214,7 @@ const FilterPcPrScreen = ({
               label={t('filter.status')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={status?.name}
+              value={status?.statusName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />

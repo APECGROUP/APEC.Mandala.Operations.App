@@ -74,7 +74,7 @@ const PickLocalScreen = ({ navigation, route }: Props) => {
       };
       return (
         <AppBlockButton key={index} onPress={onSelect} style={{ padding: vs(10) }}>
-          <AppText weight="500">{item.name}</AppText>
+          <AppText weight="500">{item.storeName}</AppText>
         </AppBlockButton>
       );
     },
@@ -123,7 +123,7 @@ const PickLocalScreen = ({ navigation, route }: Props) => {
           <FlashList
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => item?.code?.toString() || ''}
+            keyExtractor={item => item?.id?.toString() || ''}
             onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}

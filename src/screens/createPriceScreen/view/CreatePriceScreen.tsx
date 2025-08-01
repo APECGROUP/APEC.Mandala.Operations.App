@@ -145,7 +145,7 @@ const CreatePriceScreen: React.FC = () => {
 
   console.log('CreatePriceScreen', flatData);
 
-  if (isError || (isFirstLoad && !isLoading)) {
+  if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
 

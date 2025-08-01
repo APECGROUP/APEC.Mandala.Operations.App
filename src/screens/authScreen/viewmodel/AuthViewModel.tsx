@@ -7,7 +7,12 @@ import { useIsLogin } from '@/zustand/store/useIsLogin/useIsLogin';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import DataLocal from '@/data/DataLocal';
 import { goBack } from '@/navigation/RootNavigation';
-import { LoginFormData, ForgotPasswordFormData, IResponseAPILogin } from '../modal/AuthModal';
+import {
+  LoginFormData,
+  ForgotPasswordFormData,
+  IResponseAPILogin,
+  fetchStatusGlobal,
+} from '../modal/AuthModal';
 import { useQuery } from '@tanstack/react-query';
 import {
   IResponseListHotel,
@@ -136,6 +141,8 @@ export const useAuthViewModel = () => {
           );
         }
         saveInfoUser(response.data.data.user);
+        DataLocal.saveAll(response.data);
+        await fetchStatusGlobal();
         setIsLogin(true);
       } else {
         showToast(t('auth.login.loginError'), TYPE_TOAST.ERROR);
@@ -149,18 +156,29 @@ export const useAuthViewModel = () => {
   }, [saveInfoUser, setIsLogin, showToast, t]);
 
   const forgotPassword = useCallback(async () => {
-    const { userName } = forgotPasswordFormRef.current;
+    const { userName, hotel } = forgotPasswordFormRef.current;
 
-    if (userName.toLowerCase() === 'dung') {
-      showAlert(t('auth.forgotPassword.success'), t('auth.forgotPassword.subSuccess'), [
-        {
-          text: t('auth.forgotPassword.close'),
-          onPress: () => {
-            goBack();
+    try {
+      const params = {
+        userName: userName.trim(),
+      };
+      const response = await api.post(ENDPOINT.FORGOT_PASSWORD, params, {
+        headers: { hotelCode: hotel?.code },
+      });
+      if (response.status !== 200 || !response.data.isSuccess) {
+        throw new Error('Forgot password failed');
+      } else if (response.data.isSuccess) {
+        showAlert(t('auth.forgotPassword.success'), t('auth.forgotPassword.subSuccess'), [
+          {
+            text: t('auth.forgotPassword.close'),
+            onPress: () => {
+              goBack();
+            },
           },
-        },
-      ]);
-    } else {
+        ]);
+      }
+      // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
+    } catch (error) {
       showToast(t('auth.forgotPassword.errorForgotPassword'), TYPE_TOAST.ERROR);
     }
   }, [showAlert, showToast, t]);

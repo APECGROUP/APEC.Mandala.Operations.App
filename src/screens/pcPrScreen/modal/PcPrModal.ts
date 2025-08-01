@@ -1,6 +1,8 @@
 import { fakeDataHotel, fakeNote, mockDepartments, mockRequesters } from '@/data/DataFake';
+import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickStatus } from '@/views/modal/modalPickStatus/modal/PickStatusModal';
+import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 import axios from 'axios';
 
 // --- (Các interfaces không thay đổi) ---
@@ -15,9 +17,9 @@ export interface PcPrFilters {
   requester: any;
   fromDate?: Date;
   toDate?: Date;
-  department?: SelectedOption;
-  location?: IPickLocal;
-  status?: IPickStatus;
+  department?: IPickDepartment | undefined;
+  location?: IPickLocal | undefined;
+  status?: IStausGlobal | undefined;
 }
 
 export interface DataPcPr {

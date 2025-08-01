@@ -17,6 +17,7 @@ import { FlashList } from '@shopify/flash-list';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
+import { IPickItem } from '../modal/PickItemModal';
 
 type Props = NativeStackScreenProps<MainParams, 'PickItemScreen'>;
 const PickItemScreen = ({ navigation, route }: Props) => {
@@ -65,14 +66,14 @@ const PickItemScreen = ({ navigation, route }: Props) => {
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: any; index: number }) => {
+    ({ item, index }: { item: IPickItem; index: number }) => {
       const onSelect = () => {
         setItem(item);
         navigation.goBack();
       };
       return (
         <AppBlockButton key={index} onPress={onSelect} style={{ padding: vs(10) }}>
-          <AppText weight="500">{item.name}</AppText>
+          <AppText weight="500">{item.iName}</AppText>
         </AppBlockButton>
       );
     },

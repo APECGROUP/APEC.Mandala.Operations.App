@@ -15,6 +15,7 @@ const MyTabs = () => {
   );
   const PcPrScreen = React.lazy(() => import('@/screens/pcPrScreen/view/PcPrScreen'));
   const CreatePoScreen = React.lazy(() => import('@/screens/createPoScreen/view/CreatePoScreen'));
+
   return (
     <Tab.Navigator
       screenOptions={{

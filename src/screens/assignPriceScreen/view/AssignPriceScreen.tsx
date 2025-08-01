@@ -29,6 +29,8 @@ import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { styles } from './style';
 import { Colors } from '@/theme/Config';
+import DataLocal from '@/data/DataLocal';
+import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -66,6 +68,8 @@ const AssignPriceScreen: React.FC = () => {
       currentFilters: currentFilters, // Filters hiện tại đang hiển thị trên màn hình A
     });
   }, [applyFilters, currentFilters]);
+
+  console.log('token ne: ', DataLocal.token);
   const listEmptyComponent = useMemo(() => {
     if (isLoading) {
       // Nếu đang loading và chưa có dữ liệu, hiển thị skeleton hoặc indicator
@@ -87,7 +91,6 @@ const AssignPriceScreen: React.FC = () => {
     }
     return null;
   }, [isLoading, t]);
-
   const listFooterComponent = useMemo(() => {
     if (isFetchingNextPage) {
       return (

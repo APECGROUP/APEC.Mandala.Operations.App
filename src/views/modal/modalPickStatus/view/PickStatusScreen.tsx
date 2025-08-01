@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { use, useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../../../navigation/params';
@@ -21,24 +21,20 @@ import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { IPickStatus } from '../modal/PickStatusModal';
+import { IStausGlobal, useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { keyBy } from 'lodash';
 
 type Props = NativeStackScreenProps<MainParams, 'PickStatusScreen'>;
 const PickStatusScreen = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
   const { status, setStatus } = route.params;
   const { bottom } = useSafeAreaInsets();
-
+  const { statusGlobal } = useStatusGlobal();
+  const [data, setData] = useState<IStausGlobal[]>([]);
+  const [searchKey, setSearchKey] = useState<string>('');
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
-  const {
-    flatData,
-    isLoading,
-    isRefetching,
-    isFetchingNextPage,
-    onRefresh,
-    onLoadMore,
-    onSearch,
-    searchKey,
-  } = usePickStatusViewModel();
+  const { flatData, isLoading, isRefetching, isFetchingNextPage, onRefresh, onLoadMore, onSearch } =
+    usePickStatusViewModel();
 
   const listFooterComponent = () => {
     if (isFetchingNextPage) {
@@ -69,10 +65,10 @@ const PickStatusScreen = ({ navigation, route }: Props) => {
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: IPickStatus; index: number }) => {
-      const isFocus = item?.code === status?.code;
+    ({ item, index }: { item: IStausGlobal; index: number }) => {
+      const isFocus = item?.status === status?.status;
       const onSelect = () => {
-        setStatus({ code: item.code || '', name: item.name || '' });
+        setStatus(item);
         navigation.goBack();
       };
       return (
@@ -81,18 +77,29 @@ const PickStatusScreen = ({ navigation, route }: Props) => {
             key={index}
             onPress={onSelect}
             style={[isFocus ? styles.itemFocus : { padding: vs(10) }]}>
-            <AppText weight="500">{item.name}</AppText>
+            <AppText weight="500">{item.statusName}</AppText>
             {isFocus && <IconSelectHotel />}
           </AppBlockButton>
         </View>
       );
     },
-    [status?.code, setStatus, navigation],
+    [status?.status, setStatus, navigation],
   );
 
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
+  useEffect(() => {
+    if (searchKey.trim()) {
+      const filteredData = statusGlobal.filter(item =>
+        item.statusName.toLowerCase().includes(searchKey.toLowerCase()),
+      );
+      setData(filteredData);
+    } else {
+      setData(statusGlobal);
+    }
+  }, [searchKey, statusGlobal]);
+
   return (
     <ViewContainer>
       <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
@@ -125,21 +132,19 @@ const PickStatusScreen = ({ navigation, route }: Props) => {
               showIconRemove
               containerStyle={styles.containerInputSearch}
               value={searchKey}
-              onChangeText={onSearch}
+              onChangeText={setSearchKey}
               placeholder={t('filter.search')}
             />
           </View>
 
           <FlashList
-            data={flatData || []}
+            data={data || []}
             renderItem={renderItem}
-            keyExtractor={item => item.code?.toString() || ''}
-            onEndReached={onLoadMore}
+            keyExtractor={item => item.status?.toString() || ''}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
             removeClippedSubviews
             refreshing={isRefetching}
-            onRefresh={onRefresh}
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent}
             ListFooterComponent={listFooterComponent}

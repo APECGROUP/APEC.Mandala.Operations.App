@@ -21,9 +21,9 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
   saveInfoUser: (val: IUser) => {
     console.log('saveInfoUser', val);
     // TODO:bỏ check điều kiện đi
-    if (val.userName) {
-      set({ infoUser: val });
-    }
+    // if (val.userName) {
+    set({ infoUser: val });
+    // }
     // try {
     //   storage.set(USER_KEY, JSON.stringify(val));
     // } catch (e) {

@@ -24,12 +24,15 @@ import { appVersion, useOtaUpdate } from '@/hook/useOtaUpdate';
 import RightItemAccount from './RightItemAccount';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import api from '@/utils/setup-axios';
+import { ENDPOINT } from '@/utils/Constans';
+import { TYPE_TOAST } from '@/elements/toast/Message';
 
 const AccountScreen = () => {
   const { t } = useTranslation();
   const { infoUser } = useInfoUser();
   const { bottom } = useSafeAreaInsets();
-  const { showAlert } = useAlert();
+  const { showAlert, showToast } = useAlert();
 
   const { toggleLanguage } = useLanguage();
   // const [isHasUpdate, setIsHasUpdate] = useState(false);
@@ -60,11 +63,22 @@ const AccountScreen = () => {
   // };
 
   const goToChangePassword = () => navigate('ChangePasswordScreen', { type: 'change' });
-
+  const handleLogout = async () => {
+    try {
+      const response = await api.get(ENDPOINT.LOGOUT);
+      if (response.status !== 200) {
+        throw new Error('Logout failed');
+      } else if (response.data.isSuccess) {
+        await DataLocal.removeAll();
+      }
+    } catch (error) {
+      showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
+    }
+  };
   const onLogout = () => {
     showAlert(t('account.logout'), t('account.warningLogout'), [
       { text: t('account.profile.cancel'), style: 'cancel', onPress: () => {} },
-      { text: t('account.confirm'), onPress: () => DataLocal.removeAll() },
+      { text: t('account.confirm'), onPress: handleLogout },
     ]);
   };
 

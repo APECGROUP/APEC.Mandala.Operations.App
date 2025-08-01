@@ -5,13 +5,15 @@ import {
   DataAssignPrice,
   SelectedOption,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
-import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
-import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { IItemSupplier, ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { TypeApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
 import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 import { DataPcPr, PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';
 import { IPickStatus } from '@/views/modal/modalPickStatus/modal/PickStatusModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
+import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
+import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 // ─────────────────────────────────────────────────────────────
 // Bottom Tab Navigation
@@ -91,16 +93,16 @@ export type MainParams = {
     type: 'verifyEmail';
   };
   PickNccScreen: {
-    setNcc: Dispatch<SetStateAction<ResponseNcc>>;
-    ncc: ResponseNcc;
+    setNcc: Dispatch<SetStateAction<IItemSupplier>>;
+    ncc: IItemSupplier;
   };
   PickDepartmentScreen: {
-    setDepartment: Dispatch<SetStateAction<TypePickDepartment>>;
-    department: TypePickDepartment;
+    setDepartment: Dispatch<SetStateAction<IPickDepartment | undefined>>;
+    department: IPickDepartment | undefined;
   };
 
   PickItemScreen: {
-    setItem: (item: { id: string; name: string }) => void;
+    setItem: Dispatch<SetStateAction<IPickItem>>;
   };
 
   PickRequesterScreen: {
@@ -108,12 +110,12 @@ export type MainParams = {
     requester: SelectedOption;
   };
   PickStatusScreen: {
-    setStatus: Dispatch<SetStateAction<IPickStatus>>;
-    status: IPickStatus;
+    setStatus: Dispatch<SetStateAction<IStausGlobal | undefined>>;
+    status: IStausGlobal | undefined;
   };
   PickLocalScreen: {
-    setLocation: Dispatch<SetStateAction<IPickLocal>>;
-    location: IPickLocal;
+    setLocation: Dispatch<SetStateAction<IPickLocal | undefined>>;
+    location: IPickLocal | undefined;
   };
   ModalInputRejectAssign: {
     id: string;

@@ -1,4 +1,5 @@
 import { fakeDataHotel, fakeNote, mockDepartments, mockRequesters } from '@/data/DataFake';
+import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import axios from 'axios';
 
 // --- (Các interfaces không thay đổi) ---
@@ -14,7 +15,7 @@ export interface AssignPriceFilters {
   department?: SelectedOption;
   requester?: SelectedOption;
   product?: SelectedOption;
-  ncc?: SelectedOption;
+  ncc?: IItemSupplier;
   status?: SelectedOption;
 }
 

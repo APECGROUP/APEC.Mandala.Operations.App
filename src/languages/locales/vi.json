@@ -341,7 +341,7 @@
     },
     "error": {
       "title": "Oops!",
-      "subtitle": "Đã có lỗi sảy ra xin vui lòng thử lại sau ...",
+      "subtitle": "Đã có lỗi sảy ra xin vui lòng thử lại sau!",
       "goBack": "Quay lại",
       "tryAgain": "Thử lại"
     }

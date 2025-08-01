@@ -13,13 +13,13 @@ import IconSub from '@assets/icon/IconSub';
 import IconPlus from '@assets/icon/IconPlus';
 import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
-import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IItemSupplier, ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 
 const DetailOrderItemCard = ({ item }: { item: DetailOrderApprove; index: number }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
   const [count, setCount] = useState(item.approvedQty);
-  const [ncc, setNcc] = useState<ResponseNcc>(item.supplier);
+  const [ncc, setNcc] = useState<IItemSupplier>(item.supplier);
 
   const handleShowDetail = () => {
     console.log('onPress');

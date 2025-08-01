@@ -1,7 +1,13 @@
+import { ENDPOINT } from '@/utils/Constans';
+import api from '@/utils/setup-axios';
 import {
   IDataListHotel,
   IResponseListHotel,
 } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
+import {
+  IResponseStatusGlobal,
+  useStatusGlobal,
+} from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 export interface LoginFormData {
   userName: string;
@@ -35,16 +41,35 @@ export interface IDataApiLogin {
   user: IUser;
   accessToken: string;
   refreshToken: string;
+  expiresIn: number;
+  refreshExpiresIn: number;
 }
 
 export interface IUser {
   userName: string;
   displayName: string;
   email: string;
-  signature: null;
+  avatar: string;
   department: string;
+  departmentName: string;
+  departmentShortName: string;
   language: null;
   isNotification: null;
+  groups: IGroupAuth[];
+}
+export interface IGroupAuth {
+  groupName: string;
+  description: string;
+  groupCode: string;
+  prApLimit: number | null;
+  dailyApLimit: number | null;
+  monthlyApLimit: number | null;
+  id: number;
+  createdBy: string;
+  createdDate: Date;
+  deletedDate: null;
+  deletedBy: null;
+  deleted: string;
 }
 
 export interface AuthActions {
@@ -58,3 +83,16 @@ export interface AuthActions {
   toggleRememberLogin: () => void;
   refetch: () => void;
 }
+
+export const fetchStatusGlobal = async () => {
+  try {
+    const response = await api.get<IResponseStatusGlobal>(ENDPOINT.GET_STATUS_GLOBAL);
+    if (response.status === 200 && response.data.isSuccess) {
+      useStatusGlobal.getState().setStatusGlobal(response.data.data);
+    } else {
+      throw new Error('Failed to fetch global status');
+    }
+  } catch (error) {
+    console.error('Error fetching global status:', error);
+  }
+};

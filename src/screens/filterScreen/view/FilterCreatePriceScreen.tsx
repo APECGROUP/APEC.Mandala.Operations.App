@@ -20,6 +20,8 @@ import {
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { AppText } from '@/elements/text/AppText';
 import { Colors } from '@/theme/Config';
+import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 
 const FilterCreatePriceScreen = ({
   route,
@@ -34,44 +36,42 @@ const FilterCreatePriceScreen = ({
   // Đảm bảo default values cho department và requester là { id: '', name: '' }
   const initialFilters: AssignPriceFilters = route.params?.currentFilters || {};
 
-  const [ncc, setNcc] = useState<SelectedOption>(
-    initialFilters.ncc && initialFilters.ncc.id !== '' ? initialFilters.ncc : { id: '', name: '' },
+  const [ncc, setNcc] = useState<IItemSupplier | undefined>(
+    initialFilters.ncc && initialFilters.ncc?.id ? initialFilters.ncc : undefined,
   );
   const [status, setStatus] = useState<SelectedOption>(
     initialFilters.status && initialFilters.status.id !== ''
       ? initialFilters.status
       : { id: '', name: '' },
   );
-  const [product, setProduct] = useState<SelectedOption>(
-    initialFilters.product && initialFilters.product.id !== ''
-      ? initialFilters.product
-      : { id: '', name: '' },
+  const [item, setItem] = useState<IPickItem | undefined>(
+    initialFilters.product && initialFilters.product.id ? initialFilters.product : undefined,
   );
   // --- Handlers cho việc chọn giá trị từ các Modal khác ---
 
   const onPressNcc = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickNccScreen', {
-      setNcc: (v: SelectedOption) => setNcc(v),
-      ncc: ncc, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      setNcc,
+      ncc, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [ncc]);
   console.log('filter', initialFilters);
   const onPressNameItem = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickItemScreen', {
-      setItem: (_item: SelectedOption) => setProduct(_item),
-      item: product, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      setItem: (_item: SelectedOption) => setItem(_item),
+      item: item, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
-  }, [product]);
+  }, [item]);
 
   // --- Xử lý khi người dùng xác nhận bộ lọc ---
   const onConfirm = useCallback(() => {
     // Tạo object filters mới từ state cục bộ của FilterScreen
     const newFilters: AssignPriceFilters = {
-      ncc: ncc.id ? ncc : undefined, // Nếu id rỗng thì là undefined
+      ncc: ncc?.id ? ncc : undefined, // Nếu id rỗng thì là undefined
       status: status.id ? status : undefined, // Nếu id rỗng thì là undefined
-      product: product.id ? product : undefined, // Nếu id rỗng thì là undefined
+      product: item?.id ? item : undefined, // Nếu id rỗng thì là undefined
     };
 
     // Gọi callback từ màn hình trước đó để áp dụng filter
@@ -79,12 +79,12 @@ const FilterCreatePriceScreen = ({
       onApplyFiltersCallback(newFilters);
     }
     navigation.goBack();
-  }, [ncc, status, product, onApplyFiltersCallback, navigation]);
+  }, [ncc, status, item, onApplyFiltersCallback, navigation]);
 
   const onReset = useCallback(() => {
-    setNcc({ id: '', name: '' });
+    setNcc(undefined);
     setStatus({ id: '', name: '' });
-    setProduct({ id: '', name: '' });
+    setItem(undefined);
   }, []);
 
   const statusList = [
@@ -106,7 +106,7 @@ const FilterCreatePriceScreen = ({
               label={t('filter.ncc')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={ncc?.name}
+              value={ncc?.invoiceName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
@@ -119,7 +119,7 @@ const FilterCreatePriceScreen = ({
               label={t('filter.nameItem')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={product?.name}
+              value={item?.iName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />

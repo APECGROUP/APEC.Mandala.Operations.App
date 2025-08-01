@@ -13,7 +13,7 @@ import IconSub from '@assets/icon/IconSub';
 import IconPlus from '@assets/icon/IconPlus';
 import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
-import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IItemSupplier, ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 
 const InformationItemsCard = ({
   item,
@@ -28,7 +28,7 @@ const InformationItemsCard = ({
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
   const [count, setCount] = useState(item.approvedQty);
-  const [ncc, setNcc] = useState<ResponseNcc>(item.supplier);
+  const [ncc, setNcc] = useState<IItemSupplier>(item.supplier);
   const [price, setPrice] = useState(item.price);
   const handleShowDetail = () => {
     console.log('onPress');

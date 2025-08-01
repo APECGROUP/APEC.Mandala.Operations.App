@@ -1,34 +1,61 @@
-import { mockDepartments } from '@/data/DataFake';
-import axios from 'axios';
+import { ENDPOINT } from '@/utils/Constans';
+import api from '@/utils/setup-axios';
 
-export interface TypePickDepartment {
-  id: string | undefined;
-  name: string | undefined;
+export interface IResponseDepartment {
+  data: IPickDepartment[];
+  pagination: Pagination;
+  isSuccess: boolean;
+  errors: null;
 }
 
-/**
- * Tạo URL API lấy danh sách ảnh, có hỗ trợ search (giả lập).
- */
-function buildNccUrl(page: number, limit: number, key?: string): string {
-  let url = `https://picsum.photos/v2/list?page=${page}&limit=${limit}`;
-  if (key) url += `&search=${encodeURIComponent(key)}`;
-  return url;
+export interface IPickDepartment {
+  departmentCode: string;
+  departmentName: string;
+  departmentShortName: string;
+  location: string;
+  id: number;
+  createdBy: string;
+  createdDate: Date;
+  deletedDate: null;
+  deletedBy: null;
+  deleted: string;
+}
+
+export interface Pagination {
+  pageCurrent: number;
+  pageCount: number;
+  pageSize: number;
+  rowCount: number;
+  firstRowOnPage: number;
+  lastRowOnPage: number;
 }
 
 /**
  * Lấy danh sách DataAssignPrice từ API (giả lập).
  */
+
 export const fetchDepartmentData = async (
   page: number,
   limit: number = 50,
   key: string = '',
-): Promise<TypePickDepartment[]> => {
-  const url = buildNccUrl(page, limit, key);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data } = await axios.get(url);
-
-  return mockDepartments.map(item => ({
-    id: item.id,
-    name: item.name,
-  }));
+): Promise<IPickDepartment[]> => {
+  try {
+    const params = {
+      pagination: {
+        pageIndex: page,
+        pageSize: limit,
+        isAll: false,
+      },
+      filter: {
+        textSearch: key.trim(),
+      },
+    };
+    const response = await api.post<IResponseDepartment>(ENDPOINT.GET_LIST_DEPARTMENT, params);
+    if (response.status !== 200 || !response.data.isSuccess) {
+      throw new Error('Failed to fetch data');
+    }
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
 };
