@@ -34,7 +34,6 @@ const ChangePasswordScreen = ({ navigation, route }: Props) => {
   const refConfirm = useRef<TextInput>(null);
 
   const disabled = !currentPassword || !confirmPassword || newPassword !== confirmPassword;
-  console.log('change password: ', type);
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
@@ -68,7 +67,6 @@ const ChangePasswordScreen = ({ navigation, route }: Props) => {
       await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
       goBack();
     } catch (error) {
-      console.log(error);
       Toast.show({
         type: 'error',
         text2: t('account.changePassword.changePasswordFail'),

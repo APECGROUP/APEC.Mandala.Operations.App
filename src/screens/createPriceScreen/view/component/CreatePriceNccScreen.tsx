@@ -18,6 +18,7 @@ import moment from 'moment';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { Gesture } from 'react-native-gesture-handler';
 import AppBlockButton from '@/elements/button/AppBlockButton';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 const CreatePriceNccScreen = () => {
   const { t } = useTranslation();
@@ -25,24 +26,7 @@ const CreatePriceNccScreen = () => {
   const [listItem, setListItem] = useState<IPickItem[]>([]);
 
   const onAddNewItemToList = () => {
-    setListItem([
-      ...listItem,
-      {
-        id: `${moment().unix()}_${Math.random().toString(36).substring(2, 9)}`,
-        name: '',
-        price: 0,
-        end: '',
-        vat: '0',
-        ncc: '',
-        time: '',
-        dateFrom: '',
-        dateTo: '',
-        supplier: {
-          id: '',
-          name: '',
-        },
-      } as IPickItem,
-    ]);
+    setListItem([...listItem, {} as IPickItem]);
   };
   // const onCreateItem = () => {
   //   navigate('PickItemScreen', {
@@ -65,13 +49,9 @@ const CreatePriceNccScreen = () => {
     ),
     [],
   );
-  const onUpdateItem = useCallback(
-    (i: IPickItem) => {
-      console.log('update item: ', i, listItem);
-      setListItem(prevList => prevList.map(item => (item.id === i.id ? i : item)));
-    },
-    [listItem],
-  );
+  const onUpdateItem = useCallback((i: IPickItem) => {
+    setListItem(prevList => prevList.map(item => (item.id === i.id ? i : item)));
+  }, []);
   const handleDelete = useCallback((id: string) => {
     setListItem(prevList => prevList.filter(item => item.id !== id));
   }, []);
@@ -106,45 +86,45 @@ const CreatePriceNccScreen = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     goBack();
     showToast(t('createPrice.saveInfoSuccess'), 'success');
-    console.log('save info: ', listItem);
   };
 
-  console.log('render : ', listItem);
   return (
-    <View style={styles.flex1}>
-      <Header primary title={t('createPrice.createPriceNcc')} iconWidth={s(40)} />
+    <ViewContainer>
+      <View style={styles.flex1}>
+        <Header primary title={t('createPrice.createPriceNcc')} iconWidth={s(40)} />
 
-      <View style={styles.titleContainer}>
-        <AppText style={styles.titleText}>{t('Danh sách gán giá NCC')}</AppText>
-        {/* <View style={styles.countBadge}>
+        <View style={styles.titleContainer}>
+          <AppText style={styles.titleText}>{t('Danh sách gán giá NCC')}</AppText>
+          {/* <View style={styles.countBadge}>
           <AppText style={styles.countBadgeText}>{0}</AppText>
         </View> */}
-      </View>
+        </View>
 
-      <FlashList
-        ref={flashListRef}
-        // data={[]}
-        data={listItem || []}
-        renderItem={renderItem}
-        keyExtractor={item => `${item.id}`}
-        showsVerticalScrollIndicator={false}
-        onEndReachedThreshold={0.5}
-        removeClippedSubviews
-        scrollEventThrottle={16}
-        ListEmptyComponent={listEmptyComponent}
-        estimatedItemSize={100}
-        contentContainerStyle={styles.listContent}
-      />
-      <AppBlockButton onPress={scrollToTop} style={[styles.scrollBottomContainer]}>
-        <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
-      </AppBlockButton>
-      <Footer
-        onLeftAction={onAddNewItemToList}
-        onRightAction={onSaveInfo}
-        leftButtonTitle={t('createPrice.createNew')}
-        rightButtonTitle={t('createPrice.saveInfo')}
-      />
-    </View>
+        <FlashList
+          ref={flashListRef}
+          // data={[]}
+          data={listItem || []}
+          renderItem={renderItem}
+          keyExtractor={item => `${item.id}`}
+          showsVerticalScrollIndicator={false}
+          onEndReachedThreshold={0.5}
+          removeClippedSubviews
+          scrollEventThrottle={16}
+          ListEmptyComponent={listEmptyComponent}
+          estimatedItemSize={100}
+          contentContainerStyle={styles.listContent}
+        />
+        <AppBlockButton onPress={scrollToTop} style={[styles.scrollBottomContainer]}>
+          <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
+        </AppBlockButton>
+        <Footer
+          onLeftAction={onAddNewItemToList}
+          onRightAction={onSaveInfo}
+          leftButtonTitle={t('createPrice.createNew')}
+          rightButtonTitle={t('createPrice.saveInfo')}
+        />
+      </View>
+    </ViewContainer>
   );
 };
 

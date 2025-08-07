@@ -13,7 +13,7 @@ import light from '../../../theme/light';
 
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
-import { DataInformationItems } from '../modal/InformationItemsModal';
+import { IItemInDetailPr } from '../modal/InformationItemsModal';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
 import ToastContainer from '@/elements/toast/ToastContainer';
@@ -36,7 +36,7 @@ const InformationItemsScreen = ({
 }: NativeStackScreenProps<MainParams, 'InformationItemsScreen'>) => {
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
-  const { content, id } = route.params.item;
+  const { prNo, id } = route.params.item;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -51,12 +51,11 @@ const InformationItemsScreen = ({
     onUpdatePrice,
     isError,
     onAutoAssign,
-  } = useInformationItemsViewModel(id);
-  console.log('id: ', id);
+  } = useInformationItemsViewModel(id, prNo);
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
-  const flashListRef = useRef<FlashList<DataInformationItems> | null>(null);
+  const flashListRef = useRef<FlashList<IItemInDetailPr> | null>(null);
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = () => {
@@ -95,7 +94,7 @@ const InformationItemsScreen = ({
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: DataInformationItems; index: number }) => (
+    ({ item, index }: { item: IItemInDetailPr; index: number }) => (
       <InformationItemsCard
         item={item}
         index={index}
@@ -145,7 +144,7 @@ const InformationItemsScreen = ({
   return (
     <ViewContainer>
       <View style={styles.container}>
-        <Header primary title={content} rightComponent={rightComponent()} />
+        <Header primary title={prNo} rightComponent={rightComponent()} />
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('Thông tin các mặt hàng')}</AppText>
           <View style={styles.countBadge}>
@@ -187,7 +186,9 @@ const InformationItemsScreen = ({
           <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
         </AppBlockButton>
       </View>
-      {flatData && flatData.length > 0 && <FooterInformationItem onAutoAssign={onAutoAssign} />}
+      {flatData && flatData.length > 0 && (
+        <FooterInformationItem id={id} prNo={prNo} onAutoAssign={onAutoAssign} />
+      )}
     </ViewContainer>
   );
 };

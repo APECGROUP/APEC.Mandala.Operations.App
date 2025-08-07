@@ -50,7 +50,6 @@ const ModalPhotoOrCamera = ({ navigation, route }: Props) => {
           setImageAvatar(imageCrop);
         }
       } catch (e) {
-        console.log('Image Picker Error:', e);
       } finally {
         goBack();
       }

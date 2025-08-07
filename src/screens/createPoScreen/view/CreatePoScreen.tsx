@@ -17,7 +17,7 @@ import IconSearch from '@assets/icon/IconSearch';
 import IconFilter from '@assets/icon/IconFillter';
 import IconScrollBottom from '@assets/icon/IconScrollBottom';
 
-import { TypeCreatePo } from '../modal/CreatePoModal';
+import { IItemCreatePo } from '../modal/CreatePoModal';
 import Images from '@assets/image/Images';
 import { navigate } from '@/navigation/RootNavigation';
 import { AppText } from '@/elements/text/AppText';
@@ -55,11 +55,12 @@ const CreatePoScreen: React.FC = () => {
     // onLoadMore,
     applyFilters,
     handleSelect,
+    onCreatePo,
   } = useCreatePoViewModel();
   const { infoUser } = useInfoUser();
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
-  const flashListRef = useRef<FlashList<TypeCreatePo> | null>(null);
+  const flashListRef = useRef<FlashList<IItemCreatePo> | null>(null);
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
@@ -74,7 +75,7 @@ const CreatePoScreen: React.FC = () => {
 
   const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
   const goToAccount = useCallback(() => navigate('AccountScreen'), []);
-  const onCreatePo = useCallback(() => navigate('CreatePoNccScreen'), []);
+  // const onCreatePo = useCallback(() => navigate('CreatePoNccScreen'), []);
 
   const reLoadData = useCallback(() => {
     setIsFirstLoad(false);
@@ -115,7 +116,7 @@ const CreatePoScreen: React.FC = () => {
 
   const length = useMemo(() => selectedIds.length, [selectedIds]);
   const renderItem = useCallback(
-    ({ item }: { item: TypeCreatePo; index: number }) => (
+    ({ item }: { item: IItemCreatePo; index: number }) => (
       <CreatePoCard
         item={item}
         handleSelect={handleSelect}
@@ -132,7 +133,6 @@ const CreatePoScreen: React.FC = () => {
     });
   }, [applyFilters, currentFilters]);
 
-  console.log('CreatePoScreen', flatData);
   // ...existing code...
   // const navigation = useNavigation();
 
@@ -150,7 +150,7 @@ const CreatePoScreen: React.FC = () => {
   //   });
   // }, [length, navigation]);
 
-  if (isError || (isFirstLoad && !isLoading)) {
+  if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
 
@@ -166,7 +166,7 @@ const CreatePoScreen: React.FC = () => {
           <View style={[styles.headerContainer, { marginTop: top }]}>
             <View style={styles.headerLeft}>
               <AppBlockButton onPress={goToAccount}>
-                <FastImage source={{ uri: infoUser?.signature }} style={styles.avatar} />
+                <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
               </AppBlockButton>
 
               <View style={styles.greetingContainer}>
@@ -229,7 +229,7 @@ const CreatePoScreen: React.FC = () => {
             ref={flashListRef}
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.id.toString()}
             // onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
@@ -254,7 +254,7 @@ const CreatePoScreen: React.FC = () => {
       </View>
       {length > 0 && (
         <View style={styles.buttonCreate}>
-          <AppButton style={{ backgroundColor: Colors.PRIMARY }}>
+          <AppButton onPress={onCreatePo} style={{ backgroundColor: Colors.PRIMARY }}>
             <AppText weight="bold" color={Colors.WHITE}>
               {t('myTabs.tab3')}
             </AppText>

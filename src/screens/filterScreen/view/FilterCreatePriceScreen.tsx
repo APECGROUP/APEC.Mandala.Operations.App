@@ -56,7 +56,6 @@ const FilterCreatePriceScreen = ({
       ncc, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [ncc]);
-  console.log('filter', initialFilters);
   const onPressNameItem = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickItemScreen', {

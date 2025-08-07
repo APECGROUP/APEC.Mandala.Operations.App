@@ -2,7 +2,13 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { IApprove, IApproveFilters, fetchApprove } from '../modal/ApproveModal';
+import {
+  IApprove,
+  IApproveFilters,
+  checkApprovePrNoChange,
+  checkRejectPr,
+  fetchApprove,
+} from '../modal/ApproveModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
@@ -31,10 +37,10 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
   const [effectiveFilters, setEffectiveFilters] = useState<IApproveFilters>(initialFilters);
   const [currentUiFilters, setCurrentUiFilters] = useState<IApproveFilters>(initialFilters);
 
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isLoadingConfirm, setIsLoadingConfirm] = useState(false);
-  const [textReason, setTextReason] = useState('');
-  const isDisableButtonReject = useMemo(() => textReason.trim() === '', [textReason]);
+  const [textReason, setTextReason] = useState<string>();
+  const isDisableButtonReject = useMemo(() => textReason?.trim() === '', [textReason]);
   const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
     typeof debounce<typeof setEffectiveFilters>
   > | null>(null);
@@ -57,11 +63,11 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     () => [
       'listApprove',
       effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-      effectiveFilters.fromDate?.toISOString() || '',
-      effectiveFilters.toDate?.toISOString() || '',
+      effectiveFilters.prDate?.toISOString() || '',
+      effectiveFilters.expectedDate?.toISOString() || '',
       effectiveFilters.department?.id || '',
       effectiveFilters.requester?.id || '',
-      effectiveFilters.location?.id || '',
+      effectiveFilters.store?.id || '',
     ],
     [effectiveFilters],
   );
@@ -118,28 +124,20 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
   const { showAlert } = useAlert();
   const onDelete = useCallback(
     async (id: string, onSuccess?: (deletedId: string) => void) => {
-      const currentQueryKey = [
-        'listApprove',
-        effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-        effectiveFilters.fromDate?.toISOString() || '',
-        effectiveFilters.toDate?.toISOString() || '',
-        effectiveFilters.department?.id || '',
-        effectiveFilters.requester?.id || '',
-        effectiveFilters.location?.id || '',
-      ];
-
-      const cached = queryClient.getQueryData<InfiniteData<IApprove[]>>(currentQueryKey);
+      const cached = queryClient.getQueryData<InfiniteData<IApprove[]>>(queryKey);
       if (!cached) {
-        console.warn('🟥 No cache found for key:', currentQueryKey);
+        console.warn('🟥 No cache found for key:', queryKey);
         return false;
       }
 
       try {
         if (Number(id) % 5 !== 0) {
           console.log('✅ Deleting item successfully...');
-          queryClient.setQueryData(currentQueryKey, {
+          queryClient.setQueryData(queryKey, {
             ...cached,
-            pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
+            pages: cached.pages.map(
+              page => page.filter(item => Number(item.id) !== Number(id)) || [],
+            ),
           });
 
           onSuccess?.(id);
@@ -159,7 +157,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
         return false;
       }
     },
-    [queryClient, effectiveFilters, showAlert, t],
+    [queryClient, queryKey, showAlert, t],
   );
 
   const handleDelete = useCallback(
@@ -185,26 +183,22 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
   );
 
   const onApproved = useCallback(
-    async (ids: string[]) => {
+    async (ids: number[]) => {
       // Xoá các item có id nằm trong danh sách ids khỏi cache
-      const currentQueryKey = [
-        'listApprove',
-        effectiveFilters.prNo?.trim() || '',
-        effectiveFilters.fromDate?.toISOString() || '',
-        effectiveFilters.toDate?.toISOString() || '',
-        effectiveFilters.department?.id || '',
-        effectiveFilters.requester?.id || '',
-        effectiveFilters.location?.id || '',
-      ];
-      const cached = queryClient.getQueryData(currentQueryKey);
+
+      const cached = queryClient.getQueryData(queryKey);
       console.log('cached:', cached);
-      if (cached && cached.pages) {
+      if (cached && cached?.pages) {
         console.log('bấm on approved');
         // Loại bỏ các item có id nằm trong ids khỏi từng page
         const newPages = cached.pages.map((page: IApprove[]) =>
           page.filter(item => !ids.includes(item.id)),
         );
-        queryClient.setQueryData(currentQueryKey, {
+        const { isSuccess, message } = await checkApprovePrNoChange(ids[0]);
+        if (!isSuccess) {
+          return showToast(message || t('createPrice.approvedFail'), 'error');
+        }
+        queryClient.setQueryData(queryKey, {
           ...cached,
           pages: newPages,
         });
@@ -212,7 +206,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
       }
       showToast(t('createPrice.approvedSuccess'), 'success');
     },
-    [queryClient, effectiveFilters, t, showToast],
+    [queryClient, queryKey, showToast, t],
   );
 
   const onRejectSuccess = () => {
@@ -231,29 +225,26 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
       />,
     );
   };
-
+  console.log(' 111111: ', textReason);
   const onReject = useCallback(
-    async (ids: string[], func?: () => void) => {
+    async (ids: number[], func?: () => void) => {
       setIsLoadingConfirm(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const currentQueryKey = [
-        'listApprove',
-        effectiveFilters.prNo?.trim() || '',
-        effectiveFilters.fromDate?.toISOString() || '',
-        effectiveFilters.toDate?.toISOString() || '',
-        effectiveFilters.department?.id || '',
-        effectiveFilters.requester?.id || '',
-        effectiveFilters.location?.id || '',
-      ];
-      const cached = queryClient.getQueryData(currentQueryKey);
-      console.log('bấm reject');
+      const cached = queryClient.getQueryData(queryKey);
+      console.log('bấm reject', textReason);
       if (cached && cached.pages) {
         // Loại bỏ các item có id nằm trong ids khỏi từng page
         console.log('có cache reject:', cached);
         const newPages = cached.pages.map((page: IApprove[]) =>
           page.filter(item => !ids.includes(item.id)),
         );
-        queryClient.setQueryData(currentQueryKey, {
+        console.log('textReason bên ngoài: ', textReason);
+        const { isSuccess, message } = await checkRejectPr(ids[0], textReason || '');
+        console.log('thất bại: ', !isSuccess, textReason);
+        if (!isSuccess) {
+          setIsLoadingConfirm(false);
+          return showToast(message || t('createPrice.rejectFail'), 'error');
+        }
+        queryClient.setQueryData(queryKey, {
           ...cached,
           pages: newPages,
         });
@@ -266,25 +257,26 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
         onRejectSuccess();
       }
       showToast(t('createPrice.rejectSuccess'), 'success');
-      console.log('text: ', textReason);
       // Xoá các item có id nằm trong danh sách ids khỏi cache
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       effectiveFilters.prNo,
-      effectiveFilters.fromDate,
-      effectiveFilters.toDate,
+      effectiveFilters.prDate,
+      effectiveFilters.expectedDate,
       effectiveFilters.department?.id,
       effectiveFilters.requester?.id,
-      effectiveFilters.location?.id,
+      effectiveFilters.store?.id,
       queryClient,
       showToast,
       t,
       textReason,
     ],
   );
+  const length = useMemo(() => flatData.length, [flatData]);
 
   return {
+    length,
     onReject,
     selectedIds,
     setSelectedIds,

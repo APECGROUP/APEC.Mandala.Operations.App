@@ -161,7 +161,6 @@ export const fetchCreatePrice = async (
     if (filters?.prNo?.trim().toLowerCase() === 'empty') {
       return [];
     }
-    console.log('alo:', requestParams);
     // Thực hiện cuộc gọi API bằng Axios
     const { data } = await axios.get(apiUrl, { params: requestParams });
 

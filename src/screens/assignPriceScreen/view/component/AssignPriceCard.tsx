@@ -10,11 +10,13 @@ import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
-import { DataAssignPrice } from '../../modal/AssignPriceModal';
+import { IItemAssignPrice } from '../../modal/AssignPriceModal';
 import moment from 'moment';
+import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import Utilities from '@/utils/Utilities';
 
 interface AssignPriceCardProps {
-  item: DataAssignPrice;
+  item: IItemAssignPrice;
   index: number;
 }
 
@@ -28,14 +30,14 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
   const handleDetailPress = useCallback(() => {
     navigate('DetailAssignPriceCardScreen', { item });
   }, [item]);
-
+  const textTag = Utilities.getStatusName(item.status);
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={styles.card}>
       <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
       <View style={styles.itemInfo}>
         <View style={styles.itemInfoRow}>
           <AppText numberOfLines={1} style={styles.prCodeText}>
-            {item.content}
+            {item.prNo}
           </AppText>
           {/* <View style={styles.noteBadge}>
            <AppText style={styles.noteBadgeText}>{t('Ghi chú')}</AppText>
@@ -46,12 +48,12 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
           </AppBlockButton>
         </View>
         <AppText style={styles.dateText}>
-          {moment(item.createdAt).format('DD/MM/YYYY')} -{' '}
-          {moment(item.estimateDate).format('DD/MM/YYYY')}
+          {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
+          {moment(item.expectedDate).format('DD/MM/YYYY')}
         </AppText>
         <View style={styles.blockWaiting}>
           <AppText size={12} color={'#FF7009'} weight="500">
-            {t('notifications.status.waitingAssignPrice')}
+            {textTag}
           </AppText>
         </View>
       </View>

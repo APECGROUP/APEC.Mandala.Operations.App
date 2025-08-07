@@ -2,11 +2,17 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { TypeCreatePo, fetchCreatePo, CreatePoFilters } from '../modal/CreatePoModal';
+import {
+  IItemCreatePo,
+  fetchListCreatePo,
+  CreatePoFilters,
+  fetchCreatePo,
+} from '../modal/CreatePoModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
+import { TYPE_TOAST } from '@/elements/toast/Message';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
@@ -19,8 +25,8 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
   const [effectiveFilters, setEffectiveFilters] = useState<CreatePoFilters>(initialFilters);
   const [currentUiFilters, setCurrentUiFilters] = useState<CreatePoFilters>(initialFilters);
 
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [isLoadingCreatePo, setIsLoadingCreatePo] = useState(false);
   const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
     typeof debounce<typeof setEffectiveFilters>
   > | null>(null);
@@ -43,8 +49,8 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     () => [
       'listCreatePo',
       effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-      effectiveFilters.fromDate?.toISOString() || '',
-      effectiveFilters.toDate?.toISOString() || '',
+      effectiveFilters.prDate?.toISOString() || '',
+      effectiveFilters.expectedDate?.toISOString() || '',
       effectiveFilters.department?.id || '',
       effectiveFilters.requester?.id || '',
       effectiveFilters.product?.id || '',
@@ -65,11 +71,11 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     isRefetching,
     isError,
     error,
-  } = useInfiniteQuery<TypeCreatePo[], Error>({
+  } = useInfiniteQuery<IItemCreatePo[], Error>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: currentQueryKey,
     queryFn: async ({ pageParam = 1 }) =>
-      fetchCreatePo(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
+      fetchListCreatePo(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
@@ -105,8 +111,8 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
 
   const { showAlert } = useAlert();
   const onDelete = useCallback(
-    async (id: string, onSuccess?: (deletedId: string) => void) => {
-      const cached = queryClient.getQueryData<InfiniteData<TypeCreatePo[]>>(currentQueryKey);
+    async (id: number, onSuccess?: (deletedId: number) => void) => {
+      const cached = queryClient.getQueryData<InfiniteData<IItemCreatePo[]>>(currentQueryKey);
       if (!cached) {
         console.warn('🟥 No cache found for key:', currentQueryKey);
         return false;
@@ -173,7 +179,7 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     const cached = queryClient.getQueryData(currentQueryKey);
     if (cached && cached.pages) {
       // Loại bỏ các item có id nằm trong ids khỏi từng page
-      const newPages = cached.pages.map((page: TypeCreatePo[]) =>
+      const newPages = cached.pages.map((page: IItemCreatePo[]) =>
         page.filter(item => !selectedIds.includes(item.id)),
       );
       queryClient.setQueryData(currentQueryKey, {
@@ -189,7 +195,7 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     const cached = queryClient.getQueryData(currentQueryKey);
     if (cached && cached.pages) {
       // Loại bỏ các item có id nằm trong ids khỏi từng page
-      const newPages = cached.pages.map((page: TypeCreatePo[]) =>
+      const newPages = cached.pages.map((page: IItemCreatePo[]) =>
         page.filter(item => !selectedIds.includes(item.id)),
       );
       queryClient.setQueryData(currentQueryKey, {
@@ -201,7 +207,7 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     showToast(t('CreatePo.rejectSuccess'), 'success');
   }, [queryClient, currentQueryKey, showToast, t, selectedIds]);
   const toggleSelectAll = useCallback(() => {
-    const allIds = flatData.map(item => item.id);
+    const allIds = flatData.map(item => item?.id);
     if (selectedIds.length === flatData.length) {
       setSelectedIds([]); // Bỏ chọn tất cả
     } else {
@@ -210,7 +216,7 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
   }, [selectedIds.length, flatData, setSelectedIds]);
   const navigation = useNavigation();
   const handleSelect = useCallback(
-    (id: string) => {
+    (id: number) => {
       navigation.getParent()?.setOptions({
         tabBarStyle: { display: 'none' }, // hoặc undefined
       });
@@ -223,6 +229,34 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     () => selectedIds.length === flatData.length && flatData.length > 0,
     [selectedIds.length, flatData.length],
   );
+  const onCreatePo = useCallback(() => {
+    const cached = queryClient.getQueryData<InfiniteData<IItemCreatePo[]>>(currentQueryKey);
+    if (!cached) {
+      console.warn('🟥 No cache found for key:', currentQueryKey);
+      return false;
+    }
+    const prNo = cached.pages.find(page => page.length > 0)?.[0]?.prNo || '';
+    console.log('Creating PO with prNo:', prNo);
+    try {
+      setIsLoadingCreatePo(true);
+      const isSuccess = fetchCreatePo(prNo);
+      setIsLoadingCreatePo(false);
+      if (!isSuccess) {
+        throw new Error('Failed to create PO');
+      }
+      queryClient.setQueryData(currentQueryKey, {
+        ...cached,
+        pages: cached.pages.map(page => page.filter(item => item.id !== selectedIds[0]) || []),
+      });
+      setSelectedIds([]);
+
+      showToast(t('CreatePo.success'), TYPE_TOAST.ERROR);
+    } catch (error) {
+      showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
+    } finally {
+      setIsLoadingCreatePo(false);
+    }
+  }, [currentQueryKey, queryClient, selectedIds, showToast, t]);
   return {
     selectedIds,
     flatData,
@@ -246,5 +280,6 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     handleDelete,
     toggleSelectAll,
     handleSelect,
+    onCreatePo,
   };
 }

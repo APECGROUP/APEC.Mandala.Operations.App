@@ -42,8 +42,8 @@ const DetailApproveCardScreen = ({
 }: NativeStackScreenProps<MainParams, 'DetailApproveCardScreen'>) => {
   const { item } = route.params;
   const { t } = useTranslation();
-  const [dateCreate, setDateCreate] = useState<Date | undefined>(undefined);
-  const [dateEstimate, setDateEstimate] = useState<Date | undefined>(undefined);
+  const [dateCreate, setDateCreate] = useState<Date | undefined>(item.prDate);
+  const [dateEstimate, setDateEstimate] = useState<Date | undefined>(item.expectedDate);
   const { bottom } = useSafeAreaInsets();
   const [isCoppied, setIsCoppied] = useState(false);
 
@@ -68,7 +68,6 @@ const DetailApproveCardScreen = ({
       onSelectDate: setDateEstimate,
     });
   }, []);
-  console.log('item', item);
   const formatDate = useCallback((date: Date | undefined) => moment(date).format('DD/MM/YYYY'), []);
 
   return (
@@ -88,25 +87,25 @@ const DetailApproveCardScreen = ({
           onPress={onPressDateCreate}
           label={t('orderInfo.createDate')}
           value={formatDate(dateCreate)}
-          icon={<IconCalendar fill={Colors.TEXT_SECONDARY} />}
+          icon={<IconCalendar />}
         />
         <RowItem
           onPress={onPressDateEstimate}
           label={t('orderInfo.estimateDate')}
           value={formatDate(dateEstimate)}
-          icon={<IconCalendar fill={Colors.TEXT_SECONDARY} />}
+          icon={<IconCalendar />}
         />
-        <RowItem label={t('orderInfo.department')} value={item.department?.name || ''} />
-        <RowItem label={t('orderInfo.location')} value={item.location?.name || ''} />
+        <RowItem label={t('orderInfo.department')} value={item?.departmentName || ''} />
+        <RowItem label={t('orderInfo.location')} value={item?.storedName || ''} />
         <RowItem
           label={t('orderInfo.requester')}
-          value={item.requester?.name || ''}
+          value={item.requestBy || ''}
           icon={<IconName />}
         />
         <RowItem label={t('orderInfo.note')} />
         <View style={styles.noteContainer}>
           <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
-            {item.note}
+            {item.description}
           </AppText>
         </View>
       </View>

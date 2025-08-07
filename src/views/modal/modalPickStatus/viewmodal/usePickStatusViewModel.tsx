@@ -35,7 +35,6 @@ export function usePickStatusViewModel() {
 
   // Gộp data các page lại thành 1 mảng
   const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
-  // console.log('render useAssignPriceViewModel');
   // Debounce search
   const debouncedSearch = useMemo(
     () =>
@@ -48,7 +47,6 @@ export function usePickStatusViewModel() {
 
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
-    console.log('onRefresh');
     if (isFetching || isRefetching || isLoading) {
       return;
     }
@@ -57,7 +55,6 @@ export function usePickStatusViewModel() {
 
   // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
-    console.log('loadMore');
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();
     }

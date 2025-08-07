@@ -15,66 +15,29 @@ import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
 import { TYPE_TOAST } from '@/elements/toast/Message';
 import { goBack, navigate } from '@/navigation/RootNavigation';
+import { useInformationItemsViewModel } from '../viewmodal/useInformationItemsViewModel';
+import { useAssignPriceViewModel } from '@/screens/assignPriceScreen/viewmodal/useAssignPriceViewModel';
 
-const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) => {
+const FooterInformationItem = ({
+  onAutoAssign,
+  id,
+  prNo,
+}: {
+  id: number;
+  prNo: string;
+  onAutoAssign: () => void;
+}) => {
   const { t } = useTranslation();
   const [isLoadingReject, setIsLoadingReject] = useState(false);
-  const [isLoadingAssign, setIsLoadingAssign] = useState(false);
   const { bottom } = useSafeAreaInsets();
   const { showAlert, showToast } = useAlert();
-
-  const onRejectSuccess = () => {
-    showAlert(
-      t('informationItem.rejectSuccess'),
-      '',
-      [
-        {
-          text: t('Trở về'),
-          onPress: goBack,
-        },
-      ],
-      <FastImage
-        source={Images.ModalApprovedError}
-        style={{ width: s(285), aspectRatio: 285 / 187 }}
-      />,
-    );
-  };
-
+  const { onSaveDraft, onAssign, isLoadingAssign } = useInformationItemsViewModel(id, prNo);
+  const { onRefresh } = useAssignPriceViewModel();
   const onReject = async () => {
     setIsLoadingReject(true);
     await new Promise(resolve => setTimeout(resolve, 300));
-    navigate('ModalInputRejectAssign', { id: '123', onRejectSuccess: onRejectSuccess });
+    navigate('ModalInputRejectAssign', { id, prNo });
     setIsLoadingReject(false);
-  };
-  const onAssign = async () => {
-    setIsLoadingAssign(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
-    setIsLoadingAssign(false);
-    showAlert(
-      t('informationItem.assignSuccess'),
-      '',
-      [
-        {
-          text: t('Trở về'),
-          onPress: () => {
-            goBack();
-          },
-        },
-      ],
-      <FastImage
-        source={Images.ModalApprovedSuccess}
-        style={{ width: s(285), aspectRatio: 285 / 187 }}
-      />,
-      // <ConfettiAnimation
-      //   autoPlay={true}
-      //   loop={false}
-      //   style={{
-      //     position: 'absolute',
-      //     top: 0,
-      //     left: 0,
-      //   }}
-      // />,
-    );
   };
 
   const onPressAutoAssign = () => {
@@ -82,8 +45,12 @@ const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) =
     onAutoAssign();
   };
 
-  const onSave = () => {
-    showToast(t('informationItem.saveDraftSuccess'), TYPE_TOAST.SUCCESS);
+  // const onPressSaveDraft = () => {
+  //   showToast(t('informationItem.saveDraftSuccess'), TYPE_TOAST.SUCCESS);
+
+  // };
+  const handleAssign = () => {
+    onAssign(onRefresh);
   };
   return (
     <View style={[styles.bottomContainer, { paddingBlock: bottom }]}>
@@ -95,7 +62,7 @@ const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) =
           </AppText>
         </AppBlockButton>
         <View style={styles.footerDivider} />
-        <AppBlockButton onPress={onSave} style={styles.footerButton}>
+        <AppBlockButton onPress={onSaveDraft} style={styles.footerButton}>
           <IconSaveTmp />
           <AppText size={14} weight="700" color={Colors.BLACK_900} mt={4}>
             {t('informationItem.saveDraft')}
@@ -117,7 +84,7 @@ const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) =
         <View style={styles.blockButton}>
           <AppButton
             width={s(162)}
-            onPress={onAssign}
+            onPress={handleAssign}
             processing={isLoadingAssign}
             style={styles.buttonAssign}>
             <AppText size={14} weight="700" color={Colors.WHITE}>

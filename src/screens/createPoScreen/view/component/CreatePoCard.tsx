@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, memo } from 'react';
 import { View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
-import { TypeCreatePo } from '../../modal/CreatePoModal';
+import { IItemCreatePo } from '../../modal/CreatePoModal';
 import { getFontSize } from '@/constants';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { AppText } from '@/elements/text/AppText';
@@ -11,9 +11,10 @@ import { Colors } from '@/theme/Config';
 import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
+import moment from 'moment';
 
 interface CreatePoCardProps {
-  item: TypeCreatePo;
+  item: IItemCreatePo;
   isSelected: boolean;
   handleSelect: (id: string) => void;
 }
@@ -33,13 +34,12 @@ const CreatePoCard = memo<CreatePoCardProps>(({ item, isSelected, handleSelect }
     () => [
       {
         label: t('CreatePo.requester'),
-        value: item.requester?.name,
+        value: item.requestBy,
       },
-      { label: t('CreatePo.department'), value: item.department?.name },
+      { label: t('CreatePo.department'), value: item.departmentName },
     ],
-    [t, item.requester?.name, item.department?.name],
+    [t, item.requestBy, item.departmentName],
   );
-  console.log('item: ', item);
   return (
     <View style={[styles.itemContainer, styles.itemExpanded]}>
       <View style={styles.headerItem}>
@@ -55,10 +55,13 @@ const CreatePoCard = memo<CreatePoCardProps>(({ item, isSelected, handleSelect }
             <FastImage source={Images.IconCreatePo} style={styles.iconWrapper} />
             <View style={styles.nameWrapper}>
               <AppText numberOfLines={1} style={styles.name}>
-                {item.name}
+                {item.prNo}
               </AppText>
               <View style={styles.row}>
-                <AppText style={styles.titlePrice}>{item.time} </AppText>
+                <AppText style={styles.titlePrice}>
+                  {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
+                  {moment(item.expectedDate).format('DD/MM/YYYY')}
+                </AppText>
               </View>
             </View>
           </View>

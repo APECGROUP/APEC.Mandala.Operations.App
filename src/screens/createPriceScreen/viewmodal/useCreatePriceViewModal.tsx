@@ -80,12 +80,10 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
   const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
 
   const onRefresh = useCallback(() => {
-    console.log('onRefresh called from ViewModel. Forcing refetch.');
     refetch();
   }, [refetch]);
 
   const onLoadMore = useCallback(() => {
-    console.log('onLoadMore called.');
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
@@ -142,14 +140,11 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
 
   const handleDelete = useCallback(
     (id: string, onSuccess?: (deletedId: string) => void, onCancel?: () => void) => {
-      console.log('handleDelete called with onCancel:', !!onCancel);
       showAlert(t('createPrice.remove.title'), '', [
         {
           text: t('createPrice.remove.cancel'),
           style: 'cancel',
           onPress: () => {
-            console.log('Cancel button pressed, onCancel exists:', !!onCancel);
-            console.log('onCancel type:', typeof onCancel);
             onCancel?.();
           },
         },

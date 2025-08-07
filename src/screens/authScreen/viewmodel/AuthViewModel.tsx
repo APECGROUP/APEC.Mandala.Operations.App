@@ -130,6 +130,7 @@ export const useAuthViewModel = () => {
       };
       const response = await api.post<IResponseAPILogin>(ENDPOINT.LOGIN, params, {
         headers: { hotelCode: loginFormRef.current.hotel?.code },
+        noAuth: true,
       });
 
       if (response.status === 200 && response.data.isSuccess) {
@@ -141,7 +142,7 @@ export const useAuthViewModel = () => {
           );
         }
         saveInfoUser(response.data.data.user);
-        DataLocal.saveAll(response.data);
+        DataLocal.saveAll(response.data, loginFormRef.current.hotel?.code!);
         await fetchStatusGlobal();
         setIsLogin(true);
       } else {
@@ -164,6 +165,7 @@ export const useAuthViewModel = () => {
       };
       const response = await api.post(ENDPOINT.FORGOT_PASSWORD, params, {
         headers: { hotelCode: hotel?.code },
+        noAuth: true,
       });
       if (response.status !== 200 || !response.data.isSuccess) {
         throw new Error('Forgot password failed');

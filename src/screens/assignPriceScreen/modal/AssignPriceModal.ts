@@ -1,157 +1,230 @@
-import { fakeDataHotel, fakeNote, mockDepartments, mockRequesters } from '@/data/DataFake';
+import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
+import { ENDPOINT } from '@/utils/Constans';
+import api from '@/utils/setup-axios';
+import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
-import axios from 'axios';
-
-// --- (Các interfaces không thay đổi) ---
-export interface SelectedOption {
-  id: string;
-  name: string;
-}
+import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 export interface AssignPriceFilters {
   prNo?: string;
-  fromDate?: Date;
-  toDate?: Date;
-  department?: SelectedOption;
-  requester?: SelectedOption;
-  product?: SelectedOption;
+  prDate?: Date;
+  expectedDate?: Date;
+  department?: IPickDepartment | undefined;
+  requester?: IPickRequester | undefined;
+  product?: any;
   ncc?: IItemSupplier;
-  status?: SelectedOption;
+  status?: IStausGlobal | undefined;
 }
 
-export interface DataAssignPrice {
-  id: string;
+export interface IResponseListAssignPrice {
+  data: IItemAssignPrice[];
+  pagination: Pagination;
+  isSuccess: boolean;
+  errors: null;
+}
+
+export interface IItemAssignPrice {
   prNo: string;
-  content: string;
-  images: string[];
-  videos: string[];
-  time: string;
-  user: {
-    name: string;
-    avatar: string;
-  };
-  department: { id: string; name: string };
-  requester: { id: string; name: string };
-  createdAt: string;
-  location: { id: string; name: string };
-  estimateDate: string;
+  prDate: Date;
+  expectedDate: Date;
+  requestBy: string;
+  departmentCode: string;
+  departmentName: string;
+  departmentShortName: string;
+  storeCode: string;
+  storedName: string;
+  approveBy: null;
+  approveLevel: null;
+  approveDate: null;
+  approveRemark: null;
+  cancelBy: null;
+  cancelDate: null;
+  cancelReason: null;
+  notAllowBy: null;
+  notAllowDate: null;
+  notAllowReason: null;
+  marketListId: null;
+  description: string;
+  status: string;
+  poNo: null;
+  requestDate: Date;
+  id: number;
+  createdBy: string;
+  createdDate: Date;
+  deletedDate: null;
+  deletedBy: null;
+  deleted: string;
 }
 
-/**
- * Hàm giả lập để tạo dữ liệu DataAssignPrice.
- * Logic tạo dữ liệu ngẫu nhiên được tách ra để dễ quản lý.
- */
-function generateMockAssignPriceData(
-  item: any,
-  prNo?: string,
-  fromDate?: Date,
-  toDate?: Date,
-  department?: SelectedOption,
-  requester?: SelectedOption,
-): DataAssignPrice {
-  const numberOfImages = Math.floor(Math.random() * 10) + 1;
-  const imageUrls = Array.from(
-    { length: numberOfImages },
-    (_, i) => `https://picsum.photos/id/${item.id + i}/300/300`,
-  );
+export interface Pagination {
+  pageCurrent: number;
+  pageCount: number;
+  pageSize: number;
+  rowCount: number;
+  firstRowOnPage: number;
+  lastRowOnPage: number;
+}
+export type PaginationParams = {
+  pageIndex: number; // trang hiện tại
+  pageSize: number; // số lượng giá trị ở trang hiện tại
+  isAll: boolean; // có muốn search tất cả hay không
+};
 
-  let content = `PR20240624#${String(Math.floor(Math.random() * 10000) + 1).padStart(4, '0')}`;
-  if (prNo) {
-    content = `${content} - ${prNo}`; // Thêm prNo để có thể test filter
+export type Filter = {
+  propertyValue: string | number | boolean;
+  propertyName: string;
+  propertyType?: 'string' | 'number' | 'boolean' | 'datetime';
+  operator?:
+    | '=='
+    | '!='
+    | '>'
+    | '>='
+    | '<'
+    | '<='
+    | 'Contains'
+    | 'In'
+    | 'NotIn'
+    | 'StartsWith'
+    | 'EndsWith'
+    | 'Like';
+};
+
+export type FilterGroup = {
+  condition: 'And' | 'Or'; // kiểu so sánh giữa các filter
+  filters: Filter[]; // danh sách các điều kiện tìm kiếm
+};
+
+export type FilterRequest = {
+  sort?: string; // sắp xếp theo trường nào
+  textSearch?: string; // tìm kiếm toàn văn
+  filterGroup?: FilterGroup[]; // nhóm điều kiện chính
+  moreFilterGroup?: FilterGroup[]; // thêm nhiều nhóm điều kiện khác nếu có
+};
+
+export type IParams = {
+  pagination: PaginationParams;
+  filter: FilterRequest;
+};
+
+export const fetchAutoAssign = async (id: number) => {
+  try {
+    const response = await api.post(`${ENDPOINT.AUTO_ASSIGN_PRICE}/${id}`, []);
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' }; // Trả về dữ liệu đã phê duyệt
+    } else {
+      console.log('22', response.data.errors[0].message);
+      return { isSuccess: false, message: response.data.errors[0].message }; // Trả về dữ liệu đã phê duyệt
+    }
+  } catch (error) {
+    console.log('33');
+    return {
+      isSuccess: false,
+      message: 'chạy vào catch rồi ',
+    };
   }
+};
 
-  const createdAt = fromDate ? fromDate : new Date();
-  const estimateDate = toDate ? toDate : new Date();
-
-  const randomDepartment = department
-    ? department
-    : mockDepartments[Math.floor(Math.random() * mockDepartments.length)];
-  const randomRequester = requester
-    ? requester
-    : mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
-
-  return {
-    id: item.id,
-    content,
-    prNo: content,
-    images: imageUrls,
-    videos: [],
-    time: '28/05/2025 - 30/05/2025',
-    user: {
-      name: item.author,
-      avatar: `https://picsum.photos/id/${item.id}/100/100`,
-    },
-    note: fakeNote[Math.floor(Math.random() * fakeNote.length)],
-    department: randomDepartment,
-    requester: randomRequester,
-
-    location: fakeDataHotel[Math.floor(Math.random() * fakeDataHotel.length)],
-    createdAt: createdAt, // Giả định ngày tạo cố định
-    estimateDate: estimateDate, // Giả định ngày ước tính cố định
-  };
-}
-
-/**
- * Lấy danh sách DataAssignPrice từ API (giả lập).
- * Đây là hàm chính bạn sẽ thay thế bằng cuộc gọi API thật của mình.
- *
- * @param page Số trang cần lấy.
- * @param limit Số lượng item trên mỗi trang.
- * @param filters Đối tượng chứa tất cả các điều kiện lọc.
- * @returns Promise chứa mảng DataAssignPrice.
- */
 export const fetchAssignPriceData = async (
   page: number,
   limit: number = 50,
-  filters: AssignPriceFilters, // Nhận toàn bộ object filters
-): Promise<DataAssignPrice[]> => {
+  filters: AssignPriceFilters,
+): Promise<IItemSupplier> => {
   try {
-    const apiUrl = `https://picsum.photos/v2/list`;
-    console.log('goij api fet: ', filters);
-    const requestParams: any = {
-      page: page.toString(),
-      limit: limit.toString(),
-    };
-    if (filters?.prNo?.trim().toLowerCase() === 'empty') {
-      return [];
+    const filterList: Filter[] = [];
+
+    if (filters.prDate) {
+      filterList.push({
+        propertyName: 'prDate',
+        propertyValue: filters.prDate.toISOString(),
+        propertyType: 'datetime',
+        operator: '==',
+      });
     }
-    // --- ĐẦU CHỜ CHO CÁC THAM SỐ LỌC THẬT TẾ ---
-    // KHI BẠN CÓ API THẬT HỖ TRỢ LỌC, HÃY UNCOMMENT CÁC DÒNG DƯỚI ĐÂY
-    // VÀ ĐẢM BẢO TÊN THAM SỐ TRÙNG KHỚP VỚI API CỦA BẠN.
-    // Ví dụ: requestParams.pr_number = filters.prNo;
 
-    // if (filters.prNo) {
-    //   requestParams.prNo = filters.prNo;
-    // }
-    // if (filters.fromDate) {
-    //   requestParams.fromDate = filters.fromDate.toISOString();
-    // }
-    // if (filters.toDate) {
-    //   requestParams.toDate = filters.toDate.toISOString();
-    // }
-    // if (filters.department?.id) {
-    //   requestParams.departmentId = filters.department.id;
-    // }
-    // if (filters.requester?.id) {
-    //   requestParams.requesterId = filters.requester.id;
-    // }
+    if (filters.expectedDate) {
+      filterList.push({
+        propertyName: 'expectedDate',
+        propertyValue: filters.expectedDate.toISOString(),
+        propertyType: 'datetime',
+        operator: '==',
+      });
+    }
 
-    const { data } = await axios.get(apiUrl, { params: requestParams });
+    if (filters.department?.departmentCode) {
+      filterList.push({
+        propertyName: 'departmentCode',
+        propertyValue: filters.department.departmentCode,
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
 
-    let processedData: DataAssignPrice[] = data.map((item: any) =>
-      generateMockAssignPriceData(
-        item,
-        filters.prNo,
-        filters.fromDate,
-        filters.toDate,
-        filters.department,
-        filters.requester,
-      ),
-    );
+    if (filters.requester?.id) {
+      filterList.push({
+        propertyName: 'requestBy',
+        propertyValue: filters.requester.username,
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
 
-    return processedData;
+    const params: IParams = {
+      pagination: {
+        pageIndex: page,
+        pageSize: limit,
+        isAll: false,
+      },
+      filter: {
+        textSearch: filters?.prNo?.trim(),
+        ...(filterList.length > 0 && {
+          filterGroup: [
+            {
+              condition: 'And',
+              filters: filterList,
+            },
+          ],
+        }),
+      },
+    };
+
+    const response = await api.post<IItemAssignPrice, any>(ENDPOINT.GET_LIST_ASSIGN_PRICE, params);
+    if (response.status !== 200 || !response.data.isSuccess) {
+      throw new Error('Failed to fetch data');
+    }
+    return response.data.data;
   } catch (error) {
-    console.error('Lỗi khi lấy dữ liệu Assign Price:', error);
-    throw error; // Ném lỗi để TanStack Query có thể bắt và xử lý
+    throw error;
+  }
+};
+
+export const checkRejectPrAssign = async (id: number, textReason: string) => {
+  try {
+    // const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR}/${id}`, { textReason });
+    const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR_ASSIGN}/${id}`, textReason, {
+      rawStringBody: true,
+    });
+
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' }; // Trả về dữ liệu đã phê duyệt
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: '' }; // Trả về false nếu có lỗi xảy ra
+  }
+};
+export const checkAssignPr = async (id: number, data: IItemInDetailPr[] | []) => {
+  try {
+    // const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR}/${id}`, { textReason });
+    const response = await api.post(`${ENDPOINT.HANDLE_ASSIGN_PR}/${id}`, data);
+
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' }; // Trả về dữ liệu đã phê duyệt
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: '' }; // Trả về false nếu có lỗi xảy ra
   }
 };

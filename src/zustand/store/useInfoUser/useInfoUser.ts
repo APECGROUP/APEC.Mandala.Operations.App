@@ -19,7 +19,7 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
   infoUser: undefined,
 
   saveInfoUser: (val: IUser) => {
-    console.log('saveInfoUser', val);
+    // console.log('saveInfoUser', val);
     // TODO:bỏ check điều kiện đi
     // if (val.userName) {
     set({ infoUser: val });
@@ -41,18 +41,14 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
         avatar: newAvatar,
       },
     };
-    console.log('xử lý update', updatedUser);
     set({ infoUser: updatedUser });
     try {
       storage.set(USER_KEY, JSON.stringify(updatedUser));
-    } catch (error) {
-      console.log('Lỗi khi lưu avatar bằng MMKV:', error);
-    }
+    } catch (error) {}
   },
 
   fetData: async () => {
     try {
-      console.log('fetData');
       const response = await api.get('user/profile');
       if (response.status === 200 && response.data.status === 0) {
         const userData: TypeUser = response.data.data;
@@ -64,7 +60,6 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
         throw new Error('API trả về lỗi');
       }
     } catch (error) {
-      console.log('Lỗi fetData user:', error);
       Toast.show({
         type: 'error',
         text2: t(LanguageType.errorTryAgain),

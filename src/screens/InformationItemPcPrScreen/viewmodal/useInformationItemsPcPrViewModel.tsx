@@ -50,7 +50,7 @@ export function useInformationItemsPcPrViewModel(id: string) {
   const [textReason, setTextReason] = useState('');
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
-    console.log('onRefresh');
+    // console.log('onRefresh');
     if (isFetching || isRefetching || isLoading) {
       return;
     }
@@ -59,7 +59,7 @@ export function useInformationItemsPcPrViewModel(id: string) {
   const isDisableButtonReject = useMemo(() => textReason.trim(), [textReason]);
   // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
-    console.log('loadMore');
+    // console.log('loadMore');
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();
     }
@@ -73,7 +73,7 @@ export function useInformationItemsPcPrViewModel(id: string) {
       return;
     }
 
-    console.log('✅ Updating price...');
+    // console.log('✅ Updating price...');
     queryClient.setQueryData(key, {
       ...cached,
       pages: cached.pages.map(page =>
@@ -123,7 +123,6 @@ export function useInformationItemsPcPrViewModel(id: string) {
       try {
         setIsLoadingConfirm(true);
         await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log('text: ', textReason);
         setIsLoadingConfirm(false);
 
         if (func) {

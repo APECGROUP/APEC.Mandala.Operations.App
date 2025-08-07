@@ -8,13 +8,13 @@ import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
-import { DataPcPr } from '../../modal/PcPrModal';
+import { IItemPcPr } from '../../modal/PcPrModal';
 import moment from 'moment';
 import IconListPen from '@assets/icon/IconListPen';
 import { Colors } from '@/theme/Config';
 
 interface PcPrCardProps {
-  item: DataPcPr;
+  item: IItemPcPr;
   index: number;
 }
 
@@ -38,7 +38,7 @@ const PcPrCard = memo<PcPrCardProps>(({ item }) => {
       <View style={styles.itemInfo}>
         <View style={styles.itemInfoRow}>
           <AppText numberOfLines={1} style={styles.prCodeText}>
-            {item.content}
+            {item.prNo}
           </AppText>
           {/* <View style={styles.noteBadge}>
            <AppText style={styles.noteBadgeText}>{t('Ghi chú')}</AppText>
@@ -49,8 +49,8 @@ const PcPrCard = memo<PcPrCardProps>(({ item }) => {
           </AppBlockButton>
         </View>
         <AppText style={styles.dateText}>
-          {moment(item.createdAt).format('DD/MM/YYYY')} -{' '}
-          {moment(item.estimateDate).format('DD/MM/YYYY')}
+          {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
+          {moment(item.expectedDate).format('DD/MM/YYYY')}
         </AppText>
         <View style={styles.blockWaiting}>
           <AppText size={12} color={'#FF7009'} weight="500">

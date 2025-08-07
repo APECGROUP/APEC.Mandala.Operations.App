@@ -79,7 +79,6 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
       handleDelete={() => handleDelete(item.id)}
     />
   );
-  console.log('renderItem', flatData);
   // ─── Component khi list trống **và** đang không load trang >0 ─────────────
   const listEmptyComponent = () => {
     if (isLoading) {
@@ -124,7 +123,6 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
     }
     return null;
   }, [isFetchingNextPage]);
-  console.log('error:', isError, flatData);
   if (isError) {
     return <FallbackComponent resetError={onRefresh} />;
   }

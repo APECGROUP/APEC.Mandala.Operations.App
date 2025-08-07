@@ -45,6 +45,7 @@
       "assign": "Gán giá",
       "rejectSuccess": "Từ chối thành công",
       "assignSuccess": "Gán giá thành công",
+      "autoAssignError": "Tự động gán giá thất bại",
       "saveDraftSuccess": "Lưu nháp thành công",
       "autoAssignSuccess": "Tự động gán giá thành công",
       "unit": "Đơn vị"
@@ -209,6 +210,7 @@
       "saveInfoSuccess": "Lưu thông tin thành công"
     },
     "CreatePo": {
+      "success": "Tạo PO thành công",
       "title": "Xin chào",
       "requester": "Người yêu cầu",
       "department": "Bộ phận",

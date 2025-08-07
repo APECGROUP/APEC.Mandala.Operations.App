@@ -2,18 +2,19 @@ import { Dispatch, SetStateAction } from 'react';
 import { ResponseImageElement } from '../interface/Verify.interface';
 import {
   AssignPriceFilters,
-  DataAssignPrice,
+  IItemAssignPrice,
   SelectedOption,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { IItemSupplier, ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
-import { TypeApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
+import { IApprove, TypeApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
 import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
-import { DataPcPr, PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';
+import { IItemPcPr, PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';
 import { IPickStatus } from '@/views/modal/modalPickStatus/modal/PickStatusModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 
 // ─────────────────────────────────────────────────────────────
 // Bottom Tab Navigation
@@ -61,14 +62,14 @@ export type MainParams = {
     currentFilters: AssignPriceFilters;
     onApplyFilters: (filters: AssignPriceFilters) => void;
   };
-  DetailAssignPriceCardScreen: { item: DataAssignPrice };
-  DetailPcPrCardScreen: { item: DataPcPr };
-  DetailApproveCardScreen: { item: TypeApprove };
-  InformationItemsScreen: { item: DataAssignPrice };
-  InformationItemsPcPrScreen: { item: DataAssignPrice };
+  DetailAssignPriceCardScreen: { item: IItemPcPr };
+  DetailPcPrCardScreen: { item: IItemPcPr };
+  DetailApproveCardScreen: { item: IApprove };
+  InformationItemsScreen: { item: IItemAssignPrice };
+  InformationItemsPcPrScreen: { item: IItemPcPr };
   MyTabs: undefined;
   NotificationScreen: undefined;
-  DetailOrderApproveScreen: { item: DataAssignPrice };
+  DetailOrderApproveScreen: { item: IItemAssignPrice };
 
   // Modals
   ModalPhotoOrCamera: {
@@ -106,8 +107,8 @@ export type MainParams = {
   };
 
   PickRequesterScreen: {
-    setRequester: Dispatch<SetStateAction<SelectedOption>>;
-    requester: SelectedOption;
+    setRequester: Dispatch<SetStateAction<IPickRequester | undefined>>;
+    requester: IPickRequester | undefined;
   };
   PickStatusScreen: {
     setStatus: Dispatch<SetStateAction<IStausGlobal | undefined>>;
@@ -118,10 +119,11 @@ export type MainParams = {
     location: IPickLocal | undefined;
   };
   ModalInputRejectAssign: {
-    id: string;
+    id: number;
+    prNo: string;
   };
   ModalInputRejectApprove: {
-    id: string;
+    id: string | number;
   };
 };
 

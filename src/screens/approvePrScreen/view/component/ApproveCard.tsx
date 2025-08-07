@@ -12,6 +12,7 @@ import { IApprove } from '../../modal/ApproveModal';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import moment from 'moment';
+import Utilities from '@/utils/Utilities';
 
 const ApproveCard = ({
   item,
@@ -20,7 +21,7 @@ const ApproveCard = ({
 }: {
   item: IApprove;
   isSelected: boolean;
-  handleSelect: (id: string) => void;
+  handleSelect: (id: number) => void;
 }) => {
   const { t } = useTranslation();
   return (
@@ -49,12 +50,12 @@ const ApproveCard = ({
             </AppBlockButton>
           </View>
           <AppText style={styles.dateText}>
-            {moment(item.createdAt).format('DD/MM/YYYY')} -{' '}
-            {moment(item.estimateDate).format('DD/MM/YYYY')}
+            {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
+            {moment(item.expectedDate).format('DD/MM/YYYY')}
           </AppText>
           <View style={styles.noAssign}>
             <AppText size={12} color={'#FF7009'} weight="500">
-              {t('approve.waitApproval')}
+              {Utilities.getStatusName(item.status)}
             </AppText>
           </View>
         </View>

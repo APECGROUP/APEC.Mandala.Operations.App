@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { PcPrFilters, DataPcPr, fetchPcPrData } from '../modal/PcPrModal';
+import { PcPrFilters, IItemPcPr, fetchPcPrData } from '../modal/PcPrModal';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
@@ -49,10 +49,10 @@ export function usePcPrViewModel(initialFilters: PcPrFilters = {}) {
       'listPcPr',
       effectiveFilters.prNo?.trim() || '',
       effectiveFilters.pO?.trim() || '',
-      effectiveFilters.fromDate?.toISOString() || '',
-      effectiveFilters.toDate?.toISOString() || '',
+      effectiveFilters.prDate?.toISOString() || '',
+      effectiveFilters.expectedDate?.toISOString() || '',
       effectiveFilters.department?.id || '',
-      effectiveFilters.location?.code || '',
+      effectiveFilters.store?.code || '',
       effectiveFilters.status?.code || '',
     ],
     [effectiveFilters], // Dependency là toàn bộ object effectiveFilters
@@ -69,7 +69,7 @@ export function usePcPrViewModel(initialFilters: PcPrFilters = {}) {
     isRefetching,
     isError,
     error,
-  } = useInfiniteQuery<DataPcPr[], Error>({
+  } = useInfiniteQuery<IItemPcPr[], Error>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey,
     queryFn: async ({ pageParam = 1 }) =>
@@ -92,10 +92,8 @@ export function usePcPrViewModel(initialFilters: PcPrFilters = {}) {
 
   // Xử lý sự kiện refresh (kéo xuống để làm mới).
   const onRefresh = useCallback(() => {
-    console.log('onRefresh', isFetching, isRefetching, isLoading);
     // Tránh gọi refetch nếu đang trong quá trình fetching để tránh các race conditions.
     if (isFetching || isRefetching || isLoading) {
-      console.log('đang fetch');
       return;
     }
     refetch();
@@ -103,7 +101,6 @@ export function usePcPrViewModel(initialFilters: PcPrFilters = {}) {
 
   // Xử lý sự kiện tải thêm dữ liệu (cuộn cuối danh sách).
   const onLoadMore = useCallback(() => {
-    console.log('onLoadMore', hasNextPage, isFetchingNextPage, isLoading);
     // Chỉ fetchNextPage nếu có trang tiếp theo, không đang fetching và không đang loading.
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();

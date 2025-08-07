@@ -69,8 +69,6 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
     navigation.navigate('ForgotPasswordScreen');
   }, [navigation]);
 
-  console.log('render màn hình login'); // Giờ sẽ ít render hơn nhiều khi gõ
-
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="white" />

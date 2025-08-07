@@ -143,8 +143,6 @@ const CreatePriceScreen: React.FC = () => {
     });
   }, [applyFilters, currentFilters]);
 
-  console.log('CreatePriceScreen', flatData);
-
   if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }

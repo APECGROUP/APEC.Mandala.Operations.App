@@ -6,7 +6,6 @@ import { AppText } from '@/elements/text/AppText';
 
 const RightItemAccount = ({ item }: { item: any }) => {
   const { loading, progress } = useOtaUpdate();
-  console.log('RightItemAccount', loading, progress);
   if (loading) {
     return <ActivityIndicator size="small" color={Colors.PRIMARY} />;
   }

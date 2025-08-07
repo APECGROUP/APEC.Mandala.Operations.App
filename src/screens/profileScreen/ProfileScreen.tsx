@@ -63,18 +63,17 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
     },
     {
       label: t('account.profile.rank'),
-      value: infoUser?.profile?.jobPosition || '',
+      value: infoUser?.departmentName || '',
     },
     {
       label: t('account.profile.email'),
-      value: infoUser?.profile.email || '',
+      value: infoUser?.email || '',
     },
     {
       label: t('account.profile.department'),
-      value: infoUser?.profile?.jobPosition || '',
+      value: infoUser?.departmentName || '',
     },
   ];
-  console.log('infoUser: ', infoUser);
 
   return (
     <ViewContainer>
@@ -83,7 +82,7 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
 
         <ScrollView contentContainerStyle={styles.fg1}>
           <TouchableOpacity style={styles.avatar} activeOpacity={0.8} onPress={onUpdateAvatar}>
-            <AppImage style={styles.avatar} source={{ uri: infoUser?.signature }} />
+            <AppImage style={styles.avatar} source={{ uri: infoUser?.avatar }} />
             <IconTakeCamera style={styles.editIcon} />
           </TouchableOpacity>
           <AppText style={styles.textTitle}>{t('account.profile.changePhoto')}</AppText>

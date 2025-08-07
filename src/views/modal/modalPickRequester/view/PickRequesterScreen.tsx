@@ -16,7 +16,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRequesterViewModel } from '../viewmodal/useRequesterViewModel';
 import { SCREEN_HEIGHT } from '@/constants';
 import { FlashList } from '@shopify/flash-list';
-import { TypePickRequester } from '../modal/PickRequesterModal';
+import { IPickRequester } from '../modal/PickRequesterModal';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
@@ -69,10 +69,10 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: TypePickRequester; index: number }) => {
+    ({ item, index }: { item: IPickRequester; index: number }) => {
       const isFocus = item?.id === requester?.id;
       const onSelect = () => {
-        setRequester({ id: item.id || '', name: item.name || '' });
+        setRequester(item);
         navigation.goBack();
       };
       return (
@@ -81,7 +81,7 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
             key={index}
             onPress={onSelect}
             style={[isFocus ? styles.itemFocus : { padding: vs(10) }]}>
-            <AppText weight="500">{item.name}</AppText>
+            <AppText weight="500">{item.displayName}</AppText>
             {isFocus && <IconSelectHotel />}
           </AppBlockButton>
         </View>
@@ -131,7 +131,7 @@ const PickRequesterScreen = ({ navigation, route }: Props) => {
           </View>
 
           <FlashList
-            data={flatData || []}
+            data={(flatData as IPickRequester[]) || []}
             renderItem={renderItem}
             keyExtractor={item => item.id?.toString() || ''}
             onEndReached={onLoadMore}

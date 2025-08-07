@@ -80,7 +80,6 @@ const PickLocalScreen = ({ navigation, route }: Props) => {
     },
     [navigation, setLocation],
   );
-  console.log('data: ', flatData);
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);

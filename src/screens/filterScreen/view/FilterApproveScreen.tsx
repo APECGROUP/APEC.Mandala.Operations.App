@@ -36,8 +36,8 @@ const FilterApproveScreen = ({
   const initialFilters: AssignPriceFilters = route.params?.currentFilters || {};
 
   const [prNo, setPrNo] = useState<string>(initialFilters.prNo || initialFilters?.searchKey || '');
-  const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.fromDate);
-  const [toDate, setToDate] = useState<Date | undefined>(initialFilters.toDate);
+  const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.prDate);
+  const [toDate, setToDate] = useState<Date | undefined>(initialFilters.expectedDate);
   const [department, setDepartment] = useState<SelectedOption>(
     initialFilters.department && initialFilters.department.id !== ''
       ? initialFilters.department
@@ -70,7 +70,6 @@ const FilterApproveScreen = ({
       initialEndDate: toDate,
     });
   }, [fromDate, toDate]);
-  console.log('filter', initialFilters);
 
   const onPressDepartment = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
@@ -86,7 +85,6 @@ const FilterApproveScreen = ({
       location, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [location]);
-  console.log('filter', initialFilters);
   const onPressRequester = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickRequesterScreen', {
@@ -100,8 +98,8 @@ const FilterApproveScreen = ({
     // Tạo object filters mới từ state cục bộ của FilterScreen
     const newFilters: AssignPriceFilters = {
       prNo: prNo.trim() || undefined, // Đảm bảo prNo rỗng thì thành undefined
-      fromDate,
-      toDate,
+      prDate: fromDate,
+      expectedDate: toDate,
       department: department.id ? department : undefined, // Nếu id rỗng thì là undefined
       requester: requester.id ? requester : undefined, // Nếu id rỗng thì là undefined
       location: location.code ? location : undefined, // Nếu id rỗng thì là undefined

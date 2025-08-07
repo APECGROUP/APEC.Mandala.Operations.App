@@ -53,7 +53,7 @@ export function useNotificationViewModel() {
 
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
-    console.log('onRefresh');
+    // console.log('onRefresh');
     if (isFetching || isRefetching || isLoading) {
       return;
     }
@@ -63,7 +63,7 @@ export function useNotificationViewModel() {
 
   // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
-    console.log('loadMore');
+    // console.log('loadMore');
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();
     }
@@ -99,7 +99,7 @@ export function useNotificationViewModel() {
       };
 
       queryClient.setQueryData(currentQueryKey, updatedData);
-      console.log('updateSuccess');
+      // console.log('updateSuccess');
     } catch (err) {
       console.error('Error read item:', err);
     }
@@ -119,7 +119,7 @@ export function useNotificationViewModel() {
       };
 
       queryClient.setQueryData(currentQueryKey, updatedData);
-      console.log('updateSuccess');
+      // console.log('updateSuccess');
     } catch (err) {
       console.error('Error read item:', err);
     }

@@ -26,7 +26,7 @@ import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { styles } from './style';
 import { usePcPrViewModel } from '../viewmodal/usePcPrViewModel';
-import { DataPcPr } from '../modal/PcPrModal';
+import { IItemPcPr } from '../modal/PcPrModal';
 import PcPrCard from './component/PcPrCard';
 import { Colors } from '@/theme/Config';
 
@@ -52,7 +52,7 @@ const PcPrScreen: React.FC = () => {
   } = usePcPrViewModel(); // Truyền một object rỗng, ViewModel sẽ khởi tạo internal state của nó
 
   const refToast = useRef<any>(null);
-  const flashListRef = useRef<FlashList<DataPcPr> | null>(null);
+  const flashListRef = useRef<FlashList<IItemPcPr> | null>(null);
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
@@ -103,7 +103,7 @@ const PcPrScreen: React.FC = () => {
   const goToAccount = useCallback(() => navigate('AccountScreen'), []);
 
   const renderItem = useCallback(
-    ({ item, index }: { item: DataPcPr; index: number }) => <PcPrCard item={item} index={index} />,
+    ({ item, index }: { item: IItemPcPr; index: number }) => <PcPrCard item={item} index={index} />,
     [],
   );
 
@@ -128,12 +128,12 @@ const PcPrScreen: React.FC = () => {
   }, [onRefresh]);
 
   // Hiển thị FallbackComponent nếu có lỗi tải ban đầu và không có dữ liệu
+  const total = useMemo(() => flatData.length, [flatData.length]); // Có thể lấy từ meta data của API
   if (hasInitialLoadError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
 
   // Giả lập tổng số lượng item
-  const total = 60; // Có thể lấy từ meta data của API
   return (
     <ViewContainer>
       <View style={styles.container}>
@@ -152,7 +152,7 @@ const PcPrScreen: React.FC = () => {
           <View style={[styles.headerContainer, { paddingTop: top }]}>
             <View style={styles.headerLeft}>
               <AppBlockButton onPress={goToAccount}>
-                <FastImage source={{ uri: infoUser?.signature }} style={styles.avatar} />
+                <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
               </AppBlockButton>
               <View style={styles.greetingContainer}>
                 <AppText color="#FFFFFF" style={styles.greetingText}>
@@ -213,9 +213,9 @@ const PcPrScreen: React.FC = () => {
         ) : (
           <FlashList
             ref={flashListRef}
-            data={flatData} // Sử dụng flatData từ ViewModel
+            data={flatData || []} // Sử dụng flatData từ ViewModel
             renderItem={renderItem}
-            keyExtractor={item => item?.id} // Chỉ cần item.id là đủ cho key
+            keyExtractor={item => item?.id?.toString()} // Chỉ cần item.id là đủ cho key
             onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}

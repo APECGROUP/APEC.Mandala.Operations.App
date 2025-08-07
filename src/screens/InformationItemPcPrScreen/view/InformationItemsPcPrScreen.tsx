@@ -29,13 +29,15 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { DataInformationItemsPcPr } from '../modal/InformationItemsPcPrModal';
 import { useInformationItemsPcPrViewModel } from '../viewmodal/useInformationItemsPcPrViewModel';
 import InformationItemsPcPrCard from './component/InformationItemsPcPrCard';
+import { useInformationItemsViewModel } from '@/screens/InformationItemScreen/viewmodal/useInformationItemsViewModel';
+import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
 
 const InformationItemsPcPrScreen = ({
   route,
 }: NativeStackScreenProps<MainParams, 'InformationItemsPcPrScreen'>) => {
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
-  const { content, id } = route.params.item;
+  const { prNo, id } = route.params.item;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -49,8 +51,7 @@ const InformationItemsPcPrScreen = ({
     hasNextPage,
     onUpdatePrice,
     isError,
-  } = useInformationItemsPcPrViewModel(id);
-  console.log('id: ', id);
+  } = useInformationItemsViewModel(id, prNo);
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
@@ -93,7 +94,7 @@ const InformationItemsPcPrScreen = ({
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: DataInformationItemsPcPr; index: number }) => (
+    ({ item, index }: { item: IItemInDetailPr; index: number }) => (
       <InformationItemsPcPrCard item={item} index={index} />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,7 +133,7 @@ const InformationItemsPcPrScreen = ({
   return (
     <ViewContainer>
       <View style={styles.container}>
-        <Header primary title={content} rightComponent={rightComponent()} />
+        <Header primary title={prNo} rightComponent={rightComponent()} />
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('Thông tin các mặt hàng')}</AppText>
           <View style={styles.countBadge}>

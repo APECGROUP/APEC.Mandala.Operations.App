@@ -1,19 +1,31 @@
 import { useMemo, useCallback, useState } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { DataInformationItems, fetchInformationItemsData } from '../modal/InformationItemsModal';
+import {
+  IItemInDetailPr,
+  fetchInformationItemsData,
+  fetchSavedraft,
+} from '../modal/InformationItemsModal';
 import { s } from 'react-native-size-matters';
 import FastImage from 'react-native-fast-image';
 import { goBack } from '@/navigation/RootNavigation';
 import Images from '@assets/image/Images';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
+import {
+  checkAssignPr,
+  checkRejectPrAssign,
+  fetchAutoAssign,
+  IItemAssignPrice,
+} from '@/screens/assignPriceScreen/modal/AssignPriceModal';
+import Toast from 'react-native-toast-message';
+import { TYPE_TOAST } from '@/elements/toast/Message';
 
 const ITEMS_PER_PAGE = 50;
 
-export function useInformationItemsViewModel(id: string) {
+export function useInformationItemsViewModel(id: number, prNo: string) {
   const queryClient = useQueryClient();
-  const key = ['informationItems', id];
-  const { showAlert } = useAlert();
+  const key = ['informationItems', prNo];
+  const { showAlert, showToast } = useAlert();
   const { t } = useTranslation();
   // Infinite Query cho phân trang + search
   const {
@@ -26,11 +38,11 @@ export function useInformationItemsViewModel(id: string) {
     hasNextPage,
     isRefetching,
     isError,
-  } = useInfiniteQuery<DataInformationItems[], Error>({
+  } = useInfiniteQuery<IItemInDetailPr[], Error>({
     queryKey: key,
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchInformationItemsData(page, ITEMS_PER_PAGE, id);
+      return fetchInformationItemsData(page, ITEMS_PER_PAGE, prNo);
     },
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
@@ -44,33 +56,33 @@ export function useInformationItemsViewModel(id: string) {
   // console.log('render useInformationItemsViewModel');
 
   const [isLoadingConfirm, setIsLoadingConfirm] = useState(false);
+  const [isLoadingAssign, setIsLoadingAssign] = useState(false);
   const [textReason, setTextReason] = useState('');
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
-    console.log('onRefresh');
+    // console.log('onRefresh');
     if (isFetching || isRefetching || isLoading) {
       return;
     }
     refetch();
   }, [isFetching, isLoading, isRefetching, refetch]);
-  const isDisableButtonReject = useMemo(() => textReason.trim(), [textReason]);
+  const isDisableButtonReject = useMemo(() => !textReason.trim(), [textReason]);
   // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
-    console.log('loadMore');
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
-  const onUpdatePrice = (idItem: string, price: number) => {
-    const cached = queryClient.getQueryData<InfiniteData<DataInformationItems[]>>(key);
+  const onUpdatePrice = (idItem: number, price: number) => {
+    const cached = queryClient.getQueryData<InfiniteData<IItemInDetailPr[]>>(key);
 
     if (!cached) {
       console.warn('🟥 No cache found for key:', key);
       return;
     }
 
-    console.log('✅ Updating price...');
+    // console.log('✅ Updating price...');
     queryClient.setQueryData(key, {
       ...cached,
       pages: cached.pages.map(page =>
@@ -78,25 +90,43 @@ export function useInformationItemsViewModel(id: string) {
       ),
     });
   };
-  const onAutoAssign = () => {
-    const cached = queryClient.getQueryData<InfiniteData<DataInformationItems[]>>(key);
+  const onAutoAssign = async () => {
+    try {
+      // const cached = queryClient.getQueryData<InfiniteData<IItemInDetailPr[]>>(key);
 
-    if (!cached) {
-      console.warn('🟥 No cache found for key:', key);
-      return;
-    }
+      // if (!cached) {
+      //   console.warn('🟥 No cache found for key:', key);
+      //   return;
+      // }
+      const { isSuccess, message } = await fetchAutoAssign(id);
+      if (!isSuccess) {
+        console.log('thất bại: ', message);
+        return showToast(message || t('informationItem.autoAssignError'), 'error');
+      }
+      refetch();
+      // Gán giá random (bội 1000) và NCC random cho từng item
+      // queryClient.setQueryData(key, {
+      //   ...cached,
+      //   pages: cached.pages.map(page =>
+      //     page.map(item => ({
+      //       ...item,
+      //       price: Math.floor(Math.random() * 10 + 1) * 1000, // random 1000-10000
+      //       ncc: 'NCC_' + Math.floor(Math.random() * 100), // NCC random
+      //     })),
+      //   ),
+      // });
+    } catch (error) {}
+  };
+  const onSaveDraft = async () => {
+    try {
+      const { isSuccess, message } = await fetchSavedraft(id, flatData);
+      if (!isSuccess) {
+        return showToast(message || t('error.subtitle'), 'error');
+      }
+      showToast(t('informationItem.saveDraftSuccess'), TYPE_TOAST.SUCCESS);
 
-    // Gán giá random (bội 1000) và NCC random cho từng item
-    queryClient.setQueryData(key, {
-      ...cached,
-      pages: cached.pages.map(page =>
-        page.map(item => ({
-          ...item,
-          price: Math.floor(Math.random() * 10 + 1) * 1000, // random 1000-10000
-          ncc: 'NCC_' + Math.floor(Math.random() * 100), // NCC random
-        })),
-      ),
-    });
+      refetch();
+    } catch (error) {}
   };
 
   const onRejectSuccess = () => {
@@ -115,23 +145,67 @@ export function useInformationItemsViewModel(id: string) {
       />,
     );
   };
+
   const onReject = useCallback(
     async (func?: () => void) => {
-      try {
-        setIsLoadingConfirm(true);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log('text: ', textReason);
-        setIsLoadingConfirm(false);
+      setIsLoadingConfirm(true);
+      console.log('bấm reject', textReason);
+      // Loại bỏ các item có id nằm trong ids khỏi từng page
+      const { isSuccess, message } = await checkRejectPrAssign(id, textReason || '');
+      console.log('thất bại: ', !isSuccess, textReason);
+      setIsLoadingConfirm(false);
+      if (!isSuccess) {
+        return showToast(message || t('createPrice.rejectFail'), 'error');
+      }
 
-        if (func) {
-          func();
-        }
-        onRejectSuccess();
-      } catch (error) {}
+      if (func) {
+        func();
+      }
+      onRejectSuccess();
+      showToast(t('createPrice.rejectSuccess'), 'success');
+      // Xoá các item có id nằm trong danh sách ids khỏi cache
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [textReason],
+    [id, showToast, t, textReason],
   );
+
+  const onAssign = async (func?: () => void) => {
+    try {
+      setIsLoadingAssign(true);
+      const { isSuccess, message } = await checkAssignPr(id, flatData);
+      setIsLoadingAssign(false);
+      if (!isSuccess) {
+        return showToast(message || t('error.subtitle'), TYPE_TOAST.ERROR);
+      }
+      if (func) {
+        func();
+      }
+      showAlert(
+        t('informationItem.assignSuccess'),
+        '',
+        [
+          {
+            text: t('Trở về'),
+            onPress: () => {
+              goBack();
+            },
+          },
+        ],
+        <FastImage
+          source={Images.ModalApprovedSuccess}
+          style={{ width: s(285), aspectRatio: 285 / 187 }}
+        />,
+        // <ConfettiAnimation
+        //   autoPlay={true}
+        //   loop={false}
+        //   style={{
+        //     position: 'absolute',
+        //     top: 0,
+        //     left: 0,
+        //   }}
+        // />,
+      );
+    } catch (error) {}
+  };
 
   return {
     flatData,
@@ -144,11 +218,14 @@ export function useInformationItemsViewModel(id: string) {
     isLoadingConfirm,
     textReason,
     isDisableButtonReject,
+    isLoadingAssign,
     onAutoAssign,
     onRefresh,
     onLoadMore,
     onUpdatePrice,
     onReject,
     setTextReason,
+    onSaveDraft,
+    onAssign,
   };
 }

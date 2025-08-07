@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   AssignPriceFilters,
-  DataAssignPrice,
+  IItemAssignPrice,
   fetchAssignPriceData,
 } from '../modal/AssignPriceModal';
 import debounce from 'lodash/debounce';
@@ -57,8 +57,8 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
     () => [
       'listAssignPrice',
       effectiveFilters.prNo?.trim() || '',
-      effectiveFilters.fromDate?.toISOString() || '',
-      effectiveFilters.toDate?.toISOString() || '',
+      effectiveFilters.prDate?.toISOString() || '',
+      effectiveFilters.expectedDate?.toISOString() || '',
       effectiveFilters.department?.id || '',
       effectiveFilters.requester?.id || '',
     ],
@@ -76,7 +76,7 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
     isRefetching,
     isError,
     error,
-  } = useInfiniteQuery<DataAssignPrice[], Error>({
+  } = useInfiniteQuery<IItemAssignPrice[], Error>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey,
     queryFn: async ({ pageParam = 1 }) =>
@@ -99,10 +99,8 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
 
   // Xử lý sự kiện refresh (kéo xuống để làm mới).
   const onRefresh = useCallback(() => {
-    console.log('onRefresh', isFetching, isRefetching, isLoading);
     // Tránh gọi refetch nếu đang trong quá trình fetching để tránh các race conditions.
     if (isFetching || isRefetching || isLoading) {
-      console.log('đang fetch');
       return;
     }
     refetch();
@@ -110,7 +108,6 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
 
   // Xử lý sự kiện tải thêm dữ liệu (cuộn cuối danh sách).
   const onLoadMore = useCallback(() => {
-    console.log('onLoadMore', hasNextPage, isFetchingNextPage, isLoading);
     // Chỉ fetchNextPage nếu có trang tiếp theo, không đang fetching và không đang loading.
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();
@@ -134,8 +131,11 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
     setEffectiveFilters(newFilters);
   }, []);
 
+  const length = useMemo(() => flatData.length, [flatData]);
+
   return {
     data: flatData,
+    length,
     isLoading,
     isFetching,
     isRefetching,

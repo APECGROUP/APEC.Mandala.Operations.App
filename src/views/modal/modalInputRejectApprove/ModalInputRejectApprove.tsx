@@ -67,8 +67,7 @@ const ModalInputRejectApprove = ({ route }: Props) => {
 
   const onConfirm = useCallback(() => {
     onReject([id], onGoBack);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, onGoBack, onReject]);
 
   return (
     <ViewContainer>

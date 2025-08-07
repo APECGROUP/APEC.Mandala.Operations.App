@@ -50,6 +50,7 @@ const ApprovePrScreen: React.FC = () => {
   const route = useRoute() as any;
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
+    length,
     flatData,
     isLoading,
     isRefetching,
@@ -158,8 +159,6 @@ const ApprovePrScreen: React.FC = () => {
     });
   }, [applyFilters, currentFilters]);
 
-  console.log('ApprovePrScreen', flatData);
-
   // const orderSelected = useMemo(() => selectedIds.length, [selectedIds]);
 
   if (isError) {
@@ -179,7 +178,7 @@ const ApprovePrScreen: React.FC = () => {
           <View style={[styles.headerContainer, { marginTop: top }]}>
             <View style={styles.headerLeft}>
               <AppBlockButton onPress={goToAccount}>
-                <FastImage source={{ uri: infoUser?.signature }} style={styles.avatar} />
+                <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
               </AppBlockButton>
 
               <View style={styles.greetingContainer}>
@@ -222,7 +221,7 @@ const ApprovePrScreen: React.FC = () => {
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('approve.listOfPurchaseOrder')}</AppText>
           <View style={styles.countBadge}>
-            <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+            <AppText style={styles.countBadgeText}>{length}</AppText>
           </View>
         </View>
         {/* <View style={styles.header}>
@@ -235,7 +234,7 @@ const ApprovePrScreen: React.FC = () => {
           </AppText>
         </View> */}
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
-        {isLoading && flatData.length === 0 ? (
+        {isLoading && length === 0 ? (
           <View style={styles.listContent}>
             {new Array(6).fill(0).map(
               (
@@ -251,7 +250,7 @@ const ApprovePrScreen: React.FC = () => {
             ref={flashListRef}
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.id.toString()}
             // onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}

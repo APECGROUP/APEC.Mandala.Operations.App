@@ -45,17 +45,17 @@ const DetailAssignPriceCardScreen = ({
   const { item } = route.params;
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
-  const [dateCreate, setDateCreate] = useState<Date | undefined>(undefined);
-  const [dateEstimate, setDateEstimate] = useState<Date | undefined>(undefined);
+  const [dateCreate, setDateCreate] = useState<Date | undefined>(item?.prDate);
+  const [dateEstimate, setDateEstimate] = useState<Date | undefined>(item?.expectedDate);
   const [isCoppied, setIsCoppied] = useState(false);
 
   const onCopy = useCallback(() => {
-    Clipboard.setString(item.content);
+    Clipboard.setString(item?.poNo || '');
     setIsCoppied(true);
     setTimeout(() => {
       setIsCoppied(false);
     }, 2000);
-  }, [item.content]);
+  }, [item.poNo]);
 
   const onPressDateCreate = useCallback(() => {
     navigate('ModalPickCalendar', {
@@ -85,7 +85,7 @@ const DetailAssignPriceCardScreen = ({
         <AppText size={12} weight="500" color={light.placeholderTextColor}>
           {t('orderInfo.prNo')}:{' '}
         </AppText>
-        <AppText weight="600">{item.prNo || item.content}</AppText>
+        <AppText weight="600">{item.prNo}</AppText>
         <IconCopy style={styles.copyIcon} />
       </AppBlockButton>
 
@@ -102,17 +102,17 @@ const DetailAssignPriceCardScreen = ({
           value={dateEstimateFormatted}
           icon={<IconCalendar />}
         />
-        <RowItem label={t('orderInfo.department')} value={item.department?.name || ''} />
-        <RowItem label={t('orderInfo.location')} value={item.location?.name || ''} />
+        <RowItem label={t('orderInfo.department')} value={item?.departmentName || ''} />
+        <RowItem label={t('orderInfo.location')} value={item?.storedName || ''} />
         <RowItem
           label={t('orderInfo.requester')}
-          value={item.requester?.name || ''}
+          value={item.requestBy || ''}
           icon={<IconName />}
         />
         <RowItem label={t('orderInfo.note')} />
         <View style={styles.noteContainer}>
           <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
-            {item?.note || ''}
+            {item?.description || ''}
           </AppText>
         </View>
       </View>

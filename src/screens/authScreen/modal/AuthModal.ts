@@ -41,8 +41,8 @@ export interface IDataApiLogin {
   user: IUser;
   accessToken: string;
   refreshToken: string;
-  expiresIn: number;
-  refreshExpiresIn: number;
+  expiresAt: string;
+  refreshExpiresAt: string;
 }
 
 export interface IUser {
@@ -56,6 +56,7 @@ export interface IUser {
   language: null;
   isNotification: null;
   groups: IGroupAuth[];
+  hotelCode?: string;
 }
 export interface IGroupAuth {
   groupName: string;

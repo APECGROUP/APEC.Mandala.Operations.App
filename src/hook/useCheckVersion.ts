@@ -30,9 +30,7 @@ const useCheckVersion = () => {
           undefined,
         );
       }
-    } catch (error) {
-      console.log('Error checking version:', error);
-    }
+    } catch (error) {}
   };
   useEffect(() => {
     checkVersion();

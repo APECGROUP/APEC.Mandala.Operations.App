@@ -8,7 +8,7 @@ import DataLocal from '../data/DataLocal';
 import { AppBlock } from '../elements/block/Block';
 import AuthNavigator from './AuthNavigator';
 import FastImage from 'react-native-fast-image';
-
+BootSplash.hide();
 // Import các module cần thiết từ react-native-reanimated
 import Animated, {
   useSharedValue,
@@ -58,7 +58,6 @@ const AppNavigation = () => {
   const rSplashStyle = useAnimatedStyle(() => ({
     opacity: animatedOpacity.value,
   }));
-  console.log('alo: ');
 
   return (
     <AppBlock style={styles.flex}>

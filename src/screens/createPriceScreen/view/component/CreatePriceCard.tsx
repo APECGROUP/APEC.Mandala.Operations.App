@@ -54,17 +54,17 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
     }, [handleDelete, onCloseSwipe, item.id]);
 
     // Phần render nút delete
-    const renderRightActions = useCallback(() => {
-      console.log('Rendering delete button with onCloseSwipe:', !!onCloseSwipe);
-      return (
+    const renderRightActions = useCallback(
+      () => (
         <AnimatedButton
           activeOpacity={1}
           style={[styles.deleteBtn, animatedDeleteStyle]}
           onPress={handleDeleteWithClose}>
           <IconTrashPrice />
         </AnimatedButton>
-      );
-    }, [animatedDeleteStyle, handleDeleteWithClose, onCloseSwipe]);
+      ),
+      [animatedDeleteStyle, handleDeleteWithClose],
+    );
 
     const handleSelectPress = useCallback(() => {
       handleSelect(item.id);

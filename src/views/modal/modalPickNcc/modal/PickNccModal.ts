@@ -12,23 +12,23 @@ export interface IItemSupplier {
   code: string;
   accountName: string;
   address1: string;
-  address2: null;
-  country: null;
+  address2: string;
+  country: string | null;
   phone: string;
-  fax: null;
+  fax: string | null;
   representative: null | string;
   vatCode: null | string;
-  balance: null;
+  balance: number | string;
   type: string;
-  creditLimit: null;
+  creditLimit: null | number;
   invoiceName: string;
   email: null | string;
-  term: null;
+  term: string | null;
   id: number;
-  createdBy: string;
+  createdBy?: string;
   createdDate: Date;
-  deletedDate: null;
-  deletedBy: null;
+  deletedDate: string | null;
+  deletedBy: string | null;
   deleted: string;
 }
 
@@ -65,7 +65,7 @@ export const fetchNccData = async (
         textSearch: key.trim(),
       },
     };
-    const response = await api.post<IResponseListSupplier>(ENDPOINT.GET_LIST_SUPPLIER, params);
+    const response = await api.post<IResponseListSupplier, any>(ENDPOINT.GET_LIST_SUPPLIER, params);
     if (response.status !== 200 || !response.data.isSuccess) {
       throw new Error('Failed to fetch data');
     }

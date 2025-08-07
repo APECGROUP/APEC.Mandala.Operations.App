@@ -26,7 +26,7 @@ export interface ApiError {
 export const fetchListHotel = async (): Promise<IResponseListHotel> => {
   // Khai báo rõ ràng kiểu trả về
   try {
-    const res = await api.get<IResponseListHotel>(ENDPOINT.GET_LIST_HOTEL);
+    const res = await api.get<IResponseListHotel>(ENDPOINT.GET_LIST_HOTEL, { noAuth: true });
     if (res.status !== 200) {
       // Luôn throw lỗi nếu status không phải 200
       throw new Error(`Failed to fetch hotel list: Server responded with status ${res.status}`);

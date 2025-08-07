@@ -4,6 +4,7 @@ import Toast from 'react-native-toast-message';
 import ImagePicker from 'react-native-image-crop-picker';
 import isArray from 'lodash/isArray';
 import map from 'lodash/map';
+import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 export default class Utilities {
   static isAndroid = () => Platform.OS === 'android';
@@ -130,7 +131,6 @@ export default class Utilities {
       } else {
         images = await ImagePicker.openCamera(imageOptions!);
       }
-      console.log('image: ', images);
       if (isArray(images)) {
         map(images, image => {
           this.processPickedImage(image);
@@ -189,6 +189,21 @@ export default class Utilities {
       return Promise.reject(error);
     }
   };
+
+  static getStatusName(statusCode: string): string {
+    try {
+      // Truy cập Zustand trực tiếp
+      const { getState } = useStatusGlobal;
+      const { statusGlobal } = getState();
+
+      return (
+        statusGlobal.find(item => item.status.toUpperCase() === statusCode.toUpperCase())
+          ?.statusName ?? 'Không rõ trạng thái'
+      );
+    } catch (error) {
+      return 'Không rõ trạng thái';
+    }
+  }
 }
 
 export const isAndroid = () => Platform.OS === 'android';

@@ -7,14 +7,14 @@ import { useState } from 'react';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/theme/Config';
-import { DataInformationItemsPcPr } from '../../modal/InformationItemsPcPrModal';
 import IconDropDown from '@assets/icon/IconDropDown';
+import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
 
-const InformationItemsPcPrCard = ({ item }: { item: DataInformationItemsPcPr; index: number }) => {
+const InformationItemsPcPrCard = ({ item }: { item: IItemInDetailPr; index: number }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
   const handleShowDetail = () => {
-    console.log('onPress');
+    // console.log('onPress');
     setIsShow(i => !i);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
@@ -26,12 +26,12 @@ const InformationItemsPcPrCard = ({ item }: { item: DataInformationItemsPcPr; in
           <FastImage source={Images.IconBox} style={styles.itemIcon} />
           <View style={styles.itemInfo}>
             <AppText numberOfLines={1} style={styles.prCodeText}>
-              {item.name}
+              {item.iName}
             </AppText>
             <View style={styles.center}>
               <AppText color={Colors.TEXT_SECONDARY}>{t('informationItem.unit')}:</AppText>
               <AppText weight="700" ml={6}>
-                {item.end}
+                {item.unitName}
               </AppText>
             </View>
           </View>
@@ -57,7 +57,7 @@ const InformationItemsPcPrCard = ({ item }: { item: DataInformationItemsPcPr; in
 
           <View style={styles.row}>
             <AppText style={styles.label}>{t('orderDetail.numberOfApproval')}</AppText>
-            <AppText style={styles.value}>{item.quantity}</AppText>
+            <AppText style={styles.value}>{item.approvedQuantity}</AppText>
           </View>
 
           <View style={styles.row}>
@@ -68,14 +68,14 @@ const InformationItemsPcPrCard = ({ item }: { item: DataInformationItemsPcPr; in
           <View style={[styles.row]}>
             <AppText style={styles.label}>{t('NCC')}</AppText>
             <AppText style={[styles.nccText, styles.nameSupplier]} numberOfLines={2}>
-              {item.supplier.name}
+              {item.vendorName}
             </AppText>
           </View>
           <View>
             <AppText style={styles.label}>{t('Ghi chú')}</AppText>
             <View style={styles.noteBox}>
               <AppText style={styles.noteText} numberOfLines={3}>
-                {item.note}
+                {item.remark}
               </AppText>
             </View>
           </View>

@@ -24,20 +24,21 @@ import { MainParams } from '@/navigation/params';
 import { goBack, navigate } from '@/navigation/RootNavigation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import IconInfomation from '@assets/icon/IconInfomation';
-import { useDetailOrderApproveViewModel } from '../viewmodal/useDetailOrderApproveViewModel';
 import DetailOrderItemCard from './component/DetailOrderItemCard';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import Footer from '@/screens/filterScreen/view/component/Footer';
 import { useApproveViewModel } from '@/screens/approvePrScreen/viewmodal/useApproveViewModel';
+import { useInformationItemsViewModel } from '@/screens/InformationItemScreen/viewmodal/useInformationItemsViewModel';
+import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
 
 const DetailOrderApproveScreen = ({
   route,
 }: NativeStackScreenProps<MainParams, 'DetailOrderApproveScreen'>) => {
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
-  const { content, id } = route.params.item;
+  const { prNo, id } = route.params.item;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -50,13 +51,13 @@ const DetailOrderApproveScreen = ({
     onLoadMore,
     hasNextPage,
     isError,
-  } = useDetailOrderApproveViewModel(id);
+  } = useInformationItemsViewModel(id, prNo);
   const { onApproved } = useApproveViewModel();
 
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
-  const flashListRef = useRef<FlashList<DetailOrderApprove> | null>(null);
+  const flashListRef = useRef<FlashList<IItemInDetailPr> | null>(null);
   const scrollToTop = () => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
@@ -93,13 +94,12 @@ const DetailOrderApproveScreen = ({
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: DetailOrderApprove; index: number }) => (
+    ({ item, index }: { item: IItemInDetailPr; index: number }) => (
       <DetailOrderItemCard item={item} index={index} />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [flatData],
   );
-  console.log('data', flatData);
   const rightComponent = () => (
     <AppBlockButton
       style={styles.rightComponent}
@@ -116,7 +116,6 @@ const DetailOrderApproveScreen = ({
     onRefresh();
   }, [onRefresh]);
 
-  console.log('error:', isError);
   if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
@@ -124,7 +123,7 @@ const DetailOrderApproveScreen = ({
   return (
     <ViewContainer>
       <View style={styles.container}>
-        <Header primary title={content} rightComponent={rightComponent()} />
+        <Header primary title={prNo} rightComponent={rightComponent()} />
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('Thông tin các mặt hàng')}</AppText>
           <View style={styles.countBadge}>

@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
     height: s(118),
     marginBottom: vs(12),
   },
-  buttonCreatePrice: {
+  buttonCreatePo: {
     padding: vs(8),
     backgroundColor: Colors.PRIMARY,
     borderRadius: 8,
@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: vs(12),
   },
-  textCreatePrice: {
+  textCreatePo: {
     fontSize: getFontSize(12),
     color: Colors.WHITE,
     fontWeight: '500',

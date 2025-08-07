@@ -6,7 +6,7 @@ import Images from '../../../../../assets/image/Images';
 import { useState } from 'react';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
-import { DataInformationItems } from '../../modal/InformationItemsModal';
+import { IItemInDetailPr } from '../../modal/InformationItemsModal';
 import { Colors } from '@/theme/Config';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconSub from '@assets/icon/IconSub';
@@ -20,37 +20,56 @@ const InformationItemsCard = ({
   onFocusComment,
   onUpdatePrice,
 }: {
-  item: DataInformationItems;
+  item: IItemInDetailPr;
   index: number;
   onFocusComment: () => void;
   onUpdatePrice?: (id: string | number, price: number) => void;
 }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
-  const [count, setCount] = useState(item.approvedQty);
-  const [ncc, setNcc] = useState<IItemSupplier>(item.supplier);
+  const [count, setCount] = useState(item.quantity);
+  const [ncc, setNcc] = useState<IItemSupplier>({
+    accountName: item.vendorName,
+    code: item.vendor,
+    address1: '',
+    address2: '',
+    country: '',
+    phone: '',
+    email: '',
+    representative: '',
+    fax: '',
+    vatCode: '',
+    balance: 0,
+    type: '',
+    id: -1,
+    createdDate: new Date(),
+    createdBy: '',
+    creditLimit: 0,
+    invoiceName: '',
+    term: '',
+    deletedDate: null,
+  } as IItemSupplier);
   const [price, setPrice] = useState(item.price);
   const handleShowDetail = () => {
-    console.log('onPress');
     setIsShow(i => !i);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
 
   const onPickNcc = () => {
     navigate('PickNccScreen', {
-      setNcc: setNcc,
-      ncc: item.supplier,
+      setNcc,
+      ncc,
     });
   };
 
   const onBlur = async () => {
-    console.log('onBlur', price);
+    // console.log('onBlur', price);
     try {
       if (price) {
         await onUpdatePrice?.(item.id, price);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
     // Logic update giá ở đây
     // Ví dụ: call API, update state, etc.
@@ -64,14 +83,14 @@ const InformationItemsCard = ({
           <View style={styles.itemInfo}>
             <View style={styles.itemInfoRow}>
               <AppText numberOfLines={1} style={styles.prCodeText}>
-                {item.name}
+                {item.iName}
               </AppText>
             </View>
             {item.price ? (
               <View style={styles.itemInfoRow}>
                 <AppText style={styles.dateText}>{t('Giá')}: </AppText>
                 <AppText style={styles.dateTextEnd}>
-                  {moneyFormat(item.price, '.', '')}/{item.end}
+                  {moneyFormat(item.price, '.', '')}/{item.unitName}
                 </AppText>
               </View>
             ) : (
@@ -86,7 +105,7 @@ const InformationItemsCard = ({
                     style={styles.inputPrice}
                     underlineColorAndroid="transparent" // loại bỏ line mặc định Android
                   />
-                  <AppText style={styles.dateTextEnd}>/{item.end}</AppText>
+                  <AppText style={styles.dateTextEnd}>/{item.unitName}</AppText>
                 </View>
               </View>
             )}
@@ -125,7 +144,7 @@ const InformationItemsCard = ({
             <AppText style={styles.label}>{t('NCC')}</AppText>
             <TouchableOpacity onPress={onPickNcc} style={styles.nccContainer}>
               <AppText style={[styles.nccText, { marginRight: s(6) }]} numberOfLines={1}>
-                {ncc.name}
+                {ncc.accountName}
               </AppText>
               <IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />
             </TouchableOpacity>
@@ -133,14 +152,14 @@ const InformationItemsCard = ({
           <View style={styles.row}>
             <AppText style={styles.label}>{t('Số tiền duyệt')}</AppText>
             <AppText style={styles.approvedAmount}>
-              {moneyFormat(item.approvedAmount, '.', '')}
+              {moneyFormat(item.price * item.quantity, '.', '')}
             </AppText>
           </View>
           <View>
             <AppText style={styles.label}>{t('Ghi chú')}</AppText>
             <View style={styles.noteBox}>
               <AppText style={styles.noteText} numberOfLines={3}>
-                {item.note}
+                {item.remark}
               </AppText>
             </View>
           </View>

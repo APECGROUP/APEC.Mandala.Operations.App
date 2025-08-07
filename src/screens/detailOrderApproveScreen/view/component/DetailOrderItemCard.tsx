@@ -6,31 +6,51 @@ import Images from '../../../../../assets/image/Images';
 import { useState } from 'react';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
-import { DetailOrderApprove } from '../../modal/DetailOrderApproveModal';
 import { Colors } from '@/theme/Config';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconSub from '@assets/icon/IconSub';
 import IconPlus from '@assets/icon/IconPlus';
 import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
-import { IItemSupplier, ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
 
-const DetailOrderItemCard = ({ item }: { item: DetailOrderApprove; index: number }) => {
+const DetailOrderItemCard = ({ item }: { item: IItemInDetailPr; index: number }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
-  const [count, setCount] = useState(item.approvedQty);
-  const [ncc, setNcc] = useState<IItemSupplier>(item.supplier);
+  const [count, setCount] = useState(item.quantity);
+
+  const [ncc, setNcc] = useState<IItemSupplier>({
+    accountName: item.vendorName,
+    code: item.vendor,
+    address1: '',
+    address2: '',
+    country: '',
+    phone: '',
+    email: '',
+    representative: '',
+    fax: '',
+    vatCode: '',
+    balance: 0,
+    type: '',
+    id: -1,
+    createdDate: new Date(),
+    createdBy: '',
+    creditLimit: 0,
+    invoiceName: '',
+    term: '',
+    deletedDate: null,
+  } as IItemSupplier);
 
   const handleShowDetail = () => {
-    console.log('onPress');
     setIsShow(i => !i);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
 
   const onPickNcc = () => {
     navigate('PickNccScreen', {
-      setNcc: setNcc,
-      ncc: item.supplier,
+      setNcc,
+      ncc,
     });
   };
 
@@ -42,13 +62,13 @@ const DetailOrderItemCard = ({ item }: { item: DetailOrderApprove; index: number
           <View style={styles.itemInfo}>
             <View style={styles.itemInfoRow}>
               <AppText numberOfLines={1} style={styles.prCodeText}>
-                {item.name}
+                {item.unitName}
               </AppText>
             </View>
             <View style={styles.itemInfoRow}>
               <AppText style={styles.dateText}>{t('Giá')}: </AppText>
               <AppText style={styles.dateTextEnd}>
-                {`${moneyFormat(item?.price || 0, '.', ' ')} / ${item.end}`}
+                {`${moneyFormat(item?.price || 0, '.', ' ')} / ${item.unitName}`}
               </AppText>
             </View>
           </View>
@@ -86,7 +106,7 @@ const DetailOrderItemCard = ({ item }: { item: DetailOrderApprove; index: number
             <AppText style={styles.label}>{t('NCC')}</AppText>
             <TouchableOpacity onPress={onPickNcc} style={styles.nccContainer}>
               <AppText style={[styles.nccText, { marginRight: s(6) }]} numberOfLines={1}>
-                {ncc.name}
+                {ncc.accountName}
               </AppText>
               <IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />
             </TouchableOpacity>
@@ -94,14 +114,14 @@ const DetailOrderItemCard = ({ item }: { item: DetailOrderApprove; index: number
           <View style={styles.row}>
             <AppText style={styles.label}>{t('Số tiền duyệt')}</AppText>
             <AppText style={styles.approvedAmount}>
-              {moneyFormat(item.approvedAmount, '.', '')}
+              {moneyFormat(item.price * item.quantity, '.', '')}
             </AppText>
           </View>
           <View>
             <AppText style={styles.label}>{t('Ghi chú')}</AppText>
             <View style={styles.noteBox}>
               <AppText style={styles.noteText} numberOfLines={3}>
-                {item.note}
+                {item.remark}
               </AppText>
             </View>
           </View>

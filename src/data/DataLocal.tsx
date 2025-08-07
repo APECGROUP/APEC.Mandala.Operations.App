@@ -10,6 +10,7 @@
 import * as Keychain from 'react-native-keychain';
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
+// Import refreshTokenAPI từ file AuthService riêng biệt
 import { refreshTokenAPI } from '../utils/AuthService';
 import { useIsLogin } from '../zustand/store/useIsLogin/useIsLogin';
 import { useInfoUser } from '../zustand/store/useInfoUser/useInfoUser';
@@ -28,8 +29,8 @@ export const CREDENTIALS_KEY = 'USER_CREDENTIALS';
 export type TokenType = {
   accessToken: string;
   refreshToken: string;
-  expiresAt: number;
-  refreshExpiresAt: number;
+  expiresAt: number; // Đây sẽ là timestamp (milliseconds)
+  refreshExpiresAt: number; // Đây sẽ là timestamp (milliseconds)
 };
 
 export type CredentialsType = {
@@ -101,21 +102,24 @@ const DataLocal = {
   saveToken: async (
     accessToken: string,
     refreshToken: string,
-    expiresIn: number,
-    refreshExpiresIn: number,
+    expiresAt: string, // Chuỗi ISO 8601 từ API
+    refreshExpiresAt: string, // Chuỗi ISO 8601 từ API
   ): Promise<void> => {
     try {
-      const currentTime = moment().valueOf();
+      // Chuyển đổi chuỗi ISO 8601 sang timestamp (milliseconds từ epoch)
+      const expiresAtTimestamp = moment(expiresAt).valueOf();
+      const refreshExpiresAtTimestamp = moment(refreshExpiresAt).valueOf();
+
       const tokenData: TokenType = {
         accessToken,
         refreshToken,
-        expiresAt: currentTime + expiresIn * 1000,
-        refreshExpiresAt: currentTime + refreshExpiresIn * 1000,
+        expiresAt: expiresAtTimestamp,
+        refreshExpiresAt: refreshExpiresAtTimestamp,
       };
 
       DataLocal.token = tokenData;
       storage.set(TOKEN_KEY, JSON.stringify(tokenData));
-      console.log(1111111111111);
+      console.log('Token saved:', tokenData);
       DataLocal.setAuthStatus('authenticated');
     } catch (error) {
       Toast.show({ type: 'error', text2: 'Lưu token thất bại' });
@@ -136,23 +140,25 @@ const DataLocal = {
 
         if (currentTime < parsedToken.expiresAt) {
           DataLocal.token = parsedToken;
-          console.log(2222222222);
+          console.log('Token retrieved and still valid:', parsedToken);
           DataLocal.setAuthStatus('authenticated');
           return parsedToken;
         } else if (currentTime < parsedToken.refreshExpiresAt) {
+          // Chỉ gọi refreshAccessToken nếu refresh token vẫn còn hạn
           const newToken = await DataLocal.refreshAccessToken(parsedToken.refreshToken);
           if (newToken) {
             return newToken;
           }
         }
 
+        // Nếu cả access và refresh token đều hết hạn hoặc refresh thất bại
         await DataLocal.removeAll();
         return null;
       }
     } catch (error) {
       Toast.show({ type: 'error', text2: 'Lấy token thất bại' });
     }
-    console.log(33333333333);
+    console.log('No valid token found, setting status to unauthenticated.');
     DataLocal.setAuthStatus('unauthenticated');
     return null;
   },
@@ -246,7 +252,7 @@ const DataLocal = {
       await Keychain.resetGenericPassword();
 
       await useInfoUser.getState().saveInfoUser({} as IUser);
-      console.log(44444444444);
+      console.log('All data removed.');
       DataLocal.setAuthStatus('unauthenticated');
     } catch (error) {
       Toast.show({
@@ -257,14 +263,15 @@ const DataLocal = {
   },
 
   // ✅ Lưu token và user sau khi login thành công
-  saveAll: async (res: IResponseAPILogin): Promise<void> => {
+  saveAll: async (res: IResponseAPILogin, hotelCode: string): Promise<void> => {
     try {
-      await DataLocal.saveUser(res.data?.user || {});
+      await DataLocal.saveUser({ ...res.data?.user, hotelCode });
+      // Truyền expiresAt và refreshExpiresAt trực tiếp dưới dạng chuỗi
       await DataLocal.saveToken(
         res.data.accessToken,
         res.data.refreshToken,
-        res.data.expiresIn,
-        res.data.refreshExpiresIn,
+        res.data.expiresAt,
+        res.data.refreshExpiresAt,
       );
     } catch (error) {
       Toast.show({ type: 'error', text2: 'Lưu dữ liệu thất bại' });
@@ -274,18 +281,22 @@ const DataLocal = {
   // ✅ Gọi API để refresh access token khi hết hạn
   refreshAccessToken: async (refreshToken: string): Promise<TokenType | null> => {
     try {
+      // refreshTokenAPI giờ trả về IRefreshTokenResponseData | null trực tiếp
       const response = await refreshTokenAPI(refreshToken);
       if (response) {
+        // Kiểm tra trực tiếp response
         await DataLocal.saveToken(
-          response.accessToken,
-          response.refreshToken,
-          response.expiresIn || 300,
-          response.refreshExpiresIn || 1800,
+          response.accessToken, // Sử dụng accessToken trực tiếp từ response
+          response.refreshToken, // Sử dụng refreshToken trực tiếp từ response
+          response.expiresAt, // Sử dụng expiresAt trực tiếp từ response
+          response.refreshExpiresAt, // Sử dụng refreshExpiresAt trực tiếp từ response
         );
+        // Cập nhật DataLocal.token sau khi saveToken thành công
         return DataLocal.token;
       }
     } catch (error) {
-      await DataLocal.removeAll();
+      console.error('refreshAccessToken error:', error); // Log lỗi để debug
+      await DataLocal.removeAll(); // Đăng xuất nếu refresh token thất bại
     }
     return null;
   },

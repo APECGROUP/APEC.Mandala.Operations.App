@@ -38,15 +38,15 @@ const FilterPcPrScreen = ({
 
   const [prNo, setPrNo] = useState<string>(initialFilters.prNo || initialFilters?.searchKey || '');
   const [po, setPo] = useState<string>(initialFilters.prNo || initialFilters?.searchKey || '');
-  const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.fromDate);
-  const [toDate, setToDate] = useState<Date | undefined>(initialFilters.toDate);
+  const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.prDate);
+  const [toDate, setToDate] = useState<Date | undefined>(initialFilters.expectedDate);
   const [department, setDepartment] = useState<IPickDepartment | undefined>(
     initialFilters.department && initialFilters.department.id
       ? initialFilters.department
       : undefined,
   );
   const [location, setLocation] = useState<IPickLocal | undefined>(
-    initialFilters.location && initialFilters.location.id ? initialFilters.location : undefined,
+    initialFilters.store && initialFilters.store.id ? initialFilters.store : undefined,
   );
   const [status, setStatus] = useState<IStausGlobal | undefined>(
     initialFilters.status && initialFilters.status.status !== ''
@@ -71,7 +71,6 @@ const FilterPcPrScreen = ({
       initialEndDate: toDate,
     });
   }, [fromDate, toDate]);
-  console.log('filter', initialFilters);
 
   const onPressDepartment = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
@@ -80,7 +79,7 @@ const FilterPcPrScreen = ({
       department, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [department]);
-  console.log('filter', initialFilters);
+  // console.log('filter', initialFilters);
   const onPickLocation = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickLocalScreen', {
@@ -102,10 +101,10 @@ const FilterPcPrScreen = ({
     const newFilters: PcPrFilters = {
       prNo: prNo.trim() || undefined, // Đảm bảo prNo rỗng thì thành undefined
       pO: po.trim() || undefined, // Đảm bảo po rỗng thì thành undefined
-      fromDate,
-      toDate,
+      prDate: fromDate,
+      expectedDate: toDate,
       department: department?.id ? department : undefined, // Nếu id rỗng thì là undefined
-      location: location?.id ? location : undefined, // Nếu id rỗng thì là undefined
+      store: location?.id ? location : undefined, // Nếu id rỗng thì là undefined
       status: status?.status ? status : undefined, // Nếu code rỗng thì là undefined
     };
 
