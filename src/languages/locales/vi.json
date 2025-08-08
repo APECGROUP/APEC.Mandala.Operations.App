@@ -103,7 +103,7 @@
       "requester": "Người yêu cầu",
       "note": "Ghi chú"
     },
-    " ": {
+    "calendar": {
       "selectTime": "Chọn thời gian"
     },
     "orderDetail": {
@@ -263,7 +263,7 @@
       "rejectApprove": "Từ chối duyệt đơn hàng",
       "title": "Xin chào",
       "searchPlaceholder": "Tìm kiếm PR NO",
-      "listOfPurchaseOrder": "Danh sách phiếu yêu cầu mua hàng",
+      "listOfPurchaseOrder": "Danh sách PR",
       "selectAll": "Chọn tất cả",
       "orderSelected": "đơn đã chọn",
       "agree": "Đồng ý",
@@ -342,13 +342,24 @@
       "tab2": "Tạo giá ",
       "tab3": "Tạo PO ",
       "tab4": "PC PR",
-      "tab5": "PC Log"
+      "tab5": "PC Log",
+      "tab6": "Duyệt PR"
     },
     "error": {
       "title": "Oops!",
       "subtitle": "Đã có lỗi sảy ra xin vui lòng thử lại sau!",
       "goBack": "Quay lại",
       "tryAgain": "Thử lại"
+    },
+    "status": {
+      "pm": "Chờ TBP duyệt",
+      "pp": "Chờ gán giá",
+      "pa": "Chờ KTT duyệt",
+      "pc": "Chờ GM/OM duyệt",
+      "po": "Chờ tạo PO",
+      "ap": "Đã phê duyệt",
+      "cc": "Hủy bỏ",
+      "rj": "Từ chối"
     }
   }
 }

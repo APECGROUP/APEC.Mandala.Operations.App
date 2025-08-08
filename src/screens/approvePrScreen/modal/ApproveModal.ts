@@ -2,9 +2,7 @@ import { SelectedOption } from '@/screens/pcPrScreen/modal/PcPrModal';
 import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
-import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
-import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 export interface IApproveFilters {
   prNo?: string;
@@ -12,9 +10,6 @@ export interface IApproveFilters {
   expectedDate?: Date;
   department?: IPickDepartment | undefined;
   requester?: IPickRequester | undefined;
-  product?: any;
-  ncc?: IItemSupplier;
-  status?: IItemStatus | undefined;
   store?: SelectedOption;
 }
 // export interface IApproveFilters {
@@ -160,6 +155,14 @@ export const fetchApprove = async (
         operator: '==',
       });
     }
+    if (filters.store?.id) {
+      filterList.push({
+        propertyName: 'storeCode',
+        propertyValue: filters.store.storeCode,
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
 
     const params: IParams = {
       pagination: {
@@ -192,7 +195,7 @@ export const fetchApprove = async (
 
 export const checkApprovePrNoChange = async (id: number) => {
   try {
-    const response = await api.post(`${ENDPOINT.HANDLE_APPROVE_PR_NO_CHANGE}/${id}`, []);
+    const response = await api.get(`${ENDPOINT.HANDLE_APPROVE_PR_NO_CHANGE}/${id}`);
     if (response.status === 200 && response.data.isSuccess) {
       return { isSuccess: true, message: '' };
     } else {

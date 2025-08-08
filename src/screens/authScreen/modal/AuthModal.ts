@@ -55,6 +55,7 @@ export interface IUser {
   groups: IGroupAuth[];
   departments: Department[];
   hotelCode: string;
+  hotelName: string;
 }
 
 export interface Department {

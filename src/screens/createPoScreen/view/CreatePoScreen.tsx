@@ -32,11 +32,10 @@ import { styles } from './style';
 import CreatePoCard from './component/CreatePoCard';
 import { AppButton } from '@/elements/button/AppButton';
 
-const CreatePoScreen: React.FC = () => {
+export default function CreatePoScreen() {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   const route = useRoute() as any;
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
@@ -77,7 +76,6 @@ const CreatePoScreen: React.FC = () => {
   // const onCreatePo = useCallback(() => navigate('CreatePoNccScreen'), []);
 
   const reLoadData = useCallback(() => {
-    setIsFirstLoad(false);
     onRefresh();
   }, [onRefresh]);
 
@@ -99,7 +97,6 @@ const CreatePoScreen: React.FC = () => {
         </AppBlockButton> */}
       </View>
     );
-     
   }, [isLoading, t]);
 
   const listFooterComponent = useMemo(() => {
@@ -169,11 +166,11 @@ const CreatePoScreen: React.FC = () => {
               </AppBlockButton>
 
               <View style={styles.greetingContainer}>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {t('CreatePo.title')}
+                <AppText weight="400" color="#FFFFFF" style={styles.greetingText}>
+                  {t('CreatePo.title')}! - {infoUser?.userName}
                 </AppText>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {infoUser?.displayName}
+                <AppText weight="700" color="#FFFFFF" style={styles.greetingText} numberOfLines={1}>
+                  {infoUser?.hotelName}
                 </AppText>
               </View>
             </View>
@@ -262,6 +259,4 @@ const CreatePoScreen: React.FC = () => {
       )}
     </ViewContainer>
   );
-};
-
-export default CreatePoScreen;
+}

@@ -30,7 +30,7 @@ import { IItemPcPr } from '../modal/PcPrModal';
 import PcPrCard from './component/PcPrCard';
 import { Colors } from '@/theme/Config';
 
-const PcPrScreen: React.FC = () => {
+export default function PcPrScreen() {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
 
@@ -156,10 +156,10 @@ const PcPrScreen: React.FC = () => {
               </AppBlockButton>
               <View style={styles.greetingContainer}>
                 <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {t('assignPrice.title')}
+                  {t('assignPrice.title')}! - {infoUser?.userName}
                 </AppText>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {infoUser?.displayName}
+                <AppText weight="700" color="#FFFFFF" style={styles.greetingText} numberOfLines={1}>
+                  {infoUser?.hotelName}
                 </AppText>
               </View>
             </View>
@@ -239,6 +239,4 @@ const PcPrScreen: React.FC = () => {
       </View>
     </ViewContainer>
   );
-};
-
-export default PcPrScreen;
+}

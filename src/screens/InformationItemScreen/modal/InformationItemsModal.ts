@@ -130,7 +130,7 @@ export const fetchInformationItemsData = async (
 
 export const fetchSavedraft = async (id: number, data: IItemInDetailPr[]) => {
   try {
-    const response = await api.post(ENDPOINT.SAVE_DRAFT, data);
+    const response = await api.put(ENDPOINT.SAVE_DRAFT, data);
     if (response.status === 200 && response.data.isSuccess) {
       return { isSuccess: true, message: '' }; // Trả về false nếu có lỗi
     } else {

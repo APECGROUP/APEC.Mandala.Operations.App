@@ -42,8 +42,10 @@ import Footer from '@/screens/filterScreen/view/component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import ApproveCard from './component/ApproveCard';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
+import { set } from 'lodash';
+import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
-const ApprovePrScreen: React.FC = () => {
+export default function ApprovePrScreen() {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
@@ -118,11 +120,13 @@ const ApprovePrScreen: React.FC = () => {
     }
     return null;
   }, [isFetchingNextPage]);
-
+  const { statusGlobal } = useStatusGlobal();
+  console.log('alo: ', statusGlobal);
   const handleSelect = useCallback(
-    (id: string) => {
-      setSelectedIds([id]);
+    (id: number) => {
+      // setSelectedIds([id]);
       // setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+      setSelectedIds(prev => (prev.includes(id) ? [] : [id]));
     },
     [setSelectedIds],
   );
@@ -183,10 +187,10 @@ const ApprovePrScreen: React.FC = () => {
 
               <View style={styles.greetingContainer}>
                 <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {t('createPrice.title')}
+                  {t('createPrice.title')}! - {infoUser?.userName}
                 </AppText>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {infoUser?.displayName}
+                <AppText weight="700" color="#FFFFFF" style={styles.greetingText} numberOfLines={1}>
+                  {infoUser?.hotelName}
                 </AppText>
               </View>
             </View>
@@ -289,9 +293,8 @@ const ApprovePrScreen: React.FC = () => {
       )}
     </ViewContainer>
   );
-};
+}
 
-export default ApprovePrScreen;
 export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
 const styles = StyleSheet.create({
   imageBackground: {
@@ -341,7 +344,6 @@ const styles = StyleSheet.create({
   },
   greetingText: {
     fontSize: getFontSize(18),
-    fontWeight: '700',
   },
   headerRight: {
     flexDirection: 'row',

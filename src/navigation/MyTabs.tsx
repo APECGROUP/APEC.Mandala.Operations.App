@@ -1,20 +1,74 @@
-import React from 'react';
+import React, { lazy } from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { TabBarParams } from './params';
 import light from '../theme/light';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MyTabBar from './MyTabBar';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { IUser } from '@/screens/authScreen/modal/AuthModal';
+
+// Định nghĩa các hằng số cho ID nhóm người dùng
+const GROUP_IDS = {
+  GROUP_A: [14], // Trưởng bộ phận mua hàng, Admin
+  GROUP_B: [10, 12, 13], // Trưởng bộ phận, Kế toán trưởng, OM, GM
+};
+
+// --- Mới: Tách các hằng số và logic xác định nhóm ra một file riêng (nếu cần) ---
+// Ví dụ: utils/userGroups.ts
+export const getTabConfigKey = (infoUser: IUser): 'groupA' | 'groupB' | 'default' => {
+  const userGroups = infoUser?.groups?.map(group => group.id) || [];
+  if (userGroups.some(id => GROUP_IDS.GROUP_A.includes(id))) {
+    return 'groupA';
+  }
+  if (userGroups.some(id => GROUP_IDS.GROUP_B.includes(id))) {
+    return 'groupB';
+  }
+  return 'default';
+};
+
+// --- Quay lại MyTabs.tsx ---
+const screens = {
+  AssignPriceScreen: lazy(() => import('../screens/assignPriceScreen/view/AssignPriceScreen')),
+  CreatePriceScreen: lazy(() => import('@/screens/createPriceScreen/view/CreatePriceScreen')),
+  PcPrScreen: lazy(() => import('@/screens/pcPrScreen/view/PcPrScreen')),
+  CreatePoScreen: lazy(() => import('@/screens/createPoScreen/view/CreatePoScreen')),
+  ApprovePrScreen: lazy(() => import('@/screens/approvePrScreen/view/ApprovePrScreen')),
+};
+
+const tabConfigs = {
+  groupA: [
+    { name: 'AssignPriceScreen', component: screens.AssignPriceScreen },
+    { name: 'CreatePriceScreen', component: screens.CreatePriceScreen },
+    { name: 'ApprovePrScreen', component: screens.ApprovePrScreen },
+    { name: 'CreatePoScreen', component: screens.CreatePoScreen },
+    { name: 'PcPrScreen', component: screens.PcPrScreen },
+  ],
+  groupB: [
+    { name: 'ApprovePrScreen', component: screens.ApprovePrScreen },
+    { name: 'PcPrScreen', component: screens.PcPrScreen },
+  ],
+  default: [
+    { name: 'AssignPriceScreen', component: screens.AssignPriceScreen },
+    { name: 'CreatePriceScreen', component: screens.CreatePriceScreen },
+    { name: 'CreatePoScreen', component: screens.CreatePoScreen },
+    { name: 'PcPrScreen', component: screens.PcPrScreen },
+  ],
+};
 
 const MyTabs = () => {
   const Tab = createBottomTabNavigator<TabBarParams>();
-  const tabBar = (props: any) => <MyTabBar {...props} />;
-  const AssignPriceScreen = React.lazy(
-    () => import('../screens/assignPriceScreen/view/AssignPriceScreen'),
-  );
-  const CreatePriceScreen = React.lazy(
-    () => import('@/screens/createPriceScreen/view/CreatePriceScreen'),
-  );
-  const PcPrScreen = React.lazy(() => import('@/screens/pcPrScreen/view/PcPrScreen'));
-  const CreatePoScreen = React.lazy(() => import('@/screens/createPoScreen/view/CreatePoScreen'));
+  const { infoUser } = useInfoUser();
+
+  const tabConfigKey = getTabConfigKey(infoUser!); // Sử dụng hàm từ file riêng
+  const tabs = tabConfigs[tabConfigKey];
+
+  // Xử lý trường hợp không có tabs nào được định nghĩa
+  if (!tabs || tabs.length === 0) {
+    // Có thể render một màn hình trống hoặc thông báo lỗi
+    return null;
+  }
+
+  // Đảm bảo initialRouteName luôn là một route hợp lệ
+  const initialRouteName = tabs[0].name as keyof TabBarParams;
 
   return (
     <Tab.Navigator
@@ -23,28 +77,19 @@ const MyTabs = () => {
         tabBarHideOnKeyboard: true,
         sceneStyle: {
           backgroundColor: light.backgroundScreenDefault,
-
-          // paddingTop: top,
-          // paddingHorizontal: s(16),
         },
       }}
-      tabBar={tabBar}
-      initialRouteName="AssignPriceScreen">
-      <Tab.Screen
-        name="AssignPriceScreen"
-        component={AssignPriceScreen}
-        // options={
-        //   {
-        //     sceneStyle: {paddingHorizontal: 0, backgroundColor: light.white},
-        //   }
-        // }
-      />
-      <Tab.Screen name="CreatePriceScreen" component={CreatePriceScreen} />
-      {/* <Tab.Screen name="CreatePoScreen" component={ApprovePrScreen} /> */}
-      <Tab.Screen name="CreatePoScreen" component={CreatePoScreen} />
-      <Tab.Screen name="PcPrScreen" component={PcPrScreen} />
-      {/* <Tab.Screen name="PcLogScreen" component={PcLogScreen} /> */}
+      tabBar={props => <MyTabBar {...props} tabConfigKey={tabConfigKey} />}
+      initialRouteName={initialRouteName}>
+      {tabs.map(tab => (
+        <Tab.Screen
+          key={tab.name}
+          name={tab.name as keyof TabBarParams}
+          component={tab.component}
+        />
+      ))}
     </Tab.Navigator>
   );
 };
+
 export default MyTabs;

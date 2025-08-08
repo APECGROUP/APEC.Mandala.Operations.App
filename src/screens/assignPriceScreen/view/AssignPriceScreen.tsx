@@ -29,6 +29,7 @@ import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { styles } from './style';
 import { Colors } from '@/theme/Config';
+import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();
@@ -144,7 +145,6 @@ const AssignPriceScreen: React.FC = () => {
           // backgroundColor="transparent" // Thường đặt transparent nếu có ảnh nền
           // translucent // Giúp nội dung tràn ra phía sau StatusBar
         />
-
         {/* ─── Background Image ─────────────────────────────────────────────── */}
         <ImageBackground
           source={Images.BackgroundAssignPrice}
@@ -157,11 +157,12 @@ const AssignPriceScreen: React.FC = () => {
                 <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
               </AppBlockButton>
               <View style={styles.greetingContainer}>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {t('assignPrice.title')}
+                <AppText weight="400" color="#FFFFFF" style={styles.greetingText}>
+                  {t('assignPrice.title')}! - {infoUser?.userName}
                 </AppText>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {infoUser?.displayName}
+                <AppText weight="700" color="#FFFFFF" style={styles.greetingText} numberOfLines={1}>
+                  {infoUser?.hotelName}
+                  {/* {infoUser?.displayName} */}
                 </AppText>
               </View>
             </View>

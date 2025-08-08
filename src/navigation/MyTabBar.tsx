@@ -1,54 +1,81 @@
+import React, { cloneElement } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useLinkBuilder } from '@react-navigation/native';
 import { PlatformPressable } from '@react-navigation/elements';
-import light from '../theme/light';
-import { cloneElement } from 'react';
-import { AppText } from '../elements/text/AppText';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { vs } from 'react-native-size-matters';
+
+// Icons và Configs
 import IconTab1 from '@assets/icon/IconTab1';
 import IconTab2 from '@assets/icon/IconTab2';
-import { Colors } from '@/theme/Config';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconTab3 from '@assets/icon/IconTab3';
 import IconTab4 from '@assets/icon/IconTab4';
+import { Colors } from '@/theme/Config';
+import light from '../theme/light';
+import { AppText } from '../elements/text/AppText';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import IconTab6 from '@assets/icon/IconTab6';
+
+// Định nghĩa các hằng số cho ID nhóm người dùng
+const GROUP_IDS = {
+  GROUP_A: [10, 14],
+  GROUP_B: [12, 13],
+};
+
+// Cấu hình icons và labels cho từng nhóm, sử dụng một cấu trúc dữ liệu tường minh hơn
+const tabIconConfigs = {
+  groupA: [
+    { icon: <IconTab1 />, labelKey: 'myTabs.tab1' },
+    { icon: <IconTab2 />, labelKey: 'myTabs.tab2' },
+    { icon: <IconTab6 />, labelKey: 'myTabs.tab6' },
+    { icon: <IconTab3 />, labelKey: 'myTabs.tab3' },
+    { icon: <IconTab4 />, labelKey: 'myTabs.tab4' },
+  ],
+  groupB: [
+    { icon: <IconTab6 />, labelKey: 'myTabs.tab6' },
+    { icon: <IconTab4 />, labelKey: 'myTabs.tab4' },
+  ],
+  default: [
+    { icon: <IconTab1 />, labelKey: 'myTabs.tab1' },
+    { icon: <IconTab2 />, labelKey: 'myTabs.tab2' },
+    { icon: <IconTab3 />, labelKey: 'myTabs.tab3' },
+    { icon: <IconTab4 />, labelKey: 'myTabs.tab4' },
+  ],
+};
+
+const getActiveIcon = (icon: React.ReactElement) => cloneElement(icon, { fill: Colors.PRIMARY });
+
 const MyTabBar = ({ state, descriptors, navigation }: any) => {
   const { t } = useTranslation();
   const { buildHref } = useLinkBuilder();
   const { bottom } = useSafeAreaInsets();
-  const tabIcons: any = [
-    {
-      icon: <IconTab1 />,
-      iconActive: <IconTab1 fill={light.primary} />,
-      label: t('myTabs.tab1'),
-    },
-    {
-      icon: <IconTab2 />,
-      iconActive: <IconTab2 fill={light.primary} />,
-      label: t('myTabs.tab2'),
-    },
-    {
-      icon: <IconTab3 />,
-      iconActive: <IconTab3 fill={light.primary} />,
-      label: t('myTabs.tab3'),
-    },
-    {
-      icon: <IconTab4 />,
-      iconActive: <IconTab4 fill={light.primary} />,
-      label: t('myTabs.tab4'),
-    },
-    // {
-    //   icon: <IconTab2 />,
-    //   iconActive: <IconTab2 fill={light.primary} />,
-    //   label: t('myTabs.tab5'),
-    // },
-  ];
+  const { infoUser } = useInfoUser();
+
+  // Logic xác định cấu hình icon dựa trên nhóm người dùng
+  const getTabIcons = () => {
+    const userGroups = infoUser?.groups?.map(group => group.id) || [];
+    if (userGroups.some(id => GROUP_IDS.GROUP_A.includes(id))) {
+      return tabIconConfigs.groupA;
+    }
+    if (userGroups.some(id => GROUP_IDS.GROUP_B.includes(id))) {
+      return tabIconConfigs.groupB;
+    }
+    return tabIconConfigs.default;
+  };
+
+  const tabs = getTabIcons();
+
   return (
     <View style={[styles.row]}>
-      {state.routes.map((route: any, index: string) => {
+      {state.routes.map((route: any, index: number) => {
         const { options } = descriptors[route.key];
-
         const isFocused = state.index === index;
+        const tabConfig = tabs[index];
+
+        if (!tabConfig) {
+          return null; // Tránh lỗi nếu cấu hình không khớp
+        }
 
         const onPress = () => {
           const event = navigation.emit({
@@ -62,30 +89,18 @@ const MyTabBar = ({ state, descriptors, navigation }: any) => {
           }
         };
 
-        const onLongPress = () => {
-          // navigation.emit({
-          //   type: 'tabLongPress',
-          //   target: route.key,
-          // });
-          // Alert.alert('long press');
-        };
-
         return (
           <PlatformPressable
-            key={index}
+            key={route.key}
             pressOpacity={1}
-            android_ripple={{ color: 'transparent' }}
             href={buildHref(route.name, route.params)}
+            android_ripple={{ color: 'transparent' }}
             accessibilityState={isFocused ? { selected: true } : {}}
             accessibilityLabel={options.tabBarAccessibilityLabel}
             testID={options.tabBarButtonTestID}
             onPress={onPress}
-            onLongPress={onLongPress}
             style={[styles.button, { paddingBottom: bottom }]}>
-            {isFocused
-              ? cloneElement(tabIcons[index].iconActive)
-              : cloneElement(tabIcons[index].icon)}
-
+            {isFocused ? getActiveIcon(tabConfig.icon) : tabConfig.icon}
             <AppText
               numberOfLines={1}
               size={12}
@@ -93,7 +108,7 @@ const MyTabBar = ({ state, descriptors, navigation }: any) => {
               style={{
                 color: isFocused ? Colors.PRIMARY : Colors.TEXT_DEFAULT,
               }}>
-              {tabIcons[index].label}
+              {t(tabConfig.labelKey)}
             </AppText>
           </PlatformPressable>
         );

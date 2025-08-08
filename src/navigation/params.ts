@@ -24,6 +24,7 @@ export type TabBarParams = {
   CreatePoScreen: undefined;
   PcLogScreen: undefined;
   PcPrScreen: undefined;
+  ApprovePrScreen: undefined;
 };
 
 // ─────────────────────────────────────────────────────────────

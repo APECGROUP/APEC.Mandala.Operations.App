@@ -17,6 +17,7 @@ import { Colors } from '@/theme/Config';
 import { navigate } from '@/navigation/RootNavigation';
 import moment from 'moment';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 interface RowItemProps {
   label: string;
@@ -97,6 +98,9 @@ const DetailPcPrCardScreen = ({
         <AppText weight="600">{item.prNo}</AppText>
         <IconCopy style={styles.copyIcon} />
       </AppBlockButton>
+      <View style={styles.onlyCenter}>
+        <BlockStatus code={item.status} />
+      </View>
 
       <View style={styles.infoCard}>
         <RowItem
@@ -150,6 +154,7 @@ const DetailPcPrCardScreen = ({
 };
 
 const styles = StyleSheet.create({
+  onlyCenter: { alignItems: 'center' },
   flex1: { flex: 1 },
   blockTextCoppied: {
     backgroundColor: Colors.GRAY_100,

@@ -45,8 +45,10 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
-    staleTime: 60 * 1000,
-    gcTime: 300000,
+    staleTime: 0,
+    gcTime: 0,
+    // staleTime: 60 * 1000,
+    // gcTime: 300000,
   });
 
   // Gộp data các page lại thành 1 mảng
@@ -81,6 +83,7 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
     }
 
     // console.log('✅ Updating price...');
+    console.log('onUpdatePrice: ', idItem, price);
     queryClient.setQueryData(key, {
       ...cached,
       pages: cached.pages.map(page =>
@@ -90,40 +93,41 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
   };
   const onAutoAssign = async () => {
     try {
-      // const cached = queryClient.getQueryData<InfiniteData<IItemInDetailPr[]>>(key);
-
-      // if (!cached) {
-      //   console.warn('🟥 No cache found for key:', key);
-      //   return;
-      // }
-
-      const cached = queryClient.getQueryData(key);
-      const newPages = cached.pages.map((page: IItemVendorPrice[]) =>
-        page.filter(item => !selectedIds.includes(item.id)),
-      );
-      const { isSuccess, message, data } = await fetchAutoAssign(id);
-      if (!isSuccess) {
+      const res = await fetchAutoAssign(id);
+      const { isSuccess, message, data: updatedItems } = res;
+      console.log('data mới: ', updatedItems);
+      if (!isSuccess || !Array.isArray(updatedItems)) {
         console.log('thất bại: ', message);
         return showToast(message || t('informationItem.autoAssignError'), 'error');
       }
+
+      // Cập nhật lại dữ liệu trong cache bằng cách merge các item đã auto assign
+      const cached = queryClient.getQueryData<InfiniteData<IItemInDetailPr[]>>(key);
+
+      if (!cached) {
+        console.warn('🟥 Không tìm thấy cache để cập nhật auto assign');
+        return;
+      }
+
+      const updatedIds = updatedItems.map(item => item.id);
+
       queryClient.setQueryData(key, {
         ...cached,
-        pages: newPages,
+        pages: cached.pages.map(page =>
+          page.map(item => {
+            const updated = updatedItems.find(i => i.id === item.id);
+            return updated ? { ...item, ...updated } : item;
+          }),
+        ),
       });
-      // refetch();
-      // Gán giá random (bội 1000) và NCC random cho từng item
-      // queryClient.setQueryData(key, {
-      //   ...cached,
-      //   pages: cached.pages.map(page =>
-      //     page.map(item => ({
-      //       ...item,
-      //       price: Math.floor(Math.random() * 10 + 1) * 1000, // random 1000-10000
-      //       ncc: 'NCC_' + Math.floor(Math.random() * 100), // NCC random
-      //     })),
-      //   ),
-      // });
-    } catch (error) {}
+
+      showToast(t('informationItem.autoAssignSuccess'), TYPE_TOAST.SUCCESS);
+    } catch (error) {
+      console.log('❌ Auto assign error:', error);
+      showToast(t('informationItem.autoAssignError'), TYPE_TOAST.ERROR);
+    }
   };
+
   const onSaveDraft = async () => {
     try {
       const { isSuccess, message } = await fetchSavedraft(id, flatData);

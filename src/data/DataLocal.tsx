@@ -18,7 +18,7 @@ import { Strings } from '../languages/FunctionLanguage';
 import { storage } from '../views/appProvider/AppProvider';
 import i18n from '../languages/i18n';
 import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
-import { IResponseAPILogin, IUser } from '@/screens/authScreen/modal/AuthModal';
+import { fetchStatusGlobal, IResponseAPILogin, IUser } from '@/screens/authScreen/modal/AuthModal';
 
 export const TOKEN_KEY = 'ACCESS_TOKEN';
 export const USER_KEY = 'USER_INFO';
@@ -142,11 +142,13 @@ const DataLocal = {
           DataLocal.token = parsedToken;
           console.log('Token retrieved and still valid:', parsedToken);
           DataLocal.setAuthStatus('authenticated');
+          await fetchStatusGlobal();
           return parsedToken;
         } else if (currentTime < parsedToken.refreshExpiresAt) {
           // Chỉ gọi refreshAccessToken nếu refresh token vẫn còn hạn
           const newToken = await DataLocal.refreshAccessToken(parsedToken.refreshToken);
           if (newToken) {
+            await fetchStatusGlobal();
             return newToken;
           }
         }
@@ -263,9 +265,9 @@ const DataLocal = {
   },
 
   // ✅ Lưu token và user sau khi login thành công
-  saveAll: async (res: IResponseAPILogin, hotelCode: string): Promise<void> => {
+  saveAll: async (res: IResponseAPILogin, hotelCode: string, hotelName: string): Promise<void> => {
     try {
-      await DataLocal.saveUser({ ...res.data?.user, hotelCode });
+      await DataLocal.saveUser({ ...res.data?.user, hotelCode, hotelName });
       // Truyền expiresAt và refreshExpiresAt trực tiếp dưới dạng chuỗi
       await DataLocal.saveToken(
         res.data.accessToken,

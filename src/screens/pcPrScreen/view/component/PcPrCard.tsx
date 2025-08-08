@@ -13,6 +13,7 @@ import moment from 'moment';
 import IconListPen from '@assets/icon/IconListPen';
 import { Colors } from '@/theme/Config';
 import Utilities from '@/utils/Utilities';
+import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 interface PcPrCardProps {
   item: IItemPcPr;
@@ -53,12 +54,7 @@ const PcPrCard = memo<PcPrCardProps>(({ item }) => {
           {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
           {moment(item.expectedDate).format('DD/MM/YYYY')}
         </AppText>
-        <View style={styles.blockWaiting}>
-          <AppText size={12} color={'#FF7009'} weight="500">
-            {/* {t('notifications.status.waitingAssignPrice')} */}
-            {Utilities.getStatusName(item.status)}
-          </AppText>
-        </View>
+        <BlockStatus code={item.status} />
       </View>
     </TouchableOpacity>
   );

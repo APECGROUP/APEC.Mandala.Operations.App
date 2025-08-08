@@ -142,7 +142,11 @@ export const useAuthViewModel = () => {
           );
         }
         saveInfoUser(response.data.data.user);
-        DataLocal.saveAll(response.data, loginFormRef.current.hotel?.code!);
+        DataLocal.saveAll(
+          response.data,
+          loginFormRef.current.hotel?.code!,
+          loginFormRef.current.hotel?.name!,
+        );
         await fetchStatusGlobal();
         setIsLogin(true);
       } else {

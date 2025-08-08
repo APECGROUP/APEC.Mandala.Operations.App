@@ -38,10 +38,10 @@ const FooterInformationItem = ({
     setIsLoadingReject(false);
   };
 
-  const onPressAutoAssign = () => {
-    showToast(t('informationItem.autoAssignSuccess'), TYPE_TOAST.SUCCESS);
-    onAutoAssign();
-  };
+  // const onPressAutoAssign = () => {
+  //   showToast(t('informationItem.autoAssignSuccess'), TYPE_TOAST.SUCCESS);
+  //   onAutoAssign();
+  // };
 
   // const onPressSaveDraft = () => {
   //   showToast(t('informationItem.saveDraftSuccess'), TYPE_TOAST.SUCCESS);

@@ -19,7 +19,7 @@ export enum ENDPOINT {
   GET_LIST_PC_PR = '/api/spc/purchase-request/search',
   GET_LIST_VENDOR_PRICE = '/api/spc/vendor-price-list/search',
   HANDLE_APPROVE_PR = '/api/spc/request/approve-pr/approve',
-  HANDLE_APPROVE_PR_NO_CHANGE = '/api/spc/request/approve-pr/approve-by-select/',
+  HANDLE_APPROVE_PR_NO_CHANGE = '/api/spc/request/approve-pr/approve-by-select',
   HANDLE_REJECT_PR = '/api/spc/request/approve-pr/reject',
   HANDLE_REJECT_PR_ASSIGN = '/api/spc/request/assign-price/reject',
   HANDLE_ASSIGN_PR = '/api/spc/request/assign-price/approve',

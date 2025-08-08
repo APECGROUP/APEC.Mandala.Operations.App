@@ -13,6 +13,7 @@ import { navigate } from '@/navigation/RootNavigation';
 import { IItemAssignPrice } from '../../modal/AssignPriceModal';
 import moment from 'moment';
 import Utilities from '@/utils/Utilities';
+import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 interface AssignPriceCardProps {
   item: IItemAssignPrice;
@@ -50,11 +51,12 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
           {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
           {moment(item.expectedDate).format('DD/MM/YYYY')}
         </AppText>
-        <View style={styles.blockWaiting}>
+        {/* <View style={styles.blockWaiting}>
           <AppText size={12} color={'#FF7009'} weight="500">
             {textTag}
           </AppText>
-        </View>
+        </View> */}
+        <BlockStatus code={item.status} />
       </View>
     </TouchableOpacity>
   );

@@ -37,11 +37,10 @@ import Footer from '@/screens/filterScreen/view/component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { styles } from './style';
 
-const CreatePriceScreen: React.FC = () => {
+export default function CreatePriceScreen() {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   const route = useRoute() as any;
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
@@ -162,11 +161,11 @@ const CreatePriceScreen: React.FC = () => {
               </AppBlockButton>
 
               <View style={styles.greetingContainer}>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {t('createPrice.title')}
+                <AppText weight="400" color="#FFFFFF" style={styles.greetingText}>
+                  {t('createPrice.title')}! - {infoUser?.userName}
                 </AppText>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {infoUser?.displayName}
+                <AppText weight="700" color="#FFFFFF" style={styles.greetingText} numberOfLines={1}>
+                  {infoUser?.hotelName}
                 </AppText>
               </View>
             </View>
@@ -269,6 +268,4 @@ const CreatePriceScreen: React.FC = () => {
       )}
     </ViewContainer>
   );
-};
-
-export default CreatePriceScreen;
+}
