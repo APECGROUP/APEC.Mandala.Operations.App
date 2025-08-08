@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, memo } from 'react';
 import { View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
 import IconListPen from '@assets/icon/IconListPen';
-import { TypeCreatePrice } from '../../modal/CreatePriceModal';
+import { IItemVendorPrice } from '../../modal/CreatePriceModal';
 import { getFontSize } from '@/constants';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { AppText } from '@/elements/text/AppText';
@@ -16,7 +16,7 @@ import { Colors } from '@/theme/Config';
 import { moneyFormat } from '@/utils/Utilities';
 
 interface CreatePriceNccCardProps {
-  item: TypeCreatePrice;
+  item: IItemVendorPrice;
   isSelected: boolean;
   handleDelete: (id: string) => void;
   handleSelect: (id: string) => void;
@@ -111,6 +111,7 @@ const CreatePriceNccCard = memo<CreatePriceNccCardProps>(
 
             <AppBlockButton style={styles.right} onPress={handleExpand}>
               {/* <AppText style={{ fontSize: vs(20), color: '#999' }}>{expanded ? '▲' : '▼'}</AppText> */}
+              <AppText />
             </AppBlockButton>
           </View>
 

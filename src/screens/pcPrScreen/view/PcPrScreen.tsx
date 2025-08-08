@@ -178,7 +178,7 @@ const PcPrScreen: React.FC = () => {
             <TextInput
               value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
               onChangeText={onSearchPrNo} // Gọi hàm debounce từ ViewModel
-              placeholder={t('assignPrice.searchPlaceholder')}
+              placeholder={t('pcPr.searchPlaceholder')}
               placeholderTextColor={Colors.TEXT_SECONDARY}
               style={styles.searchInput}
               // returnKeyType="search"

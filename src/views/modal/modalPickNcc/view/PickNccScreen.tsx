@@ -15,7 +15,7 @@ import IconSelectHotel from '../../../../../assets/icon/IconSelectHotel';
 import { usePickNCCViewModel } from '../viewmodal/usePickNCCViewModel';
 import { SCREEN_HEIGHT } from '@/constants';
 import { FlashList } from '@shopify/flash-list';
-import { IItemSupplier, ResponseNcc } from '../modal/PickNccModal';
+import { IItemSupplier } from '../modal/PickNccModal';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';

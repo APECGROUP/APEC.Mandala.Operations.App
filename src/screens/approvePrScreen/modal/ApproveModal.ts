@@ -4,7 +4,7 @@ import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
-import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 export interface IApproveFilters {
   prNo?: string;
@@ -14,7 +14,7 @@ export interface IApproveFilters {
   requester?: IPickRequester | undefined;
   product?: any;
   ncc?: IItemSupplier;
-  status?: IStausGlobal | undefined;
+  status?: IItemStatus | undefined;
   store?: SelectedOption;
 }
 // export interface IApproveFilters {
@@ -37,6 +37,8 @@ export interface IApprove {
   prDate: Date;
   expectedDate: Date;
   requestBy: string;
+  userRequest: IPickRequester;
+
   departmentCode: string;
   departmentName: string;
   departmentShortName: string;

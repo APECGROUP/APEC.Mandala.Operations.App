@@ -220,7 +220,8 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
       navigation.getParent()?.setOptions({
         tabBarStyle: { display: 'none' }, // hoặc undefined
       });
-      setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+      // setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+      setSelectedIds(prev => (prev.includes(id) ? [] : [id]));
     },
     [navigation],
   );
@@ -229,7 +230,7 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     () => selectedIds.length === flatData.length && flatData.length > 0,
     [selectedIds.length, flatData.length],
   );
-  const onCreatePo = useCallback(() => {
+  const onCreatePo = useCallback(async () => {
     const cached = queryClient.getQueryData<InfiniteData<IItemCreatePo[]>>(currentQueryKey);
     if (!cached) {
       console.warn('🟥 No cache found for key:', currentQueryKey);
@@ -239,18 +240,18 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     console.log('Creating PO with prNo:', prNo);
     try {
       setIsLoadingCreatePo(true);
-      const isSuccess = fetchCreatePo(prNo);
+      const { isSuccess, message } = await fetchCreatePo(prNo);
       setIsLoadingCreatePo(false);
       if (!isSuccess) {
-        throw new Error('Failed to create PO');
+        return showToast(message || t('error.subtitle'), TYPE_TOAST.ERROR);
       }
       queryClient.setQueryData(currentQueryKey, {
         ...cached,
         pages: cached.pages.map(page => page.filter(item => item.id !== selectedIds[0]) || []),
       });
       setSelectedIds([]);
-
-      showToast(t('CreatePo.success'), TYPE_TOAST.ERROR);
+      showToast(t('CreatePo.success'), TYPE_TOAST.SUCCESS);
+      // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
     } catch (error) {
       showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
     } finally {

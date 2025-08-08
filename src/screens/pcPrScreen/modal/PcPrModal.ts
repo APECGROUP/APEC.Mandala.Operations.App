@@ -4,7 +4,7 @@ import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
-import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 // --- (Các interfaces không thay đổi) ---
 
@@ -16,7 +16,7 @@ export interface PcPrFilters {
   expectedDate?: Date;
   department?: IPickDepartment | undefined;
   store?: IPickLocal | undefined;
-  status?: IStausGlobal | undefined;
+  status?: IItemStatus | undefined;
 }
 
 export interface IResponseListPCPR {
@@ -31,6 +31,7 @@ export interface IItemPcPr {
   prDate: Date;
   expectedDate: Date;
   requestBy: string;
+  userRequest: IPickRequester;
   departmentCode: string;
   departmentName: string;
   departmentShortName: string;
@@ -76,18 +77,50 @@ export const fetchPcPrData = async (
   try {
     const filterList: Filter[] = [];
 
-    filterList.push({
-      propertyValue: 'PC',
-      propertyName: 'status',
-      propertyType: 'string',
-      operator: '==',
-    });
+    // filterList.push({
+    //   propertyValue: 'AP',
+    //   propertyName: 'status',
+    //   propertyType: 'string',
+    //   operator: '==',
+    // });
 
+    if (filters.prNo) {
+      filterList.push({
+        propertyName: 'prNo',
+        propertyValue: filters.prNo,
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
+    if (filters.pO) {
+      filterList.push({
+        propertyName: 'poNo',
+        propertyValue: filters.pO,
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
     if (filters.prDate) {
       filterList.push({
         propertyName: 'prDate',
         propertyValue: filters.prDate.toISOString(),
         propertyType: 'datetime',
+        operator: '==',
+      });
+    }
+    if (filters.store?.storeCode) {
+      filterList.push({
+        propertyName: 'storeCode',
+        propertyValue: filters.store.storeCode,
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
+    if (filters.status?.status) {
+      filterList.push({
+        propertyName: 'status',
+        propertyValue: filters.status.status,
+        propertyType: 'string',
         operator: '==',
       });
     }

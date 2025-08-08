@@ -17,6 +17,7 @@ export enum ENDPOINT {
   GET_LIST_APPOVE_PR = '/api/spc/request/search',
   GET_LIST_CREATE_PO = '/api/spc/request/search',
   GET_LIST_PC_PR = '/api/spc/purchase-request/search',
+  GET_LIST_VENDOR_PRICE = '/api/spc/vendor-price-list/search',
   HANDLE_APPROVE_PR = '/api/spc/request/approve-pr/approve',
   HANDLE_APPROVE_PR_NO_CHANGE = '/api/spc/request/approve-pr/approve-by-select/',
   HANDLE_REJECT_PR = '/api/spc/request/approve-pr/reject',
@@ -26,4 +27,9 @@ export enum ENDPOINT {
   SAVE_DRAFT = '/api/spc/request-detail/multi-update',
   DETAIL_PR = '/api/spc/request-detail/search',
   CREATE_PO = '/api/spc/request/create-po',
+  HANDLE_REJECT_CREATE_PRICE = '/api/spc/vendor-price-list/reject',
+  HANDLE_APPROVE_CREATE_PRICE = '/api/spc/vendor-price-list/approve',
+  HANDLE_DELETE_CREATE_PRICE = '/api/spc/vendor-price-list/delete',
+  CREATE_PRICE = '/api/spc/vendor-price-list/multi-create',
+  GET_LIST_VAT = '/api/spc/rgTax/search',
 }

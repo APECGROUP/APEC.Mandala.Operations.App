@@ -2,10 +2,18 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { TypeCreatePrice, fetchCreatePrice, CreatePriceFilters } from '../modal/CreatePriceModal';
+import {
+  IItemVendorPrice,
+  fetchCreatePrice,
+  CreatePriceFilters,
+  checkRejectCreatePrice,
+  checkApproveCreatePrice,
+  checkDeleteCreatePrice,
+} from '../modal/CreatePriceModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
+import { TYPE_TOAST } from '@/elements/toast/Message';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
@@ -18,7 +26,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
   const [effectiveFilters, setEffectiveFilters] = useState<CreatePriceFilters>(initialFilters);
   const [currentUiFilters, setCurrentUiFilters] = useState<CreatePriceFilters>(initialFilters);
 
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
     typeof debounce<typeof setEffectiveFilters>
@@ -41,14 +49,10 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
   const currentQueryKey = useMemo(
     () => [
       'listCreatePrice',
-      effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-      effectiveFilters.fromDate?.toISOString() || '',
-      effectiveFilters.toDate?.toISOString() || '',
-      effectiveFilters.department?.id || '',
-      effectiveFilters.requester?.id || '',
-      effectiveFilters.product?.id || '',
-      effectiveFilters.ncc?.id || '',
-      effectiveFilters.status?.id || '',
+      effectiveFilters.prNo?.trim() || null,
+      effectiveFilters.product?.id || null,
+      effectiveFilters.ncc?.id || null,
+      effectiveFilters.status?.id || null,
     ],
     [effectiveFilters],
   );
@@ -64,7 +68,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
     isRefetching,
     isError,
     error,
-  } = useInfiniteQuery<TypeCreatePrice[], Error>({
+  } = useInfiniteQuery<IItemVendorPrice[], Error>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: currentQueryKey,
     queryFn: async ({ pageParam = 1 }) =>
@@ -102,44 +106,50 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
 
   const { showAlert } = useAlert();
   const onDelete = useCallback(
-    async (id: string, onSuccess?: (deletedId: string) => void) => {
-      const cached = queryClient.getQueryData<InfiniteData<TypeCreatePrice[]>>(currentQueryKey);
+    async (id: number, onSuccess?: (deletedId: number) => void) => {
+      const cached = queryClient.getQueryData<InfiniteData<IItemVendorPrice[]>>(currentQueryKey);
       if (!cached) {
         console.warn('🟥 No cache found for key:', currentQueryKey);
         return false;
       }
 
       try {
-        if (Number(id) % 5 !== 0) {
-          console.log('✅ Deleting item successfully...');
-          queryClient.setQueryData(currentQueryKey, {
-            ...cached,
-            pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
-          });
-          setSelectedIds(prev => prev.filter(v => v !== id));
+        console.log('✅ Deleting item successfully...', currentQueryKey, id, cached.pages);
 
-          onSuccess?.(id);
-          return true;
-        } else {
-          await new Promise(resolve => setTimeout(() => resolve(undefined), 500));
-          showAlert(t('createPrice.warningRemove'), '', [
-            {
-              text: t('createPrice.close'),
-              onPress: () => {},
-            },
-          ]);
+        const { isSuccess, message } = await checkDeleteCreatePrice(id);
+        if (!isSuccess) {
+          showToast(message || t('error.subtitle'), 'error');
           return false;
         }
+        console.log('chayj vaof sau: ', isSuccess, message);
+        showToast(t('createPrice.deleteSuccess'), TYPE_TOAST.SUCCESS);
+        // const newPages = cached.pages.map(
+        //   (page: IItemVendorPrice[]) => page.filter(item => item.id !== id) || [],
+        // );
+        // queryClient.setQueryData(currentQueryKey, {
+        //   ...cached,
+        //   pages: newPages,
+        // });
+        // console.log('cuois cùng: ', newPages);
+        refetch();
+        setSelectedIds(prev => prev.filter(v => v !== id));
+        onSuccess?.(id);
+        // showAlert(t('createPrice.warningRemove'), '', [
+        //   {
+        //     text: t('createPrice.close'),
+        //     onPress: () => {},
+        //   },
+        // ]);
+        // return false;
       } catch (err) {
         console.error('Error deleting item:', err);
-        return false;
       }
     },
-    [queryClient, currentQueryKey, showAlert, t],
+    [queryClient, currentQueryKey, showToast, t, refetch],
   );
-
+  console.log('render hook: ', flatData);
   const handleDelete = useCallback(
-    (id: string, onSuccess?: (deletedId: string) => void, onCancel?: () => void) => {
+    (id: number, onSuccess?: (deletedId: number) => void, onCancel?: () => void) => {
       showAlert(t('createPrice.remove.title'), '', [
         {
           text: t('createPrice.remove.cancel'),
@@ -150,12 +160,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
         },
         {
           text: t('createPrice.remove.agree'),
-          onPress: async () => {
-            const success = await onDelete(id, onSuccess);
-            if (!success) {
-              console.log('❌ Delete failed, no action needed');
-            }
-          },
+          onPress: async () => onDelete(id, onSuccess),
         },
       ]);
     },
@@ -167,9 +172,13 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
     const cached = queryClient.getQueryData(currentQueryKey);
     if (cached && cached.pages) {
       // Loại bỏ các item có id nằm trong ids khỏi từng page
-      const newPages = cached.pages.map((page: TypeCreatePrice[]) =>
+      const newPages = cached.pages.map((page: IItemVendorPrice[]) =>
         page.filter(item => !selectedIds.includes(item.id)),
       );
+      const { isSuccess, message } = await checkApproveCreatePrice(selectedIds);
+      if (!isSuccess) {
+        return showToast(message || t('error.subtitle'), 'error');
+      }
       queryClient.setQueryData(currentQueryKey, {
         ...cached,
         pages: newPages,
@@ -183,9 +192,14 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
     const cached = queryClient.getQueryData(currentQueryKey);
     if (cached && cached.pages) {
       // Loại bỏ các item có id nằm trong ids khỏi từng page
-      const newPages = cached.pages.map((page: TypeCreatePrice[]) =>
+      const newPages = cached.pages.map((page: IItemVendorPrice[]) =>
         page.filter(item => !selectedIds.includes(item.id)),
       );
+      console.log('newPages', newPages);
+      const { isSuccess, message } = await checkRejectCreatePrice(selectedIds);
+      if (!isSuccess) {
+        return showToast(message || t('error.subtitle'), 'error');
+      }
       queryClient.setQueryData(currentQueryKey, {
         ...cached,
         pages: newPages,
@@ -204,7 +218,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
   }, [selectedIds.length, flatData, setSelectedIds]);
 
   const handleSelect = useCallback(
-    (id: string) => {
+    (id: number) => {
       setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
     },
     [setSelectedIds],

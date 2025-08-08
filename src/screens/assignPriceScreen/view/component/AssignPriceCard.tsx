@@ -12,7 +12,6 @@ import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
 import { IItemAssignPrice } from '../../modal/AssignPriceModal';
 import moment from 'moment';
-import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 import Utilities from '@/utils/Utilities';
 
 interface AssignPriceCardProps {

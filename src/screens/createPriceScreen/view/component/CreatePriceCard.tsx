@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, memo, useRef } from 'react';
 import { View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
 import IconListPen from '@assets/icon/IconListPen';
-import { TypeCreatePrice } from '../../modal/CreatePriceModal';
+import { IItemVendorPrice } from '../../modal/CreatePriceModal';
 import { getFontSize } from '@/constants';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { AppText } from '@/elements/text/AppText';
@@ -19,9 +19,9 @@ import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 import { useCreatePriceViewModel } from '../../viewmodal/useCreatePriceViewModal';
 
 interface CreatePriceCardProps {
-  item: TypeCreatePrice;
+  item: IItemVendorPrice;
   isSelected: boolean;
-  handleSelect: (id: string) => void;
+  handleSelect: (id: number) => void;
   simultaneousGesture: any;
 }
 
@@ -50,6 +50,7 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
     }, []);
 
     const handleDeleteWithClose = useCallback(() => {
+      console.log('id nè: ', item.id);
       handleDelete(item.id, undefined, onCloseSwipe);
     }, [handleDelete, onCloseSwipe, item.id]);
 
@@ -71,21 +72,21 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
     }, [handleSelect, item.id]);
 
     const formattedPrice = useMemo(
-      () => `${moneyFormat(item.price, '.', '')}/${item.end}/${item.vat}`,
-      [item.price, item.end, item.vat],
+      () => `${moneyFormat(item.price, '.', '')}/${item.unitName.trim()}/${item.vatCode}`,
+      [item.price, item.unitName, item.vatCode],
     );
 
     const detailItems = useMemo(
       () => [
         {
           label: t('createPrice.time'),
-          value: `${moment(item.createdAt).format('DD/MM/YYYY')} - ${moment(
-            item.estimateDate,
-          ).format('DD/MM/YYYY')}`,
+          value: `${moment(item.validFrom).format('DD/MM/YYYY')} - ${moment(item.validTo).format(
+            'DD/MM/YYYY',
+          )}`,
         },
-        { label: t('createPrice.ncc'), value: item.ncc },
+        { label: t('createPrice.ncc'), value: item.vendorName },
       ],
-      [t, item.createdAt, item.estimateDate, item.ncc],
+      [t, item.validFrom, item.validTo, item.vendorName],
     );
 
     const onSwipe = useCallback(() => {
@@ -111,7 +112,7 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
                 </View>
                 <View style={styles.nameWrapper}>
                   <AppText numberOfLines={1} style={styles.name}>
-                    {item.name}
+                    {item.itemName}
                   </AppText>
                   <View style={styles.row}>
                     <AppText style={styles.titlePrice}>{t('createPrice.price')}: </AppText>

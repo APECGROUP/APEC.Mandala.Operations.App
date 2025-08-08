@@ -1,4 +1,4 @@
-import React, { use, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../../../navigation/params';
@@ -20,21 +20,27 @@ import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { IPickStatus } from '../modal/PickStatusModal';
-import { IStausGlobal, useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
-import { keyBy } from 'lodash';
+import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import Utilities from '@/utils/Utilities';
 
 type Props = NativeStackScreenProps<MainParams, 'PickStatusScreen'>;
 const PickStatusScreen = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
   const { status, setStatus } = route.params;
   const { bottom } = useSafeAreaInsets();
-  const { statusGlobal } = useStatusGlobal();
-  const [data, setData] = useState<IStausGlobal[]>([]);
+  const [data, setData] = useState<IItemStatus[]>([]);
   const [searchKey, setSearchKey] = useState<string>('');
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const { flatData, isLoading, isRefetching, isFetchingNextPage, onRefresh, onLoadMore, onSearch } =
-    usePickStatusViewModel();
+    usePickStatusViewModel() as {
+      flatData: IItemStatus[];
+      isLoading: boolean;
+      isRefetching: boolean;
+      isFetchingNextPage: boolean;
+      onRefresh: () => void;
+      onLoadMore: () => void;
+      onSearch: (key: string) => void;
+    };
 
   const listFooterComponent = () => {
     if (isFetchingNextPage) {
@@ -58,14 +64,14 @@ const PickStatusScreen = ({ navigation, route }: Props) => {
       <View style={styles.emptyContainer}>
         <IconEmptyNcc />
         <AppText size={18} weight="700" mt={12}>
-          {t('filter.emptyDepartment')}
+          {t('filter.emptyStatus')}
         </AppText>
       </View>
     );
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: IStausGlobal; index: number }) => {
+    ({ item, index }: { item: IItemStatus; index: number }) => {
       const isFocus = item?.status === status?.status;
       const onSelect = () => {
         setStatus(item);
@@ -89,16 +95,19 @@ const PickStatusScreen = ({ navigation, route }: Props) => {
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
+  console.log('flatData: ', flatData);
   useEffect(() => {
     if (searchKey.trim()) {
-      const filteredData = statusGlobal.filter(item =>
-        item.statusName.toLowerCase().includes(searchKey.toLowerCase()),
+      const filteredData = flatData.filter(item =>
+        Utilities.removeVietnameseTones(item.statusName.toLowerCase()).includes(
+          Utilities.removeVietnameseTones(searchKey.toLowerCase()),
+        ),
       );
       setData(filteredData);
     } else {
-      setData(statusGlobal);
+      setData(flatData);
     }
-  }, [searchKey, statusGlobal]);
+  }, [searchKey, flatData]);
 
   return (
     <ViewContainer>
@@ -144,6 +153,7 @@ const PickStatusScreen = ({ navigation, route }: Props) => {
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
             removeClippedSubviews
+            onRefresh={onRefresh}
             refreshing={isRefetching}
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent}

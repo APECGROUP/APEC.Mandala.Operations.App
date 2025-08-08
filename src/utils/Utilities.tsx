@@ -48,6 +48,17 @@ export default class Utilities {
     return Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
   }
 
+  static removeVietnameseTones(str: string): string {
+    return str
+      .normalize('NFD') // Tách dấu ra khỏi chữ
+      .replace(/[\u0300-\u036f]/g, '') // Xoá các dấu
+      .replace(/đ/g, 'd') // Chuyển đ -> d
+      .replace(/Đ/g, 'D') // Chuyển Đ -> D
+      .replace(/[^a-zA-Z0-9 ]/g, '') // Bỏ ký tự đặc biệt
+      .replace(/\s+/g, ' ') // Replace multiple spaces with one
+      .trim(); // Bỏ khoảng trắng đầu cuối
+  }
+
   static async requestContactsPermission(alertHandler: any) {
     return await this.requestPermission(PermissionsAndroid.PERMISSIONS.READ_CONTACTS, alertHandler);
   }

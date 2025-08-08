@@ -16,12 +16,10 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { MainParams } from '@/navigation/params';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { SelectedOption } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
-import { IPickStatus } from '@/views/modal/modalPickStatus/modal/PickStatusModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
-import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 const FilterPcPrScreen = ({
   route,
@@ -48,7 +46,7 @@ const FilterPcPrScreen = ({
   const [location, setLocation] = useState<IPickLocal | undefined>(
     initialFilters.store && initialFilters.store.id ? initialFilters.store : undefined,
   );
-  const [status, setStatus] = useState<IStausGlobal | undefined>(
+  const [status, setStatus] = useState<IItemStatus | undefined>(
     initialFilters.status && initialFilters.status.status !== ''
       ? initialFilters.status
       : undefined,

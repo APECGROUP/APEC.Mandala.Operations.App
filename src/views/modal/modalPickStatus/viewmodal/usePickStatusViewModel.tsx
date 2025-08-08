@@ -25,7 +25,7 @@ export function usePickStatusViewModel() {
     queryKey: ['listPickStatus', searchKey.trim(), searchKey],
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchStatusData(page, ITEMS_PER_PAGE, searchKey);
+      return fetchStatusData(page, ITEMS_PER_PAGE);
     },
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,

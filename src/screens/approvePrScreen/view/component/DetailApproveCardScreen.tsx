@@ -99,7 +99,7 @@ const DetailApproveCardScreen = ({
         <RowItem label={t('orderInfo.location')} value={item?.storedName || ''} />
         <RowItem
           label={t('orderInfo.requester')}
-          value={item.requestBy || ''}
+          value={item.userRequest?.displayName || ''}
           icon={<IconName />}
         />
         <RowItem label={t('orderInfo.note')} />

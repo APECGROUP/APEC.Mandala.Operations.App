@@ -17,6 +17,7 @@ import { Colors } from '@/theme/Config';
 import { navigate } from '@/navigation/RootNavigation';
 import moment from 'moment';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
 interface RowItemProps {
   label: string;
@@ -77,53 +78,55 @@ const DetailAssignPriceCardScreen = ({
   const dateEstimateFormatted = useMemo(() => formatDate(dateEstimate), [dateEstimate, formatDate]);
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle={'dark-content'} />
-      <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
+    <ViewContainer>
+      <View style={styles.container}>
+        <StatusBar barStyle={'dark-content'} />
+        <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
 
-      <AppBlockButton onPress={onCopy} style={styles.prRow}>
-        <AppText size={12} weight="500" color={light.placeholderTextColor}>
-          {t('orderInfo.prNo')}:{' '}
-        </AppText>
-        <AppText weight="600">{item.prNo}</AppText>
-        <IconCopy style={styles.copyIcon} />
-      </AppBlockButton>
-
-      <View style={styles.infoCard}>
-        <RowItem
-          onPress={onPressDateCreate}
-          label={t('orderInfo.createDate')}
-          value={dateCreateFormatted}
-          icon={<IconCalendar />}
-        />
-        <RowItem
-          onPress={onPressDateEstimate}
-          label={t('orderInfo.estimateDate')}
-          value={dateEstimateFormatted}
-          icon={<IconCalendar />}
-        />
-        <RowItem label={t('orderInfo.department')} value={item?.departmentName || ''} />
-        <RowItem label={t('orderInfo.location')} value={item?.storedName || ''} />
-        <RowItem
-          label={t('orderInfo.requester')}
-          value={item.requestBy || ''}
-          icon={<IconName />}
-        />
-        <RowItem label={t('orderInfo.note')} />
-        <View style={styles.noteContainer}>
-          <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
-            {item?.description || ''}
+        <AppBlockButton onPress={onCopy} style={styles.prRow}>
+          <AppText size={12} weight="500" color={light.placeholderTextColor}>
+            {t('orderInfo.prNo')}:{' '}
           </AppText>
+          <AppText weight="600">{item.prNo}</AppText>
+          <IconCopy style={styles.copyIcon} />
+        </AppBlockButton>
+
+        <View style={styles.infoCard}>
+          <RowItem
+            onPress={onPressDateCreate}
+            label={t('orderInfo.createDate')}
+            value={dateCreateFormatted}
+            icon={<IconCalendar />}
+          />
+          <RowItem
+            onPress={onPressDateEstimate}
+            label={t('orderInfo.estimateDate')}
+            value={dateEstimateFormatted}
+            icon={<IconCalendar />}
+          />
+          <RowItem label={t('orderInfo.department')} value={item?.departmentName || ''} />
+          <RowItem label={t('orderInfo.location')} value={item?.storedName || ''} />
+          <RowItem
+            label={t('orderInfo.requester')}
+            value={item.userRequest?.displayName || ''}
+            icon={<IconName />}
+          />
+          <RowItem label={t('orderInfo.note')} />
+          <View style={styles.noteContainer}>
+            <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
+              {item?.description || ''}
+            </AppText>
+          </View>
         </View>
+        {isCoppied && (
+          <View style={[styles.blockTextCoppied, { bottom: bottom + 70 }]}>
+            <AppText size={14} weight="500" color={Colors.TEXT_DEFAULT}>
+              Đã sao chép
+            </AppText>
+          </View>
+        )}
       </View>
-      {isCoppied && (
-        <View style={[styles.blockTextCoppied, { bottom: bottom + 70 }]}>
-          <AppText size={14} weight="500" color={Colors.TEXT_DEFAULT}>
-            Đã sao chép
-          </AppText>
-        </View>
-      )}
-    </View>
+    </ViewContainer>
   );
 };
 

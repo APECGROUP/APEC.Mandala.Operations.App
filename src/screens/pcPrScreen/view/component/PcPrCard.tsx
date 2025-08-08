@@ -12,6 +12,7 @@ import { IItemPcPr } from '../../modal/PcPrModal';
 import moment from 'moment';
 import IconListPen from '@assets/icon/IconListPen';
 import { Colors } from '@/theme/Config';
+import Utilities from '@/utils/Utilities';
 
 interface PcPrCardProps {
   item: IItemPcPr;
@@ -54,7 +55,8 @@ const PcPrCard = memo<PcPrCardProps>(({ item }) => {
         </AppText>
         <View style={styles.blockWaiting}>
           <AppText size={12} color={'#FF7009'} weight="500">
-            {t('notifications.status.waitingAssignPrice')}
+            {/* {t('notifications.status.waitingAssignPrice')} */}
+            {Utilities.getStatusName(item.status)}
           </AppText>
         </View>
       </View>

@@ -13,7 +13,6 @@ import light from '../../../theme/light';
 
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
-import { DetailOrderApprove } from '../modal/DetailOrderApproveModal';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
 import ToastContainer from '@/elements/toast/ToastContainer';

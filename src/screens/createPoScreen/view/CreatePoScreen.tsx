@@ -27,7 +27,6 @@ import { Colors } from '@/theme/Config';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
-import IconPlus from '@assets/icon/IconPlus';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { styles } from './style';
 import CreatePoCard from './component/CreatePoCard';
@@ -94,13 +93,13 @@ const CreatePoScreen: React.FC = () => {
       <View style={styles.emptyContainer}>
         <FastImage source={Images.IconEmptyDataAssign} style={styles.emptyImage} />
         <AppText style={styles.emptyText}>{t('CreatePo.empty')}</AppText>
-        <AppBlockButton onPress={onCreatePo} style={styles.buttonCreatePo}>
+        {/* <AppBlockButton onPress={onCreatePo} style={styles.buttonCreatePo}>
           <IconPlus fill={Colors.WHITE} />
           <AppText style={styles.textCreatePo}>{t('CreatePo.CreatePo')}</AppText>
-        </AppBlockButton>
+        </AppBlockButton> */}
       </View>
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isLoading, t]);
 
   const listFooterComponent = useMemo(() => {
@@ -114,7 +113,7 @@ const CreatePoScreen: React.FC = () => {
     return null;
   }, [isFetchingNextPage]);
 
-  const length = useMemo(() => selectedIds.length, [selectedIds]);
+  const lengthPick = useMemo(() => selectedIds.length, [selectedIds]);
   const renderItem = useCallback(
     ({ item }: { item: IItemCreatePo; index: number }) => (
       <CreatePoCard
@@ -149,7 +148,7 @@ const CreatePoScreen: React.FC = () => {
   //     },
   //   });
   // }, [length, navigation]);
-
+  const lengthData = useMemo(() => flatData.length, [flatData.length]);
   if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
@@ -252,7 +251,7 @@ const CreatePoScreen: React.FC = () => {
           <IconScrollBottom style={styles.rotateIcon} />
         </AppBlockButton>
       </View>
-      {length > 0 && (
+      {lengthPick > 0 && lengthData && (
         <View style={styles.buttonCreate}>
           <AppButton onPress={onCreatePo} style={{ backgroundColor: Colors.PRIMARY }}>
             <AppText weight="bold" color={Colors.WHITE}>

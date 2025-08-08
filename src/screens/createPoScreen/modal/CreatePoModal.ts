@@ -1,13 +1,10 @@
-import { create } from 'zustand';
 // views/modal/CreatePoModal.ts
 import { IParams } from '@/screens/approvePrScreen/modal/ApproveModal';
-import { AssignPriceFilters, Filter } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
+import { Filter } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
-import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
-import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 // Đảm bảo moment được import nếu bạn dùng nó cho Date objects
 
 export interface CreatePoFilters {
@@ -16,9 +13,6 @@ export interface CreatePoFilters {
   expectedDate?: Date;
   department?: IPickDepartment | undefined;
   requester?: IPickRequester | undefined;
-  product?: any;
-  ncc?: IItemSupplier;
-  status?: IStausGlobal | undefined;
 }
 
 export interface IResponseListCreatePo {
@@ -33,6 +27,8 @@ export interface IItemCreatePo {
   prDate: Date;
   expectedDate: Date;
   requestBy: string;
+  userRequest: IPickRequester;
+
   departmentCode: string;
   departmentName: string;
   departmentShortName: string;
@@ -77,7 +73,20 @@ export const fetchListCreatePo = async (
 ): Promise<IItemCreatePo> => {
   try {
     const filterList: Filter[] = [];
-
+    filterList.push({
+      propertyName: 'status',
+      propertyValue: 'PO',
+      propertyType: 'string',
+      operator: '==',
+    });
+    if (filters.prNo) {
+      filterList.push({
+        propertyName: 'prNo',
+        propertyValue: filters.prNo.trim(),
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
     if (filters.prDate) {
       filterList.push({
         propertyName: 'prDate',
@@ -145,8 +154,18 @@ export const fetchListCreatePo = async (
 
 export const fetchCreatePo = async (prNo: string) => {
   try {
-    const response = await api.get(`${ENDPOINT.CREATE_PO}/${prNo}`);
-  } catch (error) {}
+    // const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR}/${id}`, { textReason });
+    const params = { prNo: prNo };
+    const response = await api.post(`${ENDPOINT.CREATE_PO}`, params);
+
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' }; // Trả về dữ liệu đã phê duyệt
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: '' }; // Trả về false nếu có lỗi xảy ra
+  }
 };
 
 export const deleteCreatePo = async (id: string) => {

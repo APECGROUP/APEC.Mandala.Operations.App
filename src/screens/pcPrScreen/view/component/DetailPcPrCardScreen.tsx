@@ -45,17 +45,17 @@ const DetailPcPrCardScreen = ({
   const { item } = route.params;
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
-  const [dateCreate, setDateCreate] = useState<Date | undefined>(undefined);
-  const [dateEstimate, setDateEstimate] = useState<Date | undefined>(undefined);
+  const [dateCreate, setDateCreate] = useState<Date | undefined>(item.prDate);
+  const [dateEstimate, setDateEstimate] = useState<Date | undefined>(item.expectedDate);
   const [isCoppied, setIsCoppied] = useState(false);
 
   const onCopy = useCallback(() => {
-    Clipboard.setString(item.content);
+    Clipboard.setString(item.poNo || '');
     setIsCoppied(true);
     setTimeout(() => {
       setIsCoppied(false);
     }, 2000);
-  }, [item.content]);
+  }, [item.poNo]);
 
   const onPressDateCreate = useCallback(() => {
     navigate('ModalPickCalendar', {
@@ -94,43 +94,47 @@ const DetailPcPrCardScreen = ({
         <AppText size={12} weight="500" color={light.placeholderTextColor}>
           {t('orderInfo.prNo')}:{' '}
         </AppText>
-        <AppText weight="600">{item.prNo || item.content}</AppText>
+        <AppText weight="600">{item.prNo}</AppText>
         <IconCopy style={styles.copyIcon} />
       </AppBlockButton>
 
       <View style={styles.infoCard}>
         <RowItem
-          onPress={onPressDateCreate}
+          // onPress={onPressDateCreate}
           label={t('orderInfo.requestDate')}
           value={dateCreateFormatted}
           icon={<IconCalendar />}
         />
         <RowItem
-          onPress={onPressDateEstimate}
+          // onPress={onPressDateEstimate}
           label={t('orderInfo.estimateDate')}
           value={dateEstimateFormatted}
           icon={<IconCalendar />}
         />
-        <RowItem label={t('orderInfo.department')} value={item.department?.name || ''} />
-        <RowItem label={t('orderInfo.location')} value={item.location?.name || ''} />
+        <RowItem label={t('orderInfo.department')} value={item.departmentName || ''} />
+        <RowItem label={t('orderInfo.location')} value={item.storedName || ''} />
         <RowItem
           label={t('orderInfo.requester')}
-          value={item.requester?.name || ''}
+          value={item.userRequest?.displayName}
           icon={<IconName />}
         />
-        <RowItem label={t('orderInfo.poNo')} value={''} />
-        <FlatList
-          numColumns={2}
-          data={new Array(20).fill(0)}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={renderItemPo}
-          style={{ backgroundColor: Colors.WHITE, borderRadius: s(8), maxHeight: vs(145) }}
-          showsVerticalScrollIndicator={false}
-        />
+        {item.poNo && (
+          <>
+            <RowItem label={t('orderInfo.poNo')} value={''} />
+            <FlatList
+              numColumns={2}
+              data={item.poNo.split(',')} // Assuming item.poNo is an array of PO numbers
+              keyExtractor={(_, index) => index.toString()}
+              renderItem={renderItemPo}
+              style={{ backgroundColor: Colors.WHITE, borderRadius: s(8), maxHeight: vs(145) }}
+              showsVerticalScrollIndicator={false}
+            />
+          </>
+        )}
         <RowItem label={t('orderInfo.note')} />
         <View style={styles.noteContainer}>
           <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
-            {item?.note || ''}
+            {item?.description}
           </AppText>
         </View>
       </View>

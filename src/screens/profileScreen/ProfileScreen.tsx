@@ -16,7 +16,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'ProfileScreen'>) => {
   const { t } = useTranslation();
   const { infoUser, updateAvatar } = useInfoUser();
-
+  console.log('first,', infoUser);
   // eslint-disable-next-line arrow-body-style, @typescript-eslint/no-unused-vars
   const onUploadAvatar = async (imageAvatar: ResponseImageElement) => {
     return updateAvatar('https://i.pinimg.com/736x/9c/2e/5e/9c2e5e3d63454104bdee33258fca0a28.jpg');
@@ -63,7 +63,7 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
     },
     {
       label: t('account.profile.rank'),
-      value: infoUser?.departmentName || '',
+      value: infoUser?.groups[0]?.groupName || '',
     },
     {
       label: t('account.profile.email'),
@@ -71,7 +71,7 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
     },
     {
       label: t('account.profile.department'),
-      value: infoUser?.departmentName || '',
+      value: infoUser?.departments[0]?.departmentName || '',
     },
   ];
 

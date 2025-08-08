@@ -17,7 +17,7 @@ import IconSearch from '@assets/icon/IconSearch';
 import IconFilter from '@assets/icon/IconFillter';
 import IconScrollBottom from '@assets/icon/IconScrollBottom';
 
-import { TypeCreatePrice } from '../modal/CreatePriceModal';
+import { IItemVendorPrice } from '../modal/CreatePriceModal';
 import Images from '@assets/image/Images';
 import { navigate } from '@/navigation/RootNavigation';
 import { AppText } from '@/elements/text/AppText';
@@ -65,11 +65,11 @@ const CreatePriceScreen: React.FC = () => {
     selectedAll,
   } = useCreatePriceViewModel();
   const { infoUser } = useInfoUser();
-
+  console.log('data: ', flatData);
   const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
-  const flashListRef = useRef<FlashList<TypeCreatePrice> | null>(null);
+  const flashListRef = useRef<FlashList<IItemVendorPrice> | null>(null);
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
@@ -87,7 +87,6 @@ const CreatePriceScreen: React.FC = () => {
   const onCreatePrice = useCallback(() => navigate('CreatePriceNccScreen'), []);
 
   const reLoadData = useCallback(() => {
-    setIsFirstLoad(false);
     onRefresh();
   }, [onRefresh]);
 
@@ -125,7 +124,7 @@ const CreatePriceScreen: React.FC = () => {
 
   const length = useMemo(() => selectedIds.length, [selectedIds]);
   const renderItem = useCallback(
-    ({ item }: { item: TypeCreatePrice; index: number }) => (
+    ({ item }: { item: IItemVendorPrice; index: number }) => (
       <CreatePriceCard
         item={item}
         handleSelect={handleSelect}
@@ -159,7 +158,7 @@ const CreatePriceScreen: React.FC = () => {
           <View style={[styles.headerContainer, { marginTop: top }]}>
             <View style={styles.headerLeft}>
               <AppBlockButton onPress={goToAccount}>
-                <FastImage source={{ uri: infoUser?.signature }} style={styles.avatar} />
+                <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
               </AppBlockButton>
 
               <View style={styles.greetingContainer}>
@@ -186,7 +185,7 @@ const CreatePriceScreen: React.FC = () => {
             <TextInput
               value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
               onChangeText={onSearch} // Gọi hàm debounce từ ViewModel
-              placeholder={t('assignPrice.searchPlaceholder')}
+              placeholder={t('createPrice.searchPlaceholder')}
               placeholderTextColor={Colors.TEXT_SECONDARY}
               style={styles.searchInput}
               // returnKeyType="search"
@@ -231,7 +230,7 @@ const CreatePriceScreen: React.FC = () => {
             ref={flashListRef}
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.id.toString()}
             // onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}

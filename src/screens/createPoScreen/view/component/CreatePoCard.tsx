@@ -34,11 +34,11 @@ const CreatePoCard = memo<CreatePoCardProps>(({ item, isSelected, handleSelect }
     () => [
       {
         label: t('CreatePo.requester'),
-        value: item.requestBy,
+        value: item.userRequest?.displayName,
       },
-      { label: t('CreatePo.department'), value: item.departmentName },
+      { label: t('CreatePo.department'), value: item?.departmentName },
     ],
-    [t, item.requestBy, item.departmentName],
+    [t, item.userRequest?.displayName, item?.departmentName],
   );
   return (
     <View style={[styles.itemContainer, styles.itemExpanded]}>

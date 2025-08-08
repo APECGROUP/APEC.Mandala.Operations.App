@@ -133,13 +133,13 @@ const AccountScreen = () => {
               onPress: toggleAllowNotification,
               right: <Switch value={allowNotification} />,
             },
-            {
-              key: 'checkUpdate',
-              icon: <IconChangePassword />,
-              title: t('account.checkUpdate'),
-              onPress: checkForOtaUpdate,
-              right: <IconArrowRight />,
-            },
+            // {
+            //   key: 'checkUpdate',
+            //   icon: <IconChangePassword />,
+            //   title: t('account.checkUpdate'),
+            //   onPress: checkForOtaUpdate,
+            //   right: <IconArrowRight />,
+            // },
             {
               key: 'password',
               icon: <IconChangePassword />,

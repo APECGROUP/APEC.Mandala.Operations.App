@@ -3,17 +3,15 @@ import { ResponseImageElement } from '../interface/Verify.interface';
 import {
   AssignPriceFilters,
   IItemAssignPrice,
-  SelectedOption,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
-import { IItemSupplier, ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
-import { IApprove, TypeApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
+import { IApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
 import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 import { IItemPcPr, PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';
-import { IPickStatus } from '@/views/modal/modalPickStatus/modal/PickStatusModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
-import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 
 // ─────────────────────────────────────────────────────────────
@@ -94,7 +92,7 @@ export type MainParams = {
     type: 'verifyEmail';
   };
   PickNccScreen: {
-    setNcc: Dispatch<SetStateAction<IItemSupplier>>;
+    setNcc: Dispatch<SetStateAction<IItemSupplier>> | ((i: IItemSupplier) => void);
     ncc: IItemSupplier;
   };
   PickDepartmentScreen: {
@@ -103,7 +101,7 @@ export type MainParams = {
   };
 
   PickItemScreen: {
-    setItem: Dispatch<SetStateAction<IPickItem>>;
+    setItem: Dispatch<SetStateAction<IPickItem>> | ((i: IPickItem) => void);
   };
 
   PickRequesterScreen: {
@@ -111,8 +109,8 @@ export type MainParams = {
     requester: IPickRequester | undefined;
   };
   PickStatusScreen: {
-    setStatus: Dispatch<SetStateAction<IStausGlobal | undefined>>;
-    status: IStausGlobal | undefined;
+    setStatus: Dispatch<SetStateAction<IItemStatus | undefined>>;
+    status: IItemStatus | undefined;
   };
   PickLocalScreen: {
     setLocation: Dispatch<SetStateAction<IPickLocal | undefined>>;

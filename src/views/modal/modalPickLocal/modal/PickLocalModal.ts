@@ -1,4 +1,3 @@
-import { fakeLocal } from '@/data/DataFake';
 import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
 

@@ -6,8 +6,7 @@ import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/theme/Config';
 import { navigate } from '@/navigation/RootNavigation';
-import { IItemSupplier, ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
-import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
+import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import IconPenEdit from '@assets/icon/IconPenEdit';
 import IconCalendar from '@assets/icon/IconCalendar';
 import IconListPen from '@assets/icon/IconListPen';
@@ -17,31 +16,34 @@ import moment from 'moment';
 import IconDropDown from '@assets/icon/IconDropDown';
 import AppDropdown from '@/elements/appDropdown/AppDropdown';
 import ReanimatedSwipeable from './ReanimatedSwipeable';
-import { AnimatedButton } from '../CreatePriceScreen';
 import IconTrashPrice from '@assets/icon/IconTrashPrice';
 import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useAlert } from '@/elements/alert/AlertProvider';
+import { IItemVat, IItemVendorPrice } from '../../modal/CreatePriceModal';
+import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 
 const CreateNewItemCard = ({
   item,
+  listVat,
   onFocusComment,
   onUpdateItem,
   handleDelete,
   simultaneousGesture,
 }: {
-  item: IPickItem;
+  listVat: IItemVat[];
+  item: IItemVendorPrice;
   index: number;
   onFocusComment: () => void;
-  onUpdateItem: (i: IPickItem) => void;
-  handleDelete: (id: string) => void;
+  onUpdateItem: (i: IItemVendorPrice) => void;
+  handleDelete: (id: number) => void;
   simultaneousGesture: any;
 }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(true);
-  const [ncc, setNcc] = useState<IItemSupplier>(item.supplier);
-  const [price, setPrice] = useState(item.price);
+  const [ncc, setNcc] = useState<IItemSupplier>({} as IItemSupplier);
+  const [price, setPrice] = useState(item.price || 0);
   const { showAlert } = useAlert();
-
+  console.log('list vat: ', listVat);
   const handleShowDetail = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setIsShow(i => !i);
@@ -49,8 +51,11 @@ const CreateNewItemCard = ({
 
   const onPickNcc = () => {
     navigate('PickNccScreen', {
-      setNcc: setNcc,
-      ncc: item.supplier,
+      setNcc: (i: IItemSupplier) => {
+        setNcc(i);
+        onUpdateItem({ ...item, vendorCode: String(i.code), vendorName: i.accountName });
+      },
+      ncc,
     });
   };
 
@@ -60,8 +65,8 @@ const CreateNewItemCard = ({
 
   const onPickItem = () => {
     navigate('PickItemScreen', {
-      setItem: (i: { id: string; name: string }) => {
-        onUpdateItem({ ...item, name: i.name, supplier: { id: i.id, name: i.name } });
+      setItem: (i: IPickItem) => {
+        onUpdateItem({ ...item, itemName: i.iName, itemCode: String(i.iCode) });
       },
     });
   };
@@ -70,39 +75,40 @@ const CreateNewItemCard = ({
     navigate('ModalPickCalendar', {
       isSingleMode: false,
       onSelectRange: (start: any, end: any) => {
-        onUpdateItem({ ...item, dateFrom: start, dateTo: end });
+        onUpdateItem({ ...item, validFrom: start, validTo: end });
       },
     });
   };
 
-  const onChangeVat = (itemVat: { id: string; name: string }) => {
-    onUpdateItem({ ...item, vat: { id: itemVat.id, name: itemVat.name } });
+  const onChangeVat = (itemVat: IItemVat) => {
+    onUpdateItem({ ...item, vatCode: itemVat.code, vatId: itemVat.id });
   };
 
   const isError = useMemo(
     () =>
-      item.name === '' ||
-      item.price === 0 ||
-      item.supplier.name === '' ||
-      item.vat === '' ||
-      item.dateFrom === '' ||
-      item.dateTo === '',
+      item.vendorCode === '' ||
+      item.itemCode === '0' ||
+      !item.validFrom ||
+      !item.validTo ||
+      !item.price ||
+      item.vatCode === '',
+
     [item],
   );
 
-  const listVat = [
-    { id: '1', name: '10' },
-    { id: '2', name: '15' },
-    { id: '3', name: '20' },
-    { id: '4', name: '25' },
-    { id: '5', name: '30' },
-    { id: '6', name: '35' },
-    { id: '7', name: '40' },
-    { id: '8', name: '45' },
-    { id: '9', name: '50' },
-    { id: '10', name: '55' },
-    { id: '11', name: '60' },
-  ];
+  // const listVat = [
+  //   { id: '1', name: '10' },
+  //   { id: '2', name: '15' },
+  //   { id: '3', name: '20' },
+  //   { id: '4', name: '25' },
+  //   { id: '5', name: '30' },
+  //   { id: '6', name: '35' },
+  //   { id: '7', name: '40' },
+  //   { id: '8', name: '45' },
+  //   { id: '9', name: '50' },
+  //   { id: '10', name: '55' },
+  //   { id: '11', name: '60' },
+  // ];
 
   // SharedValue để đồng bộ chiều cao cho delete button
   const heightAction = useSharedValue(0);
@@ -137,15 +143,17 @@ const CreateNewItemCard = ({
   // Phần render nút delete
   const renderRightActions = useCallback(
     (id: string) => (
-      <AnimatedButton
+      <TouchableOpacity
         activeOpacity={1}
         style={[!isShow ? styles.deleteBtn : styles.deleteBtnExtend, animatedDeleteStyle]}
         onPress={() => onDelete(id)}>
         <IconTrashPrice />
-      </AnimatedButton>
+      </TouchableOpacity>
     ),
     [animatedDeleteStyle, isShow, onDelete],
   );
+
+  const resetPrice = () => setPrice(0);
 
   return (
     <ReanimatedSwipeable
@@ -162,18 +170,20 @@ const CreateNewItemCard = ({
             <View style={styles.flex1}>
               <AppBlockButton onPress={onPickItem} style={styles.blockPickName}>
                 <AppText
-                  style={[item?.name ? styles.nccText : styles.placeholder]}
+                  style={[item?.itemName ? styles.nccText : styles.placeholder]}
                   numberOfLines={1}>
-                  {item?.name || t('createPrice.pickItem')}
+                  {item?.itemName || t('createPrice.pickItem')}
                 </AppText>
                 <IconDropDown width={vs(12)} fill={Colors.TEXT_SECONDARY} />
               </AppBlockButton>
               <View style={styles.priceRow}>
                 <AppText style={styles.priceLabel}>{t('createPrice.price')}:</AppText>
-                {item.price ? (
-                  <AppText style={styles.priceValue}>
-                    {moneyFormat(item.price, '.', '')}/{item.end || 'Kg'}
-                  </AppText>
+                {price ? (
+                  <AppBlockButton onPress={resetPrice}>
+                    <AppText style={styles.priceValue}>
+                      {moneyFormat(price, '.', '')}/{'Kg'}
+                    </AppText>
+                  </AppBlockButton>
                 ) : (
                   <TextInput
                     // value={price?.toString()}
@@ -193,9 +203,9 @@ const CreateNewItemCard = ({
                 <AppText style={styles.priceLabel}>{t('NCC')}:</AppText>
                 <TouchableOpacity onPress={onPickNcc} style={styles.nccTouchable}>
                   <AppText
-                    style={[ncc?.name ? styles.nccText : styles.placeholder, styles.mw85]}
+                    style={[ncc?.accountName ? styles.nccText : styles.placeholder, styles.mw85]}
                     numberOfLines={2}>
-                    {ncc?.name || t('createPrice.pickNcc')}
+                    {ncc?.accountName || t('createPrice.pickNcc')}
                   </AppText>
                   <IconDropDown width={vs(12)} fill={Colors.TEXT_SECONDARY} />
                 </TouchableOpacity>
@@ -217,16 +227,16 @@ const CreateNewItemCard = ({
                 <IconDropDown width={vs(12)} fill={Colors.TEXT_SECONDARY} />
               </TouchableOpacity>
             </View> */}
-            <View style={styles.detailRow}>
+            <View style={[styles.detailRow]}>
               <AppText style={styles.detailLabel}>{t('createPrice.vat')}</AppText>
               <AppDropdown
                 selectedTextStyle={styles.textSelected}
                 style={styles.dropdownStyle}
                 placeholderStyle={styles.placeholderStyle}
                 data={listVat}
-                containerStyle={{ height: vs(150), width: s(50) }}
+                containerStyle={{ height: vs(150) }}
                 placeholder="0"
-                value={item.vat}
+                value={item.vatId}
                 renderRightIcon={() => <IconDropDown width={vs(12)} fill={Colors.TEXT_SECONDARY} />}
                 onChange={onChangeVat}
                 labelField="name"
@@ -238,11 +248,11 @@ const CreateNewItemCard = ({
               <AppText style={styles.detailLabel}>{t('createPrice.timeFromTo')}</AppText>
               <TouchableOpacity style={styles.datePicker} onPress={onPickTime}>
                 <AppText
-                  style={[styles.placeholder, item.dateFrom && item.dateTo && styles.nccText]}>
-                  {item.dateFrom && item.dateTo
-                    ? `${moment(item.dateFrom).format('DD/MM/YYYY')} - ${moment(item.dateTo).format(
-                        'DD/MM/YYYY',
-                      )}`
+                  style={[styles.placeholder, item.validFrom && item.validTo && styles.nccText]}>
+                  {item.validFrom && item.validTo
+                    ? `${moment(item.validFrom).format('DD/MM/YYYY')} - ${moment(
+                        item.validTo,
+                      ).format('DD/MM/YYYY')}`
                     : t('createPrice.pickTime')}
                 </AppText>
                 <IconCalendar width={vs(12)} fill={Colors.TEXT_SECONDARY} />
@@ -267,10 +277,13 @@ const styles = StyleSheet.create({
     width: '75%',
   },
   dropdownStyle: {
+    alignItems: 'flex-end',
+    flex: 1,
     paddingBottom: vs(6),
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
     borderBottomColor: '#F1F1F1',
-    width: s(40),
+    // width: vs(40),
+    maxWidth: s(130),
   },
   placeholderStyle: {
     fontSize: getFontSize(12),

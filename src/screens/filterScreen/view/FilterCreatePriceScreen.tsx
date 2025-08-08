@@ -22,6 +22,7 @@ import { AppText } from '@/elements/text/AppText';
 import { Colors } from '@/theme/Config';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
+import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 const FilterCreatePriceScreen = ({
   route,
@@ -59,8 +60,8 @@ const FilterCreatePriceScreen = ({
   const onPressNameItem = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickItemScreen', {
-      setItem: (_item: SelectedOption) => setItem(_item),
-      item: item, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      setItem,
+      item, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [item]);
 
@@ -85,11 +86,11 @@ const FilterCreatePriceScreen = ({
     setStatus({ id: '', name: '' });
     setItem(undefined);
   }, []);
-
+  const { statusGlobal } = useStatusGlobal();
+  console.log('status', statusGlobal);
   const statusList = [
-    { id: '1', name: t('filter.statusFilter.approved') },
-    { id: '2', name: t('filter.statusFilter.rejected') },
-    { id: '3', name: t('filter.statusFilter.waiting') },
+    { id: '1', name: t('filter.statusFilter.approved'), code: 'A' },
+    { id: '3', name: t('filter.statusFilter.waiting'), code: 'W' },
   ];
 
   return (
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     marginBottom: vs(12),
   },
   statusButton: {
-    width: '30%',
+    width: '45%',
     height: vs(34),
     borderRadius: vs(101),
     backgroundColor: Colors.GRAY_100,

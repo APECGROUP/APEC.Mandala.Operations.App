@@ -1,6 +1,5 @@
 import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
-import axios from 'axios';
 export interface IResponseListSupplier {
   data: IItemSupplier[];
   pagination: Pagination;
@@ -46,9 +45,6 @@ export interface ResponseNcc {
   name: string | undefined;
 }
 
-/**
- * Lấy danh sách DataAssignPrice từ API (giả lập).
- */
 export const fetchNccData = async (
   page: number,
   limit: number = 50,

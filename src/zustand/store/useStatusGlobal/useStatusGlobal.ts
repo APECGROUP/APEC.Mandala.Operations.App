@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
-export interface IResponseStatusGlobal {
-  data: IStausGlobal[];
+export interface IResponsePickStatus {
+  data: IItemStatus[];
   pagination: null;
   isSuccess: boolean;
   errors: Error[];
 }
 
-export interface IStausGlobal {
+export interface IItemStatus {
   status: string;
   statusName: string;
 }
@@ -19,10 +19,10 @@ export interface Error {
 }
 
 export interface IUseStatusGlobal {
-  statusGlobal: IStausGlobal[];
-  setStatusGlobal: (val: IStausGlobal[]) => void;
+  statusGlobal: IItemStatus[];
+  setStatusGlobal: (val: IItemStatus[]) => void;
 }
 export const useStatusGlobal = create<IUseStatusGlobal>(set => ({
   statusGlobal: [],
-  setStatusGlobal: (val: IStausGlobal[]) => set({ statusGlobal: val }),
+  setStatusGlobal: (val: IItemStatus[]) => set({ statusGlobal: val }),
 }));

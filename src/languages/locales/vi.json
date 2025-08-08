@@ -143,6 +143,7 @@
       "selectDepartment": "Thông tin bộ phận",
       "emptyRequester": "Chưa có thông tin người yêu cầu",
       "emptyDepartment": "Chưa có thông tin bộ phận",
+      "emptyStatus": "Chưa có thông tin bộ phận",
       "search": "Tìm kiếm",
       "supplier": "Nhà cung cấp",
       "pick": "Chọn",
@@ -188,6 +189,8 @@
       "approvedSuccess": "Duyệt đơn thành công",
       "rejectSuccess": "Từ chối đơn thành công",
       "approvedFail": "Duyệt đơn thất bại",
+
+      "deleteSuccess": "Xóa mặt hàng thành công",
       "listPrice": "Danh sách giá",
       "vat": "VAT",
       "validateVat": "VAT không được bỏ trống",

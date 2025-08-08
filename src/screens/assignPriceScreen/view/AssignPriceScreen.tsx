@@ -29,8 +29,6 @@ import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { styles } from './style';
 import { Colors } from '@/theme/Config';
-import DataLocal from '@/data/DataLocal';
-import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 const AssignPriceScreen: React.FC = () => {
   const { top } = useSafeAreaInsets();

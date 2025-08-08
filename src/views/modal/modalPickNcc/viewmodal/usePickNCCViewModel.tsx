@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { fetchNccData, IItemSupplier, ResponseNcc } from '../modal/PickNccModal';
+import { fetchNccData, IItemSupplier } from '../modal/PickNccModal';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;

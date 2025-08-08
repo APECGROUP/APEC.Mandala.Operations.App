@@ -4,7 +4,7 @@ import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
-import { IStausGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 export interface AssignPriceFilters {
   prNo?: string;
@@ -14,7 +14,7 @@ export interface AssignPriceFilters {
   requester?: IPickRequester | undefined;
   product?: any;
   ncc?: IItemSupplier;
-  status?: IStausGlobal | undefined;
+  status?: IItemStatus | undefined;
 }
 
 export interface IResponseListAssignPrice {
@@ -29,6 +29,8 @@ export interface IItemAssignPrice {
   prDate: Date;
   expectedDate: Date;
   requestBy: string;
+  userRequest: IPickRequester;
+
   departmentCode: string;
   departmentName: string;
   departmentShortName: string;
@@ -111,7 +113,7 @@ export const fetchAutoAssign = async (id: number) => {
   try {
     const response = await api.post(`${ENDPOINT.AUTO_ASSIGN_PRICE}/${id}`, []);
     if (response.status === 200 && response.data.isSuccess) {
-      return { isSuccess: true, message: '' }; // Trả về dữ liệu đã phê duyệt
+      return { isSuccess: true, message: '', data: response.data.data }; // Trả về dữ liệu đã phê duyệt
     } else {
       console.log('22', response.data.errors[0].message);
       return { isSuccess: false, message: response.data.errors[0].message }; // Trả về dữ liệu đã phê duyệt

@@ -5,7 +5,7 @@ import {
   IResponseListHotel,
 } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 import {
-  IResponseStatusGlobal,
+  IResponsePickStatus,
   useStatusGlobal,
 } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
@@ -48,23 +48,35 @@ export interface IDataApiLogin {
 export interface IUser {
   userName: string;
   displayName: string;
-  email: string;
-  avatar: string;
-  department: string;
-  departmentName: string;
-  departmentShortName: string;
+  email: null;
+  avatar: null;
   language: null;
   isNotification: null;
   groups: IGroupAuth[];
-  hotelCode?: string;
+  departments: Department[];
+  hotelCode: string;
 }
+
+export interface Department {
+  departmentCode: string;
+  departmentName: string;
+  departmentShortName: string;
+  location: string;
+  id: number;
+  createdBy: string;
+  createdDate: Date;
+  deletedDate: null;
+  deletedBy: null;
+  deleted: string;
+}
+
 export interface IGroupAuth {
   groupName: string;
   description: string;
   groupCode: string;
-  prApLimit: number | null;
-  dailyApLimit: number | null;
-  monthlyApLimit: number | null;
+  prApLimit: null;
+  dailyApLimit: null;
+  monthlyApLimit: null;
   id: number;
   createdBy: string;
   createdDate: Date;
@@ -87,7 +99,7 @@ export interface AuthActions {
 
 export const fetchStatusGlobal = async () => {
   try {
-    const response = await api.get<IResponseStatusGlobal>(ENDPOINT.GET_STATUS_GLOBAL);
+    const response = await api.get<IResponsePickStatus>(ENDPOINT.GET_STATUS_GLOBAL);
     if (response.status === 200 && response.data.isSuccess) {
       useStatusGlobal.getState().setStatusGlobal(response.data.data);
     } else {

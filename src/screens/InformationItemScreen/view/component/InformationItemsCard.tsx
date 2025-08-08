@@ -13,7 +13,8 @@ import IconSub from '@assets/icon/IconSub';
 import IconPlus from '@assets/icon/IconPlus';
 import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
-import { IItemSupplier, ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { AppButton } from '@/elements/button/AppButton';
 
 const InformationItemsCard = ({
   item,
@@ -75,6 +76,10 @@ const InformationItemsCard = ({
     // Ví dụ: call API, update state, etc.
   };
 
+  const onResetPrice = () => {
+    setPrice(0);
+  };
+
   return (
     <View style={styles.card}>
       <TouchableOpacity activeOpacity={1} onPress={handleShowDetail} style={styles.header}>
@@ -86,13 +91,13 @@ const InformationItemsCard = ({
                 {item.iName}
               </AppText>
             </View>
-            {item.price ? (
-              <View style={styles.itemInfoRow}>
+            {price ? (
+              <TouchableOpacity activeOpacity={1} onPress={onResetPrice} style={styles.itemInfoRow}>
                 <AppText style={styles.dateText}>{t('Giá')}: </AppText>
                 <AppText style={styles.dateTextEnd}>
-                  {moneyFormat(item.price, '.', '')}/{item.unitName}
+                  {moneyFormat(price, '.', '')}/{item.unitName}
                 </AppText>
-              </View>
+              </TouchableOpacity>
             ) : (
               <View style={styles.itemInfoRow}>
                 <AppText style={styles.dateText}>{t('Giá')}: </AppText>

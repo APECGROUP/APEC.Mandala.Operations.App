@@ -11,10 +11,8 @@ import { s, vs } from 'react-native-size-matters';
 import { PaddingHorizontal } from '@/utils/Constans';
 import { Colors } from '@/theme/Config';
 import { useAlert } from '@/elements/alert/AlertProvider';
-import FastImage from 'react-native-fast-image';
-import Images from '@assets/image/Images';
 import { TYPE_TOAST } from '@/elements/toast/Message';
-import { goBack, navigate } from '@/navigation/RootNavigation';
+import { navigate } from '@/navigation/RootNavigation';
 import { useInformationItemsViewModel } from '../viewmodal/useInformationItemsViewModel';
 import { useAssignPriceViewModel } from '@/screens/assignPriceScreen/viewmodal/useAssignPriceViewModel';
 
@@ -55,7 +53,7 @@ const FooterInformationItem = ({
   return (
     <View style={[styles.bottomContainer, { paddingBlock: bottom }]}>
       <View style={styles.footerContainer}>
-        <AppBlockButton onPress={onPressAutoAssign} style={styles.footerButton}>
+        <AppBlockButton onPress={onAutoAssign} style={styles.footerButton}>
           <IconAutoAssign />
           <AppText size={14} weight="700" color={Colors.BLACK_900} mt={4}>
             {t('informationItem.autoAssign')}

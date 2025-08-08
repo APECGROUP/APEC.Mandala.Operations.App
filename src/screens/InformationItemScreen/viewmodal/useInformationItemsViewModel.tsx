@@ -15,9 +15,7 @@ import {
   checkAssignPr,
   checkRejectPrAssign,
   fetchAutoAssign,
-  IItemAssignPrice,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
-import Toast from 'react-native-toast-message';
 import { TYPE_TOAST } from '@/elements/toast/Message';
 
 const ITEMS_PER_PAGE = 50;
@@ -98,12 +96,21 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
       //   console.warn('🟥 No cache found for key:', key);
       //   return;
       // }
-      const { isSuccess, message } = await fetchAutoAssign(id);
+
+      const cached = queryClient.getQueryData(key);
+      const newPages = cached.pages.map((page: IItemVendorPrice[]) =>
+        page.filter(item => !selectedIds.includes(item.id)),
+      );
+      const { isSuccess, message, data } = await fetchAutoAssign(id);
       if (!isSuccess) {
         console.log('thất bại: ', message);
         return showToast(message || t('informationItem.autoAssignError'), 'error');
       }
-      refetch();
+      queryClient.setQueryData(key, {
+        ...cached,
+        pages: newPages,
+      });
+      // refetch();
       // Gán giá random (bội 1000) và NCC random cho từng item
       // queryClient.setQueryData(key, {
       //   ...cached,

@@ -27,7 +27,6 @@ import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { DataInformationItemsPcPr } from '../modal/InformationItemsPcPrModal';
-import { useInformationItemsPcPrViewModel } from '../viewmodal/useInformationItemsPcPrViewModel';
 import InformationItemsPcPrCard from './component/InformationItemsPcPrCard';
 import { useInformationItemsViewModel } from '@/screens/InformationItemScreen/viewmodal/useInformationItemsViewModel';
 import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';

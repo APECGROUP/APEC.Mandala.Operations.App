@@ -1,32 +1,41 @@
 import { StyleSheet, View } from 'react-native';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Header from '@/screens/notificationScreen/view/component/Header';
 import { useTranslation } from 'react-i18next';
 import { s, vs } from 'react-native-size-matters';
 import { AppText } from '@/elements/text/AppText';
 import { Colors } from '@/theme/Config';
 import { getFontSize } from '@/constants';
-import { PaddingHorizontal } from '@/utils/Constans';
+import { ENDPOINT, PaddingHorizontal } from '@/utils/Constans';
 import Footer from '@/screens/filterScreen/view/component/Footer';
 import { goBack } from '@/navigation/RootNavigation';
-import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 import { FlashList } from '@shopify/flash-list';
 import CreateNewItemCard from './CreateNewItemCard';
 import IconScrollBottom from '@assets/icon/IconScrollBottom';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
-import moment from 'moment';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { Gesture } from 'react-native-gesture-handler';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import {
+  checkCreatePrice,
+  IItemVat,
+  IItemVendorPrice,
+  IResponseListVat,
+} from '../../modal/CreatePriceModal';
+import moment from 'moment';
+import api from '@/utils/setup-axios';
+import { useCreatePriceViewModel } from '../../viewmodal/useCreatePriceViewModal';
 
 const CreatePriceNccScreen = () => {
+  const { onRefresh } = useCreatePriceViewModel();
+
   const { t } = useTranslation();
   const { showToast } = useAlert();
-  const [listItem, setListItem] = useState<IPickItem[]>([]);
-
+  const [listItem, setListItem] = useState<IItemVendorPrice[]>([]);
+  const [listVat, setListVat] = useState<IItemVat[]>([]);
   const onAddNewItemToList = () => {
-    setListItem([...listItem, {} as IPickItem]);
+    setListItem([...listItem, { id: moment().unix() } as IItemVendorPrice]);
   };
   // const onCreateItem = () => {
   //   navigate('PickItemScreen', {
@@ -34,7 +43,7 @@ const CreatePriceNccScreen = () => {
   //   });
   // };
 
-  const flashListRef = useRef<FlashList<IPickItem> | null>(null);
+  const flashListRef = useRef<FlashList<IItemVendorPrice> | null>(null);
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = () => {
@@ -49,18 +58,40 @@ const CreatePriceNccScreen = () => {
     ),
     [],
   );
-  const onUpdateItem = useCallback((i: IPickItem) => {
+  const onUpdateItem = useCallback((i: IItemVendorPrice) => {
     setListItem(prevList => prevList.map(item => (item.id === i.id ? i : item)));
   }, []);
-  const handleDelete = useCallback((id: string) => {
+  const handleDelete = useCallback((id: number) => {
     setListItem(prevList => prevList.filter(item => item.id !== id));
   }, []);
 
   const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
+  const getListVat = async () => {
+    // Fetch VAT list from API or any other source
+    try {
+      const params = {
+        pagination: {
+          pageIndex: 1,
+          pageSize: 50,
+          isAll: true,
+        },
+        filter: {},
+      };
 
+      const response = await api.post<IResponseListVat, any>(ENDPOINT.GET_LIST_VAT, params);
+      if (response.status === 200 && response.data.isSuccess) {
+        setListVat(response.data.data);
+      } else {
+        showToast(t('error.subtitle'), 'error');
+        goBack();
+      }
+      console.log('VAT list: ', response.data);
+    } catch (error) {}
+  };
   const renderItem = useCallback(
-    ({ item, index }: { item: IPickItem; index: number }) => (
+    ({ item, index }: { item: IItemVendorPrice; index: number }) => (
       <CreateNewItemCard
+        listVat={listVat}
         simultaneousGesture={flashListNativeGesture}
         handleDelete={handleDelete}
         item={item}
@@ -75,18 +106,29 @@ const CreatePriceNccScreen = () => {
         }}
       />
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [flashListNativeGesture, handleDelete, listVat, onUpdateItem],
   );
-
+  console.log('render list: ', listItem);
   const onSaveInfo = async () => {
     if (listItem.length === 0) {
       return;
     }
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    goBack();
-    showToast(t('createPrice.saveInfoSuccess'), 'success');
+    try {
+      const { isSuccess, message } = await checkCreatePrice(listItem);
+      if (!isSuccess) {
+        return showToast(message || t('error.subtitle'), 'error');
+      }
+      onRefresh();
+      goBack();
+      showToast(t('createPrice.saveInfoSuccess'), 'success');
+    } catch (error) {
+      return showToast(t('error.subtitle'), 'error');
+    }
   };
+
+  useEffect(() => {
+    getListVat();
+  }, []);
 
   return (
     <ViewContainer>

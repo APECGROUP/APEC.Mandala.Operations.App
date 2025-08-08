@@ -16,7 +16,9 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { MainParams } from '@/navigation/params';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { CreatePoFilters, SelectedOption } from '@/screens/createPoScreen/modal/CreatePoModal';
+import { CreatePoFilters } from '@/screens/createPoScreen/modal/CreatePoModal';
+import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 
 const FilterCreatePoScreen = ({
   route,
@@ -31,18 +33,16 @@ const FilterCreatePoScreen = ({
   // Đảm bảo default values cho department và requester là { id: '', name: '' }
   const initialFilters: CreatePoFilters = route.params?.currentFilters || {};
 
-  const [prNo, setPrNo] = useState<string>(initialFilters.prNo || initialFilters?.searchKey || '');
+  const [prNo, setPrNo] = useState<string>(initialFilters.prNo || '');
   const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.prDate);
   const [toDate, setToDate] = useState<Date | undefined>(initialFilters.expectedDate);
-  const [department, setDepartment] = useState<SelectedOption>(
-    initialFilters.department && initialFilters.department.id !== ''
+  const [department, setDepartment] = useState<IPickDepartment | undefined>(
+    initialFilters.department && initialFilters.department.id
       ? initialFilters.department
-      : { id: '', name: '' },
+      : undefined,
   );
-  const [requester, setRequester] = useState<SelectedOption>(
-    initialFilters.requester && initialFilters.requester.id !== ''
-      ? initialFilters.requester
-      : { id: '', name: '' },
+  const [requester, setRequester] = useState<IPickRequester | undefined>(
+    initialFilters.requester && initialFilters.requester.id ? initialFilters.requester : undefined,
   );
 
   // Ref cho TextInput để quản lý focus (có thể không cần thiết nếu dùng AppTextInput đúng cách)
@@ -65,14 +65,14 @@ const FilterCreatePoScreen = ({
   const onPressDepartment = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickDepartmentScreen', {
-      setDepartment: (dep: SelectedOption) => setDepartment(dep),
+      setDepartment,
       department: department, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [department]);
   const onPressRequester = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickRequesterScreen', {
-      setRequester: (req: SelectedOption) => setRequester(req),
+      setRequester,
       requester: requester, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [requester]);
@@ -84,8 +84,8 @@ const FilterCreatePoScreen = ({
       prNo: prNo.trim() || undefined, // Đảm bảo prNo rỗng thì thành undefined
       prDate: fromDate,
       expectedDate: toDate,
-      department: department.id ? department : undefined, // Nếu id rỗng thì là undefined
-      requester: requester.id ? requester : undefined, // Nếu id rỗng thì là undefined
+      department: department?.id ? department : undefined, // Nếu id rỗng thì là undefined
+      requester: requester?.id ? requester : undefined, // Nếu id rỗng thì là undefined
     };
 
     // Gọi callback từ màn hình trước đó để áp dụng filter
@@ -99,8 +99,8 @@ const FilterCreatePoScreen = ({
     setPrNo('');
     setFromDate(undefined);
     setToDate(undefined);
-    setDepartment({ id: '', name: '' });
-    setRequester({ id: '', name: '' });
+    setDepartment(undefined);
+    setRequester(undefined);
   }, []);
   const valueDate =
     fromDate && toDate
@@ -159,7 +159,7 @@ const FilterCreatePoScreen = ({
               label={t('filter.department')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={department?.name}
+              value={department?.departmentName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
@@ -172,7 +172,7 @@ const FilterCreatePoScreen = ({
               label={t('filter.requester')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={requester?.name}
+              value={requester?.displayName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
