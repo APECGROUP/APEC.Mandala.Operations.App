@@ -1,16 +1,7 @@
 // views/AssignPriceScreen.tsx
 
 import React, { useRef, useCallback, useMemo, useEffect } from 'react';
-import {
-  StyleSheet,
-  View,
-  TextInput,
-  ActivityIndicator,
-  TouchableOpacity,
-  StatusBar,
-  ImageBackground,
-} from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { StyleSheet, View, ActivityIndicator, TouchableOpacity, StatusBar } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated from 'react-native-reanimated';
@@ -18,18 +9,14 @@ import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 import { useRoute } from '@react-navigation/native';
 
-import { getFontSize, SCREEN_WIDTH } from '../../../constants';
+import { getFontSize } from '../../../constants';
 import { PaddingHorizontal } from '../../../utils/Constans';
 import light from '../../../theme/light';
 import AppBlockButton from '../../../elements/button/AppBlockButton';
 
-import IconNotification from '../../../../assets/icon/IconNotification';
-import IconSearch from '../../../../assets/icon/IconSearch';
-import IconFilter from '../../../../assets/icon/IconFillter';
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
 import { IApprove } from '../modal/ApproveModal';
-import Images from '../../../../assets/image/Images';
 import { navigate } from '../../../navigation/RootNavigation';
 import { AppText } from '@/elements/text/AppText';
 import { useApproveViewModel } from '../viewmodal/useApproveViewModel';
@@ -42,8 +29,8 @@ import Footer from '@/screens/filterScreen/view/component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import ApproveCard from './component/ApproveCard';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
-import { set } from 'lodash';
 import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import HeaderSearch from '@/HeaderSearch';
 
 export default function ApprovePrScreen() {
   const { top } = useSafeAreaInsets();
@@ -174,52 +161,12 @@ export default function ApprovePrScreen() {
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
         {/* ─── Background Image ─────────────────────────────────────────────── */}
-        <ImageBackground
-          source={Images.BackgroundAssignPrice}
-          resizeMode={FastImage.resizeMode.cover}
-          style={styles.imageBackground}>
-          {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-          <View style={[styles.headerContainer, { marginTop: top }]}>
-            <View style={styles.headerLeft}>
-              <AppBlockButton onPress={goToAccount}>
-                <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
-              </AppBlockButton>
-
-              <View style={styles.greetingContainer}>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {t('createPrice.title')}! - {infoUser?.userName}
-                </AppText>
-                <AppText weight="700" color="#FFFFFF" style={styles.greetingText} numberOfLines={1}>
-                  {infoUser?.hotelName}
-                </AppText>
-              </View>
-            </View>
-            <View style={styles.headerRight}>
-              <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
-                <IconNotification />
-                <View style={styles.notificationBadge}>
-                  <AppText style={styles.notificationBadgeText}>3</AppText>
-                </View>
-              </AppBlockButton>
-            </View>
-          </View>
-          {/* ─── Search Bar ────────────────────────────────────────────────────── */}
-          <View style={styles.searchContainer}>
-            <IconSearch width={vs(18)} />
-            <TextInput
-              value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
-              onChangeText={onSearch} // Gọi hàm debounce từ ViewModel
-              placeholder={t('assignPrice.searchPlaceholder')}
-              placeholderTextColor={Colors.TEXT_SECONDARY}
-              style={styles.searchInput}
-              // returnKeyType="search"
-              // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
-            />
-            <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
-              <IconFilter />
-            </AppBlockButton>
-          </View>
-        </ImageBackground>
+        <HeaderSearch
+          currentPrNoInput={currentPrNoInput}
+          onSearch={onSearch}
+          textPlaceholder={t('assignPrice.searchPlaceholder')}
+          goToFilterScreen={goToFilterScreen}
+        />
 
         {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
         <View style={styles.titleContainer}>
@@ -297,112 +244,9 @@ export default function ApprovePrScreen() {
 
 export const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
 const styles = StyleSheet.create({
-  imageBackground: {
-    width: SCREEN_WIDTH,
-    aspectRatio: 2.66,
-    justifyContent: 'space-between',
-  },
-  // ml7: { marginLeft: s(7) },
-  // buttonCenter: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  // },
-  // header: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   paddingBottom: vs(16),
-  //   paddingHorizontal: s(16),
-
-  //   // borderBottomWidth: 1,
-  // },
   container: {
     backgroundColor: Colors.WHITE,
     flex: 1,
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: s(16),
-    // paddingBottom: vs(12),
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    borderWidth: 1,
-    borderColor: light.white,
-    height: vs(40),
-    aspectRatio: 1,
-    borderRadius: vs(20),
-    marginRight: s(8),
-  },
-  greetingContainer: {
-    height: vs(40),
-    justifyContent: 'space-between',
-  },
-  greetingText: {
-    fontSize: getFontSize(18),
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  notificationWrapper: {
-    width: vs(32),
-    height: vs(32),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notificationBadge: {
-    borderWidth: 0.5,
-    borderColor: light.white,
-    position: 'absolute',
-    top: vs(2),
-    right: s(0),
-    backgroundColor: '#FF3B30',
-    width: vs(16),
-    height: vs(16),
-    borderRadius: vs(8),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notificationBadgeText: {
-    color: '#FFFFFF',
-    fontSize: getFontSize(8),
-    fontWeight: '500',
-  },
-
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: PaddingHorizontal,
-    marginBottom: vs(-14),
-    backgroundColor: light.white,
-    borderRadius: s(8),
-    paddingLeft: s(12),
-    height: vs(46),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: getFontSize(12),
-    fontWeight: '500',
-    paddingVertical: 0,
-    paddingLeft: s(6),
-  },
-  filterButton: {
-    borderLeftWidth: 0.3,
-    borderLeftColor: '#BABABA',
-    height: vs(46),
-    width: vs(46),
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 
   titleContainer: {

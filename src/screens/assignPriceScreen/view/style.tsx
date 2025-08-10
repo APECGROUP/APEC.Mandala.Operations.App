@@ -30,6 +30,7 @@ export const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'red',
   },
   avatar: {
     borderWidth: 1,

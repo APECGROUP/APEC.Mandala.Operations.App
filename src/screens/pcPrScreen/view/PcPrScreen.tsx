@@ -1,21 +1,15 @@
 import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
-import { View, TextInput, ActivityIndicator, StatusBar, ImageBackground } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { View, ActivityIndicator, StatusBar } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 // useFocusEffect không cần thiết nếu logic dùng `applyFilters`
 
 import light from '@/theme/light';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 
-import IconNotification from '@assets/icon/IconNotification';
-import IconSearch from '@assets/icon/IconSearch';
-import IconFilter from '@assets/icon/IconFillter';
 import IconScrollBottom from '@assets/icon/IconScrollBottom';
 
-import Images from '@assets/image/Images';
 import { navigate } from '@/navigation/RootNavigation';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
@@ -28,7 +22,7 @@ import { styles } from './style';
 import { usePcPrViewModel } from '../viewmodal/usePcPrViewModel';
 import { IItemPcPr } from '../modal/PcPrModal';
 import PcPrCard from './component/PcPrCard';
-import { Colors } from '@/theme/Config';
+import HeaderSearch from '@/HeaderSearch';
 
 export default function PcPrScreen() {
   const { top } = useSafeAreaInsets();
@@ -144,51 +138,13 @@ export default function PcPrScreen() {
         />
 
         {/* ─── Background Image ─────────────────────────────────────────────── */}
-        <ImageBackground
-          source={Images.BackgroundAssignPrice}
-          resizeMode={FastImage.resizeMode.cover}
-          style={styles.imageBackground}>
-          {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-          <View style={[styles.headerContainer, { paddingTop: top }]}>
-            <View style={styles.headerLeft}>
-              <AppBlockButton onPress={goToAccount}>
-                <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
-              </AppBlockButton>
-              <View style={styles.greetingContainer}>
-                <AppText color="#FFFFFF" style={styles.greetingText}>
-                  {t('assignPrice.title')}! - {infoUser?.userName}
-                </AppText>
-                <AppText weight="700" color="#FFFFFF" style={styles.greetingText} numberOfLines={1}>
-                  {infoUser?.hotelName}
-                </AppText>
-              </View>
-            </View>
-            <View style={styles.headerRight}>
-              <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
-                <IconNotification />
-                <View style={styles.notificationBadge}>
-                  <AppText style={styles.notificationBadgeText}>3</AppText>
-                </View>
-              </AppBlockButton>
-            </View>
-          </View>
-          {/* ─── Search Bar ────────────────────────────────────────────────────── */}
-          <View style={styles.searchContainer}>
-            <IconSearch width={vs(18)} />
-            <TextInput
-              value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
-              onChangeText={onSearchPrNo} // Gọi hàm debounce từ ViewModel
-              placeholder={t('pcPr.searchPlaceholder')}
-              placeholderTextColor={Colors.TEXT_SECONDARY}
-              style={styles.searchInput}
-              // returnKeyType="search"
-              // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
-            />
-            <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
-              <IconFilter />
-            </AppBlockButton>
-          </View>
-        </ImageBackground>
+
+        <HeaderSearch
+          currentPrNoInput={currentPrNoInput}
+          onSearch={onSearchPrNo}
+          textPlaceholder={t('pcPr.searchPlaceholder')}
+          goToFilterScreen={goToFilterScreen}
+        />
 
         {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
         <View style={styles.titleContainer}>

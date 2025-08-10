@@ -59,6 +59,11 @@ const AppNavigation = () => {
     opacity: animatedOpacity.value,
   }));
 
+  // return (
+  //   <View style={styles.flex}>
+  //     <HeaderSearch />
+  //   </View>
+  // );
   return (
     <AppBlock style={styles.flex}>
       <View style={[styles.flex]}>

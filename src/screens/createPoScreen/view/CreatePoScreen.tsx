@@ -1,20 +1,16 @@
 // views/AssignPriceScreen.tsx
 
-import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
-import { View, TextInput, ActivityIndicator, ImageBackground } from 'react-native';
+import React, { useRef, useCallback, useMemo, useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 import { useRoute } from '@react-navigation/native';
 
 import light from '@/theme/light';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 
-import IconNotification from '@assets/icon/IconNotification';
-import IconSearch from '@assets/icon/IconSearch';
-import IconFilter from '@assets/icon/IconFillter';
 import IconScrollBottom from '@assets/icon/IconScrollBottom';
 
 import { IItemCreatePo } from '../modal/CreatePoModal';
@@ -31,6 +27,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { styles } from './style';
 import CreatePoCard from './component/CreatePoCard';
 import { AppButton } from '@/elements/button/AppButton';
+import HeaderSearch from '@/HeaderSearch';
 
 export default function CreatePoScreen() {
   const { top } = useSafeAreaInsets();
@@ -154,53 +151,13 @@ export default function CreatePoScreen() {
     <ViewContainer>
       <View style={styles.container}>
         {/* ─── Background Image ─────────────────────────────────────────────── */}
-        <ImageBackground
-          source={Images.BackgroundAssignPrice}
-          resizeMode={FastImage.resizeMode.cover}
-          style={styles.imageBackground}>
-          {/* ─── Header (không animate ẩn/hiện trong ví dụ này) ──────────────────── */}
-          <View style={[styles.headerContainer, { marginTop: top }]}>
-            <View style={styles.headerLeft}>
-              <AppBlockButton onPress={goToAccount}>
-                <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
-              </AppBlockButton>
 
-              <View style={styles.greetingContainer}>
-                <AppText weight="400" color="#FFFFFF" style={styles.greetingText}>
-                  {t('CreatePo.title')}! - {infoUser?.userName}
-                </AppText>
-                <AppText weight="700" color="#FFFFFF" style={styles.greetingText} numberOfLines={1}>
-                  {infoUser?.hotelName}
-                </AppText>
-              </View>
-            </View>
-            <View style={styles.headerRight}>
-              <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
-                <IconNotification />
-                <View style={styles.notificationBadge}>
-                  <AppText style={styles.notificationBadgeText}>3</AppText>
-                </View>
-              </AppBlockButton>
-            </View>
-          </View>
-          {/* ─── Search Bar ────────────────────────────────────────────────────── */}
-          <View style={styles.searchContainer}>
-            <IconSearch width={vs(18)} />
-            <TextInput
-              value={currentPrNoInput} // Lấy giá trị từ ViewModel để đồng bộ UI với debounce
-              onChangeText={onSearch} // Gọi hàm debounce từ ViewModel
-              placeholder={t('assignPrice.searchPlaceholder')}
-              placeholderTextColor={Colors.TEXT_SECONDARY}
-              style={styles.searchInput}
-              // returnKeyType="search"
-              // onSubmitEditing={goToFilterScreen} // Submit Search hoặc đi tới FilterScreen
-            />
-            <AppBlockButton style={styles.filterButton} onPress={goToFilterScreen}>
-              <IconFilter />
-            </AppBlockButton>
-          </View>
-        </ImageBackground>
-
+        <HeaderSearch
+          currentPrNoInput={currentPrNoInput}
+          onSearch={onSearch}
+          textPlaceholder={t('assignPrice.searchPlaceholder')}
+          goToFilterScreen={goToFilterScreen}
+        />
         {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('CreatePo.supplierPriceList')}</AppText>
