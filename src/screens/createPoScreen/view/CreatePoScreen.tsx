@@ -27,7 +27,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { styles } from './style';
 import CreatePoCard from './component/CreatePoCard';
 import { AppButton } from '@/elements/button/AppButton';
-import HeaderSearch from '@/HeaderSearch';
+import HeaderSearch from '@/components/headerSearch/HeaderSearch';
 
 export default function CreatePoScreen() {
   const { top } = useSafeAreaInsets();

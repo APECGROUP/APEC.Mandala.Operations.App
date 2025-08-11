@@ -106,7 +106,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
 
   const { showAlert } = useAlert();
   const onDelete = useCallback(
-    async (id: number, onSuccess?: (deletedId: number) => void) => {
+    async (id: number, onSuccess?: (deletedId: number) => void, onCancel?: () => void) => {
       const cached = queryClient.getQueryData<InfiniteData<IItemVendorPrice[]>>(currentQueryKey);
       if (!cached) {
         console.warn('🟥 No cache found for key:', currentQueryKey);
@@ -119,6 +119,9 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
         const { isSuccess, message } = await checkDeleteCreatePrice(id);
         if (!isSuccess) {
           showToast(message || t('error.subtitle'), 'error');
+          if (onCancel) {
+            onCancel();
+          }
           return false;
         }
         console.log('chayj vaof sau: ', isSuccess, message);
@@ -160,7 +163,7 @@ export function useCreatePriceViewModel(initialFilters: CreatePriceFilters = {})
         },
         {
           text: t('createPrice.remove.agree'),
-          onPress: async () => onDelete(id, onSuccess),
+          onPress: async () => onDelete(id, onSuccess, onCancel),
         },
       ]);
     },

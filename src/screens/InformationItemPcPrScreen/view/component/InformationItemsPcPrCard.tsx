@@ -72,7 +72,7 @@ const InformationItemsPcPrCard = ({ item }: { item: IItemInDetailPr; index: numb
             </AppText>
           </View>
           <View>
-            <AppText style={styles.label}>{t('Ghi chú')}</AppText>
+            <AppText style={styles.label}>{t('orderDetail.reason')}</AppText>
             <View style={styles.noteBox}>
               <AppText style={styles.noteText} numberOfLines={3}>
                 {item.remark}

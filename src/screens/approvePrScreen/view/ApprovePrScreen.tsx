@@ -30,7 +30,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import ApproveCard from './component/ApproveCard';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
-import HeaderSearch from '@/HeaderSearch';
+import HeaderSearch from '@/components/headerSearch/HeaderSearch';
 
 export default function ApprovePrScreen() {
   const { top } = useSafeAreaInsets();

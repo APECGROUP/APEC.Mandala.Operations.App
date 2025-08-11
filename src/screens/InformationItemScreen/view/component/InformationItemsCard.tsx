@@ -13,7 +13,6 @@ import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { styles } from './style';
-import { set } from 'lodash';
 
 const InformationItemsCard = ({
   item,
@@ -97,14 +96,14 @@ const InformationItemsCard = ({
 
             {!isEditPrice ? (
               <TouchableOpacity activeOpacity={1} onPress={onResetPrice} style={styles.itemInfoRow}>
-                <AppText style={styles.dateText}>{t('Giá')}: </AppText>
+                <AppText style={styles.dateText}>{t('orderDetail.price')}: </AppText>
                 <AppText style={styles.dateTextEnd}>
                   {moneyFormat(priceRef.current, '.', '')}/{item.unitName}
                 </AppText>
               </TouchableOpacity>
             ) : (
               <View style={styles.itemInfoRow}>
-                <AppText style={styles.dateText}>{t('Giá')}: </AppText>
+                <AppText style={styles.dateText}>{t('orderDetail.price')}: </AppText>
                 <View style={styles.itemInfoRow}>
                   <TextInput
                     ref={inputRef}
@@ -138,11 +137,11 @@ const InformationItemsCard = ({
       {isShow && (
         <View style={styles.detailContainer}>
           <View style={styles.row}>
-            <AppText style={styles.label}>{t('Số lượng')}</AppText>
+            <AppText style={styles.label}>{t('orderDetail.quantity')}</AppText>
             <AppText style={styles.value}>{item.quantity}</AppText>
           </View>
           <View style={styles.row}>
-            <AppText style={styles.label}>{t('Số lượng duyệt')}</AppText>
+            <AppText style={styles.label}>{t('orderDetail.numberOfApproval')}</AppText>
             <View style={styles.quantityControl}>
               <TouchableOpacity
                 onPress={() => setCount(i => (i > 0 ? i - 1 : 0))}
@@ -167,13 +166,13 @@ const InformationItemsCard = ({
             </TouchableOpacity>
           </View>
           <View style={styles.row}>
-            <AppText style={styles.label}>{t('Số tiền duyệt')}</AppText>
+            <AppText style={styles.label}>{t('orderDetail.moneyOfApproval')}</AppText>
             <AppText style={styles.approvedAmount}>
               {moneyFormat(Number(priceRef.current) * item.quantity, '.', '')}
             </AppText>
           </View>
           <View>
-            <AppText style={styles.label}>{t('Ghi chú')}</AppText>
+            <AppText style={styles.label}>{t('orderDetail.reason')}</AppText>
             <View style={styles.noteBox}>
               <AppText style={styles.noteText} numberOfLines={3}>
                 {item.remark}

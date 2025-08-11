@@ -21,7 +21,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { styles } from './style';
-import HeaderSearch from '@/HeaderSearch';
+import HeaderSearch from '@/components/headerSearch/HeaderSearch';
 
 const AssignPriceScreen: React.FC = () => {
   const { t } = useTranslation();

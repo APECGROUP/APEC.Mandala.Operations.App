@@ -26,14 +26,13 @@ import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import { Colors } from '@/theme/Config';
 import { Gesture } from 'react-native-gesture-handler';
 import IconCreatePrice from '@assets/icon/IconCreatePrice';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import IconPlus from '@assets/icon/IconPlus';
 import Footer from '@/screens/filterScreen/view/component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { styles } from './style';
-import HeaderSearch from '@/HeaderSearch';
+import HeaderSearch from '@/components/headerSearch/HeaderSearch';
 
 export default function CreatePriceScreen() {
   const { top } = useSafeAreaInsets();
@@ -61,7 +60,6 @@ export default function CreatePriceScreen() {
     handleSelect,
     selectedAll,
   } = useCreatePriceViewModel();
-  const { infoUser } = useInfoUser();
   console.log('data: ', flatData);
   const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
 

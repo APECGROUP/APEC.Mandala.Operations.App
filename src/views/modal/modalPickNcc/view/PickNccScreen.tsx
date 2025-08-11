@@ -60,7 +60,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
       <View style={styles.emptyContainer}>
         <IconEmptyNcc />
         <AppText size={18} weight="700" mt={12}>
-          {t('Chưa có thông tin nhà cung cấp')}
+          {t('orderDetail.empty')}
         </AppText>
       </View>
     );
@@ -103,7 +103,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
           alignItems="center"
           style={styles.width1}>
           <AppText size={20} weight="bold">
-            {t('Thông tin nhà cung cấp')}
+            {t('orderDetail.titleSearch')}
           </AppText>
           <TouchableOpacity onPress={goBack} style={{ padding: PaddingHorizontal }}>
             <IconClose />
@@ -112,7 +112,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
 
         <View style={{ paddingHorizontal: PaddingHorizontal }}>
           <AppText mt={10} mb={6} weight="700">
-            {t('Nhà cung cấp')}
+            {t('filter.supplier')}
           </AppText>
           <AppInputSearch
             fill={searchKey ? Colors.PRIMARY : '#BABABA'}
@@ -120,7 +120,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
             containerStyle={styles.conatinerInputSearch}
             value={searchKey}
             onChangeText={onSearch}
-            placeholder={t('Tìm kiếm')}
+            placeholder={t('filter.search')}
           />
         </View>
 

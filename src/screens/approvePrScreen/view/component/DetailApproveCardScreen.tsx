@@ -32,7 +32,7 @@ const RowItem: React.FC<RowItemProps> = ({ label, value, icon, onPress }) => (
     </AppText>
     <TouchableOpacity onPress={onPress} activeOpacity={1} style={styles.valueContainer}>
       {value && <AppText weight="700">{value}</AppText>}
-      {icon && <View style={styles.icon}>{icon}</View>}
+      {icon ? <View style={styles.icon}>{icon}</View> : <View style={{ height: vs(14) }} />}
     </TouchableOpacity>
   </View>
 );
@@ -69,7 +69,7 @@ const DetailApproveCardScreen = ({
     });
   }, []);
   const formatDate = useCallback((date: Date | undefined) => moment(date).format('DD/MM/YYYY'), []);
-
+  console.log('first', item);
   return (
     <View style={styles.container}>
       <FastImage source={Images.IconApproved} style={styles.itemIcon} />
@@ -100,7 +100,7 @@ const DetailApproveCardScreen = ({
         <RowItem
           label={t('orderInfo.requester')}
           value={item.userRequest?.displayName || ''}
-          icon={<IconName />}
+          icon={<IconName width={vs(14)} />}
         />
         <RowItem label={t('orderInfo.note')} />
         <View style={styles.noteContainer}>

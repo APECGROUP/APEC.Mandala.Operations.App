@@ -2,18 +2,18 @@ import { ImageBackground, StatusBar, StyleSheet, TextInput, View } from 'react-n
 import React, { memo, useCallback } from 'react';
 import Images from '@assets/image/Images';
 import FastImage from 'react-native-fast-image';
-import { getFontSize, SCREEN_WIDTH } from './constants';
+import { getFontSize, SCREEN_WIDTH } from '../../constants';
 import IconSearch from '@assets/icon/IconSearch';
 import { s, vs } from 'react-native-size-matters';
-import AppBlockButton from './elements/button/AppBlockButton';
+import AppBlockButton from '../../elements/button/AppBlockButton';
 import IconFilter from '@assets/icon/IconFillter';
-import { PaddingHorizontal } from './utils/Constans';
-import { Colors } from './theme/Config';
+import { PaddingHorizontal } from '../../utils/Constans';
+import { Colors } from '../../theme/Config';
 import { useTranslation } from 'react-i18next';
-import { AppText } from './elements/text/AppText';
+import { AppText } from '../../elements/text/AppText';
 import IconNotification from '@assets/icon/IconNotification';
-import { useInfoUser } from './zustand/store/useInfoUser/useInfoUser';
-import { navigate } from './navigation/RootNavigation';
+import { useInfoUser } from '../../zustand/store/useInfoUser/useInfoUser';
+import { navigate } from '../../navigation/RootNavigation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 type propsHeaderSearch = {
   currentPrNoInput: string;

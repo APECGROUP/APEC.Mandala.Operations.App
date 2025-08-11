@@ -22,7 +22,7 @@ import { styles } from './style';
 import { usePcPrViewModel } from '../viewmodal/usePcPrViewModel';
 import { IItemPcPr } from '../modal/PcPrModal';
 import PcPrCard from './component/PcPrCard';
-import HeaderSearch from '@/HeaderSearch';
+import HeaderSearch from '@/components/headerSearch/HeaderSearch';
 
 export default function PcPrScreen() {
   const { top } = useSafeAreaInsets();

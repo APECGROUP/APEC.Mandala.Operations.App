@@ -118,7 +118,7 @@ const CreatePriceNccScreen = () => {
       if (!isSuccess) {
         return showToast(message || t('error.subtitle'), 'error');
       }
-      onRefresh();
+      await onRefresh();
       goBack();
       showToast(t('createPrice.saveInfoSuccess'), 'success');
     } catch (error) {
@@ -136,7 +136,7 @@ const CreatePriceNccScreen = () => {
         <Header primary title={t('createPrice.createPriceNcc')} iconWidth={s(40)} />
 
         <View style={styles.titleContainer}>
-          <AppText style={styles.titleText}>{t('Danh sách gán giá NCC')}</AppText>
+          <AppText style={styles.titleText}>{t('createPrice.listCreatePriceNcc')}</AppText>
           {/* <View style={styles.countBadge}>
           <AppText style={styles.countBadgeText}>{0}</AppText>
         </View> */}

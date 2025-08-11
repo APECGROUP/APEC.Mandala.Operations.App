@@ -11,7 +11,6 @@ import { s, vs } from 'react-native-size-matters';
 import { PaddingHorizontal } from '@/utils/Constans';
 import { Colors } from '@/theme/Config';
 import { useAlert } from '@/elements/alert/AlertProvider';
-import { TYPE_TOAST } from '@/elements/toast/Message';
 import { navigate } from '@/navigation/RootNavigation';
 import { useInformationItemsViewModel } from '../viewmodal/useInformationItemsViewModel';
 import { useAssignPriceViewModel } from '@/screens/assignPriceScreen/viewmodal/useAssignPriceViewModel';

@@ -146,7 +146,7 @@ const InformationItemsScreen = ({
       <View style={styles.container}>
         <Header primary title={prNo} rightComponent={rightComponent()} />
         <View style={styles.titleContainer}>
-          <AppText style={styles.titleText}>{t('Thông tin các mặt hàng')}</AppText>
+          <AppText style={styles.titleText}>{t('orderDetail.title')}</AppText>
           <View style={styles.countBadge}>
             <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
           </View>

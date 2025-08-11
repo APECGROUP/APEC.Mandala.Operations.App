@@ -32,7 +32,7 @@ const RowItem = memo<RowItemProps>(({ label, value, icon, onPress }) => (
       {label}
     </AppText>
     <TouchableOpacity onPress={onPress} activeOpacity={1} style={styles.valueContainer}>
-      {icon && <View style={styles.icon}>{icon}</View>}
+      {icon ? <View style={styles.icon}>{icon}</View> : <View style={{ height: vs(14) }} />}
       {value && <AppText weight="700">{value}</AppText>}
     </TouchableOpacity>
   </View>

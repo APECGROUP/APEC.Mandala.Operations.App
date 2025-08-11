@@ -12,7 +12,6 @@ import { IItemPcPr } from '../../modal/PcPrModal';
 import moment from 'moment';
 import IconListPen from '@assets/icon/IconListPen';
 import { Colors } from '@/theme/Config';
-import Utilities from '@/utils/Utilities';
 import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 interface PcPrCardProps {

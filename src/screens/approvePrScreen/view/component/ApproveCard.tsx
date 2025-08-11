@@ -13,6 +13,7 @@ import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import moment from 'moment';
 import Utilities from '@/utils/Utilities';
+import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 const ApproveCard = ({
   item,
@@ -53,11 +54,12 @@ const ApproveCard = ({
             {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
             {moment(item.expectedDate).format('DD/MM/YYYY')}
           </AppText>
-          <View style={styles.noAssign}>
+          {/* <View style={styles.noAssign}>
             <AppText size={12} color={'#FF7009'} weight="500">
               {Utilities.getStatusName(item.status)}
             </AppText>
-          </View>
+          </View> */}
+          <BlockStatus code={item.status} />
         </View>
       </TouchableOpacity>
     </TouchableOpacity>
