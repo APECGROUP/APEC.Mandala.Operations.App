@@ -39,10 +39,12 @@ export const styles = StyleSheet.create({
     marginBottom: vs(4),
   },
   prCodeText: {
-    flex: 1,
+    // flexGrow: 1,
     fontSize: getFontSize(14),
     fontWeight: '700',
     color: '#333333',
+    // maxWidth: '80%',
+    maxWidth: s(250),
     marginRight: s(6),
   },
   dateText: {

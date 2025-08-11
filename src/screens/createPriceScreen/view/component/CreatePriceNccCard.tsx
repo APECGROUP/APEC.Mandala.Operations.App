@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, memo } from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
 import IconListPen from '@assets/icon/IconListPen';
 import { IItemVendorPrice } from '../../modal/CreatePriceModal';
@@ -11,7 +11,6 @@ import IconTrashPrice from '@assets/icon/IconTrashPrice';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import ReanimatedSwipeable from './ReanimatedSwipeable';
 import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { AnimatedButton } from '../CreatePriceScreen';
 import { Colors } from '@/theme/Config';
 import { moneyFormat } from '@/utils/Utilities';
 
@@ -49,13 +48,13 @@ const CreatePriceNccCard = memo<CreatePriceNccCardProps>(
 
     // Phần render nút delete
     const renderRightActions = useCallback(
-      (id: string) => (
-        <AnimatedButton
+      (id: number) => (
+        <TouchableOpacity
           activeOpacity={1}
           style={[styles.deleteBtn, animatedDeleteStyle]}
           onPress={() => handleDelete(id)}>
           <IconTrashPrice />
-        </AnimatedButton>
+        </TouchableOpacity>
       ),
       [animatedDeleteStyle, handleDelete],
     );

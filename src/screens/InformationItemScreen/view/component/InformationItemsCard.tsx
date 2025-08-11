@@ -13,6 +13,7 @@ import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { styles } from './style';
+import { set } from 'lodash';
 
 const InformationItemsCard = ({
   item,
@@ -29,6 +30,8 @@ const InformationItemsCard = ({
   const [count, setCount] = useState(item.quantity);
   const initialPrice = item.price > 0 ? item.price : ''; // Khởi tạo giá trị ban đầu
   const priceRef = useRef(initialPrice); // Dùng useRef thay vì useState
+  const [isEditPrice, setIsEditPrice] = useState(true);
+
   const inputRef = useRef<TextInput>(null); // nếu cần focus programmatically
 
   const [ncc, setNcc] = useState<IItemSupplier>({
@@ -66,16 +69,18 @@ const InformationItemsCard = ({
   };
 
   const onBlur = async () => {
+    setIsEditPrice(false);
     try {
       if (priceRef.current != null) {
-        await onUpdatePrice?.(item.id, priceRef.current);
+        await onUpdatePrice?.(item.id, Number(priceRef.current || 0));
       }
     } catch (error) {}
   };
 
   const onResetPrice = () => {
-    priceRef.current = 0;
-    inputRef.current?.setNativeProps({ text: '0' });
+    setIsEditPrice(true);
+    priceRef.current = '';
+    inputRef.current?.setNativeProps({ text: '' });
   };
 
   return (
@@ -90,7 +95,7 @@ const InformationItemsCard = ({
               </AppText>
             </View>
 
-            {priceRef.current ? (
+            {!isEditPrice ? (
               <TouchableOpacity activeOpacity={1} onPress={onResetPrice} style={styles.itemInfoRow}>
                 <AppText style={styles.dateText}>{t('Giá')}: </AppText>
                 <AppText style={styles.dateTextEnd}>
@@ -103,6 +108,7 @@ const InformationItemsCard = ({
                 <View style={styles.itemInfoRow}>
                   <TextInput
                     ref={inputRef}
+                    autoFocus
                     onFocus={onFocusComment}
                     onBlur={onBlur}
                     defaultValue={String(priceRef.current)}
@@ -163,7 +169,7 @@ const InformationItemsCard = ({
           <View style={styles.row}>
             <AppText style={styles.label}>{t('Số tiền duyệt')}</AppText>
             <AppText style={styles.approvedAmount}>
-              {moneyFormat(priceRef.current * item.quantity, '.', '')}
+              {moneyFormat(Number(priceRef.current) * item.quantity, '.', '')}
             </AppText>
           </View>
           <View>

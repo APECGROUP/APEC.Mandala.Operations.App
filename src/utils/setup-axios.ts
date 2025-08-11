@@ -158,7 +158,7 @@ api.interceptors.response.use(
             newToken.refreshExpiresAt, // Sử dụng refreshExpiresAt từ phản hồi API
           );
 
-          Toast.show({ type: 'success', text2: 'Làm mới token thành công!' });
+          // Toast.show({ type: 'success', text2: 'Làm mới token thành công!' });
 
           isRefreshing = false;
           // 🔁 Gọi lại tất cả các request đang chờ với accessToken mới

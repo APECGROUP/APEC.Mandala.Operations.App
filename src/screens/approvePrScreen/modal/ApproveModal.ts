@@ -1,7 +1,7 @@
-import { SelectedOption } from '@/screens/pcPrScreen/modal/PcPrModal';
 import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 
 export interface IApproveFilters {
@@ -10,7 +10,7 @@ export interface IApproveFilters {
   expectedDate?: Date;
   department?: IPickDepartment | undefined;
   requester?: IPickRequester | undefined;
-  store?: SelectedOption;
+  store?: IPickLocal | undefined; // Thêm trường store nếu cần
 }
 // export interface IApproveFilters {
 //   prNo?: string; // Tên cũ là prNo
