@@ -132,8 +132,10 @@ export const useAuthViewModel = () => {
         headers: { hotelCode: loginFormRef.current.hotel?.code },
         noAuth: true,
       });
-
-      if (response.status === 200 && response.data.isSuccess) {
+      if (response.status !== 200) {
+        throw new Error('Login failed');
+      }
+      if (response.data.isSuccess) {
         if (loginFormRef.current.isRememberLogin) {
           await DataLocal.saveLoginCredentials(
             loginFormRef.current.userName,
@@ -150,7 +152,14 @@ export const useAuthViewModel = () => {
         await fetchStatusGlobal();
         setIsLogin(true);
       } else {
-        showToast(t('auth.login.loginError'), TYPE_TOAST.ERROR);
+        showToast(
+          response?.data?.errors &&
+            response.data.errors?.length > 0 &&
+            response.data.errors[0]?.message
+            ? response.data.errors[0].message
+            : t('auth.login.loginError'),
+          TYPE_TOAST.ERROR,
+        );
       }
       // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
     } catch (error) {
@@ -171,8 +180,18 @@ export const useAuthViewModel = () => {
         headers: { hotelCode: hotel?.code },
         noAuth: true,
       });
-      if (response.status !== 200 || !response.data.isSuccess) {
+      if (response.status !== 200) {
         throw new Error('Forgot password failed');
+      }
+      if (!response.data.isSuccess) {
+        showToast(
+          response?.data?.errors &&
+            response.data.errors?.length > 0 &&
+            response.data.errors[0]?.message
+            ? response.data.errors[0].message
+            : t('auth.forgotPassword.errorForgotPassword'),
+          TYPE_TOAST.ERROR,
+        );
       } else if (response.data.isSuccess) {
         showAlert(t('auth.forgotPassword.success'), t('auth.forgotPassword.subSuccess'), [
           {
@@ -185,7 +204,7 @@ export const useAuthViewModel = () => {
       }
       // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
     } catch (error) {
-      showToast(t('auth.forgotPassword.errorForgotPassword'), TYPE_TOAST.ERROR);
+      showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
     }
   }, [showAlert, showToast, t]);
 

@@ -21,7 +21,13 @@ export interface IResponseListAssignPrice {
   data: IItemAssignPrice[];
   pagination: Pagination;
   isSuccess: boolean;
-  errors: null;
+  errors: Error[] | null;
+}
+
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
 }
 
 export interface IItemAssignPrice {

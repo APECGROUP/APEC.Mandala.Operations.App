@@ -18,7 +18,13 @@ export interface IResponseRefreshToken {
   data: IRefreshTokenResponseData;
   pagination: null;
   isSuccess: boolean;
-  errors: null;
+  errors: Error[] | null;
+}
+
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
 }
 
 // Tạo một instance Axios riêng biệt chỉ dành cho việc refresh token

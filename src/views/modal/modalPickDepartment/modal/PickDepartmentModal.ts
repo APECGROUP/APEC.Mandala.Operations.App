@@ -5,7 +5,13 @@ export interface IResponseDepartment {
   data: IPickDepartment[];
   pagination: Pagination;
   isSuccess: boolean;
-  errors: null;
+  errors: Error[] | null;
+}
+
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
 }
 
 export interface IPickDepartment {

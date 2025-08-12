@@ -11,7 +11,13 @@ export interface IResponseListVat {
   data: IItemVat[];
   pagination: Pagination;
   isSuccess: boolean;
-  errors: null;
+  errors: Error[] | null;
+}
+
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
 }
 
 export interface IItemVat {
@@ -45,7 +51,13 @@ export interface IResponseVendorList {
   data: IItemVendorPrice[];
   pagination: Pagination;
   isSuccess: boolean;
-  errors: null;
+  errors: Error[] | null;
+}
+
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
 }
 
 export interface IItemVendorPrice {
