@@ -13,6 +13,7 @@ import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import { CreatePriceFilters } from '@/screens/createPriceScreen/modal/CreatePriceModal';
 
 // ─────────────────────────────────────────────────────────────
 // Bottom Tab Navigation
@@ -58,8 +59,8 @@ export type MainParams = {
     onApplyFilters: (filters: AssignPriceFilters) => void;
   };
   FilterCreatePriceScreen: {
-    currentFilters: AssignPriceFilters;
-    onApplyFilters: (filters: AssignPriceFilters) => void;
+    currentFilters: CreatePriceFilters;
+    onApplyFilters: (filters: CreatePriceFilters) => void;
   };
   DetailAssignPriceCardScreen: { item: IItemPcPr };
   DetailPcPrCardScreen: { item: IItemPcPr };
@@ -93,8 +94,8 @@ export type MainParams = {
     type: 'verifyEmail';
   };
   PickNccScreen: {
-    setNcc: Dispatch<SetStateAction<IItemSupplier>> | ((i: IItemSupplier) => void);
-    ncc: IItemSupplier;
+    setNcc: Dispatch<SetStateAction<IItemSupplier | undefined>> | ((i: IItemSupplier) => void);
+    ncc: IItemSupplier | undefined;
   };
   PickDepartmentScreen: {
     setDepartment: Dispatch<SetStateAction<IPickDepartment | undefined>>;
@@ -102,7 +103,7 @@ export type MainParams = {
   };
 
   PickItemScreen: {
-    setItem: Dispatch<SetStateAction<IPickItem>> | ((i: IPickItem) => void);
+    setItem: Dispatch<SetStateAction<IPickItem | undefined>> | ((i: IPickItem | undefined) => void);
   };
 
   PickRequesterScreen: {

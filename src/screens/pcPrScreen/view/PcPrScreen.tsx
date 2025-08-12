@@ -43,6 +43,7 @@ export default function PcPrScreen() {
     currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
     currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
+    length,
   } = usePcPrViewModel(); // Truyền một object rỗng, ViewModel sẽ khởi tạo internal state của nó
 
   const refToast = useRef<any>(null);
@@ -150,7 +151,7 @@ export default function PcPrScreen() {
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('assignPrice.header')}</AppText>
           <View style={styles.countBadge}>
-            <AppText style={styles.countBadgeText}>{total}</AppText>
+            <AppText style={styles.countBadgeText}>{length}</AppText>
           </View>
         </View>
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}

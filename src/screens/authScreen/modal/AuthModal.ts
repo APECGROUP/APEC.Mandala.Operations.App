@@ -12,7 +12,7 @@ import {
 export interface LoginFormData {
   userName: string;
   password: string;
-  hotel: IDataListHotel;
+  hotel: IDataListHotel | undefined;
   isRememberLogin: boolean;
 }
 

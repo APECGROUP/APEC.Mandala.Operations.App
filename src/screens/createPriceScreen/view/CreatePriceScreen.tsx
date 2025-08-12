@@ -50,6 +50,7 @@ export default function CreatePriceScreen() {
     currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
     selectedIds,
+    length,
     onSearch, // Đổi tên từ onSearchPrNo thành onSearch
     onRefresh,
     // onLoadMore,
@@ -97,10 +98,12 @@ export default function CreatePriceScreen() {
       <View style={styles.emptyContainer}>
         <FastImage source={Images.IconEmptyDataAssign} style={styles.emptyImage} />
         <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
-        <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice}>
-          <IconPlus fill={Colors.WHITE} />
-          <AppText style={styles.textCreatePrice}>{t('createPrice.createPrice')}</AppText>
-        </AppBlockButton>
+        {!currentPrNoInput ? (
+          <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice}>
+            <IconPlus fill={Colors.WHITE} />
+            <AppText style={styles.textCreatePrice}>{t('createPrice.createPrice')}</AppText>
+          </AppBlockButton>
+        ) : null}
       </View>
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,7 +120,6 @@ export default function CreatePriceScreen() {
     return null;
   }, [isFetchingNextPage]);
 
-  const length = useMemo(() => selectedIds.length, [selectedIds]);
   const renderItem = useCallback(
     ({ item }: { item: IItemVendorPrice; index: number }) => (
       <CreatePriceCard
@@ -157,7 +159,7 @@ export default function CreatePriceScreen() {
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('createPrice.supplierPriceList')}</AppText>
           <View style={styles.countBadge}>
-            <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+            <AppText style={styles.countBadgeText}>{length}</AppText>
           </View>
         </View>
         <View style={styles.header}>
@@ -186,7 +188,7 @@ export default function CreatePriceScreen() {
             ref={flashListRef}
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={item => `${item.id}_${item.status}`}
             // onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}

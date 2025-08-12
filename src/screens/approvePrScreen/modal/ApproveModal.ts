@@ -3,6 +3,7 @@ import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import { RefObject } from 'react';
 
 export interface IApproveFilters {
   prNo?: string;
@@ -122,6 +123,7 @@ export const fetchApprove = async (
   page: number,
   limit: number = 50,
   filters: IApproveFilters,
+  length: RefObject<number>,
 ): Promise<IApprove> => {
   try {
     const filterList: Filter[] = [];
@@ -192,6 +194,9 @@ export const fetchApprove = async (
     const response = await api.post<IApprove, any>(ENDPOINT.GET_LIST_APPOVE_PR, params);
     if (response.status !== 200 || !response.data.isSuccess) {
       throw new Error('Failed to fetch data');
+    }
+    if (response.data.pagination.rowCount !== 0) {
+      length.current = response.data.pagination.rowCount;
     }
     return response.data.data;
   } catch (error) {

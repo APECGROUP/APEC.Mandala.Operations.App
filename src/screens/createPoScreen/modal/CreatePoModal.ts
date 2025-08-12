@@ -5,6 +5,7 @@ import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import { RefObject } from 'react';
 // Đảm bảo moment được import nếu bạn dùng nó cho Date objects
 
 export interface CreatePoFilters {
@@ -76,6 +77,7 @@ export const fetchListCreatePo = async (
   page: number,
   limit: number = 50,
   filters: CreatePoFilters,
+  length: RefObject<number>,
 ): Promise<IItemCreatePo> => {
   try {
     const filterList: Filter[] = [];
@@ -151,6 +153,9 @@ export const fetchListCreatePo = async (
     const response = await api.post<IItemCreatePo, any>(ENDPOINT.GET_LIST_CREATE_PO, params);
     if (response.status !== 200 || !response.data.isSuccess) {
       throw new Error('Failed to fetch data');
+    }
+    if (response.data.pagination.rowCount !== 0) {
+      length.current = response.data.pagination.rowCount;
     }
     return response.data.data;
   } catch (error) {

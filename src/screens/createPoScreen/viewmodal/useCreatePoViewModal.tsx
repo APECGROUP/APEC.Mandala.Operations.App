@@ -59,7 +59,7 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     ],
     [effectiveFilters],
   );
-
+  const length = useRef<number>(0);
   const {
     data,
     isLoading,
@@ -75,7 +75,7 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: currentQueryKey,
     queryFn: async ({ pageParam = 1 }) =>
-      fetchListCreatePo(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
+      fetchListCreatePo(pageParam as number, ITEMS_PER_PAGE, effectiveFilters, length),
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
@@ -271,6 +271,7 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     isError,
     error,
     selectedAll,
+    length: length.current,
     onReject,
     setSelectedIds,
     onApproved,

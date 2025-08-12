@@ -136,6 +136,10 @@ export const useAuthViewModel = () => {
         throw new Error('Login failed');
       }
       if (response.data.isSuccess) {
+        if (response.data.data.user.groups.length === 0) {
+          showToast(t('auth.login,.loginError'), TYPE_TOAST.ERROR);
+          return;
+        }
         if (loginFormRef.current.isRememberLogin) {
           await DataLocal.saveLoginCredentials(
             loginFormRef.current.userName.trim(),

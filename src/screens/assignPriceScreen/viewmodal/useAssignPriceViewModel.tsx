@@ -65,6 +65,7 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
     [effectiveFilters], // Dependency là toàn bộ object effectiveFilters
   );
 
+  const length = useRef(0);
   const {
     data,
     isLoading,
@@ -84,7 +85,8 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
       fetchAssignPriceData(
         pageParam as number,
         ITEMS_PER_PAGE,
-        effectiveFilters, // Truyền toàn bộ object filters vào fetchAssignPriceData
+        effectiveFilters,
+        length, // Truyền toàn bộ object filters vào fetchAssignPriceData
       ),
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
@@ -96,7 +98,6 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
 
   // Gộp dữ liệu từ tất cả các trang thành một mảng phẳng để dễ dàng hiển thị.
   const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
-
   // Xử lý sự kiện refresh (kéo xuống để làm mới).
   const onRefresh = useCallback(() => {
     // Tránh gọi refetch nếu đang trong quá trình fetching để tránh các race conditions.
@@ -131,11 +132,9 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
     setEffectiveFilters(newFilters);
   }, []);
 
-  const length = useMemo(() => flatData.length, [flatData]);
-
   return {
     data: flatData,
-    length,
+    length: length.current,
     isLoading,
     isFetching,
     isRefetching,

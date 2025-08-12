@@ -44,7 +44,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
   const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
     typeof debounce<typeof setEffectiveFilters>
   > | null>(null);
-
+  const length = useRef<number>(0);
   useEffect(() => {
     if (!debouncedSetEffectiveFiltersRef.current) {
       debouncedSetEffectiveFiltersRef.current = debounce(setEffectiveFilters, DEBOUNCE_DELAY);
@@ -87,7 +87,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: queryKey,
     queryFn: async ({ pageParam = 1 }) =>
-      fetchApprove(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
+      fetchApprove(pageParam as number, ITEMS_PER_PAGE, effectiveFilters, length),
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
@@ -273,10 +273,9 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
       textReason,
     ],
   );
-  const length = useMemo(() => flatData.length, [flatData]);
 
   return {
-    length,
+    length: length.current,
     onReject,
     selectedIds,
     setSelectedIds,

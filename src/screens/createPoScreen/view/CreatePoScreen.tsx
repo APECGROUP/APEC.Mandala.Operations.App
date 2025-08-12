@@ -45,6 +45,7 @@ export default function CreatePoScreen() {
     currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
     selectedIds,
+    length,
     onSearch, // Đổi tên từ onSearchPrNo thành onSearch
     onRefresh,
     // onLoadMore,
@@ -162,7 +163,7 @@ export default function CreatePoScreen() {
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('CreatePo.supplierPriceList')}</AppText>
           <View style={styles.countBadge}>
-            <AppText style={styles.countBadgeText}>{flatData.length}</AppText>
+            <AppText style={styles.countBadgeText}>{length}</AppText>
           </View>
         </View>
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}

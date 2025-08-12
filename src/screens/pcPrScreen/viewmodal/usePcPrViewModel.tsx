@@ -6,15 +6,15 @@ import { PcPrFilters, IItemPcPr, fetchPcPrData } from '../modal/PcPrModal';
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
 
-export function usePcPrViewModel(initialFilters: PcPrFilters = {}) {
+export function usePcPrViewModel() {
   // `effectiveFilters` là state chứa các giá trị filter thực tế sẽ được sử dụng để fetch data.
   // Các giá trị này sẽ được cập nhật sau khi debounce từ `currentUiFilters`.
-  const [effectiveFilters, setEffectiveFilters] = useState<PcPrFilters>(initialFilters);
-
+  const [effectiveFilters, setEffectiveFilters] = useState<PcPrFilters>();
+  const length = useRef<number>(0);
   // `currentUiFilters` là state tạm thời, lưu trữ các giá trị filter mà người dùng
   // đang tương tác (gõ vào ô search, chọn trên màn hình filter).
   // Những giá trị này sẽ được debounce trước khi cập nhật vào `effectiveFilters`.
-  const [currentUiFilters, setCurrentUiFilters] = useState<PcPrFilters>(initialFilters);
+  const [currentUiFilters, setCurrentUiFilters] = useState<PcPrFilters>();
 
   // Ref để lưu trữ hàm debounce, đảm bảo nó chỉ được tạo một lần duy nhất
   // và có thể được hủy bỏ (cancel) khi component unmount.
@@ -37,7 +37,7 @@ export function usePcPrViewModel(initialFilters: PcPrFilters = {}) {
   // Mỗi khi `currentUiFilters` thay đổi (người dùng tương tác), hàm debounce sẽ được gọi.
   // Nếu `currentUiFilters` thay đổi nhanh, debounce sẽ ngăn việc gọi `setEffectiveFilters` liên tục.
   useEffect(() => {
-    // Gọi hàm debounce để cập nhật effectiveFilters.
+    // Gọi hàm debounce để cập nhật effectiveFilters?.
     // Nếu có các cuộc gọi debounce trước đó chưa được thực thi, chúng sẽ bị hủy bỏ.
     debouncedSetEffectiveFiltersRef.current?.(currentUiFilters);
   }, [currentUiFilters]); // Dependency là currentUiFilters, chạy lại khi UI filters thay đổi.
@@ -47,13 +47,13 @@ export function usePcPrViewModel(initialFilters: PcPrFilters = {}) {
   const queryKey = useMemo(
     () => [
       'listPcPr',
-      effectiveFilters.prNo?.trim() || '',
-      effectiveFilters.pO?.trim() || '',
-      effectiveFilters.prDate?.toISOString() || '',
-      effectiveFilters.expectedDate?.toISOString() || '',
-      effectiveFilters.department?.id || '',
-      effectiveFilters.store?.code || '',
-      effectiveFilters.status?.code || '',
+      effectiveFilters?.prNo?.trim() || '',
+      effectiveFilters?.pO?.trim() || '',
+      effectiveFilters?.prDate?.toISOString() || '',
+      effectiveFilters?.expectedDate?.toISOString() || '',
+      effectiveFilters?.department?.id || '',
+      effectiveFilters?.store?.id || '',
+      effectiveFilters?.status?.status || '',
     ],
     [effectiveFilters], // Dependency là toàn bộ object effectiveFilters
   );
@@ -78,6 +78,7 @@ export function usePcPrViewModel(initialFilters: PcPrFilters = {}) {
         pageParam as number,
         ITEMS_PER_PAGE,
         effectiveFilters, // Truyền toàn bộ object filters vào fetchPcPrData
+        length, // Truyền toàn bộ object filters vào fetchPcPrData
       ),
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
@@ -131,11 +132,12 @@ export function usePcPrViewModel(initialFilters: PcPrFilters = {}) {
     isRefetching,
     isFetchingNextPage,
     hasNextPage: !!hasNextPage,
+    length: length.current,
     onRefresh,
     onLoadMore,
     onSearchPrNo,
     applyFilters, // Đổi tên thành applyFilters cho rõ ràng
-    currentPrNoInput: currentUiFilters.prNo || '', // Giá trị hiện tại trong ô input tìm kiếm trên màn hình chính
+    currentPrNoInput: currentUiFilters?.prNo || '', // Giá trị hiện tại trong ô input tìm kiếm trên màn hình chính
     currentFilters: currentUiFilters, // Toàn bộ object filter đang được người dùng tương tác
     isError,
     error,

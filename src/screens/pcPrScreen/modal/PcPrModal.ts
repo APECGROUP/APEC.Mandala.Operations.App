@@ -5,6 +5,7 @@ import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDep
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { RefObject } from 'react';
 
 // --- (Các interfaces không thay đổi) ---
 
@@ -78,7 +79,8 @@ export interface Pagination {
 export const fetchPcPrData = async (
   page: number,
   limit: number = 50,
-  filters: PcPrFilters,
+  filters: PcPrFilters | undefined,
+  length: RefObject<number>,
 ): Promise<IItemPcPr> => {
   try {
     const filterList: Filter[] = [];
@@ -90,69 +92,69 @@ export const fetchPcPrData = async (
     //   operator: '==',
     // });
 
-    if (filters.prNo) {
+    if (filters?.prNo) {
       filterList.push({
         propertyName: 'prNo',
-        propertyValue: filters.prNo,
+        propertyValue: filters?.prNo,
         propertyType: 'string',
         operator: '==',
       });
     }
-    if (filters.pO) {
+    if (filters?.pO) {
       filterList.push({
         propertyName: 'poNo',
-        propertyValue: filters.pO,
+        propertyValue: filters?.pO,
         propertyType: 'string',
         operator: '==',
       });
     }
-    if (filters.prDate) {
+    if (filters?.prDate) {
       filterList.push({
         propertyName: 'prDate',
-        propertyValue: filters.prDate.toISOString(),
+        propertyValue: filters?.prDate.toISOString(),
         propertyType: 'datetime',
         operator: '==',
       });
     }
-    if (filters.store?.storeCode) {
+    if (filters?.store?.storeCode) {
       filterList.push({
         propertyName: 'storeCode',
-        propertyValue: filters.store.storeCode,
+        propertyValue: filters?.store.storeCode,
         propertyType: 'string',
         operator: '==',
       });
     }
-    if (filters.status?.status) {
+    if (filters?.status?.status) {
       filterList.push({
         propertyName: 'status',
-        propertyValue: filters.status.status,
+        propertyValue: filters?.status.status,
         propertyType: 'string',
         operator: '==',
       });
     }
 
-    if (filters.expectedDate) {
+    if (filters?.expectedDate) {
       filterList.push({
         propertyName: 'expectedDate',
-        propertyValue: filters.expectedDate.toISOString(),
+        propertyValue: filters?.expectedDate.toISOString(),
         propertyType: 'datetime',
         operator: '==',
       });
     }
 
-    if (filters.department?.departmentCode) {
+    if (filters?.department?.departmentCode) {
       filterList.push({
         propertyName: 'departmentCode',
-        propertyValue: filters.department.departmentCode,
+        propertyValue: filters?.department.departmentCode,
         propertyType: 'string',
         operator: '==',
       });
     }
 
-    if (filters.requester?.id) {
+    if (filters?.requester?.id) {
       filterList.push({
         propertyName: 'requestBy',
-        propertyValue: filters.requester.username,
+        propertyValue: filters?.requester.username,
         propertyType: 'string',
         operator: '==',
       });
@@ -180,6 +182,9 @@ export const fetchPcPrData = async (
     const response = await api.post<IItemPcPr, any>(ENDPOINT.GET_LIST_PC_PR, params);
     if (response.status !== 200 || !response.data.isSuccess) {
       throw new Error('Failed to fetch data');
+    }
+    if (response.data.pagination.rowCount !== 0) {
+      length.current = response.data.pagination.rowCount;
     }
     return response.data.data;
   } catch (error) {

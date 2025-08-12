@@ -5,6 +5,7 @@ import api from '@/utils/setup-axios';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { Filter, IParams } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
+import { RefObject } from 'react';
 // Đảm bảo moment được import nếu bạn dùng nó cho Date objects
 
 export interface IResponseListVat {
@@ -35,7 +36,7 @@ export interface IItemVat {
 export interface CreatePriceFilters {
   prNo?: string; // Tên cũ là prNo
   ncc?: IItemSupplier;
-  status?: { code: string; id: number; name: string };
+  status?: { code: string; id: number | string; name: string };
   product?: IPickItem;
 }
 
@@ -96,39 +97,40 @@ export interface Pagination {
 export const fetchCreatePrice = async (
   page: number,
   limit: number = 50,
-  filters: CreatePriceFilters,
+  filters: CreatePriceFilters | undefined = undefined,
+  length: RefObject<number>,
 ): Promise<IItemSupplier> => {
   try {
     const filterList: Filter[] = [];
     console.log('filter: ', filters);
-    // if (filters.prNo) {
+    // if (filters?.prNo) {
     //   filterList.push({
     //     propertyName: 'prNo',
-    //     propertyValue: filters.prNo,
+    //     propertyValue: filters?.prNo,
     //     propertyType: 'string',
     //     operator: '==',
     //   });
     // }
-    if (filters.status) {
+    if (filters?.status) {
       filterList.push({
         propertyName: 'status',
-        propertyValue: filters.status.code,
+        propertyValue: filters?.status.code,
         propertyType: 'string',
         operator: '==',
       });
     }
-    if (filters.ncc) {
+    if (filters?.ncc) {
       filterList.push({
         propertyName: 'vendorCode',
-        propertyValue: filters.ncc.code,
+        propertyValue: filters?.ncc.code,
         propertyType: 'string',
         operator: '==',
       });
     }
-    if (filters.product) {
+    if (filters?.product) {
       filterList.push({
         propertyName: 'itemCode',
-        propertyValue: filters.product.iCode,
+        propertyValue: filters?.product.iCode,
         propertyType: 'string',
         operator: '==',
       });
@@ -156,6 +158,9 @@ export const fetchCreatePrice = async (
     const response = await api.post<IItemVendorPrice, any>(ENDPOINT.GET_LIST_VENDOR_PRICE, params);
     if (response.status !== 200 || !response.data.isSuccess) {
       throw new Error('Failed to fetch data');
+    }
+    if (response.data.pagination.rowCount !== 0) {
+      length.current = response.data.pagination.rowCount;
     }
     return response.data.data;
   } catch (error) {

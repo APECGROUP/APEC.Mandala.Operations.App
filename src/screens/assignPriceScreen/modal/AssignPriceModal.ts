@@ -5,6 +5,7 @@ import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDep
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { RefObject } from 'react';
 
 export interface AssignPriceFilters {
   prNo?: string;
@@ -137,6 +138,7 @@ export const fetchAssignPriceData = async (
   page: number,
   limit: number = 50,
   filters: AssignPriceFilters,
+  length: RefObject<number>,
 ): Promise<IItemSupplier> => {
   try {
     const filterList: Filter[] = [];
@@ -199,6 +201,9 @@ export const fetchAssignPriceData = async (
     const response = await api.post<IItemAssignPrice, any>(ENDPOINT.GET_LIST_ASSIGN_PRICE, params);
     if (response.status !== 200 || !response.data.isSuccess) {
       throw new Error('Failed to fetch data');
+    }
+    if (response.data.pagination.rowCount !== 0) {
+      length.current = response.data.pagination.rowCount;
     }
     return response.data.data;
   } catch (error) {

@@ -9,7 +9,7 @@
         "login": "Đăng nhập",
         "inputUserName": "Nhập tên người dùng",
         "inputPassword": "Nhập mật khẩu",
-        "loginError": "Tên người dùng hoặc mật khẩu không đúng. Vui lòng kiểm tra lại ",
+        "loginError": "Tên người dùng hoặc mật khẩu không đúng. Vui lòng thử lại",
         "hotel": "Khách sạn",
         "pickHotel": "Chọn khách sạn",
         "saveInfoLogin": "Lưu thông tin đăng nhập",
@@ -19,6 +19,7 @@
         "emptyHotel": "Khách sạn không được để trống",
         "resetPassword": "Vui lòng thay đổi mật khẩu mới",
         "subResetPassword": "Giúp bảo vệ thông tin cá nhân tốt hơn",
+        "noGroupError": "Tài khoản của bạn không có nhóm nào, vui lòng liên hệ quản trị viên để được hỗ trợ",
         "changePassword": "Thay đổi mật khẩu"
       },
       "forgotPassword": {

@@ -19,6 +19,7 @@
         "emptyHotel": "Hotel cannot be empty",
         "resetPassword": "Please set a new password",
         "subResetPassword": "To better protect your personal information",
+        "noGroupError": "Your account has no groups, please contact the administrator for assistance",
         "changePassword": "Change password"
       },
       "forgotPassword": {
