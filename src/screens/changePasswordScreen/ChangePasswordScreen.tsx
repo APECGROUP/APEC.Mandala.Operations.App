@@ -56,7 +56,11 @@ const ChangePasswordScreen = ({ navigation, route }: Props) => {
 
       // Cập nhật mật khẩu mới vào Keychain
       if (credentials) {
-        await DataLocal.saveCredentials(credentials.username, newPassword, credentials.hotel);
+        await DataLocal.saveCredentials(
+          credentials.username.trim(),
+          newPassword.trim(),
+          credentials.hotel,
+        );
         Toast.show({
           type: 'success',
           text2: t('account.changePassword.changePasswordSuccess'),

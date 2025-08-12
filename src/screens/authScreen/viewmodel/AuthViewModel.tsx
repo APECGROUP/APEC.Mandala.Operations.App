@@ -124,9 +124,9 @@ export const useAuthViewModel = () => {
     setProcessing(true);
     try {
       const params = {
-        userName: loginFormRef.current.userName,
-        password: loginFormRef.current.password,
-        hotelCode: loginFormRef.current.hotel?.code,
+        userName: loginFormRef.current.userName.trim(),
+        password: loginFormRef.current.password.trim(),
+        hotelCode: loginFormRef.current.hotel?.code.trim(),
       };
       const response = await api.post<IResponseAPILogin>(ENDPOINT.LOGIN, params, {
         headers: { hotelCode: loginFormRef.current.hotel?.code },
@@ -138,16 +138,16 @@ export const useAuthViewModel = () => {
       if (response.data.isSuccess) {
         if (loginFormRef.current.isRememberLogin) {
           await DataLocal.saveLoginCredentials(
-            loginFormRef.current.userName,
-            loginFormRef.current.password,
+            loginFormRef.current.userName.trim(),
+            loginFormRef.current.password.trim(),
             loginFormRef.current.hotel,
           );
         }
         saveInfoUser(response.data.data.user);
         DataLocal.saveAll(
           response.data,
-          loginFormRef.current.hotel?.code!,
-          loginFormRef.current.hotel?.name!,
+          loginFormRef.current.hotel?.code.trim()!,
+          loginFormRef.current.hotel?.name.trim()!,
         );
         await fetchStatusGlobal();
         setIsLogin(true);
