@@ -1,8 +1,24 @@
 import { getFontSize } from '@/constants';
-import { Colors } from '@/theme/Config';
+import { PaddingHorizontal } from '@/utils/Constans';
 import { StyleSheet } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
+
 export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: PaddingHorizontal,
+    marginTop: vs(12),
+  },
+  titleText: {
+    fontSize: getFontSize(18),
+    fontWeight: '700',
+    color: '#333333',
+  },
   rowCenter: { flexDirection: 'row', alignItems: 'center' },
   mw85: { maxWidth: '85%' },
   flex1: { flex: 1 },
@@ -15,10 +31,11 @@ export const styles = StyleSheet.create({
     alignItems: 'flex-end',
     flex: 1,
     paddingBottom: vs(6),
-    // borderBottomWidth: 1,
     borderBottomColor: '#F1F1F1',
-    // width: vs(40),
     maxWidth: s(130),
+  },
+  dropdownContainer: {
+    height: vs(150),
   },
   placeholderStyle: {
     fontSize: getFontSize(12),
@@ -41,37 +58,6 @@ export const styles = StyleSheet.create({
     top: 0,
     transform: [{ rotate: '180deg' }],
   },
-  deleteBtn: {
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: s(50),
-    borderRadius: s(8),
-    marginTop: vs(-12),
-  },
-  deleteBtnExtend: {
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: s(50),
-    borderRadius: s(8),
-    marginTop: vs(12),
-  },
-  error: {
-    color: Colors.ERROR_600,
-    fontSize: getFontSize(12),
-    fontWeight: '500',
-    marginTop: vs(8),
-    textAlign: 'right',
-  },
-  // touchableVat: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   paddingBottom: vs(12),
-  //   borderBottomWidth: 1,
-  //   borderBottomColor: '#F1F1F1',
-  //   // flexShrink: 1,
-  // },
   card: {
     marginTop: vs(12),
     backgroundColor: '#fff',
@@ -80,11 +66,11 @@ export const styles = StyleSheet.create({
   },
   cardError: {
     backgroundColor: '#fff',
-    // borderWidth: 1,
-    borderColor: Colors.ERROR_600,
+    borderColor: '#E84545',
     borderRadius: s(8),
     padding: s(12),
     marginTop: vs(12),
+    borderWidth: 1,
   },
   header: {
     flexDirection: 'row',
@@ -101,7 +87,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: s(42),
     marginRight: s(6),
-    backgroundColor: Colors.BUTTON_DISABLED,
+    backgroundColor: '#E6E6E6',
   },
   priceRow: {
     flexDirection: 'row',
@@ -111,13 +97,13 @@ export const styles = StyleSheet.create({
   priceLabel: {
     fontSize: getFontSize(12),
     fontWeight: '500',
-    color: Colors.TEXT_SECONDARY,
+    color: '#888888',
     marginRight: s(4),
   },
   priceValue: {
     fontSize: getFontSize(14),
     fontWeight: '700',
-    color: Colors.TEXT_DEFAULT,
+    color: '#333333',
   },
   priceInput: {
     minWidth: s(60),
@@ -127,13 +113,15 @@ export const styles = StyleSheet.create({
     fontSize: getFontSize(12),
     color: '#333',
   },
+  iconEdit: {
+    marginLeft: s(6),
+  },
   nccRow: {
     flexDirection: 'row',
   },
   nccTouchable: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-
     alignItems: 'flex-start',
     flexShrink: 1,
     width: '100%',
@@ -153,10 +141,9 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   detailLabel: {
-    // width: s(200),
     fontSize: getFontSize(12),
     fontWeight: '500',
-    color: Colors.TEXT_SECONDARY,
+    color: '#888888',
   },
   datePicker: {
     flexDirection: 'row',

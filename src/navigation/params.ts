@@ -13,7 +13,10 @@ import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
-import { CreatePriceFilters } from '@/screens/createPriceScreen/modal/CreatePriceModal';
+import {
+  CreatePriceFilters,
+  IItemVendorPrice,
+} from '@/screens/createPriceScreen/modal/CreatePriceModal';
 
 // ─────────────────────────────────────────────────────────────
 // Bottom Tab Navigation
@@ -42,6 +45,7 @@ export type MainParams = {
   ApprovePrScreen: undefined;
   CreatePriceNccScreen: undefined;
   AccountScreen: undefined;
+  EditPriceNCCScreen: { item: IItemVendorPrice; onUpdateItem: (item: IItemVendorPrice) => void };
   FilterAssignPriceScreen: {
     currentFilters: AssignPriceFilters;
     onApplyFilters: (filters: AssignPriceFilters) => void;

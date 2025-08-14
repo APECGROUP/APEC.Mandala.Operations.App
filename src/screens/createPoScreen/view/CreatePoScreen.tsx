@@ -2,7 +2,6 @@
 
 import React, { useRef, useCallback, useMemo, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +13,6 @@ import AppBlockButton from '@/elements/button/AppBlockButton';
 import IconScrollBottom from '@assets/icon/IconScrollBottom';
 
 import { IItemCreatePo } from '../modal/CreatePoModal';
-import Images from '@assets/image/Images';
 import { navigate } from '@/navigation/RootNavigation';
 import { AppText } from '@/elements/text/AppText';
 import { useCreatePoViewModel } from '../viewmodal/useCreatePoViewModal';
@@ -28,6 +26,7 @@ import { styles } from './style';
 import CreatePoCard from './component/CreatePoCard';
 import { AppButton } from '@/elements/button/AppButton';
 import HeaderSearch from '@/components/headerSearch/HeaderSearch';
+import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 
 export default function CreatePoScreen() {
   const { top } = useSafeAreaInsets();
@@ -48,7 +47,7 @@ export default function CreatePoScreen() {
     length,
     onSearch, // Đổi tên từ onSearchPrNo thành onSearch
     onRefresh,
-    // onLoadMore,
+    onLoadMore,
     applyFilters,
     handleSelect,
     onCreatePo,
@@ -85,14 +84,11 @@ export default function CreatePoScreen() {
         </View>
       );
     }
+
     return (
       <View style={styles.emptyContainer}>
-        <FastImage source={Images.IconEmptyDataAssign} style={styles.emptyImage} />
+        <EmptyDataAnimation autoPlay />
         <AppText style={styles.emptyText}>{t('CreatePo.empty')}</AppText>
-        {/* <AppBlockButton onPress={onCreatePo} style={styles.buttonCreatePo}>
-          <IconPlus fill={Colors.WHITE} />
-          <AppText style={styles.textCreatePo}>{t('CreatePo.CreatePo')}</AppText>
-        </AppBlockButton> */}
       </View>
     );
   }, [isLoading, t]);
@@ -161,7 +157,7 @@ export default function CreatePoScreen() {
         />
         {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
         <View style={styles.titleContainer}>
-          <AppText style={styles.titleText}>{t('CreatePo.supplierPriceList')}</AppText>
+          <AppText style={styles.titleText}>{t('approve.listOfPurchaseOrder')}</AppText>
           <View style={styles.countBadge}>
             <AppText style={styles.countBadgeText}>{length}</AppText>
           </View>
@@ -184,7 +180,7 @@ export default function CreatePoScreen() {
             data={flatData || []}
             renderItem={renderItem}
             keyExtractor={item => item.id.toString()}
-            // onEndReached={onLoadMore}
+            onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
             removeClippedSubviews

@@ -51,15 +51,17 @@ export default function CreatePriceScreen() {
     isError,
     selectedIds,
     length,
+    selectedAll,
     onSearch, // Đổi tên từ onSearchPrNo thành onSearch
     onRefresh,
-    // onLoadMore,
+    onLoadMore,
     applyFilters,
     onApproved,
     onReject,
     toggleSelectAll,
     handleSelect,
-    selectedAll,
+    handleDelete,
+    onUpdateItem,
   } = useCreatePriceViewModel();
   console.log('data: ', flatData);
   const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
@@ -71,7 +73,7 @@ export default function CreatePriceScreen() {
   const scrollToTop = useCallback(() => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
-
+  console.log('cratePriceScreen: ', isLoading, isRefetching);
   useEffect(() => {
     if (route.params?.filters) {
       applyFilters(route.params.filters);
@@ -123,13 +125,15 @@ export default function CreatePriceScreen() {
   const renderItem = useCallback(
     ({ item }: { item: IItemVendorPrice; index: number }) => (
       <CreatePriceCard
+        onUpdateItem={onUpdateItem}
         item={item}
+        handleDelete={handleDelete}
         handleSelect={handleSelect}
         isSelected={selectedIds.includes(item.id)}
         simultaneousGesture={flashListNativeGesture}
       />
     ),
-    [handleSelect, selectedIds, flashListNativeGesture],
+    [onUpdateItem, handleDelete, handleSelect, selectedIds, flashListNativeGesture],
   );
 
   const goToFilterScreen = useCallback(() => {
@@ -168,7 +172,7 @@ export default function CreatePriceScreen() {
             <AppText style={styles.ml7}>{t('createPrice.pickAll')}</AppText>
           </AppBlockButton>
           <AppText>
-            {length} {t('createPrice.orderSelected')}
+            {selectedIds.length} {t('createPrice.orderSelected')}
           </AppText>
         </View>
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
@@ -189,7 +193,7 @@ export default function CreatePriceScreen() {
             data={flatData || []}
             renderItem={renderItem}
             keyExtractor={item => `${item.id}_${item.status}`}
-            // onEndReached={onLoadMore}
+            onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
             removeClippedSubviews
@@ -206,7 +210,7 @@ export default function CreatePriceScreen() {
         )}
 
         <ToastContainer ref={refToast} />
-        {flatData.length > 0 && length === 0 && (
+        {length > 0 && (
           <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice2}>
             <IconCreatePrice />
           </AppBlockButton>
@@ -216,7 +220,7 @@ export default function CreatePriceScreen() {
           <IconScrollBottom style={styles.rotateIcon} />
         </AppBlockButton>
       </View>
-      {length > 0 && (
+      {selectedIds.length > 0 && (
         <Footer
           onLeftAction={onReject}
           onRightAction={onApproved}

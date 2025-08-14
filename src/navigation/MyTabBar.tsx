@@ -7,74 +7,51 @@ import { useTranslation } from 'react-i18next';
 import { vs } from 'react-native-size-matters';
 
 // Icons và Configs
-import IconTab1 from '@assets/icon/IconTab1';
-import IconTab2 from '@assets/icon/IconTab2';
-import IconTab3 from '@assets/icon/IconTab3';
-import IconTab4 from '@assets/icon/IconTab4';
+import IconTabAssignPrice from '@assets/icon/IconTab1';
+import IconTabCreatePrice from '@assets/icon/IconTab2';
+import IconTabCreatePo from '@assets/icon/IconTab3';
+import IconTabPcPr from '@assets/icon/IconTab4';
 import { Colors } from '@/theme/Config';
 import light from '../theme/light';
 import { AppText } from '../elements/text/AppText';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
-import IconTab6 from '@assets/icon/IconTab6';
+import IconTabApprovePr from '@assets/icon/IconTab6';
+import { TabBarParams } from './params'; // Import TabBarParams để có kiểu dữ liệu chính xác cho tên màn hình
 
-// Định nghĩa các hằng số cho ID nhóm người dùng
-const GROUP_IDS = {
-  GROUP_A: [10, 14],
-  GROUP_B: [12, 13],
+// Định nghĩa một mapping chung cho các chi tiết của màn hình tab (icon, labelKey)
+// Điều này giúp tập trung cấu hình và tái sử dụng dễ dàng hơn.
+const SCREEN_TAB_DETAILS: {
+  [key in keyof TabBarParams]?: {
+    icon: React.ReactElement;
+    labelKey: string;
+  };
+} = {
+  AssignPriceScreen: { icon: <IconTabAssignPrice />, labelKey: 'myTabs.assignPrice' },
+  CreatePriceScreen: { icon: <IconTabCreatePrice />, labelKey: 'myTabs.createPrice' },
+  ApprovePrScreen: { icon: <IconTabApprovePr />, labelKey: 'myTabs.approvePr' },
+  CreatePoScreen: { icon: <IconTabCreatePo />, labelKey: 'myTabs.createPo' },
+  PcPrScreen: { icon: <IconTabPcPr />, labelKey: 'myTabs.pcPr' },
 };
 
-// Cấu hình icons và labels cho từng nhóm, sử dụng một cấu trúc dữ liệu tường minh hơn
-const tabIconConfigs = {
-  groupA: [
-    { icon: <IconTab1 />, labelKey: 'myTabs.tab1' },
-    { icon: <IconTab2 />, labelKey: 'myTabs.tab2' },
-    { icon: <IconTab6 />, labelKey: 'myTabs.tab6' },
-    { icon: <IconTab3 />, labelKey: 'myTabs.tab3' },
-    { icon: <IconTab4 />, labelKey: 'myTabs.tab4' },
-  ],
-  groupB: [
-    { icon: <IconTab6 />, labelKey: 'myTabs.tab6' },
-    { icon: <IconTab4 />, labelKey: 'myTabs.tab4' },
-  ],
-  default: [
-    { icon: <IconTab1 />, labelKey: 'myTabs.tab1' },
-    { icon: <IconTab2 />, labelKey: 'myTabs.tab2' },
-    { icon: <IconTab3 />, labelKey: 'myTabs.tab3' },
-    { icon: <IconTab4 />, labelKey: 'myTabs.tab4' },
-  ],
-};
-
+// Hàm để lấy icon khi tab đang focus (màu PRIMARY)
 const getActiveIcon = (icon: React.ReactElement) => cloneElement(icon, { fill: Colors.PRIMARY });
 
 const MyTabBar = ({ state, descriptors, navigation }: any) => {
   const { t } = useTranslation();
   const { buildHref } = useLinkBuilder();
   const { bottom } = useSafeAreaInsets();
-  const { infoUser } = useInfoUser();
-
-  // Logic xác định cấu hình icon dựa trên nhóm người dùng
-  const getTabIcons = () => {
-    const userGroups = infoUser?.groups?.map(group => group.id) || [];
-    if (userGroups.some(id => GROUP_IDS.GROUP_A.includes(id))) {
-      return tabIconConfigs.groupA;
-    }
-    if (userGroups.some(id => GROUP_IDS.GROUP_B.includes(id))) {
-      return tabIconConfigs.groupB;
-    }
-    return tabIconConfigs.default;
-  };
-
-  const tabs = getTabIcons();
 
   return (
     <View style={[styles.row]}>
       {state.routes.map((route: any, index: number) => {
         const { options } = descriptors[route.key];
         const isFocused = state.index === index;
-        const tabConfig = tabs[index];
 
-        if (!tabConfig) {
-          return null; // Tránh lỗi nếu cấu hình không khớp
+        // Lấy chi tiết tab từ mapping chung dựa trên tên route
+        const tabDetails = SCREEN_TAB_DETAILS[route.name as keyof TabBarParams];
+
+        // Nếu không tìm thấy chi tiết tab (ví dụ: route không nằm trong SCREEN_TAB_DETAILS), bỏ qua
+        if (!tabDetails) {
+          return null;
         }
 
         const onPress = () => {
@@ -100,7 +77,8 @@ const MyTabBar = ({ state, descriptors, navigation }: any) => {
             testID={options.tabBarButtonTestID}
             onPress={onPress}
             style={[styles.button, { paddingBottom: bottom }]}>
-            {isFocused ? getActiveIcon(tabConfig.icon) : tabConfig.icon}
+            {/* Render icon dựa vào trạng thái focus */}
+            {isFocused ? getActiveIcon(tabDetails.icon) : tabDetails.icon}
             <AppText
               numberOfLines={1}
               size={12}
@@ -108,7 +86,7 @@ const MyTabBar = ({ state, descriptors, navigation }: any) => {
               style={{
                 color: isFocused ? Colors.PRIMARY : Colors.TEXT_DEFAULT,
               }}>
-              {t(tabConfig.labelKey)}
+              {t(tabDetails.labelKey)}
             </AppText>
           </PlatformPressable>
         );

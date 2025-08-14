@@ -59,7 +59,7 @@ const PickItemScreen = ({ navigation, route }: Props) => {
       <View style={styles.emptyContainer}>
         <IconEmptyNcc />
         <AppText size={18} weight="700" mt={12}>
-          {t('filter.emptyDepartment')}
+          {t('filter.emptyItem')}
         </AppText>
       </View>
     );
@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: vs(100),
   },
 
   footerLoading: {

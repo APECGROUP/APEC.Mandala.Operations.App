@@ -61,7 +61,7 @@ const FilterCreatePriceScreen = ({
   }, []);
 
   // --- Xử lý khi người dùng xác nhận bộ lọc ---
-  const onConfirm = useCallback(() => {
+  const onConfirm = useCallback(async () => {
     // Tạo object filters mới từ state cục bộ của FilterScreen
     const newFilters: CreatePriceFilters = {
       ncc: ncc?.id ? ncc : undefined, // Nếu id rỗng thì là undefined
@@ -71,10 +71,10 @@ const FilterCreatePriceScreen = ({
 
     // Gọi callback từ màn hình trước đó để áp dụng filter
     if (onApplyFiltersCallback) {
-      onApplyFiltersCallback(newFilters);
+      await onApplyFiltersCallback(newFilters);
     }
-    navigation.goBack();
-  }, [ncc, status, item, onApplyFiltersCallback, navigation]);
+    // navigation.goBack();
+  }, [ncc, status, item, onApplyFiltersCallback]);
 
   const onReset = useCallback(() => {
     setNcc(undefined);

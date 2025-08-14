@@ -5,7 +5,6 @@ import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDep
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
-import { RefObject } from 'react';
 
 export interface AssignPriceFilters {
   prNo?: string;
@@ -18,26 +17,12 @@ export interface AssignPriceFilters {
   status?: IItemStatus | undefined;
 }
 
-export interface IResponseListAssignPrice {
-  data: IItemAssignPrice[];
-  pagination: Pagination;
-  isSuccess: boolean;
-  errors: Error[] | null;
-}
-
-export interface Error {
-  id: null;
-  code: number;
-  message: string;
-}
-
 export interface IItemAssignPrice {
   prNo: string;
   prDate: Date;
   expectedDate: Date;
   requestBy: string;
   userRequest: IPickRequester;
-
   departmentCode: string;
   departmentName: string;
   departmentShortName: string;
@@ -74,10 +59,24 @@ export interface Pagination {
   firstRowOnPage: number;
   lastRowOnPage: number;
 }
+
+export interface IResponseListAssignPrice {
+  data: IItemAssignPrice[];
+  pagination: Pagination;
+  isSuccess: boolean;
+  errors: Error[] | null;
+}
+
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
+}
+
 export type PaginationParams = {
-  pageIndex: number; // trang hiện tại
-  pageSize: number; // số lượng giá trị ở trang hiện tại
-  isAll: boolean; // có muốn search tất cả hay không
+  pageIndex: number;
+  pageSize: number;
+  isAll: boolean;
 };
 
 export type Filter = {
@@ -100,15 +99,15 @@ export type Filter = {
 };
 
 export type FilterGroup = {
-  condition: 'And' | 'Or'; // kiểu so sánh giữa các filter
-  filters: Filter[]; // danh sách các điều kiện tìm kiếm
+  condition: 'And' | 'Or';
+  filters: Filter[];
 };
 
 export type FilterRequest = {
-  sort?: string; // sắp xếp theo trường nào
-  textSearch?: string; // tìm kiếm toàn văn
-  filterGroup?: FilterGroup[]; // nhóm điều kiện chính
-  moreFilterGroup?: FilterGroup[]; // thêm nhiều nhóm điều kiện khác nếu có
+  sort?: string;
+  textSearch?: string;
+  filterGroup?: FilterGroup[];
+  moreFilterGroup?: FilterGroup[];
 };
 
 export type IParams = {
@@ -116,30 +115,11 @@ export type IParams = {
   filter: FilterRequest;
 };
 
-export const fetchAutoAssign = async (id: number) => {
-  try {
-    const response = await api.post(`${ENDPOINT.AUTO_ASSIGN_PRICE}/${id}`, []);
-    if (response.status === 200 && response.data.isSuccess) {
-      return { isSuccess: true, message: '', data: response.data.data }; // Trả về dữ liệu đã phê duyệt
-    } else {
-      console.log('22', response.data.errors[0].message);
-      return { isSuccess: false, message: response.data.errors[0].message }; // Trả về dữ liệu đã phê duyệt
-    }
-  } catch (error) {
-    console.log('33');
-    return {
-      isSuccess: false,
-      message: 'chạy vào catch rồi ',
-    };
-  }
-};
-
 export const fetchAssignPriceData = async (
   page: number,
   limit: number = 50,
   filters: AssignPriceFilters,
-  length: RefObject<number>,
-): Promise<IItemSupplier> => {
+): Promise<{ data: IItemAssignPrice[]; pagination: Pagination }> => {
   try {
     const filterList: Filter[] = [];
 
@@ -198,46 +178,66 @@ export const fetchAssignPriceData = async (
       },
     };
 
-    const response = await api.post<IItemAssignPrice, any>(ENDPOINT.GET_LIST_ASSIGN_PRICE, params);
+    const response = await api.post<IResponseListAssignPrice>(
+      ENDPOINT.GET_LIST_ASSIGN_PRICE,
+      params,
+    );
+
     if (response.status !== 200 || !response.data.isSuccess) {
       throw new Error('Failed to fetch data');
     }
-    if (response.data.pagination.rowCount !== 0) {
-      length.current = response.data.pagination.rowCount;
-    }
-    return response.data.data;
+
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination,
+    };
   } catch (error) {
     throw error;
   }
 };
 
+export const fetchAutoAssign = async (id: number) => {
+  try {
+    const response = await api.post(`${ENDPOINT.AUTO_ASSIGN_PRICE}/${id}`, []);
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '', data: response.data.data };
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return {
+      isSuccess: false,
+      message: 'chạy vào catch rồi ',
+    };
+  }
+};
+
 export const checkRejectPrAssign = async (id: number, textReason: string) => {
   try {
-    // const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR}/${id}`, { textReason });
     const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR_ASSIGN}/${id}`, textReason, {
       rawStringBody: true,
     });
 
     if (response.status === 200 && response.data.isSuccess) {
-      return { isSuccess: true, message: '' }; // Trả về dữ liệu đã phê duyệt
+      return { isSuccess: true, message: '' };
     } else {
       return { isSuccess: false, message: response.data.errors[0].message };
     }
   } catch (error) {
-    return { isSuccess: false, message: '' }; // Trả về false nếu có lỗi xảy ra
+    return { isSuccess: false, message: '' };
   }
 };
+
 export const checkAssignPr = async (id: number, data: IItemInDetailPr[] | []) => {
   try {
-    // const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR}/${id}`, { textReason });
     const response = await api.post(`${ENDPOINT.HANDLE_ASSIGN_PR}/${id}`, data);
 
     if (response.status === 200 && response.data.isSuccess) {
-      return { isSuccess: true, message: '' }; // Trả về dữ liệu đã phê duyệt
+      return { isSuccess: true, message: '' };
     } else {
       return { isSuccess: false, message: response.data.errors[0].message };
     }
   } catch (error) {
-    return { isSuccess: false, message: '' }; // Trả về false nếu có lỗi xảy ra
+    return { isSuccess: false, message: '' };
   }
 };

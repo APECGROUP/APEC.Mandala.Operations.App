@@ -73,15 +73,21 @@ const CreateNewItemCard = ({
 
   const onPickItem = () => {
     navigate('PickItemScreen', {
-      setItem: (i: IPickItem) => {
-        onUpdateItem({ ...item, itemName: i.iName, itemCode: String(i.iCode) });
+      setItem: (i: IPickItem | undefined) => {
+        onUpdateItem({
+          ...item,
+          itemName: i?.iName || '',
+          itemCode: String(i?.iCode),
+          unitName: i?.unitName || '',
+        });
       },
     });
   };
-
+  console.log('render new item card', item);
   const onPickTime = () => {
     navigate('ModalPickCalendar', {
       isSingleMode: false,
+      minDate: new Date(),
       onSelectRange: (start: any, end: any) => {
         onUpdateItem({ ...item, validFrom: start, validTo: end });
       },
@@ -181,18 +187,19 @@ const CreateNewItemCard = ({
                   <AppBlockButton style={styles.rowCenter} onPress={resetPrice}>
                     <AppText style={styles.priceValue}>
                       {/* Sửa: Hiển thị giá trị từ priceRef */}
-                      {moneyFormat(priceRef.current, '.', '')}/{'Kg'}
+                      {moneyFormat(priceRef.current, '.', '')}/{item.unitName}
                     </AppText>
                     <IconPenEdit style={{ marginLeft: s(6) }} />
                   </AppBlockButton>
                 ) : (
                   <View style={styles.rowCenter}>
                     <TextInput
-                      autoFocus
+                      // autoFocus
                       ref={inputRef}
                       defaultValue={String(priceRef.current)} // Sửa: Dùng defaultValue
                       onFocus={onFocusComment}
                       onBlur={onBlur}
+                      maxLength={9}
                       onChangeText={text => {
                         // Sửa: Cập nhật trực tiếp vào priceRef
                         const parsed = parseFloat(text);
@@ -222,7 +229,7 @@ const CreateNewItemCard = ({
               </View>
             </View>
           </View>
-          <IconDropDown style={styles.IconExtend} />
+          <IconDropDown style={isShow ? styles.IconExtend : styles.IconNoExtend} />
         </TouchableOpacity>
 
         {/* Expanded Detail Section */}
@@ -240,6 +247,7 @@ const CreateNewItemCard = ({
             <View style={[styles.detailRow]}>
               <AppText style={styles.detailLabel}>{t('createPrice.vat')}</AppText>
               <AppDropdown
+                showsVerticalScrollIndicator={false}
                 selectedTextStyle={styles.textSelected}
                 style={styles.dropdownStyle}
                 placeholderStyle={styles.placeholderStyle}

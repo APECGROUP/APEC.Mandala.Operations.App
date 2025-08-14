@@ -32,4 +32,5 @@ export enum ENDPOINT {
   HANDLE_DELETE_CREATE_PRICE = '/api/spc/vendor-price-list/delete',
   CREATE_PRICE = '/api/spc/vendor-price-list/multi-create',
   GET_LIST_VAT = '/api/spc/rgTax/search',
+  EDIT_CREATE_PRICE = '/api/spc/vendor-price-list/update',
 }

@@ -115,7 +115,7 @@ const FilterCreatePoScreen = ({
           <AppTextInput
             labelStyle={styles.label}
             label={t('filter.prNo')}
-            placeholder={t('filter.pick')}
+            placeholder={t('filter.input')}
             placeholderTextColor={light.placeholderTextColor}
             maxLength={20} // Tăng maxLength lên một chút nếu cần
             value={prNo}

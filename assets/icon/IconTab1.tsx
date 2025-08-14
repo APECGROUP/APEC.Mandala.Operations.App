@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { vs } from 'react-native-size-matters';
 import Svg, { SvgProps, Path } from 'react-native-svg';
-const IconTab1 = (props: SvgProps) => (
+const IconTabAssignPrice = (props: SvgProps) => (
   <Svg width={vs(21)} height={vs(20)} viewBox="0 0 21 20" fill="none" {...props}>
     <Path
       d="M3.37891 5.83277L10.4167 1.14093C10.6966 0.954324 11.0613 0.954324 11.3412 1.14093L18.3789 5.83277V17.4994C18.3789 17.9597 18.0058 18.3328 17.5456 18.3328H4.21224C3.75201 18.3328 3.37891 17.9597 3.37891 17.4994V5.83277ZM10.8789 9.16608C11.7994 9.16608 12.5456 8.41992 12.5456 7.49943C12.5456 6.57896 11.7994 5.83277 10.8789 5.83277C9.95842 5.83277 9.21226 6.57896 9.21226 7.49943C9.21226 8.41992 9.95842 9.16608 10.8789 9.16608ZM7.54557 13.3327V14.9994H14.2123V13.3327H7.54557ZM7.54557 10.8327V12.4994H14.2123V10.8327H7.54557Z"
@@ -9,4 +9,4 @@ const IconTab1 = (props: SvgProps) => (
     />
   </Svg>
 );
-export default IconTab1;
+export default IconTabAssignPrice;

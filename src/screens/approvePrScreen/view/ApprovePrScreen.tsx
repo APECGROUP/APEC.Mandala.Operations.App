@@ -45,7 +45,7 @@ export default function ApprovePrScreen() {
     isRefetching,
     isFetchingNextPage,
     onRefresh,
-    // onLoadMore,
+    onLoadMore,
     onSearch, // Đổi tên từ onSearchPrNo thành onSearch
     applyFilters,
     currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
@@ -202,7 +202,7 @@ export default function ApprovePrScreen() {
             data={flatData || []}
             renderItem={renderItem}
             keyExtractor={item => item.id.toString()}
-            // onEndReached={onLoadMore}
+            onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
             removeClippedSubviews

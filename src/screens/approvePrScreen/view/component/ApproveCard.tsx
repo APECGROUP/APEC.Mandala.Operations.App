@@ -12,7 +12,6 @@ import { IApprove } from '../../modal/ApproveModal';
 import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import moment from 'moment';
-import Utilities from '@/utils/Utilities';
 import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 const ApproveCard = ({

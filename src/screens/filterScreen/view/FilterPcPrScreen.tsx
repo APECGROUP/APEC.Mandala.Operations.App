@@ -145,7 +145,7 @@ const FilterPcPrScreen = ({
           <AppTextInput
             labelStyle={styles.label}
             label={'PR No'}
-            placeholder={t('filter.pick')}
+            placeholder={t('filter.input')}
             placeholderTextColor={light.placeholderTextColor}
             maxLength={20} // Tăng maxLength lên một chút nếu cần
             value={prNo}
@@ -156,7 +156,7 @@ const FilterPcPrScreen = ({
           <AppTextInput
             labelStyle={styles.label}
             label={'PO'}
-            placeholder={t('filter.pick')}
+            placeholder={t('filter.input')}
             placeholderTextColor={light.placeholderTextColor}
             maxLength={20} // Tăng maxLength lên một chút nếu cần
             value={po}

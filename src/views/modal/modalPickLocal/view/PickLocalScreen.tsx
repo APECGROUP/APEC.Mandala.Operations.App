@@ -60,7 +60,7 @@ const PickLocalScreen = ({ navigation, route }: Props) => {
       <View style={styles.emptyContainer}>
         <IconEmptyNcc />
         <AppText size={18} weight="700" mt={12}>
-          {t('filter.emptyDepartment')}
+          {t('filter.empotyLocal')}
         </AppText>
       </View>
     );
@@ -154,9 +154,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.BLACK_100,
   },
   emptyContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: vs(100),
   },
 
   footerLoading: {

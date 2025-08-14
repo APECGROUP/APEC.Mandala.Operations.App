@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { vs } from 'react-native-size-matters';
 import Svg, { SvgProps, G, Path, Defs, ClipPath, Rect } from 'react-native-svg';
-const IconTab4 = (props: SvgProps) => (
+const IconTabPcPr = (props: SvgProps) => (
   <Svg width={vs(21)} height={vs(20)} viewBox="0 0 21 20" fill="none" {...props}>
     <G clipPath="url(#clip0_600_18928)">
       <Path
@@ -16,4 +16,4 @@ const IconTab4 = (props: SvgProps) => (
     </Defs>
   </Svg>
 );
-export default IconTab4;
+export default IconTabPcPr;

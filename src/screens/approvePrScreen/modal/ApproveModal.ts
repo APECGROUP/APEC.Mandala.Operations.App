@@ -3,7 +3,6 @@ import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
-import { RefObject } from 'react';
 
 export interface IApproveFilters {
   prNo?: string;
@@ -11,27 +10,7 @@ export interface IApproveFilters {
   expectedDate?: Date;
   department?: IPickDepartment | undefined;
   requester?: IPickRequester | undefined;
-  store?: IPickLocal | undefined; // Thêm trường store nếu cần
-}
-// export interface IApproveFilters {
-//   prNo?: string; // Tên cũ là prNo
-//   prDate?: Date;
-//   expectedDate?: Date;
-//   department?: SelectedOption;
-//   requester?: SelectedOption;
-//   location?: SelectedOption;
-// }
-export interface IResponseListApprove {
-  data: IApprove[];
-  pagination: Pagination;
-  isSuccess: boolean;
-  errors: Error[] | null;
-}
-
-export interface Error {
-  id: null;
-  code: number;
-  message: string;
+  store?: IPickLocal | undefined;
 }
 
 export interface IApprove {
@@ -40,7 +19,6 @@ export interface IApprove {
   expectedDate: Date;
   requestBy: string;
   userRequest: IPickRequester;
-
   departmentCode: string;
   departmentName: string;
   departmentShortName: string;
@@ -77,10 +55,24 @@ export interface Pagination {
   firstRowOnPage: number;
   lastRowOnPage: number;
 }
+
+export interface IResponseListApprove {
+  data: IApprove[];
+  pagination: Pagination;
+  isSuccess: boolean;
+  errors: Error[] | null;
+}
+
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
+}
+
 export type PaginationParams = {
-  pageIndex: number; // trang hiện tại
-  pageSize: number; // số lượng giá trị ở trang hiện tại
-  isAll: boolean; // có muốn search tất cả hay không
+  pageIndex: number;
+  pageSize: number;
+  isAll: boolean;
 };
 
 export type Filter = {
@@ -103,15 +95,15 @@ export type Filter = {
 };
 
 export type FilterGroup = {
-  condition: 'And' | 'Or'; // kiểu so sánh giữa các filter
-  filters: Filter[]; // danh sách các điều kiện tìm kiếm
+  condition: 'And' | 'Or';
+  filters: Filter[];
 };
 
 export type FilterRequest = {
-  sort?: string; // sắp xếp theo trường nào
-  textSearch?: string; // tìm kiếm toàn văn
-  filterGroup?: FilterGroup[]; // nhóm điều kiện chính
-  moreFilterGroup?: FilterGroup[]; // thêm nhiều nhóm điều kiện khác nếu có
+  sort?: string;
+  textSearch?: string;
+  filterGroup?: FilterGroup[];
+  moreFilterGroup?: FilterGroup[];
 };
 
 export type IParams = {
@@ -119,12 +111,12 @@ export type IParams = {
   filter: FilterRequest;
 };
 
+// Sửa kiểu trả về của hàm fetchApprove để khớp với cấu trúc dữ liệu thực tế
 export const fetchApprove = async (
   page: number,
   limit: number = 50,
   filters: IApproveFilters,
-  length: RefObject<number>,
-): Promise<IApprove> => {
+): Promise<{ data: IApprove[]; pagination: Pagination }> => {
   try {
     const filterList: Filter[] = [];
 
@@ -191,14 +183,15 @@ export const fetchApprove = async (
       },
     };
 
-    const response = await api.post<IApprove, any>(ENDPOINT.GET_LIST_APPOVE_PR, params);
+    const response = await api.post<IResponseListApprove>(ENDPOINT.GET_LIST_APPOVE_PR, params);
     if (response.status !== 200 || !response.data.isSuccess) {
       throw new Error('Failed to fetch data');
     }
-    if (response.data.pagination.rowCount !== 0) {
-      length.current = response.data.pagination.rowCount;
-    }
-    return response.data.data;
+
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination,
+    };
   } catch (error) {
     throw error;
   }
@@ -218,18 +211,16 @@ export const checkApprovePrNoChange = async (id: number) => {
 };
 export const checkRejectPr = async (id: number, textReason: string) => {
   try {
-    console.log('textReason: ', textReason);
-    // const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR}/${id}`, { textReason });
     const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR}/${id}`, textReason, {
       rawStringBody: true,
     });
 
     if (response.status === 200 && response.data.isSuccess) {
-      return { isSuccess: true, message: '' }; // Trả về dữ liệu đã phê duyệt
+      return { isSuccess: true, message: '' };
     } else {
       return { isSuccess: false, message: response.data.errors[0].message };
     }
   } catch (error) {
-    return { isSuccess: false, message: '' }; // Trả về false nếu có lỗi xảy ra
+    return { isSuccess: false, message: '' };
   }
 };

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, memo, useRef } from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { s, ScaledSheet, vs } from 'react-native-size-matters';
 import IconListPen from '@assets/icon/IconListPen';
 import { IItemVendorPrice } from '../../modal/CreatePriceModal';
@@ -16,23 +16,27 @@ import { moneyFormat } from '@/utils/Utilities';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
-import { useCreatePriceViewModel } from '../../viewmodal/useCreatePriceViewModal';
+import { navigate } from '@/navigation/RootNavigation';
 
 interface CreatePriceCardProps {
   item: IItemVendorPrice;
   isSelected: boolean;
   handleSelect: (id: number) => void;
   simultaneousGesture: any;
+  handleDelete: (
+    id: number,
+    onSuccess?: (deletedId: number) => void,
+    onCancel?: () => void,
+  ) => void;
+  onUpdateItem: (i: IItemVendorPrice) => void;
 }
 
 const CreatePriceCard = memo<CreatePriceCardProps>(
-  ({ item, isSelected, handleSelect, simultaneousGesture }) => {
+  ({ item, isSelected, handleSelect, onUpdateItem, simultaneousGesture, handleDelete }) => {
     const { t } = useTranslation();
     const swipeableRef = useRef<ReanimatedSwipeableRef>(null);
     // SharedValue để đồng bộ chiều cao cho delete button
     const heightAction = useSharedValue(0);
-    const { handleDelete } = useCreatePriceViewModel();
-    // Animate delete button theo heightAction
     const animatedDeleteStyle = useAnimatedStyle(() => ({
       height: heightAction.value,
     }));
@@ -92,47 +96,51 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
     const onSwipe = useCallback(() => {
       handleDelete(item.id, undefined, onCloseSwipe);
     }, [handleDelete, item.id, onCloseSwipe]);
-
+    const onEdit = useCallback(() => {
+      navigate('EditPriceNCCScreen', { item, onUpdateItem });
+    }, [item]);
     return (
-      <ReanimatedSwipeable
-        ref={swipeableRef}
-        renderRightActions={renderRightActions}
-        simultaneousGesture={simultaneousGesture}
-        onSwipe={onSwipe}>
-        <View style={[styles.itemContainer, styles.itemExpanded]} onLayout={onItemLayout}>
-          <View style={styles.headerItem}>
-            <AppBlockButton onPress={handleSelectPress} style={styles.left}>
-              {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
-            </AppBlockButton>
+      <TouchableOpacity onPress={onEdit}>
+        <ReanimatedSwipeable
+          ref={swipeableRef}
+          renderRightActions={renderRightActions}
+          simultaneousGesture={simultaneousGesture}
+          onSwipe={onSwipe}>
+          <View style={[styles.itemContainer, styles.itemExpanded]} onLayout={onItemLayout}>
+            <View style={styles.headerItem}>
+              <AppBlockButton onPress={handleSelectPress} style={styles.left}>
+                {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
+              </AppBlockButton>
 
-            <AppBlockButton style={styles.center} onPress={() => {}}>
-              <View style={styles.row}>
-                <View style={styles.iconWrapper}>
-                  <IconListPen />
-                </View>
-                <View style={styles.nameWrapper}>
-                  <AppText numberOfLines={1} style={styles.name}>
-                    {item.itemName}
-                  </AppText>
-                  <View style={styles.row}>
-                    <AppText style={styles.titlePrice}>{t('createPrice.price')}: </AppText>
-                    <AppText style={styles.price}>{formattedPrice}</AppText>
+              <View style={styles.center}>
+                <View style={styles.row}>
+                  <View style={styles.iconWrapper}>
+                    <IconListPen />
+                  </View>
+                  <View style={styles.nameWrapper}>
+                    <AppText numberOfLines={1} style={styles.name}>
+                      {item.itemName}
+                    </AppText>
+                    <View style={styles.row}>
+                      <AppText style={styles.titlePrice}>{t('createPrice.price')}: </AppText>
+                      <AppText style={styles.price}>{formattedPrice}</AppText>
+                    </View>
                   </View>
                 </View>
               </View>
-            </AppBlockButton>
-          </View>
+            </View>
 
-          <View style={styles.expandedContent}>
-            {detailItems.map(({ label, value }, idx) => (
-              <View key={idx} style={styles.detailRow}>
-                <AppText style={styles.detailLabel}>{label}</AppText>
-                <AppText style={styles.detailValue}>{value}</AppText>
-              </View>
-            ))}
+            <View style={styles.expandedContent}>
+              {detailItems.map(({ label, value }, idx) => (
+                <View key={idx} style={styles.detailRow}>
+                  <AppText style={styles.detailLabel}>{label}</AppText>
+                  <AppText style={styles.detailValue}>{value}</AppText>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
-      </ReanimatedSwipeable>
+        </ReanimatedSwipeable>
+      </TouchableOpacity>
     );
   },
 );

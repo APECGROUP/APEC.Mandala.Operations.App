@@ -1,3 +1,4 @@
+import { getFontSize } from '@/constants';
 import { Colors } from '@/theme/Config';
 import { StyleSheet } from 'react-native';
 
@@ -34,15 +35,15 @@ const styles = StyleSheet.create({
   button: {
     width: '90%',
     backgroundColor: Colors.PRIMARY,
-    borderRadius: 50,
-    padding: 16,
-    marginHorizontal: 16,
+    // borderRadius: 50,
+    // padding: 16,
+    // marginHorizontal: 16,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: getFontSize(16),
   },
   imageError: {},
 });

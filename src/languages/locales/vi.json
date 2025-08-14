@@ -54,7 +54,7 @@
     "assignPrice": {
       "title": "Xin chào",
       "header": "Danh sách PR",
-      "empty": "Không có kết quả phù hợp",
+      "empty": "Hiện chưa có danh sách PR",
       "rejectAssign": "Từ chối gắn giá",
       "searchPlaceholder": "Tìm kiếm PR No",
       "reason": "Lý do",
@@ -144,11 +144,14 @@
       "selectDepartment": "Thông tin bộ phận",
       "emptyRequester": "Chưa có thông tin người yêu cầu",
       "emptyDepartment": "Chưa có thông tin bộ phận",
-      "emptyStatus": "Chưa có thông tin bộ phận",
+      "emptyItem": "Chưa có thông tin mặt hàng",
+      "emptyStatus": "Chưa có thông tin trạng thái",
       "search": "Tìm kiếm",
       "supplier": "Nhà cung cấp",
       "pick": "Chọn",
+      "input": "Nhập",
       "pickLocal": "Chọn kho",
+      "empotyLocal": "Chưa có thông tin kho",
       "selectPickStatus": "Chọn trạng thái",
       "location": "Kho",
       "time": "Thời gian",
@@ -170,6 +173,7 @@
     "createPrice": {
       "title": "Xin chào",
       "searchPlaceholder": "Tìm kiếm tên mặt hàng",
+      "editPriceNCC": "Sửa giá nhà cung cấp",
       "supplierPriceList": "Bảng giá NCC",
       "empty": "Hiện chưa có bảng giá nhà \n cung cấp",
       "create": "Tạo bảng giá NCC",
@@ -183,6 +187,7 @@
       "warningRemove": "Mặt hàng đã được duyệt không được xoá",
       "createPriceNcc": "Tạo giá nhà cung cấp",
       "listCreatePriceNcc": "Tạo giá nhà cung cấp",
+      "updateSuccess": "Cập nhật giá nhà cung cấp thành công",
       "close": "Đóng",
       "cancel": "Hủy",
       "agree": "Đồng ý",
@@ -221,7 +226,7 @@
       "department": "Bộ phận",
       "searchPlaceholder": "Tìm kiếm tên mặt hàng",
       "supplierPriceList": "Bảng giá NCC",
-      "empty": "Hiện chưa có bảng giá nhà \n cung cấp",
+      "empty": "Hiện chưa có danh sách PR",
       "create": "Tạo bảng giá NCC",
       "orderSelected": "đơn đã chọn",
       "time": "Thời gian",
@@ -283,7 +288,7 @@
         "ncc": "NCC",
         "moneyOfApproval": "Số tiền duyệt",
         "note": "Ghi chú",
-        "empty": "Hiện chưa có phiếu yêu cầu mua hàng"
+        "empty": "Hiện chưa có danh sách PR"
       }
     },
     "update": {
@@ -340,12 +345,12 @@
       "warningLogout": "Bạn có chắc chắn muốn đổi từ đăng xuất tài khoản này?"
     },
     "myTabs": {
-      "tab1": "Gán giá",
-      "tab2": "Tạo giá ",
-      "tab3": "Tạo PO ",
-      "tab4": "PC PR",
-      "tab5": "PC Log",
-      "tab6": "Duyệt PR"
+      "assignPrice": "Gán giá",
+      "createPrice": "Tạo giá ",
+      "createPo": "Tạo PO ",
+      "pcPr": "PC PR",
+      "pcLog": "PC Log",
+      "approvePr": "Duyệt PR"
     },
     "error": {
       "title": "Oops!",

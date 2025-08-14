@@ -1,23 +1,52 @@
 import React from 'react';
-import { SafeAreaView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
-
-import styles from './styles';
+import { SafeAreaView, StatusBar, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import ErrorBoundaryAnimation from '@/views/animation/ErrorBoundaryAnimation';
 import { useTranslation } from 'react-i18next';
 
-export type Props = { resetError: () => void; buttonText?: string; goBack?: boolean };
+import styles from './styles';
+import ErrorBoundaryAnimation from '@/views/animation/ErrorBoundaryAnimation';
+import { AppButton } from '@/elements/button/AppButton';
+
+export type Props = {
+  resetError: () => void;
+  buttonText?: string;
+  goBack?: boolean;
+};
 
 const FallbackComponent = (props: Props) => {
   const navigation = useNavigation();
   const { t } = useTranslation();
-  const onError = () => {
-    props.goBack && navigation.canGoBack() ? navigation.goBack() : props.resetError();
-  };
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const onError = React.useCallback(() => {
+    setIsLoading(true);
+
+    if (props.goBack && navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      props.resetError();
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+  }, [props, navigation]);
+
+  // eslint-disable-next-line arrow-body-style
+  React.useEffect(() => {
+    return () => {
+      // cleanup khi unmount
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={'dark-content'} />
+      <StatusBar barStyle="dark-content" />
 
       <View style={styles.content}>
         <ErrorBoundaryAnimation style={styles.imageError} />
@@ -25,15 +54,15 @@ const FallbackComponent = (props: Props) => {
           <Text style={styles.title}>{t('error.title')}</Text>
           <Text style={styles.subtitle}>{t('error.subtitle')}</Text>
         </View>
-        {/* <Text style={styles.error}>{props.error.toString()}</Text> */}
-        <TouchableOpacity style={styles.button} onPress={onError}>
+
+        <AppButton processing={isLoading} style={styles.button} onPress={onError}>
           <Text style={styles.buttonText}>
             {props.goBack ? t('error.goBack') : t('error.tryAgain')}
           </Text>
-        </TouchableOpacity>
+        </AppButton>
       </View>
     </SafeAreaView>
   );
 };
 
-export default FallbackComponent;
+export default React.memo(FallbackComponent);

@@ -1,5 +1,3 @@
-// views/viewmodal/useCreatePoViewModal.ts
-
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -7,6 +5,7 @@ import {
   fetchListCreatePo,
   CreatePoFilters,
   fetchCreatePo,
+  Pagination,
 } from '../modal/CreatePoModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
@@ -15,18 +14,25 @@ import { useNavigation } from '@react-navigation/native';
 import { TYPE_TOAST } from '@/elements/toast/Message';
 
 const ITEMS_PER_PAGE = 50;
-const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
+const DEBOUNCE_DELAY = 500;
 
-export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
+interface PageData {
+  data: IItemCreatePo[];
+  pagination: Pagination;
+}
+
+export function useCreatePoViewModel() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { showToast, showAlert } = useAlert();
+  const navigation = useNavigation();
 
-  const { showToast } = useAlert();
-  const [effectiveFilters, setEffectiveFilters] = useState<CreatePoFilters>(initialFilters);
-  const [currentUiFilters, setCurrentUiFilters] = useState<CreatePoFilters>(initialFilters);
-
+  const [effectiveFilters, setEffectiveFilters] = useState<CreatePoFilters>();
+  const [currentUiFilters, setCurrentUiFilters] = useState<CreatePoFilters>();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isLoadingCreatePo, setIsLoadingCreatePo] = useState(false);
+  const [totalItems, setTotalItems] = useState<number>(0);
+
   const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
     typeof debounce<typeof setEffectiveFilters>
   > | null>(null);
@@ -44,22 +50,18 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     debouncedSetEffectiveFiltersRef.current?.(currentUiFilters);
   }, [currentUiFilters]);
 
-  // queryKey giờ sẽ dùng effectiveFilters.prNo
   const currentQueryKey = useMemo(
     () => [
       'listCreatePo',
-      effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-      effectiveFilters.prDate?.toISOString() || '',
-      effectiveFilters.expectedDate?.toISOString() || '',
-      effectiveFilters.department?.id || '',
-      effectiveFilters.requester?.id || '',
-      effectiveFilters.product?.id || '',
-      effectiveFilters.ncc?.id || '',
-      effectiveFilters.status?.id || '',
+      effectiveFilters?.prNo?.trim() || '',
+      effectiveFilters?.prDate?.toISOString() || '',
+      effectiveFilters?.expectedDate?.toISOString() || '',
+      effectiveFilters?.department?.id || '',
+      effectiveFilters?.requester?.id || '',
     ],
     [effectiveFilters],
   );
-  const length = useRef<number>(0);
+
   const {
     data,
     isLoading,
@@ -71,36 +73,42 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     isRefetching,
     isError,
     error,
-  } = useInfiniteQuery<IItemCreatePo[], Error>({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+  } = useInfiniteQuery<PageData, Error>({
     queryKey: currentQueryKey,
     queryFn: async ({ pageParam = 1 }) =>
-      fetchListCreatePo(pageParam as number, ITEMS_PER_PAGE, effectiveFilters, length),
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
+      fetchListCreatePo(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
+    getNextPageParam: lastPage => {
+      const nextPage = lastPage.pagination?.pageCurrent + 1;
+      return nextPage <= lastPage.pagination?.pageCount ? nextPage : undefined;
+    },
     initialPageParam: 1,
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 
-  const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
+  useEffect(() => {
+    if (data?.pages[0]?.pagination?.rowCount !== undefined) {
+      setTotalItems(data.pages[0].pagination.rowCount);
+    } else {
+      setTotalItems(0);
+    }
+  }, [data]);
+
+  const flatData = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
   const onRefresh = useCallback(() => {
-    console.log('onRefresh called from ViewModel. Forcing refetch.');
     refetch();
   }, [refetch]);
 
   const onLoadMore = useCallback(() => {
-    console.log('onLoadMore called.');
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // onSearch bây giờ cập nhật prNo
   const onSearch = useCallback((val: string) => {
-    setCurrentUiFilters(prev => ({ ...prev, prNo: val })); // Thay searchKey bằng prNo
+    setCurrentUiFilters(prev => ({ ...prev, prNo: val }));
   }, []);
 
   const applyFilters = useCallback((newFilter: CreatePoFilters) => {
@@ -109,64 +117,63 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     setEffectiveFilters(newFilter);
   }, []);
 
-  const { showAlert } = useAlert();
+  const updateCacheAndTotal = useCallback(
+    (action: (item: IItemCreatePo) => boolean, totalItem: number = 1) => {
+      queryClient.setQueryData(
+        currentQueryKey,
+        (cachedData: InfiniteData<PageData> | undefined) => {
+          if (!cachedData) {
+            return undefined;
+          }
+
+          const newPages = cachedData.pages.map(page => ({
+            ...page,
+            data: page.data.filter(action),
+            pagination: {
+              ...page.pagination,
+              rowCount: page.pagination.rowCount - totalItem,
+            },
+          }));
+
+          setTotalItems(prev => prev - totalItem);
+
+          return { ...cachedData, pages: newPages };
+        },
+      );
+    },
+    [queryClient, currentQueryKey],
+  );
+
   const onDelete = useCallback(
     async (id: number, onSuccess?: (deletedId: number) => void) => {
-      const cached = queryClient.getQueryData<InfiniteData<IItemCreatePo[]>>(currentQueryKey);
-      if (!cached) {
-        console.warn('🟥 No cache found for key:', currentQueryKey);
-        return false;
-      }
-
       try {
-        if (Number(id) % 5 !== 0) {
-          console.log('✅ Deleting item successfully...');
-          queryClient.setQueryData(currentQueryKey, {
-            ...cached,
-            pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
-          });
+        if (id % 5 !== 0) {
+          updateCacheAndTotal(item => item.id !== id, 1);
           setSelectedIds(prev => prev.filter(v => v !== id));
-
           onSuccess?.(id);
           return true;
         } else {
           await new Promise(resolve => setTimeout(() => resolve(undefined), 500));
           showAlert(t('CreatePo.warningRemove'), '', [
-            {
-              text: t('CreatePo.close'),
-              onPress: () => {},
-            },
+            { text: t('CreatePo.close'), onPress: () => {} },
           ]);
           return false;
         }
       } catch (err) {
-        console.error('Error deleting item:', err);
         return false;
       }
     },
-    [queryClient, currentQueryKey, showAlert, t],
+    [showAlert, t, updateCacheAndTotal],
   );
 
   const handleDelete = useCallback(
-    (id: string, onSuccess?: (deletedId: string) => void, onCancel?: () => void) => {
-      console.log('handleDelete called with onCancel:', !!onCancel);
+    (id: number, onSuccess?: (deletedId: number) => void, onCancel?: () => void) => {
       showAlert(t('CreatePo.remove.title'), '', [
-        {
-          text: t('CreatePo.remove.cancel'),
-          style: 'cancel',
-          onPress: () => {
-            console.log('Cancel button pressed, onCancel exists:', !!onCancel);
-            console.log('onCancel type:', typeof onCancel);
-            onCancel?.();
-          },
-        },
+        { text: t('CreatePo.remove.cancel'), style: 'cancel', onPress: () => onCancel?.() },
         {
           text: t('CreatePo.remove.agree'),
           onPress: async () => {
-            const success = await onDelete(id, onSuccess);
-            if (!success) {
-              console.log('❌ Delete failed, no action needed');
-            }
+            await onDelete(id, onSuccess);
           },
         },
       ]);
@@ -175,89 +182,56 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
   );
 
   const onApproved = useCallback(async () => {
-    // Xoá các item có id nằm trong danh sách ids khỏi cache
-    const cached = queryClient.getQueryData(currentQueryKey);
-    if (cached && cached.pages) {
-      // Loại bỏ các item có id nằm trong ids khỏi từng page
-      const newPages = cached.pages.map((page: IItemCreatePo[]) =>
-        page.filter(item => !selectedIds.includes(item.id)),
-      );
-      queryClient.setQueryData(currentQueryKey, {
-        ...cached,
-        pages: newPages,
-      });
-      setSelectedIds([]);
-    }
+    updateCacheAndTotal(item => !selectedIds.includes(item.id), selectedIds.length);
+    setSelectedIds([]);
     showToast(t('CreatePo.approvedSuccess'), 'success');
-  }, [queryClient, currentQueryKey, showToast, t, selectedIds]);
+  }, [showToast, t, selectedIds, updateCacheAndTotal]);
+
   const onReject = useCallback(async () => {
-    // Xoá các item có id nằm trong danh sách ids khỏi cache
-    const cached = queryClient.getQueryData(currentQueryKey);
-    if (cached && cached.pages) {
-      // Loại bỏ các item có id nằm trong ids khỏi từng page
-      const newPages = cached.pages.map((page: IItemCreatePo[]) =>
-        page.filter(item => !selectedIds.includes(item.id)),
-      );
-      queryClient.setQueryData(currentQueryKey, {
-        ...cached,
-        pages: newPages,
-      });
-      setSelectedIds([]);
-    }
+    updateCacheAndTotal(item => !selectedIds.includes(item.id), selectedIds.length);
+    setSelectedIds([]);
     showToast(t('CreatePo.rejectSuccess'), 'success');
-  }, [queryClient, currentQueryKey, showToast, t, selectedIds]);
+  }, [showToast, t, selectedIds, updateCacheAndTotal]);
+
   const toggleSelectAll = useCallback(() => {
     const allIds = flatData.map(item => item?.id);
-    if (selectedIds.length === flatData.length) {
-      setSelectedIds([]); // Bỏ chọn tất cả
-    } else {
-      setSelectedIds(allIds); // Chọn tất cả
-    }
-  }, [selectedIds.length, flatData, setSelectedIds]);
-  const navigation = useNavigation();
+    setSelectedIds(selectedIds.length === flatData.length ? [] : allIds);
+  }, [selectedIds.length, flatData]);
+
   const handleSelect = useCallback(
     (id: number) => {
-      navigation.getParent()?.setOptions({
-        tabBarStyle: { display: 'none' }, // hoặc undefined
-      });
-      // setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
+      navigation.getParent()?.setOptions({ tabBarStyle: { display: 'none' } });
       setSelectedIds(prev => (prev.includes(id) ? [] : [id]));
     },
     [navigation],
   );
 
   const selectedAll = useMemo(
-    () => selectedIds.length === flatData.length && flatData.length > 0,
+    () => selectedIds.length > 0 && selectedIds.length === flatData.length,
     [selectedIds.length, flatData.length],
   );
+
   const onCreatePo = useCallback(async () => {
-    const cached = queryClient.getQueryData<InfiniteData<IItemCreatePo[]>>(currentQueryKey);
-    if (!cached) {
-      console.warn('🟥 No cache found for key:', currentQueryKey);
-      return false;
-    }
-    const prNo = cached.pages.find(page => page.length > 0)?.[0]?.prNo || '';
-    console.log('Creating PO with prNo:', prNo);
     try {
       setIsLoadingCreatePo(true);
+      const prNo = flatData.find(item => item.id === selectedIds[0])?.prNo || '';
       const { isSuccess, message } = await fetchCreatePo(prNo);
-      setIsLoadingCreatePo(false);
+
       if (!isSuccess) {
-        return showToast(message || t('error.subtitle'), TYPE_TOAST.ERROR);
+        showToast(message || t('error.subtitle'), TYPE_TOAST.ERROR);
+        return;
       }
-      queryClient.setQueryData(currentQueryKey, {
-        ...cached,
-        pages: cached.pages.map(page => page.filter(item => item.id !== selectedIds[0]) || []),
-      });
+
+      updateCacheAndTotal(item => item.id !== selectedIds[0], 1);
       setSelectedIds([]);
       showToast(t('CreatePo.success'), TYPE_TOAST.SUCCESS);
-      // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
     } catch (error) {
       showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
     } finally {
       setIsLoadingCreatePo(false);
     }
-  }, [currentQueryKey, queryClient, selectedIds, showToast, t]);
+  }, [flatData, selectedIds, showToast, t, updateCacheAndTotal]);
+
   return {
     selectedIds,
     flatData,
@@ -266,12 +240,12 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     isRefetching,
     isFetchingNextPage,
     hasNextPage: !!hasNextPage,
-    currentPrNoInput: currentUiFilters.prNo || '', // Thay searchKey bằng prNo
+    currentPrNoInput: currentUiFilters?.prNo || '',
     currentFilters: currentUiFilters,
     isError,
     error,
     selectedAll,
-    length: length.current,
+    length: totalItems,
     onReject,
     setSelectedIds,
     onApproved,
@@ -283,5 +257,6 @@ export function useCreatePoViewModel(initialFilters: CreatePoFilters = {}) {
     toggleSelectAll,
     handleSelect,
     onCreatePo,
+    isLoadingCreatePo,
   };
 }

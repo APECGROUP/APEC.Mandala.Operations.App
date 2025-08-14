@@ -1,15 +1,12 @@
-// views/modal/CreatePoModal.ts
 import { IParams } from '@/screens/approvePrScreen/modal/ApproveModal';
 import { Filter } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
-import { RefObject } from 'react';
-// Đảm bảo moment được import nếu bạn dùng nó cho Date objects
 
 export interface CreatePoFilters {
-  prNo?: string; // Tên cũ là prNo
+  prNo?: string;
   prDate?: Date;
   expectedDate?: Date;
   department?: IPickDepartment | undefined;
@@ -35,7 +32,6 @@ export interface IItemCreatePo {
   expectedDate: Date;
   requestBy: string;
   userRequest: IPickRequester;
-
   departmentCode: string;
   departmentName: string;
   departmentShortName: string;
@@ -76,9 +72,8 @@ export interface Pagination {
 export const fetchListCreatePo = async (
   page: number,
   limit: number = 50,
-  filters: CreatePoFilters,
-  length: RefObject<number>,
-): Promise<IItemCreatePo> => {
+  filters: CreatePoFilters | undefined,
+): Promise<{ data: IItemCreatePo[]; pagination: Pagination }> => {
   try {
     const filterList: Filter[] = [];
     filterList.push({
@@ -87,45 +82,42 @@ export const fetchListCreatePo = async (
       propertyType: 'string',
       operator: '==',
     });
-    if (filters.prNo) {
+    if (filters?.prNo) {
       filterList.push({
         propertyName: 'prNo',
-        propertyValue: filters.prNo.trim(),
+        propertyValue: filters?.prNo.trim(),
         propertyType: 'string',
         operator: '==',
       });
     }
-    if (filters.prDate) {
+    if (filters?.prDate) {
       filterList.push({
         propertyName: 'prDate',
-        propertyValue: filters.prDate.toISOString(),
+        propertyValue: filters?.prDate.toISOString(),
         propertyType: 'datetime',
         operator: '==',
       });
     }
-
-    if (filters.expectedDate) {
+    if (filters?.expectedDate) {
       filterList.push({
         propertyName: 'expectedDate',
-        propertyValue: filters.expectedDate.toISOString(),
+        propertyValue: filters?.expectedDate.toISOString(),
         propertyType: 'datetime',
         operator: '==',
       });
     }
-
-    if (filters.department?.departmentCode) {
+    if (filters?.department?.departmentCode) {
       filterList.push({
         propertyName: 'departmentCode',
-        propertyValue: filters.department.departmentCode,
+        propertyValue: filters?.department.departmentCode,
         propertyType: 'string',
         operator: '==',
       });
     }
-
-    if (filters.requester?.id) {
+    if (filters?.requester?.id) {
       filterList.push({
         propertyName: 'requestBy',
-        propertyValue: filters.requester.username,
+        propertyValue: filters?.requester.username,
         propertyType: 'string',
         operator: '==',
       });
@@ -150,14 +142,14 @@ export const fetchListCreatePo = async (
       },
     };
 
-    const response = await api.post<IItemCreatePo, any>(ENDPOINT.GET_LIST_CREATE_PO, params);
+    const response = await api.post<IResponseListCreatePo>(ENDPOINT.GET_LIST_CREATE_PO, params);
     if (response.status !== 200 || !response.data.isSuccess) {
       throw new Error('Failed to fetch data');
     }
-    if (response.data.pagination.rowCount !== 0) {
-      length.current = response.data.pagination.rowCount;
-    }
-    return response.data.data;
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination,
+    };
   } catch (error) {
     throw error;
   }
@@ -165,30 +157,21 @@ export const fetchListCreatePo = async (
 
 export const fetchCreatePo = async (prNo: string) => {
   try {
-    // const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR}/${id}`, { textReason });
     const params = { prNo: prNo };
     const response = await api.post(`${ENDPOINT.CREATE_PO}`, params);
-
     if (response.status === 200 && response.data.isSuccess) {
-      return { isSuccess: true, message: '' }; // Trả về dữ liệu đã phê duyệt
+      return { isSuccess: true, message: '' };
     } else {
       return { isSuccess: false, message: response.data.errors[0].message };
     }
   } catch (error) {
-    return { isSuccess: false, message: '' }; // Trả về false nếu có lỗi xảy ra
+    return { isSuccess: false, message: '' };
   }
 };
 
 export const deleteCreatePo = async (id: string) => {
   try {
-    // Luôn trả về true để demo UI update, trong thực tế sẽ gọi API delete
     return id;
-    // const response = await axios.delete(`/create-price/${id}`);
-    // if (response.status === 200) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
   } catch (error) {
     console.error('Error deleting item on backend:', error);
     return false;

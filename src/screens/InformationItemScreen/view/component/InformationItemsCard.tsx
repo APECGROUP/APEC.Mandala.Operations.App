@@ -22,14 +22,14 @@ const InformationItemsCard = ({
   item: IItemInDetailPr;
   index: number;
   onFocusComment: () => void;
-  onUpdatePrice?: (id: string | number, price: number) => void;
+  onUpdatePrice?: (id: number, price: number) => void;
 }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
   const [count, setCount] = useState(item.quantity);
   const initialPrice = item.price > 0 ? item.price : ''; // Khởi tạo giá trị ban đầu
   const priceRef = useRef(initialPrice); // Dùng useRef thay vì useState
-  const [isEditPrice, setIsEditPrice] = useState(true);
+  const [isEditPrice, setIsEditPrice] = useState(item.price <= 0);
 
   const inputRef = useRef<TextInput>(null); // nếu cần focus programmatically
 
@@ -107,7 +107,7 @@ const InformationItemsCard = ({
                 <View style={styles.itemInfoRow}>
                   <TextInput
                     ref={inputRef}
-                    autoFocus
+                    // autoFocus
                     onFocus={onFocusComment}
                     onBlur={onBlur}
                     defaultValue={String(priceRef.current)}

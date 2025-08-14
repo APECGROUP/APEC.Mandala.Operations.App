@@ -1,6 +1,4 @@
-// views/viewmodal/useCreatePriceViewModal.ts
-
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import {
   IItemVendorPrice,
@@ -9,52 +7,45 @@ import {
   checkRejectCreatePrice,
   checkApproveCreatePrice,
   checkDeleteCreatePrice,
+  Pagination,
 } from '../modal/CreatePriceModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
 import { TYPE_TOAST } from '@/elements/toast/Message';
+import { goBack } from '@/navigation/RootNavigation';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500;
 
+interface PageData {
+  data: IItemVendorPrice[];
+  pagination: Pagination;
+}
+
 export function useCreatePriceViewModel() {
-  const length = useRef<number>(0);
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { showToast, showAlert } = useAlert();
 
-  const [effectiveFilters, setEffectiveFilters] = useState<CreatePriceFilters>();
-  const [currentUiFilters, setCurrentUiFilters] = useState<CreatePriceFilters>();
+  const [uiFilters, setUiFilters] = useState<CreatePriceFilters>({
+    status: { id: '3', name: t('filter.statusFilter.waiting'), code: 'W' },
+  });
+  const [effectiveFilters, setEffectiveFilters] = useState<CreatePriceFilters>({
+    status: { id: '3', name: t('filter.statusFilter.waiting'), code: 'W' },
+  });
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [totalItems, setTotalItems] = useState<number>(0);
 
-  const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
-    typeof debounce<typeof setEffectiveFilters>
-  > | null>(null);
-
-  useEffect(() => {
-    if (!debouncedSetEffectiveFiltersRef.current) {
-      debouncedSetEffectiveFiltersRef.current = debounce(setEffectiveFilters, DEBOUNCE_DELAY);
-    }
-    return () => {
-      debouncedSetEffectiveFiltersRef.current?.cancel();
-    };
-  }, []);
-
-  useEffect(() => {
-    debouncedSetEffectiveFiltersRef.current?.(currentUiFilters);
-  }, [currentUiFilters]);
-
-  const currentQueryKey = useMemo(
-    () => [
-      'listCreatePrice',
-      effectiveFilters?.prNo?.trim() || null,
-      effectiveFilters?.product?.id || null,
-      effectiveFilters?.ncc?.id || null,
-      effectiveFilters?.status?.id || null,
-    ],
-    [effectiveFilters],
+  const debouncedSetEffectiveFilters = useMemo(
+    () => debounce(setEffectiveFilters, DEBOUNCE_DELAY),
+    [],
   );
+
+  useEffect(() => {
+    debouncedSetEffectiveFilters(uiFilters);
+    return () => debouncedSetEffectiveFilters.cancel();
+  }, [uiFilters, debouncedSetEffectiveFilters]);
 
   const {
     data,
@@ -67,23 +58,88 @@ export function useCreatePriceViewModel() {
     isRefetching,
     isError,
     error,
-  } = useInfiniteQuery<IItemVendorPrice[], Error>({
-    queryKey: currentQueryKey,
-    queryFn: async ({ pageParam = 1 }) =>
-      fetchCreatePrice(pageParam as number, ITEMS_PER_PAGE, effectiveFilters, length),
-    getNextPageParam: lastPage =>
-      lastPage.length === ITEMS_PER_PAGE ? lastPage.length + 1 : undefined,
+  } = useInfiniteQuery<PageData>({
+    queryKey: ['listCreatePrice', effectiveFilters],
+    queryFn: ({ pageParam = 1 }) =>
+      fetchCreatePrice(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
+    getNextPageParam: lastPage => {
+      const nextPage = lastPage.pagination?.pageCurrent + 1;
+      return nextPage <= lastPage.pagination?.pageCount ? nextPage : undefined;
+    },
     initialPageParam: 1,
-    staleTime: 0,
+    staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 
-  const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
+  // Dùng useEffect để cập nhật totalItems từ data khi có thay đổi
+  useEffect(() => {
+    if (data?.pages[0]?.pagination?.rowCount !== undefined) {
+      setTotalItems(data.pages[0].pagination.rowCount);
+    } else {
+      setTotalItems(0);
+    }
+  }, [data]);
 
-  const onRefresh = useCallback(() => {
-    refetch();
-  }, [refetch]);
+  const flatData = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
+
+  // Sửa lại hàm updateCache để cập nhật cả data trong cache của React Query
+  const updateCache = useCallback(
+    (action: (item: IItemVendorPrice) => boolean, totalItem: number = 1) => {
+      queryClient.setQueryData(
+        ['listCreatePrice', effectiveFilters],
+        (cachedData: InfiniteData<PageData> | undefined) => {
+          if (!cachedData) return undefined;
+
+          const newPages = cachedData.pages.map(page => ({
+            ...page,
+            data: page.data.filter(action),
+            // Giảm rowCount trực tiếp trong cache
+            pagination: {
+              ...page.pagination,
+              rowCount: page.pagination.rowCount - totalItem,
+            },
+          }));
+
+          // Đồng bộ state totalItems với giá trị mới từ cache
+          setTotalItems(prev => prev - totalItem);
+
+          return { ...cachedData, pages: newPages };
+        },
+      );
+    },
+    [queryClient, effectiveFilters],
+  );
+
+  const onUpdateItem = useCallback(
+    (updatedItem: IItemVendorPrice) => {
+      queryClient.setQueryData(
+        ['listCreatePrice', effectiveFilters],
+        (cachedData: InfiniteData<PageData> | undefined) => {
+          if (!cachedData) {
+            return undefined;
+          }
+
+          const newPages = cachedData.pages.map(page => ({
+            ...page,
+            data: page.data.map(currentItem =>
+              currentItem.id === updatedItem.id ? updatedItem : currentItem,
+            ),
+          }));
+
+          // Sau khi update, cần trigger lại việc cập nhật totalItems để đồng bộ
+          if (newPages[0]?.pagination?.rowCount !== undefined) {
+            setTotalItems(newPages[0].pagination.rowCount);
+          }
+
+          return { ...cachedData, pages: newPages };
+        },
+      );
+    },
+    [queryClient, effectiveFilters],
+  );
+
+  const onRefresh = useCallback(() => refetch(), [refetch]);
 
   const onLoadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -91,33 +147,15 @@ export function useCreatePriceViewModel() {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const onSearch = useCallback((val: string) => {
-    setCurrentUiFilters(prev => ({ ...prev, prNo: val }));
+  const onSearch = useCallback((prNo: string) => {
+    setUiFilters(prev => ({ ...prev, prNo }));
   }, []);
 
   const applyFilters = useCallback((newFilter: CreatePriceFilters) => {
-    debouncedSetEffectiveFiltersRef.current?.cancel();
-    setCurrentUiFilters(newFilter);
-    setEffectiveFilters(newFilter);
+    setUiFilters(newFilter);
+    goBack();
   }, []);
 
-  // Hàm cập nhật cache dùng chung
-  const updateCache = useCallback(
-    (action: (item: IItemVendorPrice) => boolean) => {
-      queryClient.setQueryData(
-        currentQueryKey,
-        (cachedData: InfiniteData<IItemVendorPrice[]> | undefined) => {
-          if (!cachedData) return undefined;
-          const newPages = cachedData.pages.map(page => page.filter(action));
-          console.log('có data: ', cachedData, newPages);
-          return { ...cachedData, pages: newPages };
-        },
-      );
-    },
-    [queryClient, currentQueryKey],
-  );
-  console.log('first render: ', flatData);
-  // --- Hàm onDelete đã được refactor ---
   const onDelete = useCallback(
     async (id: number, onSuccess?: (deletedId: number) => void, onCloseSwipe?: () => void) => {
       try {
@@ -126,15 +164,12 @@ export function useCreatePriceViewModel() {
           showToast(message || t('error.subtitle'), 'error');
           return;
         }
-        onSuccess?.(id);
         onCloseSwipe?.();
-
-        // Cập nhật cache trực tiếp
-        updateCache(item => item.id !== id);
+        onSuccess?.(id);
+        updateCache(item => item.id !== id, 1);
         setSelectedIds(prev => prev.filter(v => v !== id));
         showToast(t('createPrice.deleteSuccess'), TYPE_TOAST.SUCCESS);
       } catch (err) {
-        console.error('Error deleting item:', err);
         showToast(t('error.subtitle'), 'error');
       }
     },
@@ -163,7 +198,7 @@ export function useCreatePriceViewModel() {
     if (!isSuccess) {
       return showToast(message || t('error.subtitle'), 'error');
     }
-    updateCache(item => !selectedIds.includes(item.id));
+    updateCache(item => !selectedIds.includes(item.id), selectedIds.length);
     setSelectedIds([]);
     showToast(t('createPrice.approvedSuccess'), TYPE_TOAST.SUCCESS);
   }, [selectedIds, showToast, t, updateCache]);
@@ -173,13 +208,13 @@ export function useCreatePriceViewModel() {
     if (!isSuccess) {
       return showToast(message || t('error.subtitle'), 'error');
     }
-    updateCache(item => !selectedIds.includes(item.id));
+    updateCache(item => !selectedIds.includes(item.id), selectedIds.length);
     setSelectedIds([]);
     showToast(t('createPrice.rejectSuccess'), TYPE_TOAST.SUCCESS);
   }, [selectedIds, showToast, t, updateCache]);
 
   const toggleSelectAll = useCallback(() => {
-    const allIds = flatData.map(item => item.id);
+    const allIds = flatData.map(item => item?.id);
     setSelectedIds(selectedIds.length === flatData.length ? [] : allIds);
   }, [selectedIds.length, flatData]);
 
@@ -187,8 +222,8 @@ export function useCreatePriceViewModel() {
     setSelectedIds(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
   }, []);
 
-  const selectedAll = useMemo(
-    () => selectedIds.length === flatData.length && flatData.length > 0,
+  const isAllSelected = useMemo(
+    () => selectedIds.length > 0 && selectedIds.length === flatData.length,
     [selectedIds.length, flatData.length],
   );
 
@@ -200,12 +235,12 @@ export function useCreatePriceViewModel() {
     isRefetching,
     isFetchingNextPage,
     hasNextPage: !!hasNextPage,
-    currentPrNoInput: currentUiFilters?.prNo || '',
-    currentFilters: currentUiFilters,
+    currentPrNoInput: uiFilters?.prNo || '',
+    currentFilters: effectiveFilters,
     isError,
     error,
-    selectedAll,
-    length: length.current,
+    selectedAll: isAllSelected,
+    length: totalItems,
     onReject,
     setSelectedIds,
     onApproved,
@@ -216,5 +251,6 @@ export function useCreatePriceViewModel() {
     handleDelete,
     toggleSelectAll,
     handleSelect,
+    onUpdateItem,
   };
 }

@@ -40,6 +40,7 @@ const HeaderSearch = ({
       style={styles.containerHeader}>
       <StatusBar
         barStyle={'light-content'}
+        backgroundColor={Colors.PRIMARY}
         // backgroundColor="transparent" // Thường đặt transparent nếu có ảnh nền
         // translucent // Giúp nội dung tràn ra phía sau StatusBar
       />

@@ -40,6 +40,7 @@ import DetailPcPrCardScreen from '@/screens/pcPrScreen/view/component/DetailPcPr
 import InformationItemsPcPrScreen from '@/screens/InformationItemPcPrScreen/view/InformationItemsPcPrScreen';
 import PickStatusScreen from '@/views/modal/modalPickStatus/view/PickStatusScreen';
 import FilterCreatePoScreen from '@/screens/filterScreen/view/FilterCreatePoScreen';
+import EditPriceNCCScreen from '@/screens/createPriceScreen/view/component/EditPriceNCCScreen';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -116,6 +117,17 @@ export default function MainNavigator() {
           }}
           name="CreatePriceNccScreen"
           component={CreatePriceNccScreen}
+        />
+        <Screen
+          options={{
+            headerShown: false,
+            headerTitle: t('createPrice.editPriceNCC'),
+            contentStyle: {
+              paddingHorizontal: 0,
+            },
+          }}
+          name="EditPriceNCCScreen"
+          component={EditPriceNCCScreen}
         />
         <Screen
           name="InformationItemsScreen"
