@@ -97,12 +97,13 @@ export function useCreatePriceViewModel() {
             // Giảm rowCount trực tiếp trong cache
             pagination: {
               ...page.pagination,
-              rowCount: page.pagination.rowCount - totalItem,
+              rowCount:
+                page.pagination.rowCount > totalItem ? page.pagination.rowCount - totalItem : 0,
             },
           }));
 
           // Đồng bộ state totalItems với giá trị mới từ cache
-          setTotalItems(prev => prev - totalItem);
+          setTotalItems(prev => (prev > totalItem ? prev - totalItem : 0));
 
           return { ...cachedData, pages: newPages };
         },
@@ -194,13 +195,20 @@ export function useCreatePriceViewModel() {
   );
 
   const onApproved = useCallback(async () => {
+    // setSelectedIds([]);
+    // setTimeout(() => {
+    //   showToast(t('createPrice.approvedSuccess'), TYPE_TOAST.SUCCESS, true);
+    // }, 300);
+    // return;
     const { isSuccess, message } = await checkApproveCreatePrice(selectedIds);
     if (!isSuccess) {
       return showToast(message || t('error.subtitle'), 'error');
     }
     updateCache(item => !selectedIds.includes(item.id), selectedIds.length);
     setSelectedIds([]);
-    showToast(t('createPrice.approvedSuccess'), TYPE_TOAST.SUCCESS);
+    setTimeout(() => {
+      showToast(t('createPrice.approvedSuccess'), TYPE_TOAST.SUCCESS, true);
+    }, 300);
   }, [selectedIds, showToast, t, updateCache]);
 
   const onReject = useCallback(async () => {

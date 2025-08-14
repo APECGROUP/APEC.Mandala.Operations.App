@@ -119,7 +119,24 @@ export const fetchApprove = async (
 ): Promise<{ data: IApprove[]; pagination: Pagination }> => {
   try {
     const filterList: Filter[] = [];
-
+    filterList.push({
+      propertyName: 'status',
+      propertyValue: 'PO',
+      propertyType: 'string',
+      operator: '!=',
+    });
+    filterList.push({
+      propertyName: 'status',
+      propertyValue: 'PP',
+      propertyType: 'string',
+      operator: '!=',
+    });
+    filterList.push({
+      propertyName: 'status',
+      propertyValue: 'AP',
+      propertyType: 'string',
+      operator: '!=',
+    });
     if (filters.prDate) {
       filterList.push({
         propertyName: 'prDate',
@@ -200,6 +217,18 @@ export const fetchApprove = async (
 export const checkApprovePrNoChange = async (id: number) => {
   try {
     const response = await api.get(`${ENDPOINT.HANDLE_APPROVE_PR_NO_CHANGE}/${id}`);
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' };
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: 'An error occurred while approving PR without changes.' };
+  }
+};
+export const checkApprovePr = async (id: number, data: IApprove[]) => {
+  try {
+    const response = await api.post(`${ENDPOINT.HANDLE_APPROVE_PR}/${id}`, data);
     if (response.status === 200 && response.data.isSuccess) {
       return { isSuccess: true, message: '' };
     } else {

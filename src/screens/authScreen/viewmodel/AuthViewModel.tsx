@@ -13,7 +13,7 @@ import {
   IResponseAPILogin,
   fetchStatusGlobal,
 } from '../modal/AuthModal';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   IResponseListHotel,
   fetchListHotel,
@@ -26,6 +26,7 @@ export const useAuthViewModel = () => {
   const { showAlert, showToast } = useAlert();
   const { setIsLogin } = useIsLogin();
   const { saveInfoUser } = useInfoUser();
+  const queryClient = useQueryClient();
 
   const [processing, setProcessing] = useState(false);
 
@@ -136,6 +137,7 @@ export const useAuthViewModel = () => {
         throw new Error('Login failed');
       }
       if (response.data.isSuccess) {
+        await queryClient.clear();
         if (response.data.data.user.groups.length === 0) {
           showToast(t('auth.login,.loginError'), TYPE_TOAST.ERROR);
           return;

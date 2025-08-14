@@ -51,6 +51,7 @@ export default function ApprovePrScreen() {
     currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
     currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
+    onApprovedNoChange,
     onApproved,
     selectedIds,
     setSelectedIds,
@@ -130,12 +131,13 @@ export default function ApprovePrScreen() {
   const renderItem = useCallback(
     ({ item }: { item: IApprove; index: number }) => (
       <ApproveCard
+        onApproved={onApproved}
         item={item}
         handleSelect={handleSelect}
         isSelected={selectedIds.includes(item.id)}
       />
     ),
-    [handleSelect, selectedIds],
+    [handleSelect, onApproved, selectedIds],
   );
 
   // const selectedAll = useMemo(
@@ -228,7 +230,7 @@ export default function ApprovePrScreen() {
       {selectedIds.length > 0 && (
         <Footer
           onLeftAction={() => navigate('ModalInputRejectApprove', { id: selectedIds[0] })}
-          onRightAction={() => onApproved(selectedIds)}
+          onRightAction={() => onApprovedNoChange(selectedIds)}
           leftButtonTitle={t('createPrice.reject')}
           rightButtonTitle={t('createPrice.approvedOrder')}
           customBottom={vs(20)}

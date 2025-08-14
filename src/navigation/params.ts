@@ -73,7 +73,10 @@ export type MainParams = {
   InformationItemsPcPrScreen: { item: IItemPcPr };
   MyTabs: undefined;
   NotificationScreen: undefined;
-  DetailOrderApproveScreen: { item: IItemAssignPrice };
+  DetailOrderApproveScreen: {
+    item: IItemAssignPrice;
+    onApproved: (id: number, listData: IItemAssignPrice[]) => void;
+  };
 
   // Modals
   ModalPhotoOrCamera: {

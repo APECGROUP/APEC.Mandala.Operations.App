@@ -12,20 +12,21 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { vs } from 'react-native-size-matters';
 
 export type ToastAction = {
-  show: (msg: string, type: string) => void; // Đổi any thành void cho kiểu trả về
+  show: (msg: string, type: string, positionDown?: boolean) => void; // Đổi any thành void cho kiểu trả về
 };
 
 const ToastContainer = forwardRef<ToastAction>(({}, ref) => {
-  const { top } = useSafeAreaInsets();
+  const { bottom, top } = useSafeAreaInsets();
   const [messages, setMessages] = useState<string>('');
   const [type, setType] = useState<string>('');
   const [open, setOpen] = useState<boolean>(false);
+  const [isDown, setIsDown] = useState<boolean>(false); // Thêm state để kiểm soát hướng thông báo
 
   // useRef để lưu trữ ID của setTimeout, không gây re-render khi thay đổi
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Hàm show thông báo
-  const show = useCallback((msg: string, types: string) => {
+  const show = useCallback((msg: string, types: string, positionDown?: boolean) => {
     // 1. Xóa bỏ bất kỳ bộ đếm thời gian hiện có nào
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -35,6 +36,11 @@ const ToastContainer = forwardRef<ToastAction>(({}, ref) => {
     setMessages(msg);
     setType(types);
     setOpen(true); // Đảm bảo thông báo hiển thị
+    if (positionDown) {
+      setIsDown(positionDown); // Cập nhật hướng thông báo nếu cần
+    } else {
+      setIsDown(false); // Đặt lại hướng thông báo nếu không có positionDown
+    }
 
     // 3. Thiết lập bộ đếm thời gian mới
     timerRef.current = setTimeout(() => {
@@ -72,7 +78,8 @@ const ToastContainer = forwardRef<ToastAction>(({}, ref) => {
   return (
     <>
       {open && (
-        <View style={[styles.container, { top: top + vs(10) }]}>
+        <View
+          style={[styles.container, isDown ? { bottom: bottom + vs(50) } : { top: top + vs(10) }]}>
           <Message message={messages} type={type} onHide={onHide} />
         </View>
       )}

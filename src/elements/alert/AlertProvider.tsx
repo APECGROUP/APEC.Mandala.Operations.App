@@ -23,7 +23,7 @@ interface AlertContextType {
     cancelButton?: boolean,
   ) => void;
   hideAlert: () => void;
-  showToast: (message: string, type: string) => void;
+  showToast: (message: string, type: string, positionDown?: boolean) => void;
   showLoading: (message?: string) => void;
   hideLoading: () => void;
 }
@@ -82,8 +82,8 @@ export const AlertProvider: React.FC<AlertProviderProps> = React.memo(({ childre
 
   const hideAlert = useCallback(() => setModalVisible(false), []);
 
-  const showToast = useCallback((message: string, type: string) => {
-    toastRef.current?.show(message, type);
+  const showToast = useCallback((message: string, type: string, positionDown?: boolean) => {
+    toastRef.current?.show(message, type, positionDown);
   }, []);
 
   const showLoading = useCallback(() => {

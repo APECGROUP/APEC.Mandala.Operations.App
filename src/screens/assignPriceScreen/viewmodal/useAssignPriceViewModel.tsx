@@ -121,11 +121,12 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
           data: page.data.filter(action),
           pagination: {
             ...page.pagination,
-            rowCount: page.pagination.rowCount - totalItem,
+            rowCount:
+              page.pagination.rowCount > totalItem ? page.pagination.rowCount - totalItem : 0,
           },
         }));
 
-        setTotalItems(prev => prev - totalItem);
+        setTotalItems(prev => (prev > totalItem ? prev - totalItem : 0));
 
         return { ...cachedData, pages: newPages };
       });

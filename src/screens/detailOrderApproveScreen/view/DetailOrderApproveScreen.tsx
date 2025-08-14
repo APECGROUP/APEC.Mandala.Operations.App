@@ -38,6 +38,7 @@ const DetailOrderApproveScreen = ({
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
   const { prNo, id } = route.params.item;
+  const { onApproved } = route.params;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -48,10 +49,10 @@ const DetailOrderApproveScreen = ({
     isFetchingNextPage,
     onRefresh,
     onLoadMore,
+    onUpdateQuantity,
     hasNextPage,
     isError,
   } = useInformationItemsViewModel(id, prNo);
-  const { onApproved } = useApproveViewModel();
 
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
 
@@ -77,7 +78,7 @@ const DetailOrderApproveScreen = ({
     return (
       <View style={styles.emptyContainer}>
         <EmptyDataAnimation autoPlay />
-        <AppText style={styles.emptyText}>{t('home.empty')}</AppText>
+        <AppText style={styles.emptyText}>{t('pcPr.empty')}</AppText>
       </View>
     );
   };
@@ -94,10 +95,9 @@ const DetailOrderApproveScreen = ({
 
   const renderItem = useCallback(
     ({ item, index }: { item: IItemInDetailPr; index: number }) => (
-      <DetailOrderItemCard item={item} index={index} />
+      <DetailOrderItemCard onUpdateQuantity={onUpdateQuantity} item={item} index={index} />
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [flatData],
+    [onUpdateQuantity],
   );
   const rightComponent = () => (
     <AppBlockButton
@@ -170,8 +170,7 @@ const DetailOrderApproveScreen = ({
             navigate('ModalInputRejectApprove', { id });
           }}
           onRightAction={() => {
-            onApproved([id]);
-            goBack();
+            onApproved(id, flatData);
           }}
           leftButtonTitle={t('createPrice.reject')}
           rightButtonTitle={t('createPrice.approvedOrder')}

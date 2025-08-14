@@ -7,6 +7,7 @@ import {
   checkRejectPr,
   fetchApprove,
   Pagination,
+  checkApprovePr,
 } from '../modal/ApproveModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
@@ -135,11 +136,12 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
           data: page.data.filter(action),
           pagination: {
             ...page.pagination,
-            rowCount: page.pagination.rowCount - totalItem,
+            rowCount:
+              page.pagination.rowCount > totalItem ? page.pagination.rowCount - totalItem : 0,
           },
         }));
 
-        setTotalItems(prev => prev - totalItem);
+        setTotalItems(prev => (prev > totalItem ? prev - totalItem : 0));
 
         return { ...cachedData, pages: newPages };
       });
@@ -212,7 +214,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     );
   };
 
-  const onApproved = useCallback(
+  const onApprovedNoChange = useCallback(
     async (ids: number[]) => {
       const { isSuccess, message } = await checkApprovePrNoChange(ids[0]);
       if (!isSuccess) {
@@ -221,6 +223,19 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
 
       updateCacheAndTotal(item => !ids.includes(item.id), ids.length);
       setSelectedIds([]);
+      showToast(t('createPrice.approvedSuccess'), 'success');
+    },
+    [showToast, t, updateCacheAndTotal],
+  );
+  const onApproved = useCallback(
+    async (id: number, listData: IApprove[]) => {
+      const { isSuccess, message } = await checkApprovePr(id, listData);
+      if (!isSuccess) {
+        return showToast(message || t('createPrice.approvedFail'), 'error');
+      }
+      goBack();
+      updateCacheAndTotal(item => id !== item.id, 1);
+      setSelectedIds(ids => ids.filter(itemId => itemId !== id));
       showToast(t('createPrice.approvedSuccess'), 'success');
     },
     [showToast, t, updateCacheAndTotal],
@@ -253,6 +268,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     onReject,
     selectedIds,
     setSelectedIds,
+    onApprovedNoChange,
     onApproved,
     flatData,
     isLoading,

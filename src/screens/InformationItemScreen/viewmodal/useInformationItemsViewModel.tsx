@@ -109,8 +109,6 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
         return;
       }
 
-      const updatedIds = updatedItems.map(item => item.id);
-
       queryClient.setQueryData(key, {
         ...cached,
         pages: cached.pages.map(page =>
@@ -179,6 +177,20 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
     [id, showToast, t, textReason],
   );
 
+  const onUpdateQuantity = (itemNew: IItemInDetailPr) => {
+    const cached = queryClient.getQueryData<InfiniteData<IItemInDetailPr[]>>(key);
+
+    if (!cached) {
+      console.warn('🟥 No cache found for key:', key);
+      return;
+    }
+
+    // console.log('✅ Updating price...');
+    queryClient.setQueryData(key, {
+      ...cached,
+      pages: cached.pages.map(page => page.map(item => (item.id === itemNew.id ? itemNew : item))),
+    });
+  };
   const onAssign = async (func?: () => void) => {
     try {
       setIsLoadingAssign(true);
@@ -238,5 +250,6 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
     setTextReason,
     onSaveDraft,
     onAssign,
+    onUpdateQuantity,
   };
 }

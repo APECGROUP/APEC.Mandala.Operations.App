@@ -15,6 +15,7 @@ import moment from 'moment';
 import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 const ApproveCard = ({
+  onApproved,
   item,
   isSelected,
   handleSelect,
@@ -22,6 +23,7 @@ const ApproveCard = ({
   item: IApprove;
   isSelected: boolean;
   handleSelect: (id: number) => void;
+  onApproved: (id: number, listData: IApprove[]) => void;
 }) => {
   const { t } = useTranslation();
   return (
@@ -37,7 +39,7 @@ const ApproveCard = ({
 
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigate('DetailOrderApproveScreen', { item })}
+        onPress={() => navigate('DetailOrderApproveScreen', { item, onApproved })}
         style={styles.buttonDetailOrder}>
         <FastImage source={Images.IconApproved} style={styles.itemIcon} />
         <View style={styles.itemInfo}>
@@ -78,14 +80,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     flex: 1,
-  },
-  noAssign: {
-    paddingVertical: vs(2),
-    paddingHorizontal: s(4),
-    borderRadius: s(4),
-    backgroundColor: '#FFE2CE',
-    alignSelf: 'flex-start',
-    marginTop: vs(6),
   },
   dateText: {
     fontSize: getFontSize(12),

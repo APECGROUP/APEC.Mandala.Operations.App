@@ -122,7 +122,12 @@ export const fetchAssignPriceData = async (
 ): Promise<{ data: IItemAssignPrice[]; pagination: Pagination }> => {
   try {
     const filterList: Filter[] = [];
-
+    filterList.push({
+      propertyName: 'status',
+      propertyValue: 'PP',
+      propertyType: 'string',
+      operator: '==',
+    });
     if (filters.prDate) {
       filterList.push({
         propertyName: 'prDate',

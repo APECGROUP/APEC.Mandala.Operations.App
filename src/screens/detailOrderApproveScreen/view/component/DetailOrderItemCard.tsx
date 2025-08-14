@@ -15,32 +15,16 @@ import { navigate } from '@/navigation/RootNavigation';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
 
-const DetailOrderItemCard = ({ item }: { item: IItemInDetailPr; index: number }) => {
+const DetailOrderItemCard = ({
+  item,
+  onUpdateQuantity,
+}: {
+  item: IItemInDetailPr;
+  index: number;
+  onUpdateQuantity: (item: IItemInDetailPr) => void;
+}) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
-  const [count, setCount] = useState(item.quantity);
-
-  const [ncc, setNcc] = useState<IItemSupplier>({
-    accountName: item.vendorName,
-    code: item.vendor,
-    address1: '',
-    address2: '',
-    country: '',
-    phone: '',
-    email: '',
-    representative: '',
-    fax: '',
-    vatCode: '',
-    balance: 0,
-    type: '',
-    id: -1,
-    createdDate: new Date(),
-    createdBy: '',
-    creditLimit: 0,
-    invoiceName: '',
-    term: '',
-    deletedDate: null,
-  } as IItemSupplier);
 
   const handleShowDetail = () => {
     setIsShow(i => !i);
@@ -49,9 +33,22 @@ const DetailOrderItemCard = ({ item }: { item: IItemInDetailPr; index: number })
 
   const onPickNcc = () => {
     navigate('PickNccScreen', {
-      setNcc,
-      ncc,
+      setNcc: (ncc: IItemSupplier) => {
+        onUpdateQuantity({ ...item, vendor: ncc.code, vendorName: ncc.accountName });
+      },
+      ncc: undefined,
     });
+  };
+
+  const onAdd = () => {
+    // setCount(i => i + 1);
+    onUpdateQuantity({ ...item, approvedQuantity: Number(item.approvedQuantity) + 1 });
+  };
+  const onSub = () => {
+    if (item.approvedQuantity <= 0) {
+      return;
+    }
+    onUpdateQuantity({ ...item, approvedQuantity: Number(item.approvedQuantity) - 1 });
   };
 
   return (
@@ -62,7 +59,7 @@ const DetailOrderItemCard = ({ item }: { item: IItemInDetailPr; index: number })
           <View style={styles.itemInfo}>
             <View style={styles.itemInfoRow}>
               <AppText numberOfLines={1} style={styles.prCodeText}>
-                {item.unitName}
+                {item.iName}
               </AppText>
             </View>
             <View style={styles.itemInfoRow}>
@@ -89,15 +86,13 @@ const DetailOrderItemCard = ({ item }: { item: IItemInDetailPr; index: number })
           <View style={styles.row}>
             <AppText style={styles.label}>{t('Số lượng duyệt')}</AppText>
             <View style={styles.quantityControl}>
-              <TouchableOpacity
-                onPress={() => setCount(i => (i > 0 ? i - 1 : 0))}
-                style={styles.buttonSub}>
+              <TouchableOpacity onPress={onSub} style={styles.buttonSub}>
                 <IconSub />
               </TouchableOpacity>
               <TouchableOpacity activeOpacity={1} disabled>
-                <AppText style={styles.qtyValue}>{count}</AppText>
+                <AppText style={styles.qtyValue}>{Number(item.approvedQuantity)}</AppText>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setCount(i => i + 1)} style={styles.buttonPlus}>
+              <TouchableOpacity onPress={onAdd} style={styles.buttonPlus}>
                 <IconPlus />
               </TouchableOpacity>
             </View>
@@ -106,7 +101,7 @@ const DetailOrderItemCard = ({ item }: { item: IItemInDetailPr; index: number })
             <AppText style={styles.label}>{t('NCC')}</AppText>
             <TouchableOpacity onPress={onPickNcc} style={styles.nccContainer}>
               <AppText style={[styles.nccText, { marginRight: s(6) }]} numberOfLines={1}>
-                {ncc.accountName}
+                {item.vendorName}
               </AppText>
               <IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />
             </TouchableOpacity>
@@ -114,7 +109,7 @@ const DetailOrderItemCard = ({ item }: { item: IItemInDetailPr; index: number })
           <View style={styles.row}>
             <AppText style={styles.label}>{t('Số tiền duyệt')}</AppText>
             <AppText style={styles.approvedAmount}>
-              {moneyFormat(item.price * item.quantity, '.', '')}
+              {moneyFormat(item.price * item.approvedQuantity, '.', '')}
             </AppText>
           </View>
           <View>

@@ -206,7 +206,7 @@ export default function CreatePoScreen() {
         <View style={styles.buttonCreate}>
           <AppButton onPress={onCreatePo} style={{ backgroundColor: Colors.PRIMARY }}>
             <AppText weight="bold" color={Colors.WHITE}>
-              {t('myTabs.tab3')}
+              {t('myTabs.createPo')}
             </AppText>
           </AppButton>
         </View>

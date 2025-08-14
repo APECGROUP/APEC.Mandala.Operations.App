@@ -30,6 +30,7 @@ export interface IItemInDetailPr {
   vendor: string;
   vendorName: string;
   approvedQuantity: number;
+  stockQuantity: number;
   status: string;
   vat: string;
   itemCode: string;

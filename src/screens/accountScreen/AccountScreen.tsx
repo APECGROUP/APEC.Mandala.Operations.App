@@ -27,6 +27,7 @@ import Toast from 'react-native-toast-message';
 import api from '@/utils/setup-axios';
 import { ENDPOINT } from '@/utils/Constans';
 import { TYPE_TOAST } from '@/elements/toast/Message';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AccountScreen = () => {
   const { t } = useTranslation();
@@ -61,6 +62,7 @@ const AccountScreen = () => {
   //     { text: t('account.confirm'), onPress: () => {} },
   //   ]);
   // };
+  const queryClient = useQueryClient();
 
   const goToChangePassword = () => navigate('ChangePasswordScreen', { type: 'change' });
   const handleLogout = async () => {
@@ -69,6 +71,7 @@ const AccountScreen = () => {
       if (response.status !== 200) {
         throw new Error('Logout failed');
       } else if (response.data.isSuccess) {
+        await queryClient.clear();
         await DataLocal.removeAll();
       }
     } catch (error) {
