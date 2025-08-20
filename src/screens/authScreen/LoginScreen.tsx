@@ -22,9 +22,12 @@ import { useAutoLogin } from '@/hook/useAutoLogin';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { useAuthViewModel } from './viewmodel/AuthViewModel';
 import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { getFCMTokenAndSendToServer } from '../../../firebase/fcmService';
 
 const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginScreen'>) => {
   const { t } = useTranslation();
+  const { setDeviceToken } = useInfoUser();
   const refPassword = useRef<TextInput>(null);
   const { credentials, loading: loadingCredentials } = useAutoLogin();
   const { bottom } = useSafeAreaInsets();
@@ -54,6 +57,10 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
       // nên không cần gọi thêm ở đây nếu credentials có đủ các trường đó
     }
   }, [credentials, loadingCredentials, setLoginForm]);
+
+  useEffect(() => {
+    getFCMTokenAndSendToServer(t, setDeviceToken);
+  }, []);
 
   const disabled = !userName || !password || !hotel?.code;
 

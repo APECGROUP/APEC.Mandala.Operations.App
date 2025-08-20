@@ -28,17 +28,17 @@ const SCREENS = {
     name: 'CreatePriceScreen',
     component: lazy(() => import('@/screens/createPriceScreen/view/CreatePriceScreen')),
   },
-  PcPrScreen: {
-    name: 'PcPrScreen',
-    component: lazy(() => import('@/screens/pcPrScreen/view/PcPrScreen')),
+  ApprovePrScreen: {
+    name: 'ApprovePrScreen',
+    component: lazy(() => import('@/screens/approvePrScreen/view/ApprovePrScreen')),
   },
   CreatePoScreen: {
     name: 'CreatePoScreen',
     component: lazy(() => import('@/screens/createPoScreen/view/CreatePoScreen')),
   },
-  ApprovePrScreen: {
-    name: 'ApprovePrScreen',
-    component: lazy(() => import('@/screens/approvePrScreen/view/ApprovePrScreen')),
+  PcPrScreen: {
+    name: 'PcPrScreen',
+    component: lazy(() => import('@/screens/pcPrScreen/view/PcPrScreen')),
   },
 };
 

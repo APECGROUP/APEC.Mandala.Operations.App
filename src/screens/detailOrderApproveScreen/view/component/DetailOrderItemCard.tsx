@@ -3,7 +3,7 @@ import { LayoutAnimation, StyleSheet, TouchableOpacity, View } from 'react-nativ
 import FastImage from 'react-native-fast-image';
 import { s, vs } from 'react-native-size-matters';
 import Images from '../../../../../assets/image/Images';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/theme/Config';
@@ -14,29 +14,59 @@ import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
+import { IItemVendorPrice } from '@/screens/createPriceScreen/modal/CreatePriceModal';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { GROUP_ROLES } from '@/screens/notificationScreen/view/NotificationScreen';
 
 const DetailOrderItemCard = ({
   item,
   onUpdateQuantity,
+  onUpdateNCC,
+  onUpdatePrice,
 }: {
   item: IItemInDetailPr;
   index: number;
   onUpdateQuantity: (item: IItemInDetailPr) => void;
+  onUpdateNCC: (id: number, vendor: string) => void;
+  onUpdatePrice?: (id: number, price: number) => void;
 }) => {
   const { t } = useTranslation();
+  const { infoUser } = useInfoUser();
   const [isShow, setIsShow] = useState(false);
+
+  const [ncc, setNcc] = useState<IItemVendorPrice>({
+    vendorName: item.vendorName,
+  } as IItemVendorPrice);
 
   const handleShowDetail = () => {
     setIsShow(i => !i);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
+  console.log('DetailOrderItemCard ', item);
+  // const onPickNcc = () => {
+  //   navigate('PickNccScreen', {
+  //     setNcc: (ncc: IItemSupplier) => {
+  //       onUpdateQuantity({ ...item, vendor: ncc.code, vendorName: ncc.accountName });
+  //     },
+  //     ncc: undefined,
+  //   });
+  // };
 
+  const onSetNcc = (i: IItemVendorPrice) => {
+    setNcc(i);
+    onUpdateNCC(item.id, i.vendorCode);
+  };
+  const onSetPrice = async (price: number) => {
+    try {
+      await onUpdatePrice?.(item.id, Number(price || 0));
+    } catch (error) {}
+  };
   const onPickNcc = () => {
-    navigate('PickNccScreen', {
-      setNcc: (ncc: IItemSupplier) => {
-        onUpdateQuantity({ ...item, vendor: ncc.code, vendorName: ncc.accountName });
-      },
-      ncc: undefined,
+    navigate('PickPriceFromNccScreen', {
+      onSetNcc,
+      ncc,
+      itemCode: item.itemCode,
+      onSetPrice,
     });
   };
 
@@ -48,8 +78,14 @@ const DetailOrderItemCard = ({
     if (item.approvedQuantity <= 0) {
       return;
     }
-    onUpdateQuantity({ ...item, approvedQuantity: Number(item.approvedQuantity) - 1 });
+    onUpdateQuantity({ ...item, approvedQuantity: Math.min(0, Number(item.approvedQuantity) - 1) });
   };
+  const isDisable = infoUser?.groups?.some(i => i.id === GROUP_ROLES.PR_APPROVER.TBP);
+  useEffect(() => {
+    if (item.quantity !== item.approvedQuantity && item.approvedQuantity === 0) {
+      onUpdateQuantity({ ...item, approvedQuantity: item.quantity });
+    }
+  }, []);
 
   return (
     <View style={styles.card}>
@@ -99,9 +135,9 @@ const DetailOrderItemCard = ({
           </View>
           <View style={styles.row}>
             <AppText style={styles.label}>{t('NCC')}</AppText>
-            <TouchableOpacity onPress={onPickNcc} style={styles.nccContainer}>
+            <TouchableOpacity disabled={isDisable} onPress={onPickNcc} style={styles.nccContainer}>
               <AppText style={[styles.nccText, { marginRight: s(6) }]} numberOfLines={1}>
-                {item.vendorName}
+                {ncc.vendorName}
               </AppText>
               <IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />
             </TouchableOpacity>

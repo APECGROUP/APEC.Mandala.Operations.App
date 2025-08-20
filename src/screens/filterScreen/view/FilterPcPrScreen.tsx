@@ -34,8 +34,12 @@ const FilterPcPrScreen = ({
   // Đảm bảo default values cho department và requester là { id: '', name: '' }
   const initialFilters: PcPrFilters = route.params?.currentFilters || {};
 
-  const [prNo, setPrNo] = useState<string>(initialFilters.prNo || initialFilters?.searchKey || '');
-  const [po, setPo] = useState<string>(initialFilters.prNo || initialFilters?.searchKey || '');
+  const [prNo, setPrNo] = useState<string>(
+    initialFilters.prNo?.toLowerCase()?.includes('prno') ? initialFilters.prNo : '',
+  );
+  const [po, setPo] = useState<string>(
+    initialFilters.prNo?.toLowerCase()?.includes('po') ? initialFilters.prNo : '',
+  );
   const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.prDate);
   const [toDate, setToDate] = useState<Date | undefined>(initialFilters.expectedDate);
   const [department, setDepartment] = useState<IPickDepartment | undefined>(

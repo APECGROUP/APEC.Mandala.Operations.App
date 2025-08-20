@@ -91,6 +91,23 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
       ),
     });
   };
+  const onUpdateNCC = (idItem: number, vendor: string) => {
+    const cached = queryClient.getQueryData<InfiniteData<IItemInDetailPr[]>>(key);
+
+    if (!cached) {
+      console.warn('🟥 No cache found for key:', key);
+      return;
+    }
+
+    // console.log('✅ Updating price...');
+    console.log('onUpdateVendor: ', idItem, vendor);
+    queryClient.setQueryData(key, {
+      ...cached,
+      pages: cached.pages.map(page =>
+        page.map(item => (item.id === idItem ? { ...item, vendor } : item)),
+      ),
+    });
+  };
   const onAutoAssign = async () => {
     try {
       const res = await fetchAutoAssign(id);
@@ -191,6 +208,7 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
       pages: cached.pages.map(page => page.map(item => (item.id === itemNew.id ? itemNew : item))),
     });
   };
+
   const onAssign = async (func?: () => void) => {
     try {
       setIsLoadingAssign(true);
@@ -246,6 +264,7 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
     onRefresh,
     onLoadMore,
     onUpdatePrice,
+    onUpdateNCC,
     onReject,
     setTextReason,
     onSaveDraft,

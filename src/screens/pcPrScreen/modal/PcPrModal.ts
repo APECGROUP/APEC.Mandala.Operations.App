@@ -75,14 +75,14 @@ export const fetchPcPrData = async (
   try {
     const filterList: Filter[] = [];
 
-    if (filters?.prNo) {
-      filterList.push({
-        propertyName: 'prNo',
-        propertyValue: filters.prNo,
-        propertyType: 'string',
-        operator: '==',
-      });
-    }
+    // if (filters?.prNo) {
+    //   filterList.push({
+    //     propertyName: 'prNo',
+    //     propertyValue: filters.prNo,
+    //     propertyType: 'string',
+    //     operator: '==',
+    //   });
+    // }
     if (filters?.pO) {
       filterList.push({
         propertyName: 'poNo',

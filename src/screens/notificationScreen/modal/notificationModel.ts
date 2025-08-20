@@ -1,116 +1,91 @@
 // models/notificationModel.ts
 
-import {
-  fakeBodyNotification,
-  fakeDataHotel,
-  fakeNote,
-  fakeTitleNotification,
-  mockDepartments,
-  mockRequesters,
-} from '@/data/DataFake';
+import { IParams } from '@/screens/approvePrScreen/modal/ApproveModal';
+import { ENDPOINT } from '@/utils/Constans';
+import api from '@/utils/setup-axios';
 
-/**
- * Interface định nghĩa 1 notification.
- */
-export interface ContentNotification {
-  id: number;
-  title: string;
-  body: string;
-  read: boolean;
-  date: string; // ISO string (ví dụ: '2025-06-02T09:30:00Z')
-  location: { id: string; name: string };
-  department: { id: string; name: string };
-  requester: { id: string; name: string };
-  prNo: string;
-  content: string;
-  note: string;
+export interface IResponseNotification {
+  data: IItemNotification[];
+  pagination: Pagination;
+  isSuccess: boolean;
+  errors: null;
 }
 
-/**
- * Tổng số notification “giả” để trang. Ở đây giả lập 50 item.
- */
-const TOTAL_NOTIFICATIONS = 50;
+export interface IItemNotification {
+  prId: number;
+  prNo: string;
+  status: string;
+  message: string;
+  title: string;
+  isRead: boolean;
+  readAt: null;
+  userId: number;
+  id: number;
+  createdBy: string;
+  createdDate: Date;
+  deletedDate: null;
+  deletedBy: null;
+  deleted: string;
+}
 
-/**
- * Tạo mảng 50 notifications giả lập. Mỗi item có:
- * - id: 1..50
- * - title: “Notification #<id>”
- * - body: “Đây là nội dung thông báo #<id>”
- * - read: false ban đầu
- * - date: random trong tháng 5–6/2025
- */
-const ALL_FAKE_NOTIFICATIONS: ContentNotification[] = Array.from(
-  { length: TOTAL_NOTIFICATIONS },
-  (_, idx) => {
-    const id = idx + 1;
-    // Sinh ngày ngẫu nhiên giữa 2025-05-01 và 2025-06-30
-    const randomTimestamp =
-      new Date(2025, 4, 1).getTime() + Math.floor(Math.random() * 60) * 24 * 60 * 60 * 1000;
-    const date = new Date(randomTimestamp).toISOString();
+export interface Pagination {
+  pageCurrent: number;
+  pageCount: number;
+  pageSize: number;
+  rowCount: number;
+  firstRowOnPage: number;
+  lastRowOnPage: number;
+}
 
-    // Lấy index từ 0-3 để đảm bảo title và body khớp nhau
-    const notificationIndex = idx % 4;
-    const prNo = `PR20240624#${String(Math.floor(Math.random() * 10000) + 1).padStart(4, '0')}`;
+export const fetchNotificationData = async (
+  page: number,
+  limit: number = 50,
+): Promise<{ data: IItemNotification[]; pagination: Pagination }> => {
+  try {
+    const params: IParams = {
+      pagination: {
+        pageIndex: page,
+        pageSize: limit,
+        isAll: false,
+      },
+    };
 
-    const randomDepartment = mockDepartments[Math.floor(Math.random() * mockDepartments.length)];
-    const randomRequester = mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
+    const response = await api.post<IResponseNotification>(ENDPOINT.GET_LIST_NOTIFICATION, params);
+    if (response.status !== 200 || !response.data.isSuccess) {
+      throw new Error('Failed to fetch data');
+    }
 
     return {
-      prNo: prNo,
-      id,
-      title: fakeTitleNotification[notificationIndex],
-      body: fakeBodyNotification[notificationIndex],
-      content: fakeBodyNotification[notificationIndex],
-      read: idx % 3 === 0,
-      date,
-      note: fakeNote[Math.floor(Math.random() * fakeNote.length)],
-      department: randomDepartment,
-      requester: randomRequester,
-      location: fakeDataHotel[Math.floor(Math.random() * fakeDataHotel.length)],
-      createdAt: date, // Giả định ngày tạo cố định
-      estimateDate: date, // Giả định ngày ước tính cố định
+      data: response.data.data,
+      pagination: response.data.pagination,
     };
-  },
-);
-
-// Cache để tránh gọi API trùng lặp
-const cache = new Map<string, ContentNotification[]>();
-
-function getCacheKey(page: number, limit: number, key: string = ''): string {
-  return `${page}_${limit}_${key}`;
-}
-
-/**
- * Giả lập gọi API, trả về một “trang” notifications (limit = 10).
- *
- * @param pageNumber 1-based index
- * @param limit số phần tử/trang (mặc định 10)
- * @param key search key (không dùng ở đây, để tương thích)
- * @returns Promise<ContentNotification[]>
- */
-export async function fetchNotificationData(
-  pageNumber: number,
-  limit: number = 10,
-  key: string = '',
-): Promise<ContentNotification[]> {
-  const cacheKey = getCacheKey(pageNumber, limit, key);
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey)!;
+  } catch (error) {
+    throw error;
   }
-  // Giả lập delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  const start = (pageNumber - 1) * limit;
-  const end = Math.min(start + limit, ALL_FAKE_NOTIFICATIONS.length);
-  const pageData = ALL_FAKE_NOTIFICATIONS.slice(start, end);
-  cache.set(cacheKey, pageData);
-  // Giới hạn cache size để tránh memory leak
-  if (cache.size > 100) {
-    const firstKey = cache.keys().next().value;
-    cache.delete(firstKey);
-  }
-  return pageData;
-}
+};
 
-export const clearNotificationCache = () => {
-  cache.clear();
+export const checkReadNotification = async (id: number) => {
+  try {
+    const response = await api.patch(`${ENDPOINT.HANDLE_READ_NOTIFICATION}/${id}`);
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' };
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: 'An error occurred while approving PR without changes.' };
+  }
+};
+
+export const checkReadAllNotification = async () => {
+  try {
+    const response = await api.patch(`${ENDPOINT.HANDLE_READ_ALL_NOTIFICATION}`);
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' };
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: 'An error occurred while approving PR without changes.' };
+  }
 };

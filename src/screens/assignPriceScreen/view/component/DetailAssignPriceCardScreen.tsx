@@ -114,7 +114,7 @@ const DetailAssignPriceCardScreen = ({
           <RowItem label={t('orderInfo.note')} />
           <View style={styles.noteContainer}>
             <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
-              {item?.description || ''}
+              {item?.description || item?.remark || ''}
             </AppText>
           </View>
         </View>

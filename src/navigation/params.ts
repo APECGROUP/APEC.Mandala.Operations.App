@@ -68,13 +68,14 @@ export type MainParams = {
   };
   DetailAssignPriceCardScreen: { item: IItemPcPr };
   DetailPcPrCardScreen: { item: IItemPcPr };
+  DetailNotificationScreen: { PrNo: string };
   DetailApproveCardScreen: { item: IApprove };
-  InformationItemsScreen: { item: IItemAssignPrice };
-  InformationItemsPcPrScreen: { item: IItemPcPr };
+  InformationItemsAssignPrice: { item: IItemAssignPrice } | { item: { id: number; prNo: string } };
+  InformationItemsPcPrScreen: { item: IItemPcPr } | { item: { id: number; prNo: string } };
   MyTabs: undefined;
   NotificationScreen: undefined;
   DetailOrderApproveScreen: {
-    item: IItemAssignPrice;
+    item: IItemAssignPrice | { id: number; prNo: string };
     onApproved: (id: number, listData: IItemAssignPrice[]) => void;
   };
 
@@ -103,6 +104,12 @@ export type MainParams = {
   PickNccScreen: {
     setNcc: Dispatch<SetStateAction<IItemSupplier | undefined>> | ((i: IItemSupplier) => void);
     ncc: IItemSupplier | undefined;
+  };
+  PickPriceFromNccScreen: {
+    onSetNcc: (i: IItemVendorPrice) => void;
+    ncc: IItemVendorPrice | undefined;
+    itemCode: string;
+    onSetPrice: (price: number) => void;
   };
   PickDepartmentScreen: {
     setDepartment: Dispatch<SetStateAction<IPickDepartment | undefined>>;

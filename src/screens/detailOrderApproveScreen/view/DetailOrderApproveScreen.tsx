@@ -20,7 +20,7 @@ import { Colors } from '@/theme/Config';
 import Header from '@/screens/notificationScreen/view/component/Header';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '@/navigation/params';
-import { goBack, navigate } from '@/navigation/RootNavigation';
+import { navigate } from '@/navigation/RootNavigation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import IconInfomation from '@assets/icon/IconInfomation';
 import DetailOrderItemCard from './component/DetailOrderItemCard';
@@ -28,7 +28,6 @@ import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import Footer from '@/screens/filterScreen/view/component/Footer';
-import { useApproveViewModel } from '@/screens/approvePrScreen/viewmodal/useApproveViewModel';
 import { useInformationItemsViewModel } from '@/screens/InformationItemScreen/viewmodal/useInformationItemsViewModel';
 import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
 
@@ -50,6 +49,8 @@ const DetailOrderApproveScreen = ({
     onRefresh,
     onLoadMore,
     onUpdateQuantity,
+    onUpdateNCC,
+    onUpdatePrice,
     hasNextPage,
     isError,
   } = useInformationItemsViewModel(id, prNo);
@@ -95,9 +96,15 @@ const DetailOrderApproveScreen = ({
 
   const renderItem = useCallback(
     ({ item, index }: { item: IItemInDetailPr; index: number }) => (
-      <DetailOrderItemCard onUpdateQuantity={onUpdateQuantity} item={item} index={index} />
+      <DetailOrderItemCard
+        onUpdateNCC={onUpdateNCC}
+        onUpdateQuantity={onUpdateQuantity}
+        onUpdatePrice={onUpdatePrice}
+        item={item}
+        index={index}
+      />
     ),
-    [onUpdateQuantity],
+    [onUpdateNCC, onUpdateQuantity, onUpdatePrice],
   );
   const rightComponent = () => (
     <AppBlockButton

@@ -1,21 +1,29 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import debounce from 'lodash/debounce';
+import { Pagination } from '@/screens/approvePrScreen/modal/ApproveModal';
 import {
-  clearNotificationCache,
-  ContentNotification,
+  IItemNotification,
+  checkReadAllNotification,
+  checkReadNotification,
   fetchNotificationData,
 } from '../modal/notificationModel';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 50;
-const DEBOUNCE_DELAY = 300;
+
+interface PageData {
+  data: IItemNotification[];
+  pagination: Pagination;
+}
 
 export function useNotificationViewModel() {
-  const [searchKey, setSearchKey] = useState<string>('');
-  const debouncedSearchRef = useRef<ReturnType<typeof debounce> | null>(null);
+  const [totalItemsNoRead, setTotalItemsNoRead] = useState<number>(0);
+  const { showToast, showLoading, hideLoading } = useAlert();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const queryKey = useMemo(() => ['listNotifications'], []);
 
-  // Infinite Query cho phân trang + search
   const {
     data,
     isLoading,
@@ -26,118 +34,127 @@ export function useNotificationViewModel() {
     hasNextPage,
     isRefetching,
     isError,
-  } = useInfiniteQuery<ContentNotification[], Error>({
-    queryKey: ['listNotification', searchKey.trim()],
-    queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
-      const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchNotificationData(page, ITEMS_PER_PAGE);
+    error,
+  } = useInfiniteQuery<PageData, Error>({
+    queryKey,
+    queryFn: async ({ pageParam = 1 }) =>
+      fetchNotificationData(pageParam as number, ITEMS_PER_PAGE),
+    getNextPageParam: lastPage => {
+      const nextPage = lastPage.pagination?.pageCurrent + 1;
+      return nextPage <= lastPage.pagination?.pageCount ? nextPage : undefined;
     },
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
     initialPageParam: 1,
     staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
-  // Gộp data các page lại thành 1 mảng
-  const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
-
-  // Debounce search - chỉ tạo một lần
-  const debouncedSearch = useMemo(() => {
-    if (!debouncedSearchRef.current) {
-      debouncedSearchRef.current = debounce((key: string) => {
-        setSearchKey(key);
-      }, DEBOUNCE_DELAY);
+  useEffect(() => {
+    if (data?.pages[0]?.pagination?.totalNoRead !== undefined) {
+      setTotalItemsNoRead(data.pages[0].pagination.totalNoRead);
+    } else {
+      setTotalItemsNoRead(0);
     }
-    return debouncedSearchRef.current;
-  }, []);
+  }, [data?.pages[0]?.pagination?.totalNoRead]);
 
-  // Refresh (kéo xuống)
+  const flatData = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
+
   const onRefresh = useCallback(() => {
-    // console.log('onRefresh');
     if (isFetching || isRefetching || isLoading) {
       return;
     }
-    clearNotificationCache();
     refetch();
   }, [isFetching, isLoading, isRefetching, refetch]);
 
-  // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
-    // console.log('loadMore');
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
-  // Search
-  const onSearch = useCallback(
-    (key: string) => {
-      debouncedSearch(key);
-    },
-    [debouncedSearch],
-  );
+  /**
+   * Cập nhật trạng thái isRead của một hoặc tất cả thông báo trong cache
+   * và giảm totalItemsNoRead.
+   * @param ids Mảng các id thông báo cần cập nhật. Nếu không có, cập nhật tất cả.
+   */
+  const updateIsReadInCache = useCallback(
+    (ids?: number[]) => {
+      // Sử dụng `setTotalItemsNoRead` với một hàm callback để đảm bảo
+      // giá trị luôn được cập nhật dựa trên state mới nhất
+      let itemsToMarkAsReadCount = 0;
 
-  const onDetail = async (id: number) => {
-    const currentQueryKey = ['listNotification', searchKey.trim()];
+      queryClient.setQueryData<InfiniteData<PageData>>(queryKey, cachedData => {
+        if (!cachedData) {
+          return undefined;
+        }
 
-    const cached = queryClient.getQueryData<InfiniteData<ContentNotification[]>>(currentQueryKey);
-    if (!cached) {
-      console.warn('🟥 No cache found for key:', currentQueryKey);
-      return false;
-    }
-    try {
-      const updatedData = {
-        ...cached,
-        pages: cached.pages.map(page =>
-          page.map(item => {
-            if (item.id === id) {
-              return { ...item, read: true };
+        const newPages = cachedData.pages.map(page => ({
+          ...page,
+          data: page.data.map(item => {
+            const shouldUpdate = !ids || ids.includes(item.id);
+            if (shouldUpdate && !item.isRead) {
+              itemsToMarkAsReadCount++; // Đếm số lượng item sẽ được cập nhật
+              return { ...item, isRead: true };
             }
             return item;
           }),
-        ),
-      };
+        }));
 
-      queryClient.setQueryData(currentQueryKey, updatedData);
-      // console.log('updateSuccess');
-    } catch (err) {
-      console.error('Error read item:', err);
-    }
-  };
-  const readAll = async () => {
-    const currentQueryKey = ['listNotification', searchKey.trim()];
+        return { ...cachedData, pages: newPages };
+      });
 
-    const cached = queryClient.getQueryData<InfiniteData<ContentNotification[]>>(currentQueryKey);
-    if (!cached) {
-      console.warn('🟥 No cache found for key:', currentQueryKey);
-      return false;
-    }
+      // Giảm totalItemsNoRead sau khi cache đã được cập nhật
+      // Math.max để đảm bảo giá trị không nhỏ hơn 0
+      setTotalItemsNoRead(prev => Math.max(0, prev - itemsToMarkAsReadCount));
+    },
+    [queryClient, queryKey],
+  );
+
+  const onRead = useCallback(
+    async (id: number) => {
+      try {
+        const { isSuccess, message } = await checkReadNotification(id);
+        if (!isSuccess) {
+          showToast(message || t('error.subtitle'), 'error');
+          return;
+        }
+        updateIsReadInCache([id]);
+      } catch (error) {
+        showToast(t('error.subtitle'), 'error');
+      }
+    },
+    [updateIsReadInCache, showToast, t],
+  );
+
+  const onReadAll = useCallback(async () => {
     try {
-      const updatedData = {
-        ...cached,
-        pages: cached.pages.map(page => page.map(item => ({ ...item, read: true }))),
-      };
-
-      queryClient.setQueryData(currentQueryKey, updatedData);
-      // console.log('updateSuccess');
-    } catch (err) {
-      console.error('Error read item:', err);
+      showLoading();
+      const { isSuccess, message } = await checkReadAllNotification();
+      if (!isSuccess) {
+        showToast(message || t('error.subtitle'), 'error');
+        return;
+      }
+      updateIsReadInCache(); // Gọi mà không có id sẽ cập nhật tất cả
+    } catch (error) {
+      showToast(t('error.subtitle'), 'error');
+    } finally {
+      hideLoading();
     }
-  };
+  }, [showLoading, updateIsReadInCache, showToast, t, hideLoading]);
 
   return {
-    readAll,
     flatData,
     isLoading,
     isFetching,
     isRefetching,
     isFetchingNextPage,
     hasNextPage: !!hasNextPage,
+    totalItemsNoRead: totalItemsNoRead || 0,
+    isError,
+    error,
     onRefresh,
     onLoadMore,
-    onSearch,
-    searchKey,
-    isError,
-    onDetail,
+    onReadAll,
+    onRead,
   };
 }

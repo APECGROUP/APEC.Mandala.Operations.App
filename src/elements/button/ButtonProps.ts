@@ -1,6 +1,6 @@
-import {type ElementProps} from '../element.props';
-import type {TouchableWithoutFeedbackProps, ViewStyle} from 'react-native';
-import type {TextStyle} from 'react-native';
+import { type ElementProps } from '../element.props';
+import type { GestureResponderEvent, TouchableWithoutFeedbackProps, ViewStyle } from 'react-native';
+import type { TextStyle } from 'react-native';
 
 export interface ButtonProps extends ElementProps {
   /**
@@ -36,6 +36,8 @@ export interface ButtonProps extends ElementProps {
   disabledOpacity?: number;
   disabled?: boolean;
   reset?: boolean;
+  onDoubleTap?: (event: GestureResponderEvent) => void;
+  doubleTapDelay?: number; // Thời gian nhận diện double-tap
 }
 
 export interface ButtonLoadingProps extends ButtonProps {
@@ -62,7 +64,7 @@ export interface ButtonLoadingProps extends ButtonProps {
 
 export type AppButtonProps = ButtonProps &
   TouchableWithoutFeedbackProps &
-  ({processing?: undefined} | ButtonLoadingProps);
+  ({ processing?: undefined } | ButtonLoadingProps);
 
 export interface AppPressableProps extends ElementProps {
   sentryLabel?: string;

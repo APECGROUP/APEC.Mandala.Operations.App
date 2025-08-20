@@ -20,6 +20,7 @@ import {
 } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 import api from '@/utils/setup-axios';
 import { ENDPOINT } from '@/utils/Constans';
+import { isAndroid } from '@/utils/Utilities';
 
 export const useAuthViewModel = () => {
   const { t } = useTranslation();
@@ -128,6 +129,8 @@ export const useAuthViewModel = () => {
         userName: loginFormRef.current.userName.trim(),
         password: loginFormRef.current.password.trim(),
         hotelCode: loginFormRef.current.hotel?.code.trim(),
+        deviceType: isAndroid() ? 'Android' : 'IOS',
+        deviceToken: useInfoUser.getState().deviceToken,
       };
       const response = await api.post<IResponseAPILogin>(ENDPOINT.LOGIN, params, {
         headers: { hotelCode: loginFormRef.current.hotel?.code },
@@ -149,11 +152,12 @@ export const useAuthViewModel = () => {
             loginFormRef.current.hotel,
           );
         }
-        saveInfoUser(response.data.data.user);
+        // saveInfoUser(response.data.data.user);
         DataLocal.saveAll(
           response.data,
           loginFormRef.current.hotel?.code.trim()!,
           loginFormRef.current.hotel?.name.trim()!,
+          useInfoUser.getState().deviceToken || '',
         );
         await fetchStatusGlobal();
         setIsLogin(true);
@@ -173,7 +177,7 @@ export const useAuthViewModel = () => {
     } finally {
       setProcessing(false);
     }
-  }, [saveInfoUser, setIsLogin, showToast, t]);
+  }, [queryClient, setIsLogin, showToast, t]);
 
   const forgotPassword = useCallback(async () => {
     const { userName, hotel } = forgotPasswordFormRef.current;

@@ -170,6 +170,7 @@ const DataLocal = {
     try {
       DataLocal.user = user;
       await useInfoUser.getState().saveInfoUser(user);
+      await useInfoUser.getState().setDeviceToken(user.deviceToken);
       storage.set(USER_KEY, JSON.stringify(user));
     } catch (error) {
       Toast.show({ type: 'error', text2: 'Lưu thông tin người dùng thất bại' });
@@ -265,9 +266,14 @@ const DataLocal = {
   },
 
   // ✅ Lưu token và user sau khi login thành công
-  saveAll: async (res: IResponseAPILogin, hotelCode: string, hotelName: string): Promise<void> => {
+  saveAll: async (
+    res: IResponseAPILogin,
+    hotelCode: string,
+    hotelName: string,
+    deviceToken: string,
+  ): Promise<void> => {
     try {
-      await DataLocal.saveUser({ ...res.data?.user, hotelCode, hotelName });
+      await DataLocal.saveUser({ ...res.data?.user, hotelCode, hotelName, deviceToken });
       // Truyền expiresAt và refreshExpiresAt trực tiếp dưới dạng chuỗi
       await DataLocal.saveToken(
         res.data.accessToken,

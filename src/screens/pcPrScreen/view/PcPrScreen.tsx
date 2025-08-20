@@ -21,8 +21,8 @@ import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import { styles } from './style';
 import { usePcPrViewModel } from '../viewmodal/usePcPrViewModel';
 import { IItemPcPr } from '../modal/PcPrModal';
-import PcPrCard from './component/PcPrCard';
 import HeaderSearch from '@/components/headerSearch/HeaderSearch';
+import PcPrCard from './component/PcPrCard';
 
 export default function PcPrScreen() {
   const { top } = useSafeAreaInsets();

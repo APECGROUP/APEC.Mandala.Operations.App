@@ -120,7 +120,7 @@ const EditPriceNCCScreen: React.FC<EditPriceNCCScreenProps> = ({ route }) => {
             ...prev,
             itemName: selectedItem.iName,
             itemCode: String(selectedItem.iCode),
-            unitName: selectedItem.unitName,
+            unitName: selectedItem.unitName.trim(),
           }));
         }
       },
@@ -195,7 +195,8 @@ const EditPriceNCCScreen: React.FC<EditPriceNCCScreenProps> = ({ route }) => {
                   {!isEditPrice ? (
                     <AppBlockButton style={styles.rowCenter} onPress={() => setIsEditPrice(true)}>
                       <AppText style={styles.priceValue}>
-                        {moneyFormat(String(editingItem.price), '.', '')}/{editingItem.unitName}
+                        {moneyFormat(String(editingItem.price), '.', '')}/
+                        {editingItem.unitName.trim()}
                       </AppText>
                       <IconPenEdit style={styles.iconEdit} />
                     </AppBlockButton>
@@ -204,6 +205,7 @@ const EditPriceNCCScreen: React.FC<EditPriceNCCScreenProps> = ({ route }) => {
                       <TextInput
                         ref={inputRef}
                         autoFocus
+                        maxLength={9}
                         defaultValue={String(priceRef.current)}
                         onBlur={onBlurPrice}
                         onChangeText={text => {

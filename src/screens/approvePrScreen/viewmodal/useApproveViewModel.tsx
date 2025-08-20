@@ -28,13 +28,13 @@ interface PageData {
 export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { showToast, showAlert } = useAlert();
+  const { showToast, showAlert, showLoading, hideLoading } = useAlert();
 
   const [effectiveFilters, setEffectiveFilters] = useState<IApproveFilters>(initialFilters);
   const [currentUiFilters, setCurrentUiFilters] = useState<IApproveFilters>(initialFilters);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isLoadingConfirm, setIsLoadingConfirm] = useState(false);
-  const [textReason, setTextReason] = useState<string>();
+  const [textReason, setTextReason] = useState<string>('');
   const [totalItems, setTotalItems] = useState<number>(0);
 
   const isDisableButtonReject = useMemo(() => textReason?.trim() === '', [textReason]);
@@ -229,16 +229,22 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
   );
   const onApproved = useCallback(
     async (id: number, listData: IApprove[]) => {
-      const { isSuccess, message } = await checkApprovePr(id, listData);
-      if (!isSuccess) {
-        return showToast(message || t('createPrice.approvedFail'), 'error');
+      try {
+        showLoading();
+        const { isSuccess, message } = await checkApprovePr(id, listData);
+        if (!isSuccess) {
+          return showToast(message || t('createPrice.approvedFail'), 'error');
+        }
+        goBack();
+        updateCacheAndTotal(item => id !== item.id, 1);
+        setSelectedIds(ids => ids.filter(itemId => itemId !== id));
+        showToast(t('createPrice.approvedSuccess'), 'success');
+      } catch (error) {
+      } finally {
+        hideLoading();
       }
-      goBack();
-      updateCacheAndTotal(item => id !== item.id, 1);
-      setSelectedIds(ids => ids.filter(itemId => itemId !== id));
-      showToast(t('createPrice.approvedSuccess'), 'success');
     },
-    [showToast, t, updateCacheAndTotal],
+    [hideLoading, showLoading, showToast, t, updateCacheAndTotal],
   );
 
   const onReject = useCallback(

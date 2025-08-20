@@ -312,6 +312,8 @@
       "VietNam": "Vietnamese",
       "confirm": "Confirm",
       "profile": {
+        "nameHotel": "NameHotel",
+
         "title": "Account information",
         "userName": "Username",
         "fullName": "Full name",
@@ -338,7 +340,7 @@
         "newPasswordNotMatch": "New password and confirmation do not match",
         "inputEmail": "Enter your email to change password"
       },
-      "warningLogout": "Are you sure you want to log out of this account?"
+      "warningLogout": "Are you sure want to log out this account?"
     },
     "myTabs": {
       "assignPrice": "Assign price",

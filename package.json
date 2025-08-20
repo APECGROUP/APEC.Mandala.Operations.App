@@ -5,7 +5,7 @@
   "scripts": {
     "switch-dev": "./build.sh dev && node scripts/enviroment.js dev",
     "switch-live": "./build.sh prod && node scripts/enviroment.js production",
-    "android": "yarn switch-dev && react-native run-android",
+    "android": "yarn switch-dev && react-native run-android && yarn port",
     "android-live": "yarn switch-live && react-native run-android",
     "ios": "yarn switch-dev && react-native run-ios",
     "ios-live": "yarn switch-live && react-native run-ios",

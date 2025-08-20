@@ -54,6 +54,10 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
   };
   const data = [
     {
+      label: t('account.profile.nameHotel'),
+      value: infoUser?.hotelName || '',
+    },
+    {
       label: t('account.profile.userName'),
       value: infoUser?.userName || '',
     },

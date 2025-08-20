@@ -82,14 +82,14 @@ export const fetchListCreatePo = async (
       propertyType: 'string',
       operator: '==',
     });
-    if (filters?.prNo) {
-      filterList.push({
-        propertyName: 'prNo',
-        propertyValue: filters?.prNo.trim(),
-        propertyType: 'string',
-        operator: '==',
-      });
-    }
+    // if (filters?.prNo) {
+    //   filterList.push({
+    //     propertyName: 'prNo',
+    //     propertyValue: filters?.prNo.trim(),
+    //     propertyType: 'string',
+    //     operator: '==',
+    //   });
+    // }
     if (filters?.prDate) {
       filterList.push({
         propertyName: 'prDate',
@@ -158,7 +158,7 @@ export const fetchListCreatePo = async (
 export const fetchCreatePo = async (prNo: string) => {
   try {
     const params = { prNo: prNo };
-    const response = await api.post(`${ENDPOINT.CREATE_PO}`, params);
+    const response = await api.post(`${ENDPOINT.CREATE_PO}`, { prNo });
     if (response.status === 200 && response.data.isSuccess) {
       return { isSuccess: true, message: '' };
     } else {

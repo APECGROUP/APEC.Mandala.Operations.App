@@ -26,7 +26,8 @@ const InformationItemsPcPrCard = ({ item }: { item: IItemInDetailPr; index: numb
           <FastImage source={Images.IconBox} style={styles.itemIcon} />
           <View style={styles.itemInfo}>
             <AppText numberOfLines={1} style={styles.prCodeText}>
-              {item.iName}
+              {item.iName} kìa màn đêm hiu hắt mang tên tao quay về trong ký ức của anh qua thời
+              gian, chiều lặng im nghe gió
             </AppText>
             <View style={styles.center}>
               <AppText color={Colors.TEXT_SECONDARY}>{t('informationItem.unit')}:</AppText>
@@ -120,7 +121,8 @@ const styles = StyleSheet.create({
   },
   itemInfo: {},
   prCodeText: {
-    flex: 1,
+    maxWidth: s(230),
+
     fontSize: getFontSize(14),
     fontWeight: '700',
     color: '#333333',

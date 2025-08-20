@@ -12,7 +12,6 @@ import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
 import { IItemAssignPrice } from '../../modal/AssignPriceModal';
 import moment from 'moment';
-import Utilities from '@/utils/Utilities';
 import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 interface AssignPriceCardProps {
@@ -24,13 +23,12 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
   const { t } = useTranslation();
 
   const handlePress = useCallback(() => {
-    navigate('InformationItemsScreen', { item });
+    navigate('InformationItemsAssignPrice', { item });
   }, [item]);
 
   const handleDetailPress = useCallback(() => {
     navigate('DetailAssignPriceCardScreen', { item });
   }, [item]);
-  const textTag = Utilities.getStatusName(item.status);
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={styles.card}>
       <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
@@ -42,7 +40,7 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
           {/* <View style={styles.noteBadge}>
            <AppText style={styles.noteBadgeText}>{t('Ghi chú')}</AppText>
          </View> */}
-          <IconNote />
+          {item.description && <IconNote />}
           <AppBlockButton onPress={handleDetailPress}>
             <IconInfomation style={{ marginHorizontal: s(6) }} />
           </AppBlockButton>
@@ -81,7 +79,8 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   prCodeText: {
-    maxWidth: '70%',
+    maxWidth: s(230),
+
     fontSize: getFontSize(14),
     fontWeight: '700',
     color: '#333333',

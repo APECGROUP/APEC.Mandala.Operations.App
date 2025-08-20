@@ -54,6 +54,7 @@ export interface Pagination {
   rowCount: number;
   firstRowOnPage: number;
   lastRowOnPage: number;
+  totalNoRead: number;
 }
 
 export interface IResponseListApprove {
@@ -108,7 +109,7 @@ export type FilterRequest = {
 
 export type IParams = {
   pagination: PaginationParams;
-  filter: FilterRequest;
+  filter?: FilterRequest;
 };
 
 // Sửa kiểu trả về của hàm fetchApprove để khớp với cấu trúc dữ liệu thực tế

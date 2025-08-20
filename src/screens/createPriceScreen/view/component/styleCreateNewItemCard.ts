@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     width: s(50),
     borderRadius: s(8),
-    marginTop: vs(-12),
+    marginTop: vs(12),
   },
   deleteBtnExtend: {
     backgroundColor: 'red',

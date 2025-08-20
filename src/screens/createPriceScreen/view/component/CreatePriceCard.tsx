@@ -96,6 +96,7 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
     const onSwipe = useCallback(() => {
       handleDelete(item.id, undefined, onCloseSwipe);
     }, [handleDelete, item.id, onCloseSwipe]);
+
     const onEdit = useCallback(() => {
       navigate('EditPriceNCCScreen', { item, onUpdateItem });
     }, [item]);

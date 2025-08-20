@@ -33,4 +33,9 @@ export enum ENDPOINT {
   CREATE_PRICE = '/api/spc/vendor-price-list/multi-create',
   GET_LIST_VAT = '/api/spc/rgTax/search',
   EDIT_CREATE_PRICE = '/api/spc/vendor-price-list/update',
+  GET_LIST_NOTIFICATION = '/api/spc/notification/search',
+  HANDLE_READ_NOTIFICATION = '/api/spc/notification/read',
+  HANDLE_READ_ALL_NOTIFICATION = '/api/spc/notification/read-all',
+
+  CHANGE_PASSWORD = '/api/spc/user/update-password',
 }

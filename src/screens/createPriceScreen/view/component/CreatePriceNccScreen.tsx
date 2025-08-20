@@ -29,65 +29,83 @@ import { useCreatePriceViewModel } from '../../viewmodal/useCreatePriceViewModal
 
 const CreatePriceNccScreen = () => {
   const { onRefresh } = useCreatePriceViewModel();
-
   const { t } = useTranslation();
-  const { showToast } = useAlert();
+  const { showToast, showLoading, hideLoading } = useAlert();
+
   const [listItem, setListItem] = useState<IItemVendorPrice[]>([]);
   const [listVat, setListVat] = useState<IItemVat[]>([]);
-  const onAddNewItemToList = () => {
-    setListItem([...listItem, { id: moment().unix() } as IItemVendorPrice]);
-  };
-  // const onCreateItem = () => {
-  //   navigate('PickItemScreen', {
-  //     setItem: onAddNewItemToList,
-  //   });
-  // };
 
   const flashListRef = useRef<FlashList<IItemVendorPrice> | null>(null);
+  const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
 
-  // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
-  const scrollToTop = () => {
-    flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
-  };
-
-  const listEmptyComponent = useCallback(
-    () => (
-      <View style={styles.emptyContainer}>
-        <EmptyDataAnimation autoPlay />
-      </View>
-    ),
+  // Hàm tiện ích để kiểm tra tính hợp lệ của một đối tượng
+  const isValidItem = useCallback(
+    (item: IItemVendorPrice): boolean =>
+      // Luồng 1: Kiểm tra các trường bắt buộc
+      !!item.vendorCode &&
+      !!item.itemCode &&
+      !!item.validFrom &&
+      !!item.validTo &&
+      !!item.price &&
+      !!item.vatCode,
     [],
   );
-  const onUpdateItem = useCallback((i: IItemVendorPrice) => {
-    setListItem(prevList => prevList.map(item => (item.id === i.id ? i : item)));
+
+  // Hàm thêm một item mới vào danh sách
+  const onAddNewItemToList = useCallback(() => {
+    setListItem(prevList => [{ id: moment().unix() } as IItemVendorPrice, ...prevList]);
   }, []);
+
+  // Hàm cập nhật một item trong danh sách
+  const onUpdateItem = useCallback((updatedItem: IItemVendorPrice) => {
+    setListItem(prevList =>
+      prevList.map(item => (item.id === updatedItem.id ? updatedItem : item)),
+    );
+  }, []);
+
+  // Hàm xóa một item khỏi danh sách
   const handleDelete = useCallback((id: number) => {
     setListItem(prevList => prevList.filter(item => item.id !== id));
   }, []);
 
-  const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
-  const getListVat = async () => {
-    // Fetch VAT list from API or any other source
-    try {
-      const params = {
-        pagination: {
-          pageIndex: 1,
-          pageSize: 50,
-          isAll: true,
-        },
-        filter: {},
-      };
+  // Hàm scroll lên đầu trang
+  const scrollToTop = useCallback(() => {
+    flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
 
-      const response = await api.post<IResponseListVat, any>(ENDPOINT.GET_LIST_VAT, params);
-      if (response.status === 200 && response.data.isSuccess) {
-        setListVat(response.data.data);
-      } else {
-        showToast(t('error.subtitle'), 'error');
-        goBack();
+  // Hàm lưu thông tin
+  const onSaveInfo = useCallback(async () => {
+    // Luồng 1: Kiểm tra nếu danh sách rỗng
+    if (listItem.length === 0) {
+      return showToast(t('createPrice.noItemToSave'), 'warning');
+    }
+
+    // Luồng 2: Kiểm tra tính hợp lệ của tất cả các item
+    const isInvalid = listItem.some(item => !isValidItem(item));
+    if (isInvalid) {
+      return showToast(t('createPrice.error'), 'error');
+    }
+
+    // Luồng 3: Gọi API và xử lý
+    try {
+      showLoading();
+      const { isSuccess, message } = await checkCreatePrice(listItem);
+
+      if (!isSuccess) {
+        return showToast(message || t('error.subtitle'), 'error');
       }
-      console.log('VAT list: ', response.data);
-    } catch (error) {}
-  };
+
+      await onRefresh();
+      goBack();
+      showToast(t('createPrice.saveInfoSuccess'), 'success');
+    } catch (error) {
+      return showToast(t('error.subtitle'), 'error');
+    } finally {
+      hideLoading();
+    }
+  }, [listItem, isValidItem, onRefresh, t, showToast, showLoading, hideLoading]);
+
+  // Hàm render item cho FlashList
   const renderItem = useCallback(
     ({ item, index }: { item: IItemVendorPrice; index: number }) => (
       <CreateNewItemCard
@@ -101,34 +119,51 @@ const CreatePriceNccScreen = () => {
           flashListRef.current?.scrollToIndex({
             index,
             animated: true,
-            viewPosition: 0.1, // 0 = top, 0.5 = center, 1 = bottom
+            viewPosition: 0.1,
           });
         }}
       />
     ),
     [flashListNativeGesture, handleDelete, listVat, onUpdateItem],
   );
-  console.log('render list: ', listItem);
-  const onSaveInfo = async () => {
-    if (listItem.length === 0) {
-      return;
-    }
-    try {
-      const { isSuccess, message } = await checkCreatePrice(listItem);
-      if (!isSuccess) {
-        return showToast(message || t('error.subtitle'), 'error');
-      }
-      await onRefresh();
-      goBack();
-      showToast(t('createPrice.saveInfoSuccess'), 'success');
-    } catch (error) {
-      return showToast(t('error.subtitle'), 'error');
-    }
-  };
 
+  // Component rỗng cho FlashList
+  const listEmptyComponent = useCallback(
+    () => (
+      <View style={styles.emptyContainer}>
+        <EmptyDataAnimation autoPlay />
+      </View>
+    ),
+    [],
+  );
+
+  // Lấy danh sách VAT khi component được mount
   useEffect(() => {
+    const getListVat = async () => {
+      try {
+        const params = {
+          pagination: {
+            pageIndex: 1,
+            pageSize: 50,
+            isAll: true,
+          },
+          filter: {},
+        };
+
+        const response = await api.post<IResponseListVat, any>(ENDPOINT.GET_LIST_VAT, params);
+        if (response.status === 200 && response.data.isSuccess) {
+          setListVat(response.data.data);
+        } else {
+          showToast(t('error.subtitle'), 'error');
+          goBack();
+        }
+      } catch (error) {
+        showToast(t('error.subtitle'), 'error');
+        goBack();
+      }
+    };
     getListVat();
-  }, []);
+  }, [t, showToast]);
 
   return (
     <ViewContainer>
@@ -137,31 +172,27 @@ const CreatePriceNccScreen = () => {
 
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('createPrice.listCreatePriceNcc')}</AppText>
-          {/* <View style={styles.countBadge}>
-          <AppText style={styles.countBadgeText}>{0}</AppText>
-        </View> */}
         </View>
 
         <FlashList
           ref={flashListRef}
-          // data={[]}
-          data={listItem || []}
+          data={listItem}
           renderItem={renderItem}
           keyExtractor={item => `${item.id}`}
           showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.5}
-          removeClippedSubviews
-          scrollEventThrottle={16}
           ListEmptyComponent={listEmptyComponent}
-          estimatedItemSize={100}
+          estimatedItemSize={vs(300)} // Giúp FlashList render mượt hơn
           contentContainerStyle={styles.listContent}
         />
-        <AppBlockButton onPress={scrollToTop} style={[styles.scrollBottomContainer]}>
+
+        <AppBlockButton onPress={scrollToTop} style={styles.scrollBottomContainer}>
           <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
         </AppBlockButton>
+
         <Footer
           onLeftAction={onAddNewItemToList}
           onRightAction={onSaveInfo}
+          rippleDuration={0}
           leftButtonTitle={t('createPrice.createNew')}
           rightButtonTitle={t('createPrice.saveInfo')}
         />
@@ -181,7 +212,7 @@ const styles = StyleSheet.create({
   scrollBottomContainer: {
     position: 'absolute',
     right: s(16),
-    bottom: vs(50),
+    bottom: vs(100),
     width: s(40),
     height: s(40),
     borderRadius: s(20),

@@ -49,6 +49,7 @@ type FooterProps = {
   leftTextStyle?: StyleProp<TextStyle>;
   rightTextStyle?: StyleProp<TextStyle>;
   customBottom?: number;
+  rippleDuration?: number;
 };
 
 // --- ScreenActionFooter Component ---
@@ -64,6 +65,7 @@ const Footer = ({
   leftTextStyle, // New prop for left text style
   rightTextStyle, // New prop for right text style
   customBottom,
+  rippleDuration = 400,
 }: FooterProps) => {
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
@@ -144,6 +146,8 @@ const Footer = ({
         {showLeftButton && (
           <View style={{ width: s(162) }}>
             <AppButton
+              rippleDuration={rippleDuration}
+              delayPressIn={3000}
               width={s(162)} // Consider making button width configurable if needed
               onPress={handleLeftAction}
               processing={isLeftActionLoading}

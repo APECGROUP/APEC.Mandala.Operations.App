@@ -44,8 +44,8 @@
       "saveDraft": "Lưu nháp",
       "reject": "Từ chối",
       "assign": "Gán giá",
-      "rejectSuccess": "Từ chối thành công",
-      "assignSuccess": "Gán giá thành công",
+      "rejectSuccess": "Bạn đã từ chối gán giá thành công",
+      "assignSuccess": "Bạn đã gán giá thành công",
       "autoAssignError": "Tự động gán giá thất bại",
       "saveDraftSuccess": "Lưu nháp thành công",
       "autoAssignSuccess": "Tự động gán giá thành công",
@@ -94,7 +94,7 @@
 
     "orderInfo": {
       "title": "Thông tin đơn hàng",
-      "prNo": "prNo",
+      "prNo": "PR No",
       "createDate": "Ngày tạo đơn",
       "requestDate": "Ngày yêu cầu",
       "poNo": "PO NO",
@@ -311,11 +311,13 @@
       "allowNotificationSubtitle": "Bạn đã cho phép gửi thông báo",
       "allowNotificationSubtitle2": "Bạn đã tắt gửi thông báo",
       "changePasswordTitle": "Đổi mật khẩu",
+
       "checkUpdate": "Kiểm tra cập nhật",
       "logout": "Đăng xuất",
       "VietNam": "Tiếng việt",
       "confirm": "Xác nhận",
       "profile": {
+        "nameHotel": "Tên khách sạn",
         "title": "Thông tin tài khoản",
         "userName": "Tên đăng nhập",
         "fullName": "Họ và tên",
@@ -328,7 +330,7 @@
         "changePhoto": "Thay đổi ảnh"
       },
       "changePassword": {
-        "currentPasswordNotMatch": "Mật khẩu hiện tại không đúng",
+        "currentPasswordNotMatch": "Mật khẩu không đúng",
         "title": "Đổi mật khẩu",
         "currentPassword": "Mật khẩu hiện tại",
         "newPassword": "Mật khẩu mới",
@@ -342,7 +344,7 @@
         "newPasswordNotMatch": "Mật khẩu mới và xác nhận mật khẩu mới chưa khớp với nhau",
         "inputEmail": "Nhập thông tin email của bạn để đổi mật khẩu"
       },
-      "warningLogout": "Bạn có chắc chắn muốn đổi từ đăng xuất tài khoản này?"
+      "warningLogout": "Bạn có chắc chắn đăng xuất tài khoản này không"
     },
     "myTabs": {
       "assignPrice": "Gán giá",

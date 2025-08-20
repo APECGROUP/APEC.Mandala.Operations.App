@@ -15,6 +15,8 @@ import IconNotification from '@assets/icon/IconNotification';
 import { useInfoUser } from '../../zustand/store/useInfoUser/useInfoUser';
 import { navigate } from '../../navigation/RootNavigation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNotificationViewModel } from '@/screens/notificationScreen/viewmodal/useNotificationViewModel';
+import { formatNotificationCount } from '@/screens/notificationScreen/view/NotificationScreen';
 type propsHeaderSearch = {
   currentPrNoInput: string;
   onSearch: (text: string) => void;
@@ -30,9 +32,9 @@ const HeaderSearch = ({
   const { t } = useTranslation();
   const { infoUser } = useInfoUser();
   const { top } = useSafeAreaInsets();
+  const { totalItemsNoRead } = useNotificationViewModel();
   const goToAccount = useCallback(() => navigate('AccountScreen'), []);
   const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
-
   return (
     <ImageBackground
       source={Images.BackgroundAssignPrice}
@@ -62,9 +64,13 @@ const HeaderSearch = ({
         <View style={styles.headerRight}>
           <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
             <IconNotification />
-            <View style={styles.notificationBadge}>
-              <AppText style={styles.notificationBadgeText}>3</AppText>
-            </View>
+            {totalItemsNoRead > 0 && (
+              <View style={styles.notificationBadge}>
+                <AppText style={styles.notificationBadgeText}>
+                  {formatNotificationCount(totalItemsNoRead)}
+                </AppText>
+              </View>
+            )}
           </AppBlockButton>
         </View>
       </View>
@@ -100,7 +106,7 @@ const styles = StyleSheet.create({
   },
   notificationBadgeText: {
     color: '#FFFFFF',
-    fontSize: getFontSize(8),
+    fontSize: getFontSize(7),
     fontWeight: '500',
   },
   notificationBadge: {

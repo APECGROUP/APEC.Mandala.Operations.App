@@ -44,7 +44,7 @@ const PcPrCard = memo<PcPrCardProps>(({ item }) => {
           {/* <View style={styles.noteBadge}>
            <AppText style={styles.noteBadgeText}>{t('Ghi chú')}</AppText>
          </View> */}
-          <IconNote />
+          {item.description && <IconNote />}
           <AppBlockButton onPress={handleDetailPress}>
             <IconInfomation style={{ marginHorizontal: s(6) }} />
           </AppBlockButton>
@@ -78,7 +78,8 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   prCodeText: {
-    maxWidth: '70%',
+    maxWidth: s(230),
+
     fontSize: getFontSize(14),
     fontWeight: '700',
     color: '#333333',

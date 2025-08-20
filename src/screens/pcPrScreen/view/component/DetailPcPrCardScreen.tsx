@@ -80,7 +80,7 @@ const DetailPcPrCardScreen = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-shadow
     ({ item, index }: { item: any; index: number }) => (
       <AppText size={12} weight="500" pv={5} style={styles.flex1}>
-        PR20240624#0001
+        {item}
       </AppText>
     ),
     [],

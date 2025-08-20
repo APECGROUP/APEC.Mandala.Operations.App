@@ -14,13 +14,14 @@ import AppBlockButton from '@/elements/button/AppBlockButton';
 import moment from 'moment';
 import IconDropDown from '@assets/icon/IconDropDown';
 import AppDropdown from '@/elements/appDropdown/AppDropdown';
-import ReanimatedSwipeable from './ReanimatedSwipeable';
+import ReanimatedSwipeable, { ReanimatedSwipeableRef } from './ReanimatedSwipeable';
 import IconTrashPrice from '@assets/icon/IconTrashPrice';
 import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { IItemVat, IItemVendorPrice } from '../../modal/CreatePriceModal';
 import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
 import { styles } from './styleCreateNewItemCard';
+import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 
 const CreateNewItemCard = ({
   item,
@@ -47,6 +48,7 @@ const CreateNewItemCard = ({
   // Sửa: Dùng useRef thay vì useState cho price để tránh re-render khi gõ
   const priceRef = useRef(initialPrice);
   const inputRef = useRef<TextInput>(null);
+  const swipeableRef = useRef<ReanimatedSwipeableRef>(null);
 
   const { showAlert } = useAlert();
   console.log('list vat: ', listVat);
@@ -123,17 +125,20 @@ const CreateNewItemCard = ({
     heightAction.value = withTiming(height, { duration: 0 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const onDelete = useCallback((id: number) => {
+  const onCloseSwipe = useCallback(() => {
+    console.log('close swipe callback triggered');
+    swipeableRef.current?.closeSwipe();
+  }, []);
+  const onDelete = useCallback(() => {
     showAlert(t('createPrice.remove.title'), '', [
       {
         text: t('createPrice.remove.cancel'),
         style: 'cancel',
-        onPress: () => {},
+        onPress: onCloseSwipe,
       },
       {
         text: t('createPrice.remove.agree'),
-        onPress: async () => handleDelete(id),
+        onPress: async () => handleDelete(item.id),
       },
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -141,15 +146,15 @@ const CreateNewItemCard = ({
 
   // Phần render nút delete
   const renderRightActions = useCallback(
-    (id: number) => (
-      <TouchableOpacity
+    () => (
+      <AnimatedButton
         activeOpacity={1}
-        style={[!isShow ? styles.deleteBtn : styles.deleteBtnExtend, animatedDeleteStyle]}
-        onPress={() => onDelete(id)}>
+        style={[styles.deleteBtn, animatedDeleteStyle]}
+        onPress={onDelete}>
         <IconTrashPrice />
-      </TouchableOpacity>
+      </AnimatedButton>
     ),
-    [animatedDeleteStyle, isShow, onDelete],
+    [animatedDeleteStyle, onDelete],
   );
 
   // Sửa: Cập nhật cả priceRef và TextInput khi reset giá
@@ -161,9 +166,10 @@ const CreateNewItemCard = ({
 
   return (
     <ReanimatedSwipeable
-      renderRightActions={() => renderRightActions(item.id!)}
+      ref={swipeableRef}
+      renderRightActions={renderRightActions}
       simultaneousGesture={simultaneousGesture}
-      onSwipe={() => {}}>
+      onSwipe={onDelete}>
       <View onLayout={onItemLayout} style={[isError && !isShow ? styles.cardError : styles.card]}>
         {/* Header Row */}
         <TouchableOpacity activeOpacity={1} onPress={handleShowDetail} style={styles.header}>

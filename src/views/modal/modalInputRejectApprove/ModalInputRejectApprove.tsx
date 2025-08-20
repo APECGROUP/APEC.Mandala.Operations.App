@@ -30,9 +30,9 @@ type Props = NativeStackScreenProps<MainParams, 'ModalInputRejectApprove'>;
 const ModalInputRejectApprove = ({ route }: Props) => {
   const { id } = route.params;
   const { onReject, isLoadingConfirm, textReason, setTextReason, isDisableButtonReject } =
-    useApproveViewModel(id);
+    useApproveViewModel();
   const { t } = useTranslation();
-
+  console.log('render : ', isDisableButtonReject, textReason);
   const translateY = useSharedValue(800);
   React.useEffect(() => {
     translateY.value = withTiming(0, {
@@ -49,6 +49,7 @@ const ModalInputRejectApprove = ({ route }: Props) => {
         },
         finished => {
           if (finished && func) {
+            runOnJS(func)();
             runOnJS(func)();
           }
         },

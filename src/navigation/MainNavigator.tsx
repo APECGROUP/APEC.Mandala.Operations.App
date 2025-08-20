@@ -18,7 +18,6 @@ import ModalPickCalendar from '@/elements/calendar/ModalPickCalendar';
 import AccountScreen from '@/screens/accountScreen/AccountScreen';
 import { Colors } from '@/theme/Config';
 import ChangePasswordScreen from '@/screens/changePasswordScreen/ChangePasswordScreen';
-import InformationItemsScreen from '@/screens/InformationItemScreen/view/InformationItemsScreen';
 import DetailAssignPriceCardScreen from '@/screens/assignPriceScreen/view/component/DetailAssignPriceCardScreen';
 import PickNccScreen from '@/views/modal/modalPickNcc/view/PickNccScreen';
 import FilterAssignPriceScreen from '@/screens/filterScreen/view/FilterAssignPriceScreen';
@@ -41,6 +40,8 @@ import InformationItemsPcPrScreen from '@/screens/InformationItemPcPrScreen/view
 import PickStatusScreen from '@/views/modal/modalPickStatus/view/PickStatusScreen';
 import FilterCreatePoScreen from '@/screens/filterScreen/view/FilterCreatePoScreen';
 import EditPriceNCCScreen from '@/screens/createPriceScreen/view/component/EditPriceNCCScreen';
+import InformationItemsAssignPrice from '@/screens/InformationItemScreen/view/InformationItemsAssignPrice';
+import PickPriceFromNccScreen from '@/views/modal/modalPickPriceFromNcc/view/PickPriceFromNccScreen';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -130,8 +131,8 @@ export default function MainNavigator() {
           component={EditPriceNCCScreen}
         />
         <Screen
-          name="InformationItemsScreen"
-          component={InformationItemsScreen}
+          name="InformationItemsAssignPrice"
+          component={InformationItemsAssignPrice}
           options={{
             // animation: 'fade',
             // animation: 'fade_from_bottom' ,
@@ -299,6 +300,7 @@ export default function MainNavigator() {
         <Screen name={'ModalPhotoOrCamera'} component={ModalPhotoOrCamera} />
         <Screen name={'ModalPickCalendar'} component={ModalPickCalendar} />
         <Screen name={'PickNccScreen'} component={PickNccScreen} />
+        <Screen name={'PickPriceFromNccScreen'} component={PickPriceFromNccScreen} />
         <Screen name={'PickDepartmentScreen'} component={PickDepartmentScreen} />
         <Screen name={'PickItemScreen'} component={PickItemScreen} />
         <Screen name={'PickLocalScreen'} component={PickLocalScreen} />

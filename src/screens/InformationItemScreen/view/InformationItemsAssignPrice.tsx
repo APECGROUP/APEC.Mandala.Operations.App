@@ -16,7 +16,6 @@ import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 import { IItemInDetailPr } from '../modal/InformationItemsModal';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
-import ToastContainer from '@/elements/toast/ToastContainer';
 import { useInformationItemsViewModel } from '../viewmodal/useInformationItemsViewModel';
 import InformationItemsCard from './component/InformationItemsCard';
 import { Colors } from '@/theme/Config';
@@ -31,11 +30,11 @@ import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 
-const InformationItemsScreen = ({
+const InformationItemsAssignPrice = ({
   route,
-}: NativeStackScreenProps<MainParams, 'InformationItemsScreen'>) => {
+}: NativeStackScreenProps<MainParams, 'InformationItemsAssignPrice'>) => {
   const { t } = useTranslation();
-  const refToast = useRef<any>(null);
+  // const refToast = useRef<any>(null);
   const { prNo, id } = route.params.item;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
@@ -49,6 +48,7 @@ const InformationItemsScreen = ({
     onLoadMore,
     hasNextPage,
     onUpdatePrice,
+    onUpdateNCC,
     isError,
     onAutoAssign,
   } = useInformationItemsViewModel(id, prNo);
@@ -99,6 +99,7 @@ const InformationItemsScreen = ({
         item={item}
         index={index}
         onUpdatePrice={onUpdatePrice}
+        onUpdateNCC={onUpdateNCC}
         onFocusComment={() => {
           flashListRef.current?.scrollToIndex({
             index,
@@ -179,8 +180,6 @@ const InformationItemsScreen = ({
           />
         )}
 
-        <ToastContainer ref={refToast} />
-
         {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
         <AppBlockButton onPress={scrollToTop} style={[styles.scrollBottomContainer]}>
           <IconScrollBottom style={{ transform: [{ rotate: '180deg' }] }} />
@@ -193,7 +192,7 @@ const InformationItemsScreen = ({
   );
 };
 
-export default InformationItemsScreen;
+export default InformationItemsAssignPrice;
 
 const styles = StyleSheet.create({
   rightComponent: {

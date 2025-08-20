@@ -16,12 +16,16 @@ import DataLocal from '@/data/DataLocal';
 import { useAutoLogin } from '@/hook/useAutoLogin';
 import Toast from 'react-native-toast-message';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { TYPE_TOAST } from '@/elements/toast/Message';
+import { checkChangePassword } from '../authScreen/modal/AuthModal';
 
 type Props = NativeStackScreenProps<RootStackParams, 'ChangePasswordScreen'>;
 
 const ChangePasswordScreen = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
+  const { showToast } = useAlert();
   const { keyboardHeight, keyboardVisible } = useKeyboard();
   const { credentials } = useAutoLogin();
   const [currentPassword, setCurrentPassword] = useState('');
@@ -33,7 +37,7 @@ const ChangePasswordScreen = ({ navigation, route }: Props) => {
   const refNew = useRef<TextInput>(null);
   const refConfirm = useRef<TextInput>(null);
 
-  const disabled = !currentPassword || !confirmPassword || newPassword !== confirmPassword;
+  const disabled = !currentPassword || !confirmPassword || !newPassword;
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
@@ -44,16 +48,23 @@ const ChangePasswordScreen = ({ navigation, route }: Props) => {
 
       // Kiểm tra mật khẩu hiện tại có đúng không
       if (credentials && currentPassword !== credentials.password) {
-        Toast.show({
-          type: 'error',
-          text2: t('account.changePassword.currentPasswordNotMatch'),
-        });
+        showToast(t('account.changePassword.currentPasswordNotMatch'), TYPE_TOAST.ERROR);
+
         setProcessing(false);
         return;
       }
+      if (newPassword && confirmPassword && newPassword.trim() !== confirmPassword.trim()) {
+        setProcessing(false);
 
-      await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
+        return showToast(t('account.changePassword.newPasswordNotMatch'), TYPE_TOAST.ERROR);
+      }
 
+      // await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
+      const { isSuccess, message } = await checkChangePassword(currentPassword, newPassword);
+      if (!isSuccess) {
+        showToast(message || t('error.subtitle'), 'error');
+        return;
+      }
       // Cập nhật mật khẩu mới vào Keychain
       if (credentials) {
         await DataLocal.saveCredentials(
@@ -61,25 +72,24 @@ const ChangePasswordScreen = ({ navigation, route }: Props) => {
           newPassword.trim(),
           credentials.hotel,
         );
-        Toast.show({
-          type: 'success',
-          text2: t('account.changePassword.changePasswordSuccess'),
-        });
+        showToast(t('account.changePassword.changePasswordSuccess'), TYPE_TOAST.SUCCESS);
       }
 
       setProcessing(false);
       await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
       goBack();
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text2: t('account.changePassword.changePasswordFail'),
-      });
+      showToast(t('account.changePassword.changePasswordFail'), TYPE_TOAST.ERROR);
+
       setProcessing(false);
     }
     // Gọi API đổi mật khẩu hoặc xử lý xác thực tại đây
   };
-
+  const onBlurConfirmPassword = () => {
+    if (newPassword && confirmPassword && newPassword.trim() !== confirmPassword.trim()) {
+      return showToast(t('account.changePassword.newPasswordNotMatch'), TYPE_TOAST.ERROR);
+    }
+  };
   return (
     <ViewContainer>
       <KeyboardAvoidingView
@@ -118,6 +128,7 @@ const ChangePasswordScreen = ({ navigation, route }: Props) => {
             labelStyle={styles.labelPassword}
             placeholder={t('account.changePassword.inputNewPassword')}
             value={newPassword}
+            onBlur={onBlurConfirmPassword}
             secureTextEntry
             maxLength={20}
             onChangeText={setNewPassword}
@@ -134,6 +145,7 @@ const ChangePasswordScreen = ({ navigation, route }: Props) => {
             labelStyle={styles.labelPassword}
             placeholder={t('account.changePassword.inputConfirmPassword')}
             value={confirmPassword}
+            onBlur={onBlurConfirmPassword}
             secureTextEntry
             maxLength={20}
             onChangeText={setConfirmPassword}

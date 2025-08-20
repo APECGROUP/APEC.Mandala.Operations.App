@@ -62,6 +62,7 @@ export interface IUser {
   departments: Department[];
   hotelCode: string;
   hotelName: string;
+  deviceToken: string;
 }
 
 export interface Department {
@@ -114,5 +115,22 @@ export const fetchStatusGlobal = async () => {
     }
   } catch (error) {
     console.error('Error fetching global status:', error);
+  }
+};
+
+export const checkChangePassword = async (oldPassword: string, newPassword: string) => {
+  try {
+    const params = {
+      oldPassword,
+      newPassword,
+    };
+    const response = await api.post(ENDPOINT.CHANGE_PASSWORD, params);
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' };
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: '' };
   }
 };

@@ -87,7 +87,8 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   prCodeText: {
-    maxWidth: '70%',
+    maxWidth: s(230),
+
     fontSize: getFontSize(14),
     fontWeight: '700',
     color: '#333333',

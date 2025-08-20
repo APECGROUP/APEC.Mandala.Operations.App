@@ -24,10 +24,7 @@ interface Props extends TouchableWithoutFeedbackProps {
   rippleSequential?: boolean;
   rippleFades?: boolean;
   nativeID?: string;
-  onRippleAnimation?: (
-    animation: Animated.CompositeAnimation,
-    callback: () => void
-  ) => any;
+  onRippleAnimation?: (animation: Animated.CompositeAnimation, callback: () => void) => any;
 }
 
 type RippleType = {
@@ -55,10 +52,8 @@ export default class Ripple extends PureComponent<Props, State> {
     rippleSequential: false,
     rippleFades: true,
     disabled: false,
-    onRippleAnimation: (
-      animation: Animated.CompositeAnimation,
-      callback: () => void
-    ) => animation.start(callback),
+    onRippleAnimation: (animation: Animated.CompositeAnimation, callback: () => void) =>
+      animation.start(callback),
   };
 
   mounted = false;
@@ -149,8 +144,7 @@ export default class Ripple extends PureComponent<Props, State> {
 
   startRipple(event: GestureResponderEvent) {
     const { width, height } = this.state;
-    const { rippleDuration, rippleCentered, rippleSize, onRippleAnimation } =
-      this.props;
+    const { rippleDuration, rippleCentered, rippleSize, onRippleAnimation } = this.props;
 
     const w2 = 0.5 * width;
     const h2 = 0.5 * height;
@@ -263,9 +257,7 @@ export default class Ripple extends PureComponent<Props, State> {
       <TouchableWithoutFeedback {...touchableProps}>
         <Animated.View {...props} pointerEvents="box-only">
           {children}
-          <View style={[styles.container, containerStyle]}>
-            {ripples.map(this.renderRipple)}
-          </View>
+          <View style={[styles.container, containerStyle]}>{ripples.map(this.renderRipple)}</View>
         </Animated.View>
       </TouchableWithoutFeedback>
     );

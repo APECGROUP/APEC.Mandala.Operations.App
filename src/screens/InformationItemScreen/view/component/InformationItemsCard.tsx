@@ -13,16 +13,19 @@ import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { styles } from './style';
+import { IItemVendorPrice } from '@/screens/createPriceScreen/modal/CreatePriceModal';
 
 const InformationItemsCard = ({
   item,
   onFocusComment,
   onUpdatePrice,
+  onUpdateNCC,
 }: {
   item: IItemInDetailPr;
   index: number;
   onFocusComment: () => void;
   onUpdatePrice?: (id: number, price: number) => void;
+  onUpdateNCC: (id: number, vendor: string) => void;
 }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
@@ -33,40 +36,35 @@ const InformationItemsCard = ({
 
   const inputRef = useRef<TextInput>(null); // nếu cần focus programmatically
 
-  const [ncc, setNcc] = useState<IItemSupplier>({
-    accountName: item.vendorName,
-    code: item.vendor,
-    address1: '',
-    address2: '',
-    country: '',
-    phone: '',
-    email: '',
-    representative: '',
-    fax: '',
-    vatCode: '',
-    balance: 0,
-    type: '',
-    id: -1,
-    createdDate: new Date(),
-    createdBy: '',
-    creditLimit: 0,
-    invoiceName: '',
-    term: '',
-    deletedDate: null,
-  } as IItemSupplier);
+  const [ncc, setNcc] = useState<IItemVendorPrice>({} as IItemVendorPrice);
 
   const handleShowDetail = () => {
     setIsShow(i => !i);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
-
-  const onPickNcc = () => {
-    navigate('PickNccScreen', {
-      setNcc,
-      ncc,
-    });
+  const onSetNcc = (i: IItemVendorPrice) => {
+    setNcc(i);
+    onUpdateNCC(item.id, i.vendorCode);
   };
 
+  const onPickNcc = () => {
+    navigate('PickPriceFromNccScreen', {
+      onSetNcc,
+      ncc,
+      itemCode: item.itemCode,
+      onSetPrice,
+    });
+  };
+  console.log('render: ', ncc, item);
+  const onSetPrice = async (price: number) => {
+    setIsEditPrice(false);
+    console.log('giá nè: ', price);
+    try {
+      if (priceRef.current != null) {
+        await onUpdatePrice?.(item.id, Number(price || 0));
+      }
+    } catch (error) {}
+  };
   const onBlur = async () => {
     setIsEditPrice(false);
     try {
@@ -95,10 +93,14 @@ const InformationItemsCard = ({
             </View>
 
             {!isEditPrice ? (
-              <TouchableOpacity activeOpacity={1} onPress={onResetPrice} style={styles.itemInfoRow}>
+              <TouchableOpacity
+                disabled
+                activeOpacity={1}
+                onPress={onResetPrice}
+                style={styles.itemInfoRow}>
                 <AppText style={styles.dateText}>{t('orderDetail.price')}: </AppText>
                 <AppText style={styles.dateTextEnd}>
-                  {moneyFormat(priceRef.current, '.', '')}/{item.unitName}
+                  {moneyFormat(ncc.price, '.', '')}/{ncc.unitName}
                 </AppText>
               </TouchableOpacity>
             ) : (
@@ -106,6 +108,7 @@ const InformationItemsCard = ({
                 <AppText style={styles.dateText}>{t('orderDetail.price')}: </AppText>
                 <View style={styles.itemInfoRow}>
                   <TextInput
+                    editable={false}
                     ref={inputRef}
                     // autoFocus
                     onFocus={onFocusComment}
@@ -160,7 +163,7 @@ const InformationItemsCard = ({
             <AppText style={styles.label}>{t('NCC')}</AppText>
             <TouchableOpacity onPress={onPickNcc} style={styles.nccContainer}>
               <AppText style={[styles.nccText, { marginRight: s(6) }]} numberOfLines={1}>
-                {ncc.accountName}
+                {ncc.vendorName}
               </AppText>
               <IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />
             </TouchableOpacity>
