@@ -213,6 +213,7 @@ const handleNotificationAction = (remoteMessage: any) => {
     navigate(screen);
     Alert.alert('Chuyển hướng', remoteMessage?.notification?.body || '');
   } else {
+    navigate('NotificationScreen');
     Alert.alert('Thông báo', remoteMessage?.notification?.body || '');
   }
 };

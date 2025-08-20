@@ -26,6 +26,7 @@ import {
 import moment from 'moment';
 import api from '@/utils/setup-axios';
 import { useCreatePriceViewModel } from '../../viewmodal/useCreatePriceViewModal';
+import { TYPE_TOAST } from '@/elements/toast/Message';
 
 const CreatePriceNccScreen = () => {
   const { onRefresh } = useCreatePriceViewModel();
@@ -34,6 +35,7 @@ const CreatePriceNccScreen = () => {
 
   const [listItem, setListItem] = useState<IItemVendorPrice[]>([]);
   const [listVat, setListVat] = useState<IItemVat[]>([]);
+  const [timeSystem, setTimeSystem] = useState('');
 
   const flashListRef = useRef<FlashList<IItemVendorPrice> | null>(null);
   const flashListNativeGesture = useMemo(() => Gesture.Native(), []);
@@ -58,9 +60,21 @@ const CreatePriceNccScreen = () => {
 
   // Hàm cập nhật một item trong danh sách
   const onUpdateItem = useCallback((updatedItem: IItemVendorPrice) => {
-    setListItem(prevList =>
-      prevList.map(item => (item.id === updatedItem.id ? updatedItem : item)),
-    );
+    setListItem(prevList => {
+      // Kiểm tra có item nào khác có cùng itemCode chưa
+      const isDuplicated = prevList.some(
+        item => item.itemCode === updatedItem.itemCode && item.id !== updatedItem.id,
+      );
+
+      if (isDuplicated) {
+        // Nếu trùng thì giữ nguyên list, không update
+        showToast(`${updatedItem.itemName} đã tồn tại trên hệ thống`, TYPE_TOAST.ERROR);
+        return prevList;
+      }
+
+      // Nếu không trùng thì update
+      return prevList.map(item => (item.id === updatedItem.id ? updatedItem : item));
+    });
   }, []);
 
   // Hàm xóa một item khỏi danh sách
@@ -109,6 +123,7 @@ const CreatePriceNccScreen = () => {
   const renderItem = useCallback(
     ({ item, index }: { item: IItemVendorPrice; index: number }) => (
       <CreateNewItemCard
+        timeSystem={timeSystem}
         listVat={listVat}
         simultaneousGesture={flashListNativeGesture}
         handleDelete={handleDelete}
@@ -138,31 +153,46 @@ const CreatePriceNccScreen = () => {
   );
 
   // Lấy danh sách VAT khi component được mount
-  useEffect(() => {
-    const getListVat = async () => {
-      try {
-        const params = {
-          pagination: {
-            pageIndex: 1,
-            pageSize: 50,
-            isAll: true,
-          },
-          filter: {},
-        };
+  const getListVat = async () => {
+    try {
+      const params = {
+        pagination: {
+          pageIndex: 1,
+          pageSize: 50,
+          isAll: true,
+        },
+        filter: {},
+      };
 
-        const response = await api.post<IResponseListVat, any>(ENDPOINT.GET_LIST_VAT, params);
-        if (response.status === 200 && response.data.isSuccess) {
-          setListVat(response.data.data);
-        } else {
-          showToast(t('error.subtitle'), 'error');
-          goBack();
-        }
-      } catch (error) {
+      const response = await api.post<IResponseListVat, any>(ENDPOINT.GET_LIST_VAT, params);
+      if (response.status === 200 && response.data.isSuccess) {
+        setListVat(response.data.data);
+      } else {
         showToast(t('error.subtitle'), 'error');
         goBack();
       }
-    };
+    } catch (error) {
+      showToast(t('error.subtitle'), 'error');
+      goBack();
+    }
+  };
+  const getTimeSystem = async () => {
+    try {
+      const response = await api.get<IResponseListVat, any>(ENDPOINT.GET_TIME_SYSTEM);
+      if (response.status === 200 && response.data.isSuccess && response.data?.data?.varValue) {
+        console.log('giờ hệ thống', response.data.data.varValue, response.data.data);
+        setTimeSystem(response.data.data.varValue);
+      } else {
+        showToast(t('Lỗi khi lấy giờ hệ thông'), 'error');
+      }
+    } catch (error) {
+      showToast(t('Lỗi khi lấy giờ hệ thông'), 'error');
+      goBack();
+    }
+  };
+  useEffect(() => {
     getListVat();
+    getTimeSystem();
   }, [t, showToast]);
 
   return (

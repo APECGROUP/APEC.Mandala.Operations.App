@@ -38,4 +38,7 @@ export enum ENDPOINT {
   HANDLE_READ_ALL_NOTIFICATION = '/api/spc/notification/read-all',
 
   CHANGE_PASSWORD = '/api/spc/user/update-password',
+  UPLOAD_AVATAR = '/api/spc/static-file/update-avatar',
+  GET_TOTAL_NOTIFICATION_NO_READ = '/api/spc/notification/total-unread',
+  GET_TIME_SYSTEM = '/api/spc/sysvar/system-date',
 }

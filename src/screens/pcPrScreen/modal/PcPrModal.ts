@@ -5,6 +5,7 @@ import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDep
 import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import moment from 'moment';
 
 export interface PcPrFilters {
   prNo?: string;
@@ -73,6 +74,7 @@ export const fetchPcPrData = async (
   filters: PcPrFilters | undefined,
 ): Promise<{ data: IItemPcPr[]; pagination: Pagination }> => {
   try {
+    console.log('filter: ', filters);
     const filterList: Filter[] = [];
 
     // if (filters?.prNo) {
@@ -88,15 +90,23 @@ export const fetchPcPrData = async (
         propertyName: 'poNo',
         propertyValue: filters.pO,
         propertyType: 'string',
-        operator: '==',
+        operator: 'Contains',
+      });
+    }
+    if (filters?.prNo?.trim().toLocaleLowerCase().includes('po')) {
+      filterList.push({
+        propertyName: 'poNo',
+        propertyValue: filters.prNo.trim(),
+        propertyType: 'string',
+        operator: 'Contains',
       });
     }
     if (filters?.prDate) {
       filterList.push({
-        propertyName: 'prDate',
-        propertyValue: filters.prDate.toISOString(),
-        propertyType: 'datetime',
-        operator: '==',
+        propertyName: 'createdDate',
+        propertyValue: moment(filters.prDate).format('YYYY-MM-DD'),
+        propertyType: 'date',
+        operator: '>=',
       });
     }
     if (filters?.store?.storeCode) {
@@ -119,9 +129,9 @@ export const fetchPcPrData = async (
     if (filters?.expectedDate) {
       filterList.push({
         propertyName: 'expectedDate',
-        propertyValue: filters.expectedDate.toISOString(),
-        propertyType: 'datetime',
-        operator: '==',
+        propertyValue: moment(filters.expectedDate).format('YYYY-MM-DD'),
+        propertyType: 'date',
+        operator: '<=',
       });
     }
 
@@ -138,7 +148,7 @@ export const fetchPcPrData = async (
       filterList.push({
         propertyName: 'requestBy',
         propertyValue: filters.requester.username,
-        propertyType: 'string',
+        propertyType: 'date',
         operator: '==',
       });
     }
@@ -150,7 +160,9 @@ export const fetchPcPrData = async (
         isAll: false,
       },
       filter: {
-        textSearch: filters?.prNo?.trim(),
+        textSearch: filters?.prNo?.trim().toLocaleLowerCase().includes('pr')
+          ? filters?.prNo?.trim()
+          : '',
         ...(filterList.length > 0 && {
           filterGroup: [
             {

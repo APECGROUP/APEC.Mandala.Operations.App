@@ -35,7 +35,7 @@ const FilterPcPrScreen = ({
   const initialFilters: PcPrFilters = route.params?.currentFilters || {};
 
   const [prNo, setPrNo] = useState<string>(
-    initialFilters.prNo?.toLowerCase()?.includes('prno') ? initialFilters.prNo : '',
+    initialFilters.prNo?.toLowerCase()?.includes('pr') ? initialFilters.prNo : '',
   );
   const [po, setPo] = useState<string>(
     initialFilters.prNo?.toLowerCase()?.includes('po') ? initialFilters.prNo : '',

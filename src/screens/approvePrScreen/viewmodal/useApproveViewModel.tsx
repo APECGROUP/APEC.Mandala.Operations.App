@@ -199,7 +199,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
 
   const onRejectSuccess = () => {
     showAlert(
-      t('informationItem.rejectSuccess'),
+      t('orderDetail.rejectSuccess'),
       '',
       [
         {

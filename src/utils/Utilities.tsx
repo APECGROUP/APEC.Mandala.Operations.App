@@ -108,8 +108,8 @@ export default class Utilities {
     isUsingCamera?: boolean;
   }) => {
     const defaultOptions = {
-      width: 1000,
-      height: 700,
+      width: 500,
+      height: 500,
       multiple: true,
       mediaType: 'photo',
       includeBase64: false,

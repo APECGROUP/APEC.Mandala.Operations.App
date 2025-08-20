@@ -99,7 +99,9 @@ export default function CreatePriceScreen() {
     return (
       <View style={styles.emptyContainer}>
         <FastImage source={Images.IconEmptyDataAssign} style={styles.emptyImage} />
-        <AppText style={styles.emptyText}>{t('createPrice.empty')}</AppText>
+        <AppText style={styles.emptyText}>
+          {!currentPrNoInput ? t('createPrice.empty') : t('createPrice.emptySearch')}
+        </AppText>
         {!currentPrNoInput ? (
           <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice}>
             <IconPlus fill={Colors.WHITE} />

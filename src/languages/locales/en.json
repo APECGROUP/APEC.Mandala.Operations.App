@@ -173,6 +173,8 @@
       "editPriceNCC": "Edit supplier price",
       "supplierPriceList": "Supplier price list",
       "empty": "No supplier price list available yet",
+      "emptySearch": "Empty search",
+
       "create": "Create supplier price list",
       "orderSelected": "orders selected",
       "time": "Time",
@@ -362,7 +364,7 @@
       "pa": "Waiting for CA approval",
       "pc": "Waiting for GM/OM approval",
       "po": "Waiting for PO creation",
-      "ap": "Approved",
+      "ap": "PO Created",
       "cc": "Cancelled",
       "rj": "Rejected"
     }

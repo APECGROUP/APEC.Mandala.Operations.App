@@ -176,6 +176,7 @@
       "editPriceNCC": "Sửa giá nhà cung cấp",
       "supplierPriceList": "Bảng giá NCC",
       "empty": "Hiện chưa có bảng giá nhà \n cung cấp",
+      "emptySearch": "Không có kết quả tìm kiếm phù hợp",
       "create": "Tạo bảng giá NCC",
       "orderSelected": "đơn đã chọn",
       "time": "Thời gian",
@@ -366,7 +367,7 @@
       "pa": "Chờ KTT duyệt",
       "pc": "Chờ GM/OM duyệt",
       "po": "Chờ tạo PO",
-      "ap": "Đã phê duyệt",
+      "ap": "Đã tạo PO",
       "cc": "Hủy bỏ",
       "rj": "Từ chối"
     }

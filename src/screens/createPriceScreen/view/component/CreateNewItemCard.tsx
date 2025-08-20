@@ -30,6 +30,7 @@ const CreateNewItemCard = ({
   onUpdateItem,
   handleDelete,
   simultaneousGesture,
+  timeSystem,
 }: {
   listVat: IItemVat[];
   item: IItemVendorPrice;
@@ -38,6 +39,7 @@ const CreateNewItemCard = ({
   onUpdateItem: (i: IItemVendorPrice) => void;
   handleDelete: (id: number) => void;
   simultaneousGesture: any;
+  timeSystem: string;
 }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(true);
@@ -86,10 +88,14 @@ const CreateNewItemCard = ({
     });
   };
   console.log('render new item card', item);
+  const parseDate = (str: string) => {
+    const [d, m, y] = str.split('/').map(Number);
+    return new Date(y, m - 1, d);
+  };
   const onPickTime = () => {
     navigate('ModalPickCalendar', {
       isSingleMode: false,
-      minDate: new Date(),
+      minDate: parseDate(timeSystem),
       onSelectRange: (start: any, end: any) => {
         onUpdateItem({ ...item, validFrom: start, validTo: end });
       },
@@ -253,7 +259,7 @@ const CreateNewItemCard = ({
             <View style={[styles.detailRow]}>
               <AppText style={styles.detailLabel}>{t('createPrice.vat')}</AppText>
               <AppDropdown
-                showsVerticalScrollIndicator={false}
+                // showsVerticalScrollIndicator={true}
                 selectedTextStyle={styles.textSelected}
                 style={styles.dropdownStyle}
                 placeholderStyle={styles.placeholderStyle}

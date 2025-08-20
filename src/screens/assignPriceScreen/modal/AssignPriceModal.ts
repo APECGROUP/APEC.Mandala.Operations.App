@@ -5,6 +5,7 @@ import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDep
 import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import moment from 'moment';
 
 export interface AssignPriceFilters {
   prNo?: string;
@@ -82,7 +83,7 @@ export type PaginationParams = {
 export type Filter = {
   propertyValue: string | number | boolean;
   propertyName: string;
-  propertyType?: 'string' | 'number' | 'boolean' | 'datetime';
+  propertyType?: 'string' | 'number' | 'boolean' | 'datetime' | 'date';
   operator?:
     | '=='
     | '!='
@@ -130,19 +131,19 @@ export const fetchAssignPriceData = async (
     });
     if (filters.prDate) {
       filterList.push({
-        propertyName: 'prDate',
-        propertyValue: filters.prDate.toISOString(),
-        propertyType: 'datetime',
-        operator: '==',
+        propertyName: 'createdDate',
+        propertyValue: moment(filters.prDate).format('YYYY-MM-DD'),
+        propertyType: 'date',
+        operator: '>=',
       });
     }
 
     if (filters.expectedDate) {
       filterList.push({
         propertyName: 'expectedDate',
-        propertyValue: filters.expectedDate.toISOString(),
-        propertyType: 'datetime',
-        operator: '==',
+        propertyValue: moment(filters.expectedDate).format('YYYY-MM-DD'),
+        propertyType: 'date',
+        operator: '<=',
       });
     }
 

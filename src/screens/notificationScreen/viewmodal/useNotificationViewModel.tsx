@@ -9,6 +9,7 @@ import {
 } from '../modal/notificationModel';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
+import { useTotalNotificationNoRead } from '@/zustand/store/useTotalNotificationNoRead/useTotalNotificationNoRead';
 
 const ITEMS_PER_PAGE = 50;
 
@@ -20,6 +21,7 @@ interface PageData {
 export function useNotificationViewModel() {
   const [totalItemsNoRead, setTotalItemsNoRead] = useState<number>(0);
   const { showToast, showLoading, hideLoading } = useAlert();
+  const { setTotal, totalNotification } = useTotalNotificationNoRead();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const queryKey = useMemo(() => ['listNotifications'], []);
@@ -105,9 +107,14 @@ export function useNotificationViewModel() {
 
       // Giảm totalItemsNoRead sau khi cache đã được cập nhật
       // Math.max để đảm bảo giá trị không nhỏ hơn 0
-      setTotalItemsNoRead(prev => Math.max(0, prev - itemsToMarkAsReadCount));
+      if (ids?.length === 0) {
+        setTotal(0);
+      } else {
+        setTotal(Math.max(0, totalNotification - itemsToMarkAsReadCount));
+      }
+      // setTotalItemsNoRead(prev => Math.max(0, prev - itemsToMarkAsReadCount));
     },
-    [queryClient, queryKey],
+    [queryClient, queryKey, setTotal, totalNotification],
   );
 
   const onRead = useCallback(
@@ -119,11 +126,13 @@ export function useNotificationViewModel() {
           return;
         }
         updateIsReadInCache([id]);
+        // fetData();
+        // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
       } catch (error) {
         showToast(t('error.subtitle'), 'error');
       }
     },
-    [updateIsReadInCache, showToast, t],
+    [showToast, t, updateIsReadInCache],
   );
 
   const onReadAll = useCallback(async () => {
@@ -134,7 +143,9 @@ export function useNotificationViewModel() {
         showToast(message || t('error.subtitle'), 'error');
         return;
       }
+      // fetData();
       updateIsReadInCache(); // Gọi mà không có id sẽ cập nhật tất cả
+      // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
     } catch (error) {
       showToast(t('error.subtitle'), 'error');
     } finally {

@@ -33,7 +33,7 @@ const AccountScreen = () => {
   const { t } = useTranslation();
   const { infoUser } = useInfoUser();
   const { bottom } = useSafeAreaInsets();
-  const { showAlert, showToast } = useAlert();
+  const { showAlert, showToast, showLoading, hideLoading } = useAlert();
 
   const { toggleLanguage } = useLanguage();
   // const [isHasUpdate, setIsHasUpdate] = useState(false);
@@ -67,6 +67,7 @@ const AccountScreen = () => {
   const goToChangePassword = () => navigate('ChangePasswordScreen', { type: 'change' });
   const handleLogout = async () => {
     try {
+      showLoading();
       const response = await api.get(ENDPOINT.LOGOUT);
       if (response.status !== 200) {
         throw new Error('Logout failed');
@@ -76,6 +77,8 @@ const AccountScreen = () => {
       }
     } catch (error) {
       showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
+    } finally {
+      hideLoading();
     }
   };
   const onLogout = () => {

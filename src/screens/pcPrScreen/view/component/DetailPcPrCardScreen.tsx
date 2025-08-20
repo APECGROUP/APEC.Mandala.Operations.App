@@ -46,7 +46,7 @@ const DetailPcPrCardScreen = ({
   const { item } = route.params;
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
-  const [dateCreate, setDateCreate] = useState<Date | undefined>(item.prDate);
+  const [dateCreate, setDateCreate] = useState<Date | undefined>(item.createdDate);
   const [dateEstimate, setDateEstimate] = useState<Date | undefined>(item.expectedDate);
   const [isCoppied, setIsCoppied] = useState(false);
 

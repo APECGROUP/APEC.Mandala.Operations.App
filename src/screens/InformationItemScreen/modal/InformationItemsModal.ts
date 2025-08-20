@@ -5,6 +5,7 @@ import {
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
+import moment from 'moment';
 
 export interface IResponsePRDetail {
   data: IItemInDetailPr[];
@@ -72,19 +73,19 @@ export const fetchInformationItemsData = async (
     });
     if (filters?.prDate) {
       filterList.push({
-        propertyName: 'prDate',
-        propertyValue: filters.prDate.toISOString(),
-        propertyType: 'datetime',
-        operator: '==',
+        propertyName: 'createdDate',
+        propertyValue: moment(filters.prDate).format('YYYY-MM-DD'),
+        propertyType: 'date',
+        operator: '>=',
       });
     }
 
     if (filters?.expectedDate) {
       filterList.push({
         propertyName: 'expectedDate',
-        propertyValue: filters.expectedDate.toISOString(),
-        propertyType: 'datetime',
-        operator: '==',
+        propertyValue: moment(filters.expectedDate).format('YYYY-MM-DD'),
+        propertyType: 'date',
+        operator: '<=',
       });
     }
 

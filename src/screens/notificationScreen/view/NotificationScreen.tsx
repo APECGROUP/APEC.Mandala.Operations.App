@@ -27,6 +27,7 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { navigate } from '@/navigation/RootNavigation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { useTotalNotificationNoRead } from '@/zustand/store/useTotalNotificationNoRead/useTotalNotificationNoRead';
 export const GROUP_ROLES = {
   // Định nghĩa các hằng số vai trò để tránh magic numbers và dễ đọc hơn
   PC_PR_VIEWER: 9,
@@ -60,10 +61,10 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
     isError,
     onRead,
     onReadAll,
-    totalItemsNoRead,
   } = useNotificationViewModel();
   const { infoUser } = useInfoUser();
   // ─── Refs & shared values để show/hide nút cuộn ─────────────────────
+  const { totalNotification } = useTotalNotificationNoRead();
 
   const flatListRef = useRef<FlashList<IItemNotification> | null>(null);
 
@@ -159,7 +160,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
     );
   };
 
-  const notificationLabel = formatNotificationCount(totalItemsNoRead);
+  const notificationLabel = formatNotificationCount(totalNotification);
 
   const rightComponent = () => (
     <TouchableOpacity style={styles.rightButton} onPress={onReadAll}>
@@ -203,7 +204,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
             ref={flatListRef}
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => `${item.id}_${item.read}`}
+            keyExtractor={item => `${item.id}_${item.isRead}`}
             // extraData={flatData.map(item => item.read).join(',')}
             onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}

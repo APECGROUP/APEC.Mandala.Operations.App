@@ -12,42 +12,47 @@ import AppImage from '../../elements/appImage/AppImage';
 import IconTakeCamera from '@assets/icon/IconTakeCamera';
 import { Colors } from '@/theme/Config';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import Utilities from '@/utils/Utilities';
+import api from '@/utils/setup-axios';
+import { ENDPOINT } from '@/utils/Constans';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { TYPE_TOAST } from '@/elements/toast/Message';
 
 const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'ProfileScreen'>) => {
   const { t } = useTranslation();
   const { infoUser, updateAvatar } = useInfoUser();
+  const { showToast } = useAlert();
   console.log('first,', infoUser);
   // eslint-disable-next-line arrow-body-style, @typescript-eslint/no-unused-vars
   const onUploadAvatar = async (imageAvatar: ResponseImageElement) => {
-    return updateAvatar('https://i.pinimg.com/736x/9c/2e/5e/9c2e5e3d63454104bdee33258fca0a28.jpg');
-    // try {
-    //   const uri = imageAvatar?.path || imageAvatar?.sourceURL || imageAvatar?.uri;
-    //   let formData: any = new FormData();
-    //   formData.append('file', {
-    //     uri: Utilities.normalizeUri(uri || ''),
-    //     type: imageAvatar?.type ?? imageAvatar?.mime,
-    //     name: `avatar_${imageAvatar?.filename || uri}`,
-    //   });
-    //   formData.append('type', 'avatar');
-    //   const response = await api.post('user/commons/upload-file', formData, {
-    //     headers: {
-    //       'content-type': 'multipart/form-data',
-    //       Accept: 'application/json',
-    //     },
-    //   });
-    //   if (response.status !== 200 || response.data.status !== 0) {
-    //     throw new Error();
-    //   }
-    //   if (response.data.status === 0) {
-    //     updateAvatar(response.data.data.profile.avatar);
-    //   }
-    // } catch (error) {
-    //   Toast.show({
-    //     type: 'error',
-    //     text2: t(LanguageType.errorTryAgain),
-    //   });
-    // } finally {
-    // }
+    // return updateAvatar('https://i.pinimg.com/736x/9c/2e/5e/9c2e5e3d63454104bdee33258fca0a28.jpg');
+    try {
+      const uri = imageAvatar?.path || imageAvatar?.sourceURL || imageAvatar?.uri;
+      let formData: any = new FormData();
+      formData.append('file', {
+        uri: Utilities.normalizeUri(uri || ''),
+        type: imageAvatar?.type ?? imageAvatar?.mime,
+        name: `avatar_${imageAvatar?.filename || uri}`,
+      });
+      // formData.append('type', 'avatar');
+      const response = await api.post(ENDPOINT.UPLOAD_AVATAR, formData, {
+        headers: {
+          'content-type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      });
+      if (response.status !== 200) {
+        throw new Error();
+      }
+      if (!response.data.isSuccess) {
+        return showToast(response.data.errors[0].message, TYPE_TOAST.ERROR);
+      } else {
+        updateAvatar(response.data.data.url);
+      }
+    } catch (error) {
+      showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
+    } finally {
+    }
   };
   const onUpdateAvatar = () => {
     navigation.navigate('ModalPhotoOrCamera', { setImageAvatar: onUploadAvatar });

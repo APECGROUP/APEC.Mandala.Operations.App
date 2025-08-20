@@ -92,18 +92,18 @@ export const fetchListCreatePo = async (
     // }
     if (filters?.prDate) {
       filterList.push({
-        propertyName: 'prDate',
+        propertyName: 'createdDate',
         propertyValue: filters?.prDate.toISOString(),
-        propertyType: 'datetime',
-        operator: '==',
+        propertyType: 'date',
+        operator: '>=',
       });
     }
     if (filters?.expectedDate) {
       filterList.push({
         propertyName: 'expectedDate',
         propertyValue: filters?.expectedDate.toISOString(),
-        propertyType: 'datetime',
-        operator: '==',
+        propertyType: 'date',
+        operator: '<=',
       });
     }
     if (filters?.department?.departmentCode) {

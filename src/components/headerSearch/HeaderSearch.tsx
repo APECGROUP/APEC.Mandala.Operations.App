@@ -1,5 +1,5 @@
 import { ImageBackground, StatusBar, StyleSheet, TextInput, View } from 'react-native';
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import Images from '@assets/image/Images';
 import FastImage from 'react-native-fast-image';
 import { getFontSize, SCREEN_WIDTH } from '../../constants';
@@ -15,8 +15,8 @@ import IconNotification from '@assets/icon/IconNotification';
 import { useInfoUser } from '../../zustand/store/useInfoUser/useInfoUser';
 import { navigate } from '../../navigation/RootNavigation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNotificationViewModel } from '@/screens/notificationScreen/viewmodal/useNotificationViewModel';
 import { formatNotificationCount } from '@/screens/notificationScreen/view/NotificationScreen';
+import { useTotalNotificationNoRead } from '@/zustand/store/useTotalNotificationNoRead/useTotalNotificationNoRead';
 type propsHeaderSearch = {
   currentPrNoInput: string;
   onSearch: (text: string) => void;
@@ -32,9 +32,14 @@ const HeaderSearch = ({
   const { t } = useTranslation();
   const { infoUser } = useInfoUser();
   const { top } = useSafeAreaInsets();
-  const { totalItemsNoRead } = useNotificationViewModel();
+  const { fetData, totalNotification } = useTotalNotificationNoRead();
+  // const { totalNotification } = useNotificationViewModel();
   const goToAccount = useCallback(() => navigate('AccountScreen'), []);
   const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
+  useEffect(() => {
+    fetData();
+  }, []);
+
   return (
     <ImageBackground
       source={Images.BackgroundAssignPrice}
@@ -64,10 +69,10 @@ const HeaderSearch = ({
         <View style={styles.headerRight}>
           <AppBlockButton onPress={goToNotification} style={styles.notificationWrapper}>
             <IconNotification />
-            {totalItemsNoRead > 0 && (
+            {totalNotification > 0 && (
               <View style={styles.notificationBadge}>
                 <AppText style={styles.notificationBadgeText}>
-                  {formatNotificationCount(totalItemsNoRead)}
+                  {formatNotificationCount(totalNotification)}
                 </AppText>
               </View>
             )}

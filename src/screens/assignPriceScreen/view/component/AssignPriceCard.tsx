@@ -46,7 +46,7 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
           </AppBlockButton>
         </View>
         <AppText style={styles.dateText}>
-          {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
+          {moment(item.createdDate).format('DD/MM/YYYY')} -{' '}
           {moment(item.expectedDate).format('DD/MM/YYYY')}
         </AppText>
         {/* <View style={styles.blockWaiting}>
