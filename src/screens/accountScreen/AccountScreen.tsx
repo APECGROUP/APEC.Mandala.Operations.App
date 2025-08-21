@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StatusBar, StyleSheet, Switch, View } from 'react-native';
 import { Colors } from '@/theme/Config';
 import AppBlockButton from '@/elements/button/AppBlockButton';
@@ -20,40 +20,55 @@ import IconLogout from '@assets/icon/IconLogout';
 import IconVietNam from '@assets/icon/IconVietNam';
 import { useLanguage } from '@/hook/useLanguage';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { appVersion, useOtaUpdate } from '@/hook/useOtaUpdate';
+import { appVersion } from '@/hook/useOtaUpdate';
 import RightItemAccount from './RightItemAccount';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 import api from '@/utils/setup-axios';
 import { ENDPOINT } from '@/utils/Constans';
 import { TYPE_TOAST } from '@/elements/toast/Message';
 import { useQueryClient } from '@tanstack/react-query';
+import { checkTurnOnOffNotification } from '../authScreen/modal/AuthModal';
 
 const AccountScreen = () => {
   const { t } = useTranslation();
-  const { infoUser } = useInfoUser();
+  const { infoUser, toggleTurnOnOffNotification } = useInfoUser();
   const { bottom } = useSafeAreaInsets();
   const { showAlert, showToast, showLoading, hideLoading } = useAlert();
 
   const { toggleLanguage } = useLanguage();
   // const [isHasUpdate, setIsHasUpdate] = useState(false);
   // const { isHasUpdate, isCheckingUpdate, isDone, isSuccess, isError } = useCheckUpdate();
-  const { checkForOtaUpdate } = useOtaUpdate();
-  const [allowNotification, setAllowNotification] = useState(infoUser?.isNotification);
+  // const { checkForOtaUpdate } = useOtaUpdate();
 
-  const toggleAllowNotification = () => {
-    if (!allowNotification) {
-      Toast.show({
-        text2: t('account.allowNotificationSubtitle'),
-        type: 'success',
-      });
-    } else {
-      Toast.show({
-        text2: t('account.allowNotificationSubtitle2'),
-        type: 'success',
-      });
+  const toggleAllowNotification = async () => {
+    try {
+      showLoading();
+      const { isSuccess, message } = await checkTurnOnOffNotification();
+      if (!isSuccess) {
+        showToast(message || t('error.subtitle'), 'error');
+        return;
+      }
+
+      if (!infoUser?.isNotification) {
+        showToast(t('account.allowNotificationSubtitle'), TYPE_TOAST.SUCCESS);
+        toggleTurnOnOffNotification(true);
+        // Toast.show({
+        //   text2: t('account.allowNotificationSubtitle'),
+        //   type: 'success',
+        // });
+      } else {
+        showToast(t('account.allowNotificationSubtitle2'), TYPE_TOAST.SUCCESS);
+        toggleTurnOnOffNotification(false);
+
+        // Toast.show({
+        //   text2: t('account.allowNotificationSubtitle2'),
+        //   type: 'success',
+        // });
+      }
+    } catch (error) {
+    } finally {
+      hideLoading();
     }
-    setAllowNotification(prev => !prev);
   };
 
   // const onCheckUpdate = () => {
@@ -137,7 +152,7 @@ const AccountScreen = () => {
               icon: <IconAllowNotification />,
               title: t('account.allowNotification'),
               onPress: toggleAllowNotification,
-              right: <Switch value={allowNotification} />,
+              right: <Switch value={infoUser?.isNotification} />,
             },
             // {
             //   key: 'checkUpdate',

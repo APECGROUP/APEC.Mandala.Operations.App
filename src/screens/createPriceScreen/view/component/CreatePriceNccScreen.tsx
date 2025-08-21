@@ -56,6 +56,9 @@ const CreatePriceNccScreen = () => {
   // Hàm thêm một item mới vào danh sách
   const onAddNewItemToList = useCallback(() => {
     setListItem(prevList => [{ id: moment().unix() } as IItemVendorPrice, ...prevList]);
+    setTimeout(() => {
+      scrollToTop();
+    }, 200);
   }, []);
 
   // Hàm cập nhật một item trong danh sách

@@ -16,6 +16,7 @@ interface typeInfo {
   saveInfoUser: (val: Partial<IUser>) => void;
   fetData: () => Promise<void>;
   updateAvatar: (source: string) => Promise<void>;
+  toggleTurnOnOffNotification: (status: boolean) => void;
 }
 
 export const useInfoUser = create<typeInfo>((set, get) => ({
@@ -31,14 +32,25 @@ export const useInfoUser = create<typeInfo>((set, get) => ({
   },
 
   updateAvatar: async (source: string) => {
-    const newAvatar = source;
     // Tạo một bản sao của infoUser hiện có và cập nhật chỉ trường avatar trong profile
+    const prevUser = get().infoUser || {};
     const updatedUser: IUser = {
-      ...(get().infoUser || {}), // Đảm bảo infoUser tồn tại trước khi spread
-      profile: {
-        ...(get().infoUser?.profile || {}), // Đảm bảo profile tồn tại trước khi spread
-        avatar: newAvatar,
-      },
+      ...(prevUser as IUser), // Đảm bảo infoUser tồn tại trước khi spread
+      avatar: source,
+    };
+    set({ infoUser: updatedUser }); // Cập nhật state trong Zustand
+    try {
+      storage.set(USER_KEY, JSON.stringify(updatedUser)); // Lưu vào MMKV storage
+    } catch (error) {
+      console.error('Lỗi khi lưu người dùng vào MMKV:', error); // Log lỗi rõ ràng hơn
+    }
+  },
+  toggleTurnOnOffNotification: async (status: boolean) => {
+    // Tạo một bản sao của infoUser hiện có và cập nhật chỉ trường avatar trong profile
+    const prevUser = get().infoUser || {};
+    const updatedUser: IUser = {
+      ...(prevUser as IUser),
+      isNotification: status,
     };
     set({ infoUser: updatedUser }); // Cập nhật state trong Zustand
     try {

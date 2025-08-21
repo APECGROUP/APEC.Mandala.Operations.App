@@ -87,7 +87,11 @@ export default function CreatePriceScreen() {
   const reLoadData = useCallback(() => {
     onRefresh();
   }, [onRefresh]);
-
+  const isSearch =
+    currentPrNoInput ||
+    currentFilters.status?.id !== '3' ||
+    currentFilters?.ncc?.code ||
+    currentFilters?.product?.id;
   const listEmptyComponent = useMemo(() => {
     if (isLoading) {
       return (
@@ -100,9 +104,9 @@ export default function CreatePriceScreen() {
       <View style={styles.emptyContainer}>
         <FastImage source={Images.IconEmptyDataAssign} style={styles.emptyImage} />
         <AppText style={styles.emptyText}>
-          {!currentPrNoInput ? t('createPrice.empty') : t('createPrice.emptySearch')}
+          {!isSearch ? t('createPrice.empty') : t('createPrice.emptySearch')}
         </AppText>
-        {!currentPrNoInput ? (
+        {!isSearch ? (
           <AppBlockButton onPress={onCreatePrice} style={styles.buttonCreatePrice}>
             <IconPlus fill={Colors.WHITE} />
             <AppText style={styles.textCreatePrice}>{t('createPrice.createPrice')}</AppText>

@@ -1,5 +1,5 @@
 import { ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../navigation/params';
 import { useTranslation } from 'react-i18next';
@@ -17,13 +17,14 @@ import api from '@/utils/setup-axios';
 import { ENDPOINT } from '@/utils/Constans';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { TYPE_TOAST } from '@/elements/toast/Message';
+import { BASE_URL } from '@/env';
+import FastImage from 'react-native-fast-image';
 
 const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'ProfileScreen'>) => {
   const { t } = useTranslation();
   const { infoUser, updateAvatar } = useInfoUser();
   const { showToast } = useAlert();
   console.log('first,', infoUser);
-  // eslint-disable-next-line arrow-body-style, @typescript-eslint/no-unused-vars
   const onUploadAvatar = async (imageAvatar: ResponseImageElement) => {
     // return updateAvatar('https://i.pinimg.com/736x/9c/2e/5e/9c2e5e3d63454104bdee33258fca0a28.jpg');
     try {
@@ -44,10 +45,16 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
       if (response.status !== 200) {
         throw new Error();
       }
+      console.log('avatar: ', response.data);
       if (!response.data.isSuccess) {
         return showToast(response.data.errors[0].message, TYPE_TOAST.ERROR);
       } else {
-        updateAvatar(response.data.data.url);
+        console.log(
+          'alo avatar: ',
+          response.data.data.url,
+          `${BASE_URL}/${response.data.data.url}`,
+        );
+        updateAvatar(`${BASE_URL}/${response.data.data.url}`);
       }
     } catch (error) {
       showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
@@ -83,6 +90,9 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
       value: infoUser?.departments[0]?.departmentName || '',
     },
   ];
+  useEffect(() => {
+    console.log('avatar nayf; ', infoUser?.avatar, infoUser);
+  }, [infoUser, infoUser?.avatar]);
 
   return (
     <ViewContainer>
@@ -91,7 +101,7 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
 
         <ScrollView contentContainerStyle={styles.fg1}>
           <TouchableOpacity style={styles.avatar} activeOpacity={0.8} onPress={onUpdateAvatar}>
-            <AppImage style={styles.avatar} source={{ uri: infoUser?.avatar }} />
+            <FastImage style={styles.avatar} source={{ uri: infoUser?.avatar }} />
             <IconTakeCamera style={styles.editIcon} />
           </TouchableOpacity>
           <AppText style={styles.textTitle}>{t('account.profile.changePhoto')}</AppText>

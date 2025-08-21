@@ -41,4 +41,5 @@ export enum ENDPOINT {
   UPLOAD_AVATAR = '/api/spc/static-file/update-avatar',
   GET_TOTAL_NOTIFICATION_NO_READ = '/api/spc/notification/total-unread',
   GET_TIME_SYSTEM = '/api/spc/sysvar/system-date',
+  TOGGLE_NOTIFICATION = '/api/spc/user/on-off-notification',
 }

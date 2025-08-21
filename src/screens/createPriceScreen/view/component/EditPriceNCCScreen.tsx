@@ -106,7 +106,11 @@ const EditPriceNCCScreen: React.FC<EditPriceNCCScreenProps> = ({ route }) => {
   const onPickNcc = useCallback(() => {
     navigate('PickNccScreen', {
       setNcc: (selectedNcc: IItemSupplier) => {
-        setEditingItem(prev => ({ ...prev, vendorName: selectedNcc.accountName }));
+        setEditingItem(prev => ({
+          ...prev,
+          vendorName: selectedNcc.accountName,
+          vendorCode: selectedNcc.code,
+        }));
       },
       ncc: { accountName: editingItem.vendorName } as IItemSupplier,
     });

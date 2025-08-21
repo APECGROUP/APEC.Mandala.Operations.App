@@ -5,6 +5,7 @@ import {
 } from '@/screens/createPriceScreen/modal/CreatePriceModal';
 import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
+import moment from 'moment';
 export interface IResponseListSupplier {
   data: IItemSupplier[];
   pagination: Pagination;
@@ -102,6 +103,18 @@ export const fetchPickPriceFromNcc = async (
       propertyValue: itemCode,
       propertyType: 'string',
       operator: '==',
+    });
+    filterList.push({
+      propertyName: 'validTo',
+      propertyValue: moment().format('YYYY-MM-DD'),
+      propertyType: 'string',
+      operator: '>=',
+    });
+    filterList.push({
+      propertyName: 'validFrom',
+      propertyValue: moment().format('YYYY-MM-DD'),
+      propertyType: 'string',
+      operator: '<=',
     });
 
     const params: IParams = {

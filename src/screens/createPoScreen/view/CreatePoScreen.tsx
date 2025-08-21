@@ -51,6 +51,7 @@ export default function CreatePoScreen() {
     applyFilters,
     handleSelect,
     onCreatePo,
+    isLoadingCreatePo,
   } = useCreatePoViewModel();
   const { infoUser } = useInfoUser();
 
@@ -204,7 +205,10 @@ export default function CreatePoScreen() {
       </View>
       {lengthPick > 0 && lengthData && (
         <View style={styles.buttonCreate}>
-          <AppButton onPress={onCreatePo} style={{ backgroundColor: Colors.PRIMARY }}>
+          <AppButton
+            processing={isLoadingCreatePo}
+            onPress={onCreatePo}
+            style={{ backgroundColor: Colors.PRIMARY }}>
             <AppText weight="bold" color={Colors.WHITE}>
               {t('myTabs.createPo')}
             </AppText>

@@ -55,9 +55,9 @@ export interface IUser {
   userName: string;
   displayName: string;
   email: null;
-  avatar: null;
+  avatar: string;
   language: null;
-  isNotification: null;
+  isNotification: boolean;
   groups: IGroupAuth[];
   departments: Department[];
   hotelCode: string;
@@ -125,6 +125,19 @@ export const checkChangePassword = async (oldPassword: string, newPassword: stri
       newPassword,
     };
     const response = await api.post(ENDPOINT.CHANGE_PASSWORD, params);
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' };
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: '' };
+  }
+};
+
+export const checkTurnOnOffNotification = async () => {
+  try {
+    const response = await api.get(ENDPOINT.TOGGLE_NOTIFICATION);
     if (response.status === 200 && response.data.isSuccess) {
       return { isSuccess: true, message: '' };
     } else {

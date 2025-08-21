@@ -110,6 +110,11 @@ const InformationItemsCard = ({
       } as IItemVendorPrice);
     }
   }, [item, ncc.price, ncc.vendorName]);
+  // useEffect(() => {
+  //   if (!item.approvedQuantity && item.quantity) {
+  //     onUpdateQuantity({ ...item, approvedQuantity: item.quantity });
+  //   }
+  // }, []);
 
   return (
     <View style={styles.card}>
@@ -200,7 +205,7 @@ const InformationItemsCard = ({
           <View style={styles.row}>
             <AppText style={styles.label}>{t('orderDetail.moneyOfApproval')}</AppText>
             <AppText style={styles.approvedAmount}>
-              {moneyFormat(Number(priceRef.current) * item.approvedQuantity, '.', '')}
+              {moneyFormat(Number(item.price) * item.approvedQuantity, '.', '')}
             </AppText>
           </View>
           <View>
