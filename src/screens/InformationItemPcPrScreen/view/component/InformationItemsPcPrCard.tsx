@@ -26,8 +26,7 @@ const InformationItemsPcPrCard = ({ item }: { item: IItemInDetailPr; index: numb
           <FastImage source={Images.IconBox} style={styles.itemIcon} />
           <View style={styles.itemInfo}>
             <AppText numberOfLines={1} style={styles.prCodeText}>
-              {item.iName} kìa màn đêm hiu hắt mang tên tao quay về trong ký ức của anh qua thời
-              gian, chiều lặng im nghe gió
+              {item.iName}
             </AppText>
             <View style={styles.center}>
               <AppText color={Colors.TEXT_SECONDARY}>{t('informationItem.unit')}:</AppText>

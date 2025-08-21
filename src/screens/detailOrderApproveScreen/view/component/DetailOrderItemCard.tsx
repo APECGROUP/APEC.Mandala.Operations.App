@@ -87,7 +87,7 @@ const DetailOrderItemCard = ({
   };
   const isDisable =
     infoUser?.groups?.some(i => i.id === GROUP_ROLES.PR_APPROVER.TBP) &&
-    infoUser?.groups.length === 1;
+    infoUser?.groups.length <= 4;
   // useEffect(() => {
   //   if (item.quantity !== item.approvedQuantity && item.approvedQuantity === 0) {
   //     onUpdateQuantity({ ...item, approvedQuantity: item.quantity });
