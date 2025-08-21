@@ -1,4 +1,4 @@
-package vn.com.apec.mandala.operations
+package vn.com.apec.smarthotel.spc
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

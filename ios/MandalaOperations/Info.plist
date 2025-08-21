@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mandala Operations</string>
+	<string>MandalaOperations</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -38,7 +38,7 @@
 	<key>NSContactsUsageDescription</key>
 	<string>Ứng dụng cần truy cập danh bạ để tìm bạn bè.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Mandala Operations cần truy cập thư viện ảnh để bạn có thể chọn ảnh từ thiết bị.</string>
 	<key>UIAppFonts</key>

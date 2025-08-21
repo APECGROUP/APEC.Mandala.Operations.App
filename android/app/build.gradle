@@ -78,9 +78,9 @@ android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
-    namespace "vn.com.apec.mandala.operations"
+    namespace "vn.com.apec.smarthotel.spc"
     defaultConfig {
-        applicationId "vn.com.apec.mandala.operations"
+        applicationId "vn.com.apec.smarthotel.spc"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 16

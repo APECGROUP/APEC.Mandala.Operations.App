@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:559693137785:android:b2d44e1549f6345be291a8",
+        "mobilesdk_app_id": "1:559693137785:android:d9006425834ab654e291a8",
         "android_client_info": {
-          "package_name": "vn.com.apec.mandala.operations"
+          "package_name": "vn.com.apec.smarthotel.spc"
         }
       },
       "oauth_client": [],
