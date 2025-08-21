@@ -3,7 +3,7 @@ import { LayoutAnimation, TextInput, TouchableOpacity, View } from 'react-native
 import FastImage from 'react-native-fast-image';
 import { s } from 'react-native-size-matters';
 import Images from '../../../../../assets/image/Images';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IItemInDetailPr } from '../../modal/InformationItemsModal';
 import IconArrowRight from '@assets/icon/IconArrowRight';
@@ -11,7 +11,6 @@ import IconSub from '@assets/icon/IconSub';
 import IconPlus from '@assets/icon/IconPlus';
 import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
-import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { styles } from './style';
 import { IItemVendorPrice } from '@/screens/createPriceScreen/modal/CreatePriceModal';
 
@@ -20,31 +19,38 @@ const InformationItemsCard = ({
   onFocusComment,
   onUpdatePrice,
   onUpdateNCC,
+  onUpdateQuantity,
 }: {
   item: IItemInDetailPr;
   index: number;
   onFocusComment: () => void;
   onUpdatePrice?: (id: number, price: number) => void;
-  onUpdateNCC: (id: number, vendor: string) => void;
+  onUpdateNCC: (id: number, vendor: IItemVendorPrice) => void;
+  onUpdateQuantity: (item: IItemInDetailPr) => void;
 }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
-  const [count, setCount] = useState(item.quantity);
   const initialPrice = item.price > 0 ? item.price : ''; // Khởi tạo giá trị ban đầu
   const priceRef = useRef(initialPrice); // Dùng useRef thay vì useState
-  const [isEditPrice, setIsEditPrice] = useState(item.price <= 0);
+  // const [isEditPrice, setIsEditPrice] = useState(item.price <= 0);
 
   const inputRef = useRef<TextInput>(null); // nếu cần focus programmatically
 
-  const [ncc, setNcc] = useState<IItemVendorPrice>({} as IItemVendorPrice);
+  const [ncc, setNcc] = useState<IItemVendorPrice>({ price: item.price } as IItemVendorPrice);
 
   const handleShowDetail = () => {
     setIsShow(i => !i);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
   const onSetNcc = (i: IItemVendorPrice) => {
+    console.log('alo: setNCC: ', i);
     setNcc(i);
-    onUpdateNCC(item.id, i.vendorCode);
+    onUpdateNCC(item.id, {
+      ...i,
+      id: item.id,
+      vat: i.vatCode,
+      vendor: i.vendorCode,
+    } as IItemVendorPrice);
   };
 
   const onPickNcc = () => {
@@ -57,16 +63,16 @@ const InformationItemsCard = ({
   };
   console.log('render: ', ncc, item);
   const onSetPrice = async (price: number) => {
-    setIsEditPrice(false);
-    console.log('giá nè: ', price);
-    try {
-      if (priceRef.current != null) {
-        await onUpdatePrice?.(item.id, Number(price || 0));
-      }
-    } catch (error) {}
+    // setIsEditPrice(false);
+    // console.log('giá nè: ', price);
+    // try {
+    //   if (priceRef.current != null) {
+    //     await onUpdatePrice?.(item.id, Number(price || 0));
+    //   }
+    // } catch (error) {}
   };
   const onBlur = async () => {
-    setIsEditPrice(false);
+    // setIsEditPrice(false);
     try {
       if (priceRef.current != null) {
         await onUpdatePrice?.(item.id, Number(priceRef.current || 0));
@@ -75,10 +81,35 @@ const InformationItemsCard = ({
   };
 
   const onResetPrice = () => {
-    setIsEditPrice(true);
+    // setIsEditPrice(true);
     priceRef.current = '';
     inputRef.current?.setNativeProps({ text: '' });
   };
+
+  const onAdd = () => {
+    // setCount(i => i + 1);
+    onUpdateQuantity({ ...item, approvedQuantity: Number(item.approvedQuantity) + 1 });
+  };
+  const onSub = () => {
+    if (item.approvedQuantity <= 0) {
+      return;
+    }
+    onUpdateQuantity({ ...item, approvedQuantity: Math.min(0, Number(item.approvedQuantity) - 1) });
+  };
+  useEffect(() => {
+    if (
+      item.price &&
+      item.price !== ncc.price &&
+      item.vendorName &&
+      item.vendorName !== ncc.vendorName
+    ) {
+      setNcc({
+        price: item.price,
+        vendorName: item.vendorName,
+        unitName: item.unitName,
+      } as IItemVendorPrice);
+    }
+  }, [item, ncc.price, ncc.vendorName]);
 
   return (
     <View style={styles.card}>
@@ -92,7 +123,7 @@ const InformationItemsCard = ({
               </AppText>
             </View>
 
-            {!isEditPrice ? (
+            {item.price >= 0 ? (
               <TouchableOpacity
                 disabled
                 activeOpacity={1}
@@ -100,7 +131,7 @@ const InformationItemsCard = ({
                 style={styles.itemInfoRow}>
                 <AppText style={styles.dateText}>{t('orderDetail.price')}: </AppText>
                 <AppText style={styles.dateTextEnd}>
-                  {moneyFormat(ncc.price, '.', '')}/{ncc.unitName}
+                  {moneyFormat(item.price, '.', '')}/{ncc.unitName || item.unitName}
                 </AppText>
               </TouchableOpacity>
             ) : (
@@ -146,15 +177,13 @@ const InformationItemsCard = ({
           <View style={styles.row}>
             <AppText style={styles.label}>{t('orderDetail.numberOfApproval')}</AppText>
             <View style={styles.quantityControl}>
-              <TouchableOpacity
-                onPress={() => setCount(i => (i > 0 ? i - 1 : 0))}
-                style={styles.buttonSub}>
+              <TouchableOpacity onPress={onSub} style={styles.buttonSub}>
                 <IconSub />
               </TouchableOpacity>
               <TouchableOpacity activeOpacity={1} disabled>
-                <AppText style={styles.qtyValue}>{count}</AppText>
+                <AppText style={styles.qtyValue}>{Number(item.approvedQuantity)}</AppText>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setCount(i => i + 1)} style={styles.buttonPlus}>
+              <TouchableOpacity onPress={onAdd} style={styles.buttonPlus}>
                 <IconPlus />
               </TouchableOpacity>
             </View>
@@ -171,7 +200,7 @@ const InformationItemsCard = ({
           <View style={styles.row}>
             <AppText style={styles.label}>{t('orderDetail.moneyOfApproval')}</AppText>
             <AppText style={styles.approvedAmount}>
-              {moneyFormat(Number(priceRef.current) * item.quantity, '.', '')}
+              {moneyFormat(Number(priceRef.current) * item.approvedQuantity, '.', '')}
             </AppText>
           </View>
           <View>

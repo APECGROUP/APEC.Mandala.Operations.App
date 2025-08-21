@@ -213,7 +213,7 @@ export const fetchAutoAssign = async (id: number) => {
   } catch (error) {
     return {
       isSuccess: false,
-      message: 'chạy vào catch rồi ',
+      message: 'Kết nối mạng không không ổn định',
     };
   }
 };

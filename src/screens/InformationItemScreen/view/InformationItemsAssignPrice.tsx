@@ -44,13 +44,17 @@ const InformationItemsAssignPrice = ({
     isRefetching,
     isFetching,
     isFetchingNextPage,
+    hasNextPage,
+    isError,
+    isLoadingAssign,
     onRefresh,
     onLoadMore,
-    hasNextPage,
     onUpdatePrice,
     onUpdateNCC,
-    isError,
     onAutoAssign,
+    onAssign,
+    onSaveDraft,
+    onUpdateQuantity,
   } = useInformationItemsViewModel(id, prNo);
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
 
@@ -96,6 +100,7 @@ const InformationItemsAssignPrice = ({
   const renderItem = useCallback(
     ({ item, index }: { item: IItemInDetailPr; index: number }) => (
       <InformationItemsCard
+        onUpdateQuantity={onUpdateQuantity}
         item={item}
         index={index}
         onUpdatePrice={onUpdatePrice}
@@ -137,7 +142,7 @@ const InformationItemsAssignPrice = ({
   //   }));
   //   setItems(newItems);
   // };
-
+  console.log('danh sách item:P ', flatData);
   if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
@@ -165,7 +170,7 @@ const InformationItemsAssignPrice = ({
             // data={[]}
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => `${item.id}-${item.price}`}
+            keyExtractor={item => `${item.id}-${item.price}-${item.vendorName}`}
             onEndReached={onEndReached}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
@@ -186,7 +191,14 @@ const InformationItemsAssignPrice = ({
         </AppBlockButton>
       </View>
       {flatData && flatData.length > 0 && (
-        <FooterInformationItem id={id} prNo={prNo} onAutoAssign={onAutoAssign} />
+        <FooterInformationItem
+          onSaveDraft={onSaveDraft}
+          handleAssign={onAssign}
+          isLoadingAssign={isLoadingAssign}
+          id={id}
+          prNo={prNo}
+          onAutoAssign={onAutoAssign}
+        />
       )}
     </ViewContainer>
   );

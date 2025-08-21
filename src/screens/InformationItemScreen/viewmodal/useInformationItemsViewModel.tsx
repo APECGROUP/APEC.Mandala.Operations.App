@@ -17,13 +17,15 @@ import {
   fetchAutoAssign,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { TYPE_TOAST } from '@/elements/toast/Message';
+import { DeviceEventEmitter } from 'react-native';
+import { IItemVendorPrice } from '@/screens/createPriceScreen/modal/CreatePriceModal';
 
 const ITEMS_PER_PAGE = 50;
 
 export function useInformationItemsViewModel(id: number, prNo: string) {
   const queryClient = useQueryClient();
   const key = ['informationItems', prNo];
-  const { showAlert, showToast } = useAlert();
+  const { showAlert, showToast, showLoading, hideLoading } = useAlert();
   const { t } = useTranslation();
   // Infinite Query cho phân trang + search
   const {
@@ -91,9 +93,9 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
       ),
     });
   };
-  const onUpdateNCC = (idItem: number, vendor: string) => {
+  const onUpdateNCC = (idItem: number, vendor: IItemVendorPrice) => {
     const cached = queryClient.getQueryData<InfiniteData<IItemInDetailPr[]>>(key);
-
+    console.log('3333333,', idItem, vendor, cached);
     if (!cached) {
       console.warn('🟥 No cache found for key:', key);
       return;
@@ -104,12 +106,13 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
     queryClient.setQueryData(key, {
       ...cached,
       pages: cached.pages.map(page =>
-        page.map(item => (item.id === idItem ? { ...item, vendor } : item)),
+        page.map(item => (item.id === idItem ? { ...item, ...vendor } : item)),
       ),
     });
   };
   const onAutoAssign = async () => {
     try {
+      showLoading();
       const res = await fetchAutoAssign(id);
       const { isSuccess, message, data: updatedItems } = res;
       console.log('data mới: ', updatedItems);
@@ -131,6 +134,7 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
         pages: cached.pages.map(page =>
           page.map(item => {
             const updated = updatedItems.find(i => i.id === item.id);
+            console.log('11111111', updated, updatedItems, page);
             return updated ? { ...item, ...updated } : item;
           }),
         ),
@@ -140,6 +144,8 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
     } catch (error) {
       console.log('❌ Auto assign error:', error);
       showToast(t('informationItem.autoAssignError'), TYPE_TOAST.ERROR);
+    } finally {
+      hideLoading();
     }
   };
 
@@ -217,6 +223,7 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
       if (!isSuccess) {
         return showToast(message || t('error.subtitle'), TYPE_TOAST.ERROR);
       }
+      DeviceEventEmitter.emit('refreshListAssignPrice');
       if (func) {
         func();
       }

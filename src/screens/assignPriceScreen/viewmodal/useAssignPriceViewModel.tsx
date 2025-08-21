@@ -7,6 +7,7 @@ import {
   Pagination,
 } from '../modal/AssignPriceModal';
 import debounce from 'lodash/debounce';
+import { DeviceEventEmitter } from 'react-native';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500;
@@ -38,6 +39,15 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
   useEffect(() => {
     debouncedSetEffectiveFiltersRef.current?.(currentUiFilters);
   }, [currentUiFilters]);
+
+  useEffect(() => {
+    DeviceEventEmitter.addListener('refreshListAssignPrice', () => {
+      onRefresh();
+    });
+    return () => {
+      DeviceEventEmitter.removeAllListeners('refreshListAssignPrice');
+    };
+  }, []);
 
   const queryKey = useMemo(
     () => [

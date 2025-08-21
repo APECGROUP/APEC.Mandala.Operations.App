@@ -26,6 +26,7 @@ export interface IItemInDetailPr {
   itemUnit: string;
   unitName: string;
   quantity: number;
+  receviedQuantity: number;
   remark: null;
   price: number;
   vendor: string;

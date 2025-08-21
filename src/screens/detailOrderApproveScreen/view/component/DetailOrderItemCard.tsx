@@ -27,7 +27,7 @@ const DetailOrderItemCard = ({
   item: IItemInDetailPr;
   index: number;
   onUpdateQuantity: (item: IItemInDetailPr) => void;
-  onUpdateNCC: (id: number, vendor: string) => void;
+  onUpdateNCC: (id: number, vendor: IItemVendorPrice) => void;
   onUpdatePrice?: (id: number, price: number) => void;
 }) => {
   const { t } = useTranslation();
@@ -54,11 +54,16 @@ const DetailOrderItemCard = ({
 
   const onSetNcc = (i: IItemVendorPrice) => {
     setNcc(i);
-    onUpdateNCC(item.id, i.vendorCode);
+    onUpdateNCC(item.id, {
+      ...i,
+      id: item.id,
+      vat: i.vatCode,
+      vendor: i.vendorCode,
+    } as IItemVendorPrice);
   };
   const onSetPrice = async (price: number) => {
     try {
-      await onUpdatePrice?.(item.id, Number(price || 0));
+      // await onUpdatePrice?.(item.id, Number(price || 0));
     } catch (error) {}
   };
   const onPickNcc = () => {
@@ -80,12 +85,14 @@ const DetailOrderItemCard = ({
     }
     onUpdateQuantity({ ...item, approvedQuantity: Math.min(0, Number(item.approvedQuantity) - 1) });
   };
-  const isDisable = infoUser?.groups?.some(i => i.id === GROUP_ROLES.PR_APPROVER.TBP);
-  useEffect(() => {
-    if (item.quantity !== item.approvedQuantity && item.approvedQuantity === 0) {
-      onUpdateQuantity({ ...item, approvedQuantity: item.quantity });
-    }
-  }, []);
+  const isDisable =
+    infoUser?.groups?.some(i => i.id === GROUP_ROLES.PR_APPROVER.TBP) &&
+    infoUser?.groups.length === 1;
+  // useEffect(() => {
+  //   if (item.quantity !== item.approvedQuantity && item.approvedQuantity === 0) {
+  //     onUpdateQuantity({ ...item, approvedQuantity: item.quantity });
+  //   }
+  // }, []);
 
   return (
     <View style={styles.card}>

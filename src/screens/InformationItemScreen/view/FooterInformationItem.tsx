@@ -10,26 +10,26 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { s, vs } from 'react-native-size-matters';
 import { PaddingHorizontal } from '@/utils/Constans';
 import { Colors } from '@/theme/Config';
-import { useAlert } from '@/elements/alert/AlertProvider';
 import { navigate } from '@/navigation/RootNavigation';
-import { useInformationItemsViewModel } from '../viewmodal/useInformationItemsViewModel';
-import { useAssignPriceViewModel } from '@/screens/assignPriceScreen/viewmodal/useAssignPriceViewModel';
 
 const FooterInformationItem = ({
   onAutoAssign,
   id,
   prNo,
+  isLoadingAssign,
+  handleAssign,
+  onSaveDraft,
 }: {
   id: number;
   prNo: string;
   onAutoAssign: () => void;
+  handleAssign: () => void;
+  onSaveDraft: () => void;
+  isLoadingAssign: boolean;
 }) => {
   const { t } = useTranslation();
   const [isLoadingReject, setIsLoadingReject] = useState(false);
   const { bottom } = useSafeAreaInsets();
-  const { showAlert, showToast } = useAlert();
-  const { onSaveDraft, onAssign, isLoadingAssign } = useInformationItemsViewModel(id, prNo);
-  const { onRefresh } = useAssignPriceViewModel();
   const onReject = async () => {
     setIsLoadingReject(true);
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -46,9 +46,7 @@ const FooterInformationItem = ({
   //   showToast(t('informationItem.saveDraftSuccess'), TYPE_TOAST.SUCCESS);
 
   // };
-  const handleAssign = () => {
-    onAssign(onRefresh);
-  };
+
   return (
     <View style={[styles.bottomContainer, { paddingBlock: bottom }]}>
       <View style={styles.footerContainer}>

@@ -63,7 +63,7 @@ const InformationItemsPcPrCard = ({ item }: { item: IItemInDetailPr; index: numb
 
           <View style={styles.row}>
             <AppText style={styles.label}>{t('orderDetail.numberOfApprovaled')}</AppText>
-            <AppText style={styles.value}>{item.stockQuantity || 0}</AppText>
+            <AppText style={styles.value}>{item.receviedQuantity || 0}</AppText>
           </View>
 
           <View style={[styles.row]}>
