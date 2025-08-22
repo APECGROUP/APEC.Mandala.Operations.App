@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>MandalaOperations</string>
+	<string>Mandala Operations DEV</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>16</string>
+	<string>2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
@@ -38,7 +38,7 @@
 	<key>NSContactsUsageDescription</key>
 	<string>Ứng dụng cần truy cập danh bạ để tìm bạn bè.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Mandala Operations cần truy cập thư viện ảnh để bạn có thể chọn ảnh từ thiết bị.</string>
 	<key>UIAppFonts</key>
@@ -49,6 +49,10 @@
 		<string>GoogleSans-Medium.ttf</string>
 		<string>GoogleSans-MediumItalic.ttf</string>
 		<string>GoogleSans-Regular.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash</string>

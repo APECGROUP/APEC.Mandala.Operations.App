@@ -42,7 +42,7 @@ export interface IItemPcPr {
   marketListId: number | null;
   description: null | string;
   status: string;
-  poNo: null | string;
+  poNo: string;
   requestDate: Date;
   id: number;
   createdBy: string;

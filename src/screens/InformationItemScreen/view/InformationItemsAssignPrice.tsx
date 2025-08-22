@@ -36,6 +36,7 @@ const InformationItemsAssignPrice = ({
   const { t } = useTranslation();
   // const refToast = useRef<any>(null);
   const { prNo, id } = route.params.item;
+  const updateCacheAndTotal = route.params.updateCacheAndTotal;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -193,7 +194,7 @@ const InformationItemsAssignPrice = ({
       {flatData && flatData.length > 0 && (
         <FooterInformationItem
           onSaveDraft={onSaveDraft}
-          handleAssign={onAssign}
+          handleAssign={() => onAssign(updateCacheAndTotal(id))}
           isLoadingAssign={isLoadingAssign}
           id={id}
           prNo={prNo}

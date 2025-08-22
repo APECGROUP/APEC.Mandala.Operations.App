@@ -17,14 +17,15 @@ import BlockStatus from '@/components/blockStatus/BlockStatus';
 interface AssignPriceCardProps {
   item: IItemAssignPrice;
   index: number;
+  updateCacheAndTotal: (i: number) => void;
 }
 
-const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
+const AssignPriceCard = memo<AssignPriceCardProps>(({ item, updateCacheAndTotal }) => {
   const { t } = useTranslation();
 
   const handlePress = useCallback(() => {
-    navigate('InformationItemsAssignPrice', { item });
-  }, [item]);
+    navigate('InformationItemsAssignPrice', { item, updateCacheAndTotal });
+  }, [item, updateCacheAndTotal]);
 
   const handleDetailPress = useCallback(() => {
     navigate('DetailAssignPriceCardScreen', { item });
@@ -46,7 +47,7 @@ const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
           </AppBlockButton>
         </View>
         <AppText style={styles.dateText}>
-          {moment(item.createdDate).format('DD/MM/YYYY')} -{' '}
+          {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
           {moment(item.expectedDate).format('DD/MM/YYYY')}
         </AppText>
         {/* <View style={styles.blockWaiting}>

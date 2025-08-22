@@ -46,17 +46,17 @@ const DetailAssignPriceCardScreen = ({
   const { item } = route.params;
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
-  const [dateCreate, setDateCreate] = useState<Date | undefined>(item?.prDate);
+  const [dateCreate, setDateCreate] = useState<Date | undefined>(item?.createdDate);
   const [dateEstimate, setDateEstimate] = useState<Date | undefined>(item?.expectedDate);
   const [isCoppied, setIsCoppied] = useState(false);
 
   const onCopy = useCallback(() => {
-    Clipboard.setString(item?.poNo || '');
+    Clipboard.setString(item?.prNo || '');
     setIsCoppied(true);
     setTimeout(() => {
       setIsCoppied(false);
     }, 2000);
-  }, [item.poNo]);
+  }, [item.prNo]);
 
   const onPressDateCreate = useCallback(() => {
     navigate('ModalPickCalendar', {

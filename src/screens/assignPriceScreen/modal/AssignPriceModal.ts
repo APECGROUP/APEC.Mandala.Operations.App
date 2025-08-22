@@ -131,7 +131,7 @@ export const fetchAssignPriceData = async (
     });
     if (filters.prDate) {
       filterList.push({
-        propertyName: 'createdDate',
+        propertyName: 'prDate',
         propertyValue: moment(filters.prDate).format('YYYY-MM-DD'),
         propertyType: 'date',
         operator: '>=',

@@ -70,7 +70,9 @@ export type MainParams = {
   DetailPcPrCardScreen: { item: IItemPcPr };
   DetailNotificationScreen: { PrNo: string };
   DetailApproveCardScreen: { item: IApprove };
-  InformationItemsAssignPrice: { item: IItemAssignPrice } | { item: { id: number; prNo: string } };
+  InformationItemsAssignPrice:
+    | { item: IItemAssignPrice; updateCacheAndTotal: (v: number) => void }
+    | { item: { id: number; prNo: string }; updateCacheAndTotal: (v: number) => void };
   InformationItemsPcPrScreen: { item: IItemPcPr } | { item: { id: number; prNo: string } };
   MyTabs: undefined;
   NotificationScreen: undefined;

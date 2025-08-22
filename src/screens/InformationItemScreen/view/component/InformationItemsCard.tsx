@@ -94,7 +94,7 @@ const InformationItemsCard = ({
     if (item.approvedQuantity <= 0) {
       return;
     }
-    onUpdateQuantity({ ...item, approvedQuantity: Math.min(0, Number(item.approvedQuantity) - 1) });
+    onUpdateQuantity({ ...item, approvedQuantity: Math.max(0, Number(item.approvedQuantity) - 1) });
   };
   useEffect(() => {
     if (

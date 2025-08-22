@@ -50,7 +50,7 @@ const PcPrCard = memo<PcPrCardProps>(({ item }) => {
           </AppBlockButton>
         </View>
         <AppText style={styles.dateText}>
-          {moment(item.createdDate).format('DD/MM/YYYY')} -{' '}
+          {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
           {moment(item.expectedDate).format('DD/MM/YYYY')}
         </AppText>
         <BlockStatus code={item.status} />

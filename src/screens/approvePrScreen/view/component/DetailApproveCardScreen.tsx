@@ -42,7 +42,7 @@ const DetailApproveCardScreen = ({
 }: NativeStackScreenProps<MainParams, 'DetailApproveCardScreen'>) => {
   const { item } = route.params;
   const { t } = useTranslation();
-  const [dateCreate, setDateCreate] = useState<Date | undefined>(item.createdDate);
+  const [dateCreate, setDateCreate] = useState<Date | undefined>(item.prDate);
   const [dateEstimate, setDateEstimate] = useState<Date | undefined>(item.expectedDate);
   const { bottom } = useSafeAreaInsets();
   const [isCoppied, setIsCoppied] = useState(false);
@@ -50,6 +50,7 @@ const DetailApproveCardScreen = ({
   const onCopy = useCallback(() => {
     Clipboard.setString(item.prNo);
     setIsCoppied(true);
+    console.log('coppy thành công');
     setTimeout(() => {
       setIsCoppied(false);
     }, 2000);

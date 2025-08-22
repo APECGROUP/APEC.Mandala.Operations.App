@@ -39,6 +39,7 @@ const AssignPriceScreen: React.FC = () => {
     onLoadMore,
     onSearchPrNo, // Hàm để cập nhật prNo khi gõ vào ô search
     applyFilters, // Hàm để áp dụng các filter từ FilterScreen
+    updateCacheAndTotal,
     currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
     currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
     isError,
@@ -97,7 +98,7 @@ const AssignPriceScreen: React.FC = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: IItemAssignPrice; index: number }) => (
-      <AssignPriceCard item={item} index={index} />
+      <AssignPriceCard item={item} index={index} updateCacheAndTotal={updateCacheAndTotal} />
     ),
     [],
   );

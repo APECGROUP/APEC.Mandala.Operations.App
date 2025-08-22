@@ -59,7 +59,7 @@ const CreatePoCard = memo<CreatePoCardProps>(({ item, isSelected, handleSelect }
               </AppText>
               <View style={styles.row}>
                 <AppText style={styles.titlePrice}>
-                  {moment(item.createdDate).format('DD/MM/YYYY')} -{' '}
+                  {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
                   {moment(item.expectedDate).format('DD/MM/YYYY')}
                 </AppText>
               </View>

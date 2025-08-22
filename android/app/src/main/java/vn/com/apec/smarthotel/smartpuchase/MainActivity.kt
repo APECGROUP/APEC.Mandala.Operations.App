@@ -1,4 +1,4 @@
-package vn.com.apec.smarthotel.spc
+package vn.com.apec.smarthotel.smartpuchase
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>vn.com.apec.smarthotel.spc</string>
+	<string>vn.com.apec.smarthotel.smartpuchase</string>
 	<key>PROJECT_ID</key>
 	<string>mandalaoperations-903c4</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:559693137785:ios:fd35ee7de03e4cb6e291a8</string>
+	<string>1:559693137785:ios:37b6f126530b471fe291a8</string>
 </dict>
 </plist>

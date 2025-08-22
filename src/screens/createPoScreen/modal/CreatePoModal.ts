@@ -92,7 +92,7 @@ export const fetchListCreatePo = async (
     // }
     if (filters?.prDate) {
       filterList.push({
-        propertyName: 'createdDate',
+        propertyName: 'prDate',
         propertyValue: filters?.prDate.toISOString(),
         propertyType: 'date',
         operator: '>=',

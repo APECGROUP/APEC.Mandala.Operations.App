@@ -83,7 +83,7 @@ const DetailOrderItemCard = ({
     if (item.approvedQuantity <= 0) {
       return;
     }
-    onUpdateQuantity({ ...item, approvedQuantity: Math.min(0, Number(item.approvedQuantity) - 1) });
+    onUpdateQuantity({ ...item, approvedQuantity: Math.max(0, Number(item.approvedQuantity) - 1) });
   };
   const isDisable =
     infoUser?.groups?.some(i => i.id === GROUP_ROLES.PR_APPROVER.TBP) &&

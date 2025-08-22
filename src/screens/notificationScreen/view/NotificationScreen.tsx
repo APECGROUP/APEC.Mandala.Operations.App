@@ -1,6 +1,6 @@
 // views/NotificationScreen.tsx
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -64,7 +64,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   } = useNotificationViewModel();
   const { infoUser } = useInfoUser();
   // ─── Refs & shared values để show/hide nút cuộn ─────────────────────
-  const { totalNotification } = useTotalNotificationNoRead();
+  const { totalNotification, fetData } = useTotalNotificationNoRead();
 
   const flatListRef = useRef<FlashList<IItemNotification> | null>(null);
 
@@ -114,7 +114,10 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
         );
         if (canAssignPrice) {
           // Điều hướng đến màn hình gán giá
-          return navigate('InformationItemsAssignPrice', { item: { id, prNo } });
+          return navigate('InformationItemsAssignPrice', {
+            item: { id, prNo },
+            updateCacheAndTotal: () => {},
+          });
         }
       }
 
@@ -182,6 +185,10 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
     }
     return null;
   }, [isFetchingNextPage]);
+
+  useEffect(() => {
+    fetData();
+  }, []);
 
   if (isError) {
     return <FallbackComponent resetError={onRefresh} />;

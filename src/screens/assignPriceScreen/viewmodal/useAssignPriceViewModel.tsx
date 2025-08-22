@@ -42,6 +42,7 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
 
   useEffect(() => {
     DeviceEventEmitter.addListener('refreshListAssignPrice', () => {
+      console.log('refreshListAssignPrice');
       onRefresh();
     });
     return () => {
@@ -97,6 +98,7 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
   const flatData = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
   const onRefresh = useCallback(() => {
+    console.log('onRefresh list nè: ');
     if (isFetching || isRefetching || isLoading) {
       return;
     }
@@ -120,7 +122,7 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
   }, []);
 
   const updateCacheAndTotal = useCallback(
-    (action: (item: IItemAssignPrice) => boolean, totalItem: number = 1) => {
+    (v: number) => {
       queryClient.setQueryData(queryKey, (cachedData: InfiniteData<PageData> | undefined) => {
         if (!cachedData) {
           return undefined;
@@ -128,15 +130,14 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
 
         const newPages = cachedData.pages.map(page => ({
           ...page,
-          data: page.data.filter(action),
+          data: page.data.filter(i => i.id !== v),
           pagination: {
             ...page.pagination,
-            rowCount:
-              page.pagination.rowCount > totalItem ? page.pagination.rowCount - totalItem : 0,
+            rowCount: page.pagination.rowCount > 1 ? page.pagination.rowCount - 1 : 0,
           },
         }));
 
-        setTotalItems(prev => (prev > totalItem ? prev - totalItem : 0));
+        setTotalItems(prev => (prev > 1 ? prev - 1 : 0));
 
         return { ...cachedData, pages: newPages };
       });

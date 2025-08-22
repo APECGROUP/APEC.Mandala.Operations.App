@@ -135,7 +135,9 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
           page.map(item => {
             const updated = updatedItems.find(i => i.id === item.id);
             console.log('11111111', updated, updatedItems, page);
-            return updated ? { ...item, ...updated } : item;
+            return updated
+              ? { ...item, ...updated, vendor: updated.vendor || updated?.vendorCode }
+              : item;
           }),
         ),
       });
@@ -219,14 +221,17 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
     try {
       setIsLoadingAssign(true);
       const { isSuccess, message } = await checkAssignPr(id, flatData);
+      console.log('gán giá api: ', isSuccess, message);
       setIsLoadingAssign(false);
       if (!isSuccess) {
         return showToast(message || t('error.subtitle'), TYPE_TOAST.ERROR);
       }
-      DeviceEventEmitter.emit('refreshListAssignPrice');
       if (func) {
+        console.log('có hàm nè');
         func();
       }
+      // DeviceEventEmitter.emit('refreshListAssignPrice');
+      console.log('gán giá thành công');
       showAlert(
         t('informationItem.assignSuccess'),
         '',
@@ -252,7 +257,9 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
         //   }}
         // />,
       );
-    } catch (error) {}
+    } catch (error) {
+      showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
+    }
   };
 
   return {
