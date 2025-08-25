@@ -16,7 +16,7 @@ import { useIsLogin } from '../zustand/store/useIsLogin/useIsLogin';
 import { useInfoUser } from '../zustand/store/useInfoUser/useInfoUser';
 import { Strings } from '../languages/FunctionLanguage';
 import { storage } from '../views/appProvider/AppProvider';
-import i18n from '../languages/i18n';
+import i18n, { getDeviceLanguage } from '../languages/i18n';
 import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 import { fetchStatusGlobal, IResponseAPILogin, IUser } from '@/screens/authScreen/modal/AuthModal';
 
@@ -36,7 +36,7 @@ export type TokenType = {
 export type CredentialsType = {
   username: string;
   password: string;
-  hotel: IDataListHotel;
+  hotel: IDataListHotel | undefined;
 };
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
@@ -47,7 +47,7 @@ const DataLocal = {
   credentials: null as CredentialsType | null,
   authStatus: 'loading' as AuthStatus,
   rememberLogin: false,
-  currentLanguage: 'vi' as string, // Mặc định là tiếng Việt
+  currentLanguage: '',
 
   setAuthStatus: (status: AuthStatus) => {
     console.log('setAuthStatus', status);
@@ -218,17 +218,18 @@ const DataLocal = {
   getLanguage: (): string => DataLocal.currentLanguage,
 
   // ✅ Load ngôn ngữ từ storage
-  loadLanguage: (): void => {
+  loadLanguage: async () => {
     try {
-      const storedLanguage = storage.getString(LANGUAGE_KEY);
+      const storedLanguage = await storage.getString(LANGUAGE_KEY);
       if (storedLanguage) {
         DataLocal.currentLanguage = storedLanguage;
         // Cập nhật ngôn ngữ trong i18n
         i18n.changeLanguage(storedLanguage);
       } else {
         // Nếu chưa có ngôn ngữ được lưu, dùng ngôn ngữ mặc định
-        DataLocal.currentLanguage = 'vi';
-        i18n.changeLanguage('vi');
+        const defaultLanguage = await getDeviceLanguage();
+        DataLocal.currentLanguage = defaultLanguage;
+        i18n.changeLanguage(defaultLanguage);
       }
     } catch (error) {
       // Nếu có lỗi, dùng ngôn ngữ mặc định

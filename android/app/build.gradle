@@ -83,7 +83,7 @@ android {
         applicationId "vn.com.apec.smarthotel.smartpuchase"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
+        versionCode 4
         versionName "1.0.0"
     }
     // splits {

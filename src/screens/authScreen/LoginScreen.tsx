@@ -61,7 +61,6 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
   useEffect(() => {
     getFCMTokenAndSendToServer(t, setDeviceToken);
   }, []);
-
   const disabled = !userName || !password || !hotel?.code;
 
   const onPickHotel = useCallback(() => {
@@ -71,7 +70,6 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
       setHotel: (newHotel: IDataListHotel | undefined) => setLoginForm({ hotel: newHotel }),
     });
   }, [navigation, hotel, setLoginForm]);
-
   const onForgotPassword = useCallback(() => {
     navigation.navigate('ForgotPasswordScreen');
   }, [navigation]);

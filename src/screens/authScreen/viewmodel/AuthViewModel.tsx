@@ -34,11 +34,17 @@ export const useAuthViewModel = () => {
   // Dùng useReducer để ép re-render khi cần cập nhật UI từ useRef
   const [_, forceUpdate] = useReducer(x => x + 1, 0);
 
+  // const loginFormRef = useRef<LoginFormData>({
+  //   userName: '',
+  //   password: '',
+  //   hotel: undefined,
+  //   isRememberLogin: false,
+  // });
   const loginFormRef = useRef<LoginFormData>({
-    userName: '',
-    password: '',
-    hotel: undefined,
-    isRememberLogin: false,
+    userName: 'admin',
+    password: '123123@123',
+    hotel: { code: 'MDLMN', name: 'Mandala Cham Bay Mui Ne' },
+    isRememberLogin: true,
   });
 
   const forgotPasswordFormRef = useRef<ForgotPasswordFormData>({

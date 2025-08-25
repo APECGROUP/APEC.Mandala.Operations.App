@@ -35,7 +35,6 @@ const ModalPickHotel = ({ navigation, route }: Props) => {
   const { data, error, refetch, isLoading } = useAuthViewModel();
 
   const { bottom } = useSafeAreaInsets();
-
   const goBack = useCallback(() => {
     if (!hotel?.code) {
       showToast(t('auth.login.emptyHotel'), TYPE_TOAST.ERROR);
