@@ -70,7 +70,7 @@ export const getFCMTokenAndSendToServer = async (
 
     console.log('[FCM] 🎯 FCM Device Token:', token);
     setDeviceToken(token); // <-- Gọi hàm được truyền từ bên ngoài
-    Clipboard.setString(token);
+    // Clipboard.setString(token);
 
     // Gửi token lên server (tuỳ chọn bật lại)
     // const resp = await api.post('notifications/app-push/register', {

@@ -90,9 +90,6 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
       value: infoUser?.departments[0]?.departmentName || '',
     },
   ];
-  useEffect(() => {
-    console.log('avatar nayf; ', infoUser?.avatar, infoUser);
-  }, [infoUser, infoUser?.avatar]);
 
   return (
     <ViewContainer>
