@@ -17,6 +17,8 @@ import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 import { navigate } from '@/navigation/RootNavigation';
+import { AppBlock } from '@/elements/block/Block';
+import { PaddingHorizontal } from '@/utils/Constans';
 
 interface CreatePriceCardProps {
   item: IItemVendorPrice;
@@ -29,10 +31,11 @@ interface CreatePriceCardProps {
     onCancel?: () => void,
   ) => void;
   onUpdateItem: (i: IItemVendorPrice) => void;
+  canPick:boolean
 }
 
 const CreatePriceCard = memo<CreatePriceCardProps>(
-  ({ item, isSelected, handleSelect, onUpdateItem, simultaneousGesture, handleDelete }) => {
+  ({ item, isSelected, handleSelect, onUpdateItem, simultaneousGesture, handleDelete,canPick }) => {
     const { t } = useTranslation();
     const swipeableRef = useRef<ReanimatedSwipeableRef>(null);
     // SharedValue để đồng bộ chiều cao cho delete button
@@ -109,9 +112,12 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
           onSwipe={onSwipe}>
           <View style={[styles.itemContainer, styles.itemExpanded]} onLayout={onItemLayout}>
             <View style={styles.headerItem}>
+              {canPick?
               <AppBlockButton onPress={handleSelectPress} style={styles.left}>
                 {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
               </AppBlockButton>
+              :<AppBlock width={PaddingHorizontal}/>
+              }
 
               <View style={styles.center}>
                 <View style={styles.row}>

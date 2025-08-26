@@ -54,7 +54,8 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
           response.data.data.url,
           `${BASE_URL}/${response.data.data.url}`,
         );
-        updateAvatar(`${BASE_URL}/${response.data.data.url}`);
+        updateAvatar(`${response.data.data.url}`);
+        // updateAvatar(`${BASE_URL}/${response.data.data.url}`);
       }
     } catch (error) {
       showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
@@ -98,7 +99,7 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
 
         <ScrollView contentContainerStyle={styles.fg1}>
           <TouchableOpacity style={styles.avatar} activeOpacity={0.8} onPress={onUpdateAvatar}>
-            <FastImage style={styles.avatar} source={{ uri: infoUser?.avatar }} />
+            <FastImage style={styles.avatar} source={{ uri: `${BASE_URL}/${infoUser?.avatar}` }} />
             <IconTakeCamera style={styles.editIcon} />
           </TouchableOpacity>
           <AppText style={styles.textTitle}>{t('account.profile.changePhoto')}</AppText>

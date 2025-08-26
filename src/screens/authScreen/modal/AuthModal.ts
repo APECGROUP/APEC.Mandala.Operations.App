@@ -63,6 +63,8 @@ export interface IUser {
   hotelCode: string;
   hotelName: string;
   deviceToken: string;
+  canApproveVp:boolean;
+  canRejectVp:boolean;
 }
 
 export interface Department {

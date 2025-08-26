@@ -118,7 +118,7 @@ const InformationItemsAssignPrice = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [flatData, onUpdatePrice],
   );
-
+console.log('manf hinhf: ',route.params)
   const rightComponent = () => (
     <AppBlockButton
       style={styles.rightComponent}

@@ -16,6 +16,7 @@ import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
 import { s } from 'react-native-size-matters';
 import { goBack } from '@/navigation/RootNavigation';
+import { DeviceEventEmitter } from 'react-native';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500;
@@ -268,6 +269,17 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     },
     [textReason, showToast, t, updateCacheAndTotal],
   );
+
+
+  useEffect(() => {
+      DeviceEventEmitter.addListener('refreshListApprove', () => {
+        console.log('refreshListApprove');
+        onRefresh();
+      });
+      return () => {
+        DeviceEventEmitter.removeAllListeners('refreshListApprove');
+      };
+    }, []);
 
   return {
     length: totalItems,

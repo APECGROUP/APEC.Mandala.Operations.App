@@ -46,7 +46,7 @@ const DetailAssignPriceCardScreen = ({
   const { item } = route.params;
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
-  const [dateCreate, setDateCreate] = useState<Date | undefined>(item?.createdDate);
+  const [dateCreate, setDateCreate] = useState<Date | undefined>(item?.prDate);
   const [dateEstimate, setDateEstimate] = useState<Date | undefined>(item?.expectedDate);
   const [isCoppied, setIsCoppied] = useState(false);
 

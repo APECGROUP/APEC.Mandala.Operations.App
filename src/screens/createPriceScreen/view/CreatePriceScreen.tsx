@@ -33,10 +33,12 @@ import Footer from '@/screens/filterScreen/view/component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { styles } from './style';
 import HeaderSearch from '@/components/headerSearch/HeaderSearch';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 
 export default function CreatePriceScreen() {
   const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
+  const {infoUser} =useInfoUser()
   const refToast = useRef<any>(null);
 
   const route = useRoute() as any;
@@ -127,10 +129,11 @@ export default function CreatePriceScreen() {
     }
     return null;
   }, [isFetchingNextPage]);
-
+  const canPick=useMemo(() => Boolean(infoUser?.canApproveVp&&infoUser.canRejectVp), [infoUser])
   const renderItem = useCallback(
     ({ item }: { item: IItemVendorPrice; index: number }) => (
       <CreatePriceCard
+      canPick={canPick}
         onUpdateItem={onUpdateItem}
         item={item}
         handleDelete={handleDelete}
@@ -139,7 +142,7 @@ export default function CreatePriceScreen() {
         simultaneousGesture={flashListNativeGesture}
       />
     ),
-    [onUpdateItem, handleDelete, handleSelect, selectedIds, flashListNativeGesture],
+    [onUpdateItem, handleDelete, handleSelect, selectedIds, flashListNativeGesture,canPick],
   );
 
   const goToFilterScreen = useCallback(() => {
@@ -172,6 +175,7 @@ export default function CreatePriceScreen() {
             <AppText style={styles.countBadgeText}>{length}</AppText>
           </View>
         </View>
+        {infoUser?.canApproveVp&&infoUser?.canRejectVp&&
         <View style={styles.header}>
           <AppBlockButton onPress={toggleSelectAll} style={styles.buttonCenter}>
             {selectedAll ? <IconCheckBox /> : <IconUnCheckBox />}
@@ -181,6 +185,7 @@ export default function CreatePriceScreen() {
             {selectedIds.length} {t('createPrice.orderSelected')}
           </AppText>
         </View>
+        }
         {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
         {isLoading && flatData.length === 0 ? (
           <View style={styles.listContent}>

@@ -1,7 +1,7 @@
 // views/NotificationScreen.tsx
 
-import React, { useRef, useMemo, useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, View, TouchableOpacity } from 'react-native';
+import React, { useRef, useMemo, useEffect, useCallback } from 'react';
+import { ActivityIndicator, StyleSheet, View, TouchableOpacity, DeviceEventEmitter } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { s, vs } from 'react-native-size-matters';
@@ -24,10 +24,12 @@ import { PaddingHorizontal } from '@/utils/Constans';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { navigate } from '@/navigation/RootNavigation';
+import { goBack, navigate } from '@/navigation/RootNavigation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import { useTotalNotificationNoRead } from '@/zustand/store/useTotalNotificationNoRead/useTotalNotificationNoRead';
+import { checkApprovePr, IApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
+import { useAlert } from '@/elements/alert/AlertProvider';
 export const GROUP_ROLES = {
   // Định nghĩa các hằng số vai trò để tránh magic numbers và dễ đọc hơn
   PC_PR_VIEWER: 9,
@@ -65,7 +67,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   const { infoUser } = useInfoUser();
   // ─── Refs & shared values để show/hide nút cuộn ─────────────────────
   const { totalNotification, fetData } = useTotalNotificationNoRead();
-
+const {showLoading,hideLoading,showToast}=useAlert()
   const flatListRef = useRef<FlashList<IItemNotification> | null>(null);
 
   const scrollToTop = () => {
@@ -79,7 +81,28 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
     // TODO: gọi API xóa notification, rồi update listNotification
   };
 
-  const goToDetail = async (prNo: string, id: number, status: string) => {
+  const onApproved = useCallback(
+      async (id: number, listData: IApprove[]) => {
+        try {
+          showLoading();
+          const { isSuccess, message } = await checkApprovePr(id, listData);
+          if (!isSuccess) {
+            return showToast(message || t('createPrice.approvedFail'), 'error');
+          }
+          goBack();
+          DeviceEventEmitter.emit('refreshListApprove')
+          showToast(t('createPrice.approvedSuccess'), 'success');
+        } catch (error) {
+        } finally {
+          hideLoading();
+        }
+      },
+      [hideLoading, showLoading, showToast, t],
+    );
+
+  const goToDetail = async (item:IItemNotification) => {
+    const {status,id}=item
+    const newItem={...item,id:item.prId||item.id}
     try {
       // Luồng 1: Cập nhật trạng thái thông báo
       // Gọi hàm để đánh dấu thông báo này là đã đọc, không ảnh hưởng đến luồng điều hướng
@@ -99,7 +122,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
       // và người dùng hiện tại có vai trò cần thiết để duyệt hay không
       if (requiredRole && infoUser?.groups?.some(i => i.id === requiredRole)) {
         // Điều hướng đến màn hình duyệt đơn hàng
-        return navigate('DetailOrderApproveScreen', { item: { id, prNo }, onApproved: () => {} });
+        return navigate('DetailOrderApproveScreen', { item:newItem, onApproved });
       }
 
       // Luồng 3: Xử lý trạng thái "Chờ gán giá" (PP)
@@ -115,7 +138,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
         if (canAssignPrice) {
           // Điều hướng đến màn hình gán giá
           return navigate('InformationItemsAssignPrice', {
-            item: { id, prNo },
+            item:newItem,
             updateCacheAndTotal: () => {},
           });
         }
@@ -123,7 +146,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
 
       // Luồng 4: Xử lý các trạng thái còn lại
       // Nếu không khớp với bất kỳ điều kiện nào ở trên, điều hướng đến màn hình chi tiết thông thường
-      navigate('InformationItemsPcPrScreen', { item: { id, prNo } });
+      navigate('InformationItemsPcPrScreen', { item:newItem });
     } catch (error) {
       // Xử lý lỗi nếu có bất kỳ vấn đề nào xảy ra trong quá trình điều hướng
       console.error('Error navigating:', error);
@@ -133,7 +156,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   const renderItem = ({ item }: { item: IItemNotification }) => (
     <ItemNotification
       item={item}
-      onDetail={() => goToDetail(item.prNo, item.id, item.status)}
+      onDetail={() => goToDetail(item)}
       // onDetail={() => {
       //   if (!item.read) {
       //     onDetail(item.id);

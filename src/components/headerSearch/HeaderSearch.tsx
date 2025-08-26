@@ -17,6 +17,7 @@ import { navigate } from '../../navigation/RootNavigation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatNotificationCount } from '@/screens/notificationScreen/view/NotificationScreen';
 import { useTotalNotificationNoRead } from '@/zustand/store/useTotalNotificationNoRead/useTotalNotificationNoRead';
+import { BASE_URL } from '@/env';
 type propsHeaderSearch = {
   currentPrNoInput: string;
   onSearch: (text: string) => void;
@@ -54,7 +55,7 @@ const HeaderSearch = ({
       <View style={[styles.headerContainer, { marginTop: top || vs(20) }]}>
         <View style={styles.headerLeft}>
           <AppBlockButton onPress={goToAccount}>
-            <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
+            <FastImage source={{ uri: `${BASE_URL}/${infoUser?.avatar}` }} style={styles.avatar} />
           </AppBlockButton>
 
           <View style={styles.greetingContainer}>

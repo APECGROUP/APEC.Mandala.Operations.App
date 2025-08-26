@@ -28,6 +28,8 @@ import { ENDPOINT } from '@/utils/Constans';
 import { TYPE_TOAST } from '@/elements/toast/Message';
 import { useQueryClient } from '@tanstack/react-query';
 import { checkTurnOnOffNotification } from '../authScreen/modal/AuthModal';
+import FastImage from 'react-native-fast-image';
+import { BASE_URL } from '@/env';
 
 const AccountScreen = () => {
   const { t } = useTranslation();
@@ -113,7 +115,7 @@ const AccountScreen = () => {
           <View>
             <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>
               <View style={{ marginTop: vs(20) }}>
-                <AppImage style={styles.avatar} source={{ uri: infoUser?.avatar }} />
+                <FastImage style={styles.avatar} source={{ uri: `${BASE_URL}/${infoUser?.avatar}` }} />
                 <IconEditAvatar style={styles.editIcon} />
               </View>
               <AppText weight="700" size={18} mb={2}>

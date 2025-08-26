@@ -9,7 +9,7 @@ import { storage } from '../../../views/appProvider/AppProvider';
 import { IUser } from '@/screens/authScreen/modal/AuthModal';
 
 // Đảm bảo interface `typeInfo` phản ánh đúng các hàm được triển khai
-interface typeInfo {
+export interface typeInfo {
   infoUser: Partial<IUser> | undefined;
   deviceToken?: string;
   setDeviceToken: (v: string) => void;
