@@ -1,4 +1,4 @@
-package vn.com.apec.smarthotel.smartpuchase
+package vn.com.apec.smarthotel.spc
 
 import android.app.Application
 import com.facebook.react.PackageList

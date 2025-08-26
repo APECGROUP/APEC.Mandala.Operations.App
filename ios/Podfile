@@ -19,7 +19,7 @@ prepare_react_native_project!
 # (Optional) Nếu bạn cần modular headers cho pod không có module map
 use_modular_headers!
 
-target 'MandalaOperations' do
+target 'MandalaPurchasing' do
   config = use_native_modules!
 
   use_react_native!(

@@ -1,5 +1,5 @@
 {
-  "name": "mandalaoperations",
+  "name": "mandalapurchasing",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -17,7 +17,7 @@
     "open-folder-apk": "open ./android/app/build/outputs/apk",
     "open-folder-aab": "open ./android/app/build/outputs/bundle",
     "prepare": "husky install",
-    "openXcode": "open ios/mandalaoperations.xcworkspace",
+    "openXcode": "open ios/mandalapurchasing.xcworkspace",
     "openAndroidStudio": "open -a 'Android Studio' android",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",

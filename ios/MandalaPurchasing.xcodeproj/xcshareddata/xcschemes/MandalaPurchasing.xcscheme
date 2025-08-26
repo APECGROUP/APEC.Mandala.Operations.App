@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "MandalaOperations.app"
-               BlueprintName = "MandalaOperations"
-               ReferencedContainer = "container:MandalaOperations.xcodeproj">
+               BuildableName = "MandalaPurchasing.app"
+               BlueprintName = "MandalaPurchasing"
+               ReferencedContainer = "container:MandalaPurchasing.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "MandalaOperationsTests.xctest"
-               BlueprintName = "MandalaOperationsTests"
-               ReferencedContainer = "container:MandalaOperations.xcodeproj">
+               BuildableName = "MandalaPurchasingTests.xctest"
+               BlueprintName = "MandalaPurchasingTests"
+               ReferencedContainer = "container:MandalaPurchasing.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MandalaOperations.app"
-            BlueprintName = "MandalaOperations"
-            ReferencedContainer = "container:MandalaOperations.xcodeproj">
+            BuildableName = "MandalaPurchasing.app"
+            BlueprintName = "MandalaPurchasing"
+            ReferencedContainer = "container:MandalaPurchasing.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MandalaOperations.app"
-            BlueprintName = "MandalaOperations"
-            ReferencedContainer = "container:MandalaOperations.xcodeproj">
+            BuildableName = "MandalaPurchasing.app"
+            BlueprintName = "MandalaPurchasing"
+            ReferencedContainer = "container:MandalaPurchasing.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
