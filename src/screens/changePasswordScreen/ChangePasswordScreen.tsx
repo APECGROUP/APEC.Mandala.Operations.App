@@ -14,7 +14,6 @@ import { getFontSize, SCREEN_WIDTH } from '@/constants';
 import { useKeyboard } from '@/hook/keyboardHook';
 import DataLocal from '@/data/DataLocal';
 import { useAutoLogin } from '@/hook/useAutoLogin';
-import Toast from 'react-native-toast-message';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { TYPE_TOAST } from '@/elements/toast/Message';

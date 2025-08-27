@@ -15,6 +15,7 @@ import { Colors } from '@/theme/Config';
 import Utilities from '@/utils/Utilities';
 import IconCreatePo from '@assets/icon/IconCreatedPo';
 import IconRejectPo from '@assets/icon/IconRejectPo';
+import IconWaitingCreatePo from '@assets/icon/IconWaitingCreatePo';
 type props = {
   item: IItemNotification;
   onDetail: (id: number) => void;
@@ -34,6 +35,8 @@ const ItemNotification = ({ item, onDetail }: props) => {
         return <IconWaitingAssignPrice />;
       case 'RJ': //RJ Từ chối
         return <IconRejectPo />;
+      case 'PO': //Chờ tạo PO
+        return <IconWaitingCreatePo />;
       default: //pp
         return <IconCreatePo />;
     }

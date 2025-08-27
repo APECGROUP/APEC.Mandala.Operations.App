@@ -112,6 +112,7 @@ export type MainParams = {
     ncc: IItemVendorPrice | undefined;
     itemCode: string;
     onSetPrice: (price: number) => void;
+    requestDate: string;
   };
   PickDepartmentScreen: {
     setDepartment: Dispatch<SetStateAction<IPickDepartment | undefined>>;

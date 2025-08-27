@@ -20,6 +20,7 @@ const InformationItemsCard = ({
   onUpdatePrice,
   onUpdateNCC,
   onUpdateQuantity,
+  requestDate,
 }: {
   item: IItemInDetailPr;
   index: number;
@@ -27,6 +28,7 @@ const InformationItemsCard = ({
   onUpdatePrice?: (id: number, price: number) => void;
   onUpdateNCC: (id: number, vendor: IItemVendorPrice) => void;
   onUpdateQuantity: (item: IItemInDetailPr) => void;
+  requestDate: string;
 }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(false);
@@ -36,7 +38,11 @@ const InformationItemsCard = ({
 
   const inputRef = useRef<TextInput>(null); // nếu cần focus programmatically
 
-  const [ncc, setNcc] = useState<IItemVendorPrice>({ price: item.price } as IItemVendorPrice);
+  const [ncc, setNcc] = useState<IItemVendorPrice>({
+    price: item?.price,
+    vendorCode: item?.vendor,
+    vendorName: item?.vendorName,
+  } as IItemVendorPrice);
 
   const handleShowDetail = () => {
     setIsShow(i => !i);
@@ -59,6 +65,7 @@ const InformationItemsCard = ({
       ncc,
       itemCode: item.itemCode,
       onSetPrice,
+      requestDate,
     });
   };
   console.log('render: ', ncc, item);

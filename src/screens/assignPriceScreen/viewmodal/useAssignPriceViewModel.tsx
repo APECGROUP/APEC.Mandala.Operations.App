@@ -43,7 +43,7 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
   useEffect(() => {
     DeviceEventEmitter.addListener('refreshListAssignPrice', () => {
       console.log('refreshListAssignPrice');
-      onRefresh();
+      refetch();
     });
     return () => {
       DeviceEventEmitter.removeAllListeners('refreshListAssignPrice');
@@ -97,13 +97,13 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
 
   const flatData = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
-  const onRefresh = useCallback(() => {
-    console.log('onRefresh list nè: ');
-    if (isFetching || isRefetching || isLoading) {
-      return;
-    }
-    refetch();
-  }, [isFetching, isLoading, isRefetching, refetch]);
+  // const onRefresh = useCallback(() => {
+  //   if (isFetching || isRefetching || isLoading) {
+  //     return;
+  //   }
+  //   console.log('onRefresh list nè: ');
+  //   refetch();
+  // }, [isFetching, isLoading, isRefetching, refetch]);
 
   const onLoadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
@@ -153,7 +153,7 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
     isRefetching,
     isFetchingNextPage,
     hasNextPage: !!hasNextPage,
-    onRefresh,
+    onRefresh: refetch,
     onLoadMore,
     onSearchPrNo,
     applyFilters,

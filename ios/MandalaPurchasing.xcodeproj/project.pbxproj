@@ -25,9 +25,9 @@
 
 /* Begin PBXFileReference section */
 		0BE5D987D6C74B34AF5F2C69 /* GoogleSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSans-Medium.ttf"; path = "../assets/fonts/GoogleSans-Medium.ttf"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* MandalaPurchasing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MandalaPurchasing.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = MandalaPurchasing/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = MandalaPurchasing/Info.plist; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* MandalaPurchasing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MandalaPurchasing.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "MandalaPurchasing/Images.xcassets"; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "MandalaPurchasing/Info.plist"; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = MandalaPurchasing/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		2205F9BB6C5949488C1C6BE0 /* GoogleSans-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSans-MediumItalic.ttf"; path = "../assets/fonts/GoogleSans-MediumItalic.ttf"; sourceTree = "<group>"; };
 		238323351941421F87C856F7 /* GoogleSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSans-Regular.ttf"; path = "../assets/fonts/GoogleSans-Regular.ttf"; sourceTree = "<group>"; };
@@ -36,7 +36,7 @@
 		5709B34CF0A7D63546082F79 /* Pods-MandalaPurchasing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MandalaPurchasing.release.xcconfig"; path = "Target Support Files/Pods-MandalaPurchasing/Pods-MandalaPurchasing.release.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = MandalaPurchasing/AppDelegate.swift; sourceTree = "<group>"; };
 		795A0821DF4E46EC920A9FBB /* GoogleSans-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSans-Italic.ttf"; path = "../assets/fonts/GoogleSans-Italic.ttf"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = MandalaPurchasing/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = "MandalaPurchasing/LaunchScreen.storyboard"; sourceTree = "<group>"; };
 		989E801AD4662DFBE2D974B8 /* Pods_MandalaPurchasing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MandalaPurchasing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A22396F35F4D480993413B54 /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = MandalaPurchasing/Colors.xcassets; sourceTree = "<group>"; };
 		B2BD3F1F08F4459681EEACC8 /* GoogleSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSans-Bold.ttf"; path = "../assets/fonts/GoogleSans-Bold.ttf"; sourceTree = "<group>"; };
@@ -71,7 +71,7 @@
 				B8384FA68F704138A98D1FFF /* BootSplash.storyboard */,
 				A22396F35F4D480993413B54 /* Colors.xcassets */,
 			);
-			name = MandalaPurchasing;
+			name = "MandalaPurchasing";
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
@@ -155,8 +155,8 @@
 			);
 			dependencies = (
 			);
-			name = MandalaPurchasing;
-			productName = MandalaPurchasing;
+			name = "MandalaPurchasing";
+			productName = "MandalaPurchasing";
 			productReference = 13B07F961A680F5B00A75B9A /* MandalaPurchasing.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -326,7 +326,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PRQHTGDMQG;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = MandalaPurchasing/Info.plist;
+				INFOPLIST_FILE = "MandalaPurchasing/Info.plist";
+             INFOPLIST_KEY_CFBundleDisplayName = "MandalaPurchasing";
 				INFOPLIST_KEY_CFBundleDisplayName = MandalaPurchasing;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -340,7 +341,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = vn.com.apec.smarthotel.spc;
-				PRODUCT_NAME = MandalaPurchasing;
+				PRODUCT_NAME = "MandalaPurchasing";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -361,7 +362,8 @@
 				CODE_SIGN_ENTITLEMENTS = MandalaPurchasing/MandalaPurchasing.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PRQHTGDMQG;
-				INFOPLIST_FILE = MandalaPurchasing/Info.plist;
+				INFOPLIST_FILE = "MandalaPurchasing/Info.plist";
+             INFOPLIST_KEY_CFBundleDisplayName = "MandalaPurchasing";
 				INFOPLIST_KEY_CFBundleDisplayName = MandalaPurchasing;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -375,7 +377,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = vn.com.apec.smarthotel.spc;
-				PRODUCT_NAME = MandalaPurchasing;
+				PRODUCT_NAME = "MandalaPurchasing";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

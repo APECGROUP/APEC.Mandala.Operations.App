@@ -120,13 +120,14 @@ export function useNotificationViewModel() {
   const onRead = useCallback(
     async (id: number) => {
       try {
-        const { isSuccess, message } = await checkReadNotification(id);
+        const { isSuccess, message, isEdit } = await checkReadNotification(id);
         if (!isSuccess) {
           showToast(message || t('error.subtitle'), 'error');
-          return;
+          return true;
         }
         updateIsReadInCache([id]);
         // fetData();
+        return isEdit;
         // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
       } catch (error) {
         showToast(t('error.subtitle'), 'error');

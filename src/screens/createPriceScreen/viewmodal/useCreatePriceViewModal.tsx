@@ -14,6 +14,7 @@ import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
 import { TYPE_TOAST } from '@/elements/toast/Message';
 import { goBack } from '@/navigation/RootNavigation';
+import { DeviceEventEmitter } from 'react-native';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 500;
@@ -234,6 +235,16 @@ export function useCreatePriceViewModel() {
     () => selectedIds.length > 0 && selectedIds.length === flatData.length,
     [selectedIds.length, flatData.length],
   );
+
+  useEffect(() => {
+    DeviceEventEmitter.addListener('refreshListCreatePo', () => {
+      console.log('refreshListCreatePo');
+      onRefresh();
+    });
+    return () => {
+      DeviceEventEmitter.removeAllListeners('refreshListCreatePo');
+    };
+  }, []);
 
   return {
     selectedIds,

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../../../navigation/params';
@@ -8,7 +8,7 @@ import light from '../../../../theme/light';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 import IconClose from '../../../../../assets/icon/IconClose';
-import { PaddingHorizontal } from '../../../../utils/Constans';
+import { ENDPOINT, PaddingHorizontal } from '../../../../utils/Constans';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppBlockButton from '../../../../elements/button/AppBlockButton';
 import IconSelectHotel from '../../../../../assets/icon/IconSelectHotel';
@@ -18,15 +18,22 @@ import { FlashList } from '@shopify/flash-list';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
-import { IItemVendorPrice } from '@/screens/createPriceScreen/modal/CreatePriceModal';
+import {
+  IItemVendorPrice,
+  IResponseListVat,
+} from '@/screens/createPriceScreen/modal/CreatePriceModal';
 import { moneyFormat } from '@/utils/Utilities';
+import api from '@/utils/setup-axios';
+import { useAlert } from '@/elements/alert/AlertProvider';
 
 type Props = NativeStackScreenProps<MainParams, 'PickPriceFromNccScreen'>;
 const PickPriceFromNccScreen = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
-  const { onSetNcc, ncc, itemCode, onSetPrice } = route.params;
-  const { bottom } = useSafeAreaInsets();
+  const { showToast } = useAlert();
+  const [timeSystem, setTimeSystem] = useState('');
 
+  const { onSetNcc, ncc, itemCode, onSetPrice, requestDate } = route.params;
+  const { bottom } = useSafeAreaInsets();
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
     flatData,
@@ -37,7 +44,7 @@ const PickPriceFromNccScreen = ({ navigation, route }: Props) => {
     onLoadMore,
     onSearch,
     searchKey,
-  } = usePickPriceFromNccViewModel(itemCode);
+  } = usePickPriceFromNccViewModel(itemCode, timeSystem, requestDate);
 
   const listFooterComponent = () => {
     if (isFetchingNextPage) {
@@ -93,6 +100,23 @@ const PickPriceFromNccScreen = ({ navigation, route }: Props) => {
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
+  const getTimeSystem = async () => {
+    try {
+      const response = await api.get<IResponseListVat, any>(ENDPOINT.GET_TIME_SYSTEM);
+      if (response.status === 200 && response.data.isSuccess && response.data?.data?.varValue) {
+        console.log('giờ hệ thống', response.data.data.varValue, response.data.data);
+        setTimeSystem(response.data.data.varValue);
+      } else {
+        showToast(t('Lỗi khi lấy giờ hệ thông'), 'error');
+      }
+    } catch (error) {
+      showToast(t('Lỗi khi lấy giờ hệ thông'), 'error');
+      goBack();
+    }
+  };
+  useEffect(() => {
+    getTimeSystem();
+  }, []);
   return (
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
       <View

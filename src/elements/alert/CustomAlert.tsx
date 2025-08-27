@@ -135,6 +135,7 @@ export default CustomAlert;
 const styles = StyleSheet.create({
   bold: {
     fontWeight: 'bold',
+    color: '#141414',
   },
   blockTextContent: {
     flexDirection: 'row',

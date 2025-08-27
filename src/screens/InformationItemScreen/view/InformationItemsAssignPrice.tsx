@@ -36,8 +36,9 @@ const InformationItemsAssignPrice = ({
   const { t } = useTranslation();
   // const refToast = useRef<any>(null);
   const { prNo, id } = route.params.item;
+  const requestDate = route.params.item?.requestDate || route.params.item.request.requestDate;
   const updateCacheAndTotal = route.params.updateCacheAndTotal;
-
+  console.log('itemmmmmmmm: ', requestDate, route.params.item);
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
     flatData,
@@ -101,6 +102,7 @@ const InformationItemsAssignPrice = ({
   const renderItem = useCallback(
     ({ item, index }: { item: IItemInDetailPr; index: number }) => (
       <InformationItemsCard
+        requestDate={requestDate}
         onUpdateQuantity={onUpdateQuantity}
         item={item}
         index={index}
@@ -118,7 +120,7 @@ const InformationItemsAssignPrice = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [flatData, onUpdatePrice],
   );
-console.log('manf hinhf: ',route.params)
+  console.log('manf hinhf: ', route.params);
   const rightComponent = () => (
     <AppBlockButton
       style={styles.rightComponent}
@@ -171,7 +173,7 @@ console.log('manf hinhf: ',route.params)
             // data={[]}
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => `${item.id}-${item.price}-${item.vendorName}`}
+            keyExtractor={item => `${item.id}-${item.price}-${item.vendorName}-${item.iName}`}
             onEndReached={onEndReached}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
@@ -194,7 +196,7 @@ console.log('manf hinhf: ',route.params)
       {flatData && flatData.length > 0 && (
         <FooterInformationItem
           onSaveDraft={onSaveDraft}
-          handleAssign={() => onAssign(updateCacheAndTotal(id))}
+          handleAssign={() => onAssign(updateCacheAndTotal(id)!)}
           isLoadingAssign={isLoadingAssign}
           id={id}
           prNo={prNo}

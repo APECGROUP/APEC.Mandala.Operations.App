@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {

@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
 import moment from 'moment';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 
 interface CreatePoCardProps {
   item: IItemCreatePo;
@@ -22,7 +21,6 @@ interface CreatePoCardProps {
 
 const CreatePoCard = memo<CreatePoCardProps>(({ item, isSelected, handleSelect }) => {
   const { t } = useTranslation();
-const {infoUser}=useInfoUser()
   // onLayout gọi mỗi khi layout thay đổi (do expand/collapse)
 
   // Phần render nút delete
@@ -42,13 +40,11 @@ const {infoUser}=useInfoUser()
     [t, item.userRequest?.displayName, item?.departmentName],
   );
   return (
-    <View style={[styles.itemContainer, styles.itemExpanded]}>
+    <AppBlockButton onPress={handleSelectPress} style={[styles.itemContainer, styles.itemExpanded]}>
       <View style={styles.headerItem}>
-        <AppBlockButton disabled={Boolean(infoUser?.avatar)} onPress={handleSelectPress} style={styles.left}>
-          {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
-        </AppBlockButton>
+        <View style={styles.left}>{isSelected ? <IconCheckBox /> : <IconUnCheckBox />}</View>
 
-        <AppBlockButton style={styles.center} onPress={() => {}}>
+        <View style={styles.center}>
           <View style={styles.row}>
             {/* <View style={styles.iconWrapper}>
               <IconListPen />
@@ -66,7 +62,7 @@ const {infoUser}=useInfoUser()
               </View>
             </View>
           </View>
-        </AppBlockButton>
+        </View>
       </View>
 
       <View style={styles.expandedContent}>
@@ -77,7 +73,7 @@ const {infoUser}=useInfoUser()
           </View>
         ))}
       </View>
-    </View>
+    </AppBlockButton>
   );
 });
 

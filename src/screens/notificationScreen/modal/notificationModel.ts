@@ -68,12 +68,16 @@ export const checkReadNotification = async (id: number) => {
   try {
     const response = await api.patch(`${ENDPOINT.HANDLE_READ_NOTIFICATION}/${id}`);
     if (response.status === 200 && response.data.isSuccess) {
-      return { isSuccess: true, message: '' };
+      return { isSuccess: true, message: '', isEdit: response.data.data.isEdit };
     } else {
-      return { isSuccess: false, message: response.data.errors[0].message };
+      return { isSuccess: false, message: response.data.errors[0].message, isEdit: true };
     }
   } catch (error) {
-    return { isSuccess: false, message: 'An error occurred while approving PR without changes.' };
+    return {
+      isSuccess: false,
+      message: 'An error occurred while approving PR without changes.',
+      isEdit: true,
+    };
   }
 };
 

@@ -1,7 +1,13 @@
 // views/NotificationScreen.tsx
 
 import React, { useRef, useMemo, useEffect, useCallback } from 'react';
-import { ActivityIndicator, StyleSheet, View, TouchableOpacity, DeviceEventEmitter } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  DeviceEventEmitter,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { s, vs } from 'react-native-size-matters';
@@ -30,6 +36,8 @@ import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import { useTotalNotificationNoRead } from '@/zustand/store/useTotalNotificationNoRead/useTotalNotificationNoRead';
 import { checkApprovePr, IApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
 import { useAlert } from '@/elements/alert/AlertProvider';
+import { TYPE_TOAST } from '@/elements/toast/Message';
+import { fetchCreatePo } from '@/screens/createPoScreen/modal/CreatePoModal';
 export const GROUP_ROLES = {
   // Định nghĩa các hằng số vai trò để tránh magic numbers và dễ đọc hơn
   PC_PR_VIEWER: 9,
@@ -67,7 +75,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
   const { infoUser } = useInfoUser();
   // ─── Refs & shared values để show/hide nút cuộn ─────────────────────
   const { totalNotification, fetData } = useTotalNotificationNoRead();
-const {showLoading,hideLoading,showToast}=useAlert()
+  const { showLoading, hideLoading, showToast, showAlert } = useAlert();
   const flatListRef = useRef<FlashList<IItemNotification> | null>(null);
 
   const scrollToTop = () => {
@@ -82,31 +90,74 @@ const {showLoading,hideLoading,showToast}=useAlert()
   };
 
   const onApproved = useCallback(
-      async (id: number, listData: IApprove[]) => {
-        try {
-          showLoading();
-          const { isSuccess, message } = await checkApprovePr(id, listData);
-          if (!isSuccess) {
-            return showToast(message || t('createPrice.approvedFail'), 'error');
-          }
-          goBack();
-          DeviceEventEmitter.emit('refreshListApprove')
-          showToast(t('createPrice.approvedSuccess'), 'success');
-        } catch (error) {
-        } finally {
-          hideLoading();
+    async (id: number, listData: IApprove[]) => {
+      try {
+        showLoading();
+        const { isSuccess, message } = await checkApprovePr(id, listData);
+        if (!isSuccess) {
+          return showToast(message || t('createPrice.approvedFail'), 'error');
         }
-      },
-      [hideLoading, showLoading, showToast, t],
-    );
+        goBack();
+        DeviceEventEmitter.emit('refreshListApprove');
+        showToast(t('createPrice.approvedSuccess'), 'success');
+      } catch (error) {
+      } finally {
+        hideLoading();
+      }
+    },
+    [hideLoading, showLoading, showToast, t],
+  );
 
-  const goToDetail = async (item:IItemNotification) => {
-    const {status,id}=item
-    const newItem={...item,id:item.prId||item.id}
+  const onCreatePo = useCallback(
+    async (prNo: string) => {
+      try {
+        showLoading();
+        const { isSuccess, message } = await fetchCreatePo(prNo);
+
+        DeviceEventEmitter.emit('refreshListCreatePo');
+        if (!isSuccess) {
+          showToast(message || t('error.subtitle'), TYPE_TOAST.ERROR);
+          return;
+        }
+
+        showToast(t('CreatePo.success'), TYPE_TOAST.SUCCESS);
+      } catch (error) {
+        showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
+      } finally {
+        hideLoading();
+      }
+    },
+    [hideLoading, showLoading, showToast, t],
+  );
+
+  const goToDetail = async (item: IItemNotification) => {
+    const { status, id } = item;
+    const newItem = { ...item, id: item.prId || item.id };
     try {
       // Luồng 1: Cập nhật trạng thái thông báo
       // Gọi hàm để đánh dấu thông báo này là đã đọc, không ảnh hưởng đến luồng điều hướng
-      onRead(id);
+      console.log('sta: ', item);
+      const isEdit = await onRead(id);
+      if (isEdit) {
+        return navigate('InformationItemsPcPrScreen', { item: newItem });
+      }
+      if (status === 'PO') {
+        return showAlert(
+          'Xác nhận tạo PO',
+          `Bạn có chắc chắn muốn tạo **${item.prNo}** thành PO không?`,
+          [
+            {
+              text: t('assignPrice.close'),
+              onPress: () => {},
+              style: 'cancel',
+            },
+            {
+              text: t('assignPrice.confirm'),
+              onPress: () => onCreatePo(item.prNo),
+            },
+          ],
+        );
+      }
 
       // Luồng 2: Xử lý các trạng thái cần duyệt (PM, PA, PC)
       // Sử dụng Map để ánh xạ trạng thái với ID vai trò cụ thể cần duyệt
@@ -122,7 +173,7 @@ const {showLoading,hideLoading,showToast}=useAlert()
       // và người dùng hiện tại có vai trò cần thiết để duyệt hay không
       if (requiredRole && infoUser?.groups?.some(i => i.id === requiredRole)) {
         // Điều hướng đến màn hình duyệt đơn hàng
-        return navigate('DetailOrderApproveScreen', { item:newItem, onApproved });
+        return navigate('DetailOrderApproveScreen', { item: newItem, onApproved });
       }
 
       // Luồng 3: Xử lý trạng thái "Chờ gán giá" (PP)
@@ -138,15 +189,18 @@ const {showLoading,hideLoading,showToast}=useAlert()
         if (canAssignPrice) {
           // Điều hướng đến màn hình gán giá
           return navigate('InformationItemsAssignPrice', {
-            item:newItem,
-            updateCacheAndTotal: () => {},
+            item: newItem,
+            updateCacheAndTotal: () => {
+              console.log('bấm số 1');
+              // DeviceEventEmitter.emit('refreshListAssignPrice');
+            },
           });
         }
       }
 
       // Luồng 4: Xử lý các trạng thái còn lại
       // Nếu không khớp với bất kỳ điều kiện nào ở trên, điều hướng đến màn hình chi tiết thông thường
-      navigate('InformationItemsPcPrScreen', { item:newItem });
+      navigate('InformationItemsPcPrScreen', { item: newItem });
     } catch (error) {
       // Xử lý lỗi nếu có bất kỳ vấn đề nào xảy ra trong quá trình điều hướng
       console.error('Error navigating:', error);

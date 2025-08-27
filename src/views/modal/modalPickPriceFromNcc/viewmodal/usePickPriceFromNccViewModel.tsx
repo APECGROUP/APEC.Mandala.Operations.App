@@ -1,12 +1,16 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { fetchNccData, fetchPickPriceFromNcc, IItemSupplier } from '../modal/PickPriceFromNccModal';
+import { fetchPickPriceFromNcc, IItemSupplier } from '../modal/PickPriceFromNccModal';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;
 
-export function usePickPriceFromNccViewModel(itemCode: string) {
+export function usePickPriceFromNccViewModel(
+  itemCode: string,
+  timeSystem: string,
+  requestDate: string,
+) {
   const [searchKey, setSearchKey] = useState<string>('');
   const queryClient = useQueryClient();
 
@@ -21,10 +25,24 @@ export function usePickPriceFromNccViewModel(itemCode: string) {
     hasNextPage,
     isRefetching,
   } = useInfiniteQuery<IItemSupplier[], Error>({
-    queryKey: ['listPickPriceFromNcc', searchKey.trim(), searchKey, itemCode],
+    queryKey: [
+      'listPickPriceFromNcc',
+      searchKey.trim(),
+      searchKey,
+      itemCode,
+      timeSystem,
+      requestDate,
+    ],
     queryFn: async ({ pageParam }: { pageParam?: any }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
-      return fetchPickPriceFromNcc(page, ITEMS_PER_PAGE, searchKey, itemCode);
+      return fetchPickPriceFromNcc(
+        page,
+        ITEMS_PER_PAGE,
+        searchKey,
+        itemCode,
+        timeSystem,
+        requestDate,
+      );
     },
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,

@@ -136,7 +136,12 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
             const updated = updatedItems.find(i => i.id === item.id);
             console.log('11111111', updated, updatedItems, page);
             return updated
-              ? { ...item, ...updated, vendor: updated.vendor || updated?.vendorCode }
+              ? {
+                  ...item,
+                  ...updated,
+                  vendor: updated.vendor || updated?.vendorCode,
+                  vat: updated.vat || updated.vatCode,
+                }
               : item;
           }),
         ),
@@ -217,20 +222,22 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
     });
   };
 
-  const onAssign = async (func?: () => void) => {
+  const onAssign = async (func?: (i?: any) => void) => {
     try {
+      // func?.();
+      // return;
       setIsLoadingAssign(true);
       const { isSuccess, message } = await checkAssignPr(id, flatData);
       console.log('gán giá api: ', isSuccess, message);
+      DeviceEventEmitter.emit('refreshListAssignPrice');
       setIsLoadingAssign(false);
       if (!isSuccess) {
         return showToast(message || t('error.subtitle'), TYPE_TOAST.ERROR);
       }
       if (func) {
         console.log('có hàm nè');
-        func();
+        func(id);
       }
-      // DeviceEventEmitter.emit('refreshListAssignPrice');
       console.log('gán giá thành công');
       showAlert(
         t('informationItem.assignSuccess'),
@@ -239,6 +246,7 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
           {
             text: t('Trở về'),
             onPress: () => {
+              // DeviceEventEmitter.emit('refreshListAssignPrice');
               goBack();
             },
           },

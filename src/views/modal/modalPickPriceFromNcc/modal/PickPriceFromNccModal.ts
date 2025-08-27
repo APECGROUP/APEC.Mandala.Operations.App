@@ -1,4 +1,3 @@
-import { Filter, IParams } from '@/screens/approvePrScreen/modal/ApproveModal';
 import {
   IItemVendorPrice,
   IResponseVendorPriceList,
@@ -57,6 +56,36 @@ export interface ResponseNcc {
   name: string | undefined;
 }
 
+interface FilterItem {
+  propertyName: string;
+  propertyType: string;
+  operator: string;
+  propertyValue: string;
+}
+
+interface FilterGroup {
+  filters: FilterItem[];
+  condition: 'And' | 'Or';
+}
+
+interface MoreFilterGroup {
+  groupFilters: FilterGroup[];
+  condition: 'And' | 'Or';
+}
+
+interface Params {
+  pagination: {
+    pageIndex: number;
+    pageSize: number;
+    isAll: boolean;
+  };
+  filter: {
+    textSearch: string;
+    filterGroup: FilterGroup[];
+    moreFilterGroup: MoreFilterGroup;
+  };
+}
+
 export const fetchNccData = async (
   page: number,
   limit: number = 50,
@@ -88,36 +117,14 @@ export const fetchPickPriceFromNcc = async (
   limit: number = 50,
   searchKey: string,
   itemCode: string,
+  timeSystem: string,
+  requestDate: string,
 ): Promise<IItemVendorPrice[]> => {
   try {
-    const filterList: Filter[] = [];
+    const fomatRequestDate = moment(requestDate).format('YYYY-MM-DD');
+    const fomatTimeSystem = moment(timeSystem, 'DD/MM/YYYY').format('YYYY-MM-DD');
 
-    filterList.push({
-      propertyName: 'status',
-      propertyValue: 'A',
-      propertyType: 'string',
-      operator: '==',
-    });
-    filterList.push({
-      propertyName: 'itemCode',
-      propertyValue: itemCode,
-      propertyType: 'string',
-      operator: '==',
-    });
-    filterList.push({
-      propertyName: 'validTo',
-      propertyValue: moment().format('YYYY-MM-DD'),
-      propertyType: 'string',
-      operator: '>=',
-    });
-    filterList.push({
-      propertyName: 'validFrom',
-      propertyValue: moment().format('YYYY-MM-DD'),
-      propertyType: 'string',
-      operator: '<=',
-    });
-
-    const params: IParams = {
+    const params: Params = {
       pagination: {
         pageIndex: page,
         pageSize: limit,
@@ -125,18 +132,63 @@ export const fetchPickPriceFromNcc = async (
       },
       filter: {
         textSearch: searchKey?.trim(),
-        ...(filterList.length > 0 && {
-          filterGroup: [
+
+        filterGroup: [
+          {
+            filters: [
+              {
+                propertyName: 'itemCode',
+                propertyType: 'string',
+                operator: '==',
+                propertyValue: itemCode,
+              },
+              {
+                propertyName: 'status',
+                propertyType: 'string',
+                operator: '==',
+                propertyValue: 'A',
+              },
+              {
+                propertyName: 'validFrom',
+                propertyType: 'date',
+                operator: '<=',
+                propertyValue: fomatTimeSystem,
+              },
+              {
+                propertyName: 'validFrom',
+                propertyType: 'date',
+                operator: '<=',
+                propertyValue: fomatRequestDate,
+              },
+            ],
+            condition: 'And',
+          },
+        ],
+        moreFilterGroup: {
+          groupFilters: [
             {
-              condition: 'And',
-              filters: filterList,
+              filters: [
+                {
+                  propertyName: 'validTo',
+                  propertyType: 'date',
+                  operator: '==',
+                  propertyValue: '',
+                },
+                {
+                  propertyName: 'validTo',
+                  propertyType: 'date',
+                  operator: '>',
+                  propertyValue: fomatRequestDate,
+                },
+              ],
+              condition: 'Or',
             },
           ],
-        }),
+          condition: 'And',
+        },
       },
     };
 
-    // Dùng đúng interface cho response từ API
     const response = await api.post<IResponseVendorPriceList>(
       ENDPOINT.GET_LIST_VENDOR_PRICE,
       params,
@@ -146,7 +198,6 @@ export const fetchPickPriceFromNcc = async (
       throw new Error('Failed to fetch data');
     }
 
-    // Trả về một object chứa cả data và pagination
     return response.data.data;
   } catch (error) {
     throw error;

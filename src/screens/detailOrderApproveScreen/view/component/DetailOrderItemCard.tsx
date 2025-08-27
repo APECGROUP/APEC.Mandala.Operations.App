@@ -12,7 +12,6 @@ import IconSub from '@assets/icon/IconSub';
 import IconPlus from '@assets/icon/IconPlus';
 import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
-import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
 import { IItemVendorPrice } from '@/screens/createPriceScreen/modal/CreatePriceModal';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
@@ -72,6 +71,7 @@ const DetailOrderItemCard = ({
       ncc,
       itemCode: item.itemCode,
       onSetPrice,
+      requestDate: '',
     });
   };
 

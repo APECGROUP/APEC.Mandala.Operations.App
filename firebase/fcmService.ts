@@ -15,7 +15,6 @@ import {
   AuthorizationStatus,
   registerDeviceForRemoteMessages,
 } from '@react-native-firebase/messaging';
-import Clipboard from '@react-native-clipboard/clipboard';
 // Không cần import useInfoUser ở đây nữa vì đây là hàm tiện ích
 // import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 

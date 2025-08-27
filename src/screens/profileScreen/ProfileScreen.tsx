@@ -1,5 +1,5 @@
 import { ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../navigation/params';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,6 @@ import { ResponseImageElement } from '../../interface/Verify.interface';
 import { AppText } from '../../elements/text/AppText';
 import { useInfoUser } from '../../zustand/store/useInfoUser/useInfoUser';
 import { getFontSize } from '../../constants';
-import AppImage from '../../elements/appImage/AppImage';
 import IconTakeCamera from '@assets/icon/IconTakeCamera';
 import { Colors } from '@/theme/Config';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
