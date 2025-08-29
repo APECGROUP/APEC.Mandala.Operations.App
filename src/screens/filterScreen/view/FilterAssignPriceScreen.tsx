@@ -19,6 +19,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AssignPriceFilters } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { Colors } from '@/theme/Config';
 
 const FilterAssignPriceScreen = ({
   route,
@@ -111,7 +112,7 @@ const FilterAssignPriceScreen = ({
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
 
         <View style={styles.form}>
           <AppTextInput

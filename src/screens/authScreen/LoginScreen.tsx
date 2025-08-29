@@ -76,7 +76,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
 
   return (
     <>
-      <StatusBar barStyle="light-content" backgroundColor="white" />
+      <StatusBar barStyle="light-content" />
       <ViewContainer>
         <View style={[styles.container, { paddingBottom: bottom }]}>
           <View style={styles.center}>

@@ -91,7 +91,7 @@ const FilterCreatePriceScreen = ({
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
 
         <View style={styles.form}>
           <AppBlockButton style={styles.width100} onPress={onPressNcc}>

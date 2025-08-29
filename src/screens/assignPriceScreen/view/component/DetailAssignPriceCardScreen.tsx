@@ -80,7 +80,7 @@ const DetailAssignPriceCardScreen = ({
   return (
     <ViewContainer>
       <View style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
         <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
 
         <AppBlockButton onPress={onCopy} style={styles.prRow}>

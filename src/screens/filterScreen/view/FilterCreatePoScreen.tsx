@@ -19,6 +19,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CreatePoFilters } from '@/screens/createPoScreen/modal/CreatePoModal';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import { Colors } from '@/theme/Config';
 
 const FilterCreatePoScreen = ({
   route,
@@ -109,7 +110,7 @@ const FilterCreatePoScreen = ({
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
 
         <View style={styles.form}>
           <AppTextInput

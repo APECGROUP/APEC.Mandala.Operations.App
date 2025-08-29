@@ -109,7 +109,7 @@ const AccountScreen = () => {
   return (
     <ViewContainer>
       <View style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
         <View>
           <View>
             <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>

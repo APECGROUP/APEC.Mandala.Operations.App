@@ -20,6 +20,7 @@ import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
 import { IApproveFilters } from '@/screens/approvePrScreen/modal/ApproveModal';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { Colors } from '@/theme/Config';
 
 const FilterApproveScreen = ({
   route,
@@ -123,7 +124,7 @@ const FilterApproveScreen = ({
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
 
         <View style={styles.form}>
           <AppTextInput

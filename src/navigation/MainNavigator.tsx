@@ -67,7 +67,9 @@ export default function MainNavigator() {
       screenOptions={{
         // animation: 'simple_push',
         headerShown: false,
+
         headerTransparent: false,
+        // headerStyle: { backgroundColor: 'red' },
         headerBackButtonDisplayMode: 'minimal',
         headerLeft: HeaderLeft,
 
@@ -82,6 +84,7 @@ export default function MainNavigator() {
         contentStyle: {
           backgroundColor: '#fff',
           paddingHorizontal: PaddingHorizontal,
+          // paddingTop: 10,
         },
         headerTitleAlign: 'center',
       }}>

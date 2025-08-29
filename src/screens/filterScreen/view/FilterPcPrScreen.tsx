@@ -20,6 +20,7 @@ import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
 import { PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';
 import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
 import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { Colors } from '@/theme/Config';
 
 const FilterPcPrScreen = ({
   route,
@@ -143,7 +144,7 @@ const FilterPcPrScreen = ({
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
 
         <View style={styles.form}>
           <AppTextInput
