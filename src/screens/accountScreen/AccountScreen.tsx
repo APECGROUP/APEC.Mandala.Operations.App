@@ -114,7 +114,7 @@ const AccountScreen = () => {
           <View>
             <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>
               <View style={{ marginTop: vs(20) }}>
-                <FastImage style={styles.avatar} source={{ uri: `${BASE_URL}/${infoUser?.avatar}` }} />
+                <FastImage style={styles.avatar} source={{ uri: infoUser?.avatar }} />
                 <IconEditAvatar style={styles.editIcon} />
               </View>
               <AppText weight="700" size={18} mb={2}>

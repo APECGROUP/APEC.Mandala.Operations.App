@@ -37,7 +37,7 @@ const Header = ({
       <View
         style={[
           styles.container,
-          { paddingTop: top },
+          { paddingTop: Math.max(top, vs(50)) },
           primary && { backgroundColor: Colors.PRIMARY },
         ]}>
         <AppBlockButton onPress={goBack} style={[styles.buttonBack, { width: iconWidth }]}>

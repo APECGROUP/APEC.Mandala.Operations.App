@@ -98,7 +98,7 @@ const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'Profi
 
         <ScrollView contentContainerStyle={styles.fg1}>
           <TouchableOpacity style={styles.avatar} activeOpacity={0.8} onPress={onUpdateAvatar}>
-            <FastImage style={styles.avatar} source={{ uri: `${BASE_URL}/${infoUser?.avatar}` }} />
+            <FastImage style={styles.avatar} source={{ uri: infoUser?.avatar }} />
             <IconTakeCamera style={styles.editIcon} />
           </TouchableOpacity>
           <AppText style={styles.textTitle}>{t('account.profile.changePhoto')}</AppText>

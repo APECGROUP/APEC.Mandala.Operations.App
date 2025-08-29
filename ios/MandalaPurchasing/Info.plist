@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mandala Purchasing DEV</string>
+	<string>Mandala Purchasing</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,11 +21,9 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>8</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NFCReaderUsageDescription</key>
-	<string>We need to use NFC</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -34,13 +32,11 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your Camera.</string>
+	<string>Mandala Purchasing cần quyền truy cập camera của bạn để thay đổi avatar.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Ứng dụng cần truy cập danh bạ để tìm bạn bè.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Mandala Operations cần truy cập thư viện ảnh để bạn có thể chọn ảnh từ thiết bị.</string>
+	<string>Mandala Purchasing cần truy cập thư viện ảnh của bạn để thay đổi avatar.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>GoogleSans-Bold.ttf</string>

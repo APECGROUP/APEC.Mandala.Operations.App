@@ -136,9 +136,9 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
     try {
       // Luồng 1: Cập nhật trạng thái thông báo
       // Gọi hàm để đánh dấu thông báo này là đã đọc, không ảnh hưởng đến luồng điều hướng
-      console.log('sta: ', item);
       const isEdit = await onRead(id);
-      if (isEdit) {
+      console.log('sta: ', item, isEdit, !isEdit, infoUser);
+      if (!isEdit) {
         return navigate('InformationItemsPcPrScreen', { item: newItem });
       }
       if (status === 'PO') {
@@ -180,11 +180,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
       if (status === 'PP') {
         // Kiểm tra xem người dùng có vai trò được phép gán giá không
         const canAssignPrice = infoUser?.groups?.some(
-          i =>
-            // Nếu người dùng là ADMIN
-            i.id === GROUP_ROLES.ADMIN ||
-            // Hoặc có bất kỳ vai trò nào trong nhóm người duyệt
-            Object.values(GROUP_ROLES.PR_APPROVER).includes(i.id),
+          i => i.id === GROUP_ROLES.PO_CREATOR_ASSIGNER || i.id === GROUP_ROLES.ADMIN,
         );
         if (canAssignPrice) {
           // Điều hướng đến màn hình gán giá

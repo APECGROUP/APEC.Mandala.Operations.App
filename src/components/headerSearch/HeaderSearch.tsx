@@ -55,7 +55,7 @@ const HeaderSearch = ({
       <View style={[styles.headerContainer, { marginTop: top || vs(20) }]}>
         <View style={styles.headerLeft}>
           <AppBlockButton onPress={goToAccount}>
-            <FastImage source={{ uri: `${BASE_URL}/${infoUser?.avatar}` }} style={styles.avatar} />
+            <FastImage source={{ uri: infoUser?.avatar }} style={styles.avatar} />
           </AppBlockButton>
 
           <View style={styles.greetingContainer}>
