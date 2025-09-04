@@ -111,7 +111,6 @@ export const fetchNccData = async (
     throw error;
   }
 };
-
 export const fetchPickPriceFromNcc = async (
   page: number,
   limit: number = 50,
@@ -121,8 +120,69 @@ export const fetchPickPriceFromNcc = async (
   requestDate: string,
 ): Promise<IItemVendorPrice[]> => {
   try {
-    const fomatRequestDate = moment(requestDate).format('YYYY-MM-DD');
-    const fomatTimeSystem = moment(timeSystem, 'DD/MM/YYYY').format('YYYY-MM-DD');
+    const fomatRequestDate = requestDate ? moment(requestDate).format('YYYY-MM-DD') : '';
+    const fomatTimeSystem = timeSystem ? moment(timeSystem, 'DD/MM/YYYY').format('YYYY-MM-DD') : '';
+
+    const filters: FilterItem[] = [
+      {
+        propertyName: 'itemCode',
+        propertyType: 'string',
+        operator: '==',
+        propertyValue: itemCode,
+      },
+      {
+        propertyName: 'status',
+        propertyType: 'string',
+        operator: '==',
+        propertyValue: 'A',
+      },
+    ];
+
+    if (fomatTimeSystem) {
+      filters.push({
+        propertyName: 'validFrom',
+        propertyType: 'date',
+        operator: '<=',
+        propertyValue: fomatTimeSystem,
+      });
+    }
+
+    if (fomatRequestDate) {
+      filters.push({
+        propertyName: 'validFrom',
+        propertyType: 'date',
+        operator: '<=',
+        propertyValue: fomatRequestDate,
+      });
+    }
+
+    const validToFilters: FilterItem[] = [
+      {
+        propertyName: 'validTo',
+        propertyType: 'date',
+        operator: '==',
+        propertyValue: '',
+      },
+    ];
+
+    if (fomatRequestDate) {
+      validToFilters.push({
+        propertyName: 'validTo',
+        propertyType: 'date',
+        operator: '>',
+        propertyValue: fomatRequestDate,
+      });
+    }
+
+    const moreFilterGroup: MoreFilterGroup = {
+      groupFilters: [
+        {
+          filters: validToFilters,
+          condition: 'Or',
+        },
+      ],
+      condition: 'And',
+    };
 
     const params: Params = {
       pagination: {
@@ -132,60 +192,13 @@ export const fetchPickPriceFromNcc = async (
       },
       filter: {
         textSearch: searchKey?.trim(),
-
         filterGroup: [
           {
-            filters: [
-              {
-                propertyName: 'itemCode',
-                propertyType: 'string',
-                operator: '==',
-                propertyValue: itemCode,
-              },
-              {
-                propertyName: 'status',
-                propertyType: 'string',
-                operator: '==',
-                propertyValue: 'A',
-              },
-              {
-                propertyName: 'validFrom',
-                propertyType: 'date',
-                operator: '<=',
-                propertyValue: fomatTimeSystem,
-              },
-              {
-                propertyName: 'validFrom',
-                propertyType: 'date',
-                operator: '<=',
-                propertyValue: fomatRequestDate,
-              },
-            ],
+            filters: filters,
             condition: 'And',
           },
         ],
-        moreFilterGroup: {
-          groupFilters: [
-            {
-              filters: [
-                {
-                  propertyName: 'validTo',
-                  propertyType: 'date',
-                  operator: '==',
-                  propertyValue: '',
-                },
-                {
-                  propertyName: 'validTo',
-                  propertyType: 'date',
-                  operator: '>',
-                  propertyValue: fomatRequestDate,
-                },
-              ],
-              condition: 'Or',
-            },
-          ],
-          condition: 'And',
-        },
+        moreFilterGroup: moreFilterGroup,
       },
     };
 

@@ -13,6 +13,7 @@ import { goBack } from './RootNavigation';
 import { StyleSheet } from 'react-native';
 import { Colors } from '@/theme/Config';
 import ChangePasswordScreen from '@/screens/changePasswordScreen/ChangePasswordScreen';
+import { isAndroid } from '@/utils/Utilities';
 
 const { Navigator, Screen, Group } = createNativeStackNavigator<AuthParams>();
 export const HeaderLeft = () => (
@@ -30,12 +31,13 @@ export default function AuthNavigator() {
     <Navigator
       screenOptions={{
         // animation: 'simple_push',
+
         headerShown: false,
         headerTransparent: false,
         headerBackButtonDisplayMode: 'minimal',
         headerLeft: HeaderLeft,
         headerTitleStyle: {
-          fontSize: getFontSize(18),
+          fontSize: isAndroid() ? 18 : getFontSize(18),
           color: light.text,
           fontWeight: '700',
         },

@@ -4,7 +4,7 @@ import { MainParams } from './params';
 import { s } from 'react-native-size-matters';
 import NotificationScreen from '../screens/notificationScreen/view/NotificationScreen';
 
-import Utilities from '../utils/Utilities';
+import Utilities, { isAndroid } from '../utils/Utilities';
 import { useAlert } from '../elements/alert/AlertProvider';
 import ModalPhotoOrCamera from '../views/modal/ModalPhotoOrCamera';
 import ProfileScreen from '../screens/profileScreen/ProfileScreen';
@@ -67,17 +67,17 @@ export default function MainNavigator() {
       screenOptions={{
         // animation: 'simple_push',
         headerShown: false,
-
         headerTransparent: false,
         // headerStyle: { backgroundColor: 'red' },
         headerBackButtonDisplayMode: 'minimal',
         headerLeft: HeaderLeft,
 
         headerTitleStyle: {
-          fontSize: getFontSize(18),
+          fontSize: isAndroid() ? 18 : getFontSize(18),
           color: light.text,
           fontWeight: '700',
         },
+        headerStyle: {},
 
         headerShadowVisible: false,
 
