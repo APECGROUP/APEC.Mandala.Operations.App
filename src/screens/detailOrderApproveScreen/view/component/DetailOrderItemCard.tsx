@@ -21,7 +21,6 @@ const DetailOrderItemCard = ({
   item,
   onUpdateQuantity,
   onUpdateNCC,
-  onUpdatePrice,
   requestDate,
 }: {
   item: IItemInDetailPr;
@@ -62,7 +61,7 @@ const DetailOrderItemCard = ({
       vendor: i.vendorCode,
     } as IItemVendorPrice);
   };
-  const onSetPrice = async (price: number) => {
+  const onSetPrice = async () => {
     try {
       // await onUpdatePrice?.(item.id, Number(price || 0));
     } catch (error) {}
@@ -95,6 +94,7 @@ const DetailOrderItemCard = ({
     if (!item.approvedQuantity && item.quantity) {
       onUpdateQuantity({ ...item, approvedQuantity: item.quantity });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

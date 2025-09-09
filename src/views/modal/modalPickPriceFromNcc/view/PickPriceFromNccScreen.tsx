@@ -116,6 +116,7 @@ const PickPriceFromNccScreen = ({ navigation, route }: Props) => {
   };
   useEffect(() => {
     getTimeSystem();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>

@@ -60,6 +60,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
 
   useEffect(() => {
     getFCMTokenAndSendToServer(t, setDeviceToken);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const disabled = !userName || !password || !hotel?.code;
 

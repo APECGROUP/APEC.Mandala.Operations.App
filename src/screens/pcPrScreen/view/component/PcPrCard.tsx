@@ -5,7 +5,6 @@ import IconInfomation from '../../../../../assets/icon/IconInfomation';
 import IconNote from '../../../../../assets/icon/IconNote';
 import { memo, useCallback } from 'react';
 import { getFontSize } from '@/constants';
-import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
 import { IItemPcPr } from '../../modal/PcPrModal';
@@ -20,8 +19,6 @@ interface PcPrCardProps {
 }
 
 const PcPrCard = memo<PcPrCardProps>(({ item }) => {
-  const { t } = useTranslation();
-
   const handlePress = useCallback(() => {
     navigate('InformationItemsPcPrScreen', { item });
   }, [item]);

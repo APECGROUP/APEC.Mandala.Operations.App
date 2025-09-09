@@ -14,7 +14,6 @@ import IconCalendar from '@assets/icon/IconCalendar';
 import IconCopy from '@assets/icon/IconCopy';
 import Images from '@assets/image/Images';
 import { Colors } from '@/theme/Config';
-import { navigate } from '@/navigation/RootNavigation';
 import moment from 'moment';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BlockStatus from '@/components/blockStatus/BlockStatus';
@@ -46,8 +45,8 @@ const DetailPcPrCardScreen = ({
   const { item } = route.params;
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
-  const [dateCreate, setDateCreate] = useState<Date | undefined>(item.prDate);
-  const [dateEstimate, setDateEstimate] = useState<Date | undefined>(item.expectedDate);
+  const [dateCreate] = useState<Date | undefined>(item.prDate);
+  const [dateEstimate] = useState<Date | undefined>(item.expectedDate);
   const [isCoppied, setIsCoppied] = useState(false);
 
   const onCopy = useCallback(() => {
@@ -58,19 +57,19 @@ const DetailPcPrCardScreen = ({
     }, 2000);
   }, [item]);
 
-  const onPressDateCreate = useCallback(() => {
-    navigate('ModalPickCalendar', {
-      isSingleMode: true,
-      onSelectDate: setDateCreate,
-    });
-  }, []);
+  // const onPressDateCreate = useCallback(() => {
+  //   navigate('ModalPickCalendar', {
+  //     isSingleMode: true,
+  //     onSelectDate: setDateCreate,
+  //   });
+  // }, []);
 
-  const onPressDateEstimate = useCallback(() => {
-    navigate('ModalPickCalendar', {
-      isSingleMode: true,
-      onSelectDate: setDateEstimate,
-    });
-  }, []);
+  // const onPressDateEstimate = useCallback(() => {
+  //   navigate('ModalPickCalendar', {
+  //     isSingleMode: true,
+  //     onSelectDate: setDateEstimate,
+  //   });
+  // }, []);
 
   const formatDate = useCallback((date: Date | undefined) => moment(date).format('DD/MM/YYYY'), []);
 

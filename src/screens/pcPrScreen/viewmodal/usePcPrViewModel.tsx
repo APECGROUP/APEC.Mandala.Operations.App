@@ -59,6 +59,7 @@ export function usePcPrViewModel() {
     isError,
     error,
   } = useInfiniteQuery<PageData, Error>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey,
     queryFn: async ({ pageParam = 1 }) =>
       fetchPcPrData(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),

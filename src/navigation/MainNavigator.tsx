@@ -25,7 +25,6 @@ import PickDepartmentScreen from '@/views/modal/modalPickDepartment/view/PickDep
 import PickRequesterScreen from '@/views/modal/modalPickRequester/view/PickRequesterScreen';
 import CreatePriceNccScreen from '@/screens/createPriceScreen/view/component/CreatePriceNccScreen';
 import ApprovePrScreen from '@/screens/approvePrScreen/view/ApprovePrScreen';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import DetailApproveCardScreen from '@/screens/approvePrScreen/view/component/DetailApproveCardScreen';
 import DetailOrderApproveScreen from '@/screens/detailOrderApproveScreen/view/DetailOrderApproveScreen';
 import PickItemScreen from '@/views/modal/modalPickItem/view/PickItemScreen';
@@ -51,8 +50,6 @@ export default function MainNavigator() {
   const getPermission = async () => {
     await Utilities.requestNotificationPermission(showAlert);
   };
-
-  const { infoUser } = useInfoUser();
 
   useEffect(() => {
     // fetData();

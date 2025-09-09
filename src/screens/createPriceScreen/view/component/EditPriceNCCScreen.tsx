@@ -45,6 +45,7 @@ const EditPriceNCCScreen: React.FC<EditPriceNCCScreenProps> = ({ route }) => {
   useEffect(() => {
     // Gọi API lấy danh sách VAT khi component mount
     getListVat();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   console.log('render: ', item, editingItem);
   // Hàm xử lý khi ấn nút lưu
@@ -148,12 +149,6 @@ const EditPriceNCCScreen: React.FC<EditPriceNCCScreenProps> = ({ route }) => {
     setIsEditPrice(false);
     // Cập nhật giá từ ref vào state khi blur
     setEditingItem(prev => ({ ...prev, price: priceRef.current }));
-  }, []);
-
-  const resetPrice = useCallback(() => {
-    setIsEditPrice(true);
-    priceRef.current = '';
-    inputRef.current?.setNativeProps({ text: '' });
   }, []);
 
   const isError = useMemo(

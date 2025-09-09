@@ -26,7 +26,6 @@ export const useAuthViewModel = () => {
   const { t } = useTranslation();
   const { showAlert, showToast } = useAlert();
   const { setIsLogin } = useIsLogin();
-  const { saveInfoUser } = useInfoUser();
   const queryClient = useQueryClient();
 
   const [processing, setProcessing] = useState(false);

@@ -59,6 +59,7 @@ const CreatePriceNccScreen = () => {
     setTimeout(() => {
       scrollToTop();
     }, 200);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Hàm cập nhật một item trong danh sách
@@ -78,6 +79,7 @@ const CreatePriceNccScreen = () => {
       // Nếu không trùng thì update
       return prevList.map(item => (item.id === updatedItem.id ? updatedItem : item));
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Hàm xóa một item khỏi danh sách
@@ -142,6 +144,7 @@ const CreatePriceNccScreen = () => {
         }}
       />
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [flashListNativeGesture, handleDelete, listVat, onUpdateItem],
   );
 
@@ -196,6 +199,7 @@ const CreatePriceNccScreen = () => {
   useEffect(() => {
     getListVat();
     getTimeSystem();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [t, showToast]);
 
   return (

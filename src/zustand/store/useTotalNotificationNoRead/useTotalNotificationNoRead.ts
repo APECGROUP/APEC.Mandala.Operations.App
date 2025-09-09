@@ -10,7 +10,7 @@ interface typeInfo {
   fetData: () => Promise<void>;
 }
 
-export const useTotalNotificationNoRead = create<typeInfo>((set, get) => ({
+export const useTotalNotificationNoRead = create<typeInfo>(set => ({
   totalNotification: 0,
 
   setTotal: (val: number) => {

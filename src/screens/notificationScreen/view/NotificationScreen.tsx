@@ -261,6 +261,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     fetData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isError) {

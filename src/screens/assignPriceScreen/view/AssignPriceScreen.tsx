@@ -16,7 +16,6 @@ import { AppText } from '@/elements/text/AppText';
 import { useAssignPriceViewModel } from '../viewmodal/useAssignPriceViewModel';
 import ToastContainer from '@/elements/toast/ToastContainer';
 import AssignPriceCard from './component/AssignPriceCard';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
@@ -46,7 +45,7 @@ const AssignPriceScreen: React.FC = () => {
   } = useAssignPriceViewModel({}); // Truyền một object rỗng, ViewModel sẽ khởi tạo internal state của nó
 
   const refToast = useRef<any>(null);
-  const flashListRef = useRef<FlashList<IItemAssignPrice> | null>(null);
+  const flashListRef = useRef<any>(null);
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
@@ -93,17 +92,12 @@ const AssignPriceScreen: React.FC = () => {
     return null;
   }, [isFetchingNextPage]);
 
-  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
-  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
-
   const renderItem = useCallback(
     ({ item, index }: { item: IItemAssignPrice; index: number }) => (
       <AssignPriceCard item={item} index={index} updateCacheAndTotal={updateCacheAndTotal} />
     ),
-    [],
+    [updateCacheAndTotal],
   );
-
-  const { infoUser } = useInfoUser();
 
   // Xử lý lỗi ban đầu hoặc khi có lỗi API
   const [hasInitialLoadError, setHasInitialLoadError] = useState(false);
@@ -174,7 +168,6 @@ const AssignPriceScreen: React.FC = () => {
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent} // Chỉ hiện nếu data rỗng sau khi loading
             ListFooterComponent={listFooterComponent}
-            estimatedItemSize={100}
             contentContainerStyle={styles.listContent}
           />
         )}

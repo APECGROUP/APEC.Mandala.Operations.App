@@ -3,7 +3,6 @@
 import React, { useRef, useCallback, useMemo, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useRoute } from '@react-navigation/native';
 
@@ -18,7 +17,6 @@ import { AppText } from '@/elements/text/AppText';
 import { useCreatePoViewModel } from '../viewmodal/useCreatePoViewModal';
 import ToastContainer from '@/elements/toast/ToastContainer';
 import { Colors } from '@/theme/Config';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
@@ -29,7 +27,6 @@ import HeaderSearch from '@/components/headerSearch/HeaderSearch';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 
 export default function CreatePoScreen() {
-  const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
 
@@ -53,10 +50,9 @@ export default function CreatePoScreen() {
     onCreatePo,
     isLoadingCreatePo,
   } = useCreatePoViewModel();
-  const { infoUser } = useInfoUser();
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
-  const flashListRef = useRef<FlashList<IItemCreatePo> | null>(null);
+  const flashListRef = useRef<any>(null);
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
@@ -68,10 +64,6 @@ export default function CreatePoScreen() {
       applyFilters(route.params.filters);
     }
   }, [route.params?.filters, applyFilters]);
-
-  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
-  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
-  // const onCreatePo = useCallback(() => navigate('CreatePoNccScreen'), []);
 
   const reLoadData = useCallback(() => {
     onRefresh();

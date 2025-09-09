@@ -28,7 +28,6 @@ import { TYPE_TOAST } from '@/elements/toast/Message';
 import { useQueryClient } from '@tanstack/react-query';
 import { checkTurnOnOffNotification } from '../authScreen/modal/AuthModal';
 import FastImage from 'react-native-fast-image';
-import { BASE_URL } from '@/env';
 
 const AccountScreen = () => {
   const { t } = useTranslation();

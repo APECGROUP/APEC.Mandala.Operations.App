@@ -7,7 +7,6 @@ import IconNote from '../../../../../assets/icon/IconNote';
 import Images from '../../../../../assets/image/Images';
 import { memo, useCallback } from 'react';
 import { getFontSize } from '@/constants';
-import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
 import { IItemAssignPrice } from '../../modal/AssignPriceModal';
@@ -21,8 +20,6 @@ interface AssignPriceCardProps {
 }
 
 const AssignPriceCard = memo<AssignPriceCardProps>(({ item, updateCacheAndTotal }) => {
-  const { t } = useTranslation();
-
   const handlePress = useCallback(() => {
     navigate('InformationItemsAssignPrice', { item, updateCacheAndTotal });
   }, [item, updateCacheAndTotal]);

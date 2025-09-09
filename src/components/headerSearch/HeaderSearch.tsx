@@ -17,7 +17,6 @@ import { navigate } from '../../navigation/RootNavigation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatNotificationCount } from '@/screens/notificationScreen/view/NotificationScreen';
 import { useTotalNotificationNoRead } from '@/zustand/store/useTotalNotificationNoRead/useTotalNotificationNoRead';
-import { BASE_URL } from '@/env';
 type propsHeaderSearch = {
   currentPrNoInput: string;
   onSearch: (text: string) => void;
@@ -39,7 +38,7 @@ const HeaderSearch = ({
   const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
   useEffect(() => {
     fetData();
-  }, []);
+  }, [fetData]);
 
   return (
     <ImageBackground

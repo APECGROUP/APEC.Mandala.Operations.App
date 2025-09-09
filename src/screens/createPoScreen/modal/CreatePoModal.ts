@@ -157,7 +157,7 @@ export const fetchListCreatePo = async (
 
 export const fetchCreatePo = async (prNo: string) => {
   try {
-    const params = { prNo: prNo };
+    // const params = { prNo: prNo };
     const response = await api.post(`${ENDPOINT.CREATE_PO}`, prNo);
     if (response.status === 200 && response.data.isSuccess) {
       return { isSuccess: true, message: '' };

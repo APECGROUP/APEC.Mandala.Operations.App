@@ -82,6 +82,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     isError,
     error,
   } = useInfiniteQuery<PageData, Error>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: queryKey,
     queryFn: async ({ pageParam = 1 }) =>
       fetchApprove(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
@@ -240,7 +241,10 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
         updateCacheAndTotal(item => id !== item.id, 1);
         setSelectedIds(ids => ids.filter(itemId => itemId !== id));
         showToast(t('createPrice.approvedSuccess'), 'success');
+        // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
       } catch (error) {
+        console.log('❌ Approve error:', error);
+        showToast(t('createPrice.approvedFail'), 'error');
       } finally {
         hideLoading();
       }
@@ -267,19 +271,20 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
       }
       onRejectSuccess();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [textReason, showToast, t, updateCacheAndTotal],
   );
 
-
   useEffect(() => {
-      DeviceEventEmitter.addListener('refreshListApprove', () => {
-        console.log('refreshListApprove');
-        onRefresh();
-      });
-      return () => {
-        DeviceEventEmitter.removeAllListeners('refreshListApprove');
-      };
-    }, []);
+    DeviceEventEmitter.addListener('refreshListApprove', () => {
+      console.log('refreshListApprove');
+      onRefresh();
+    });
+    return () => {
+      DeviceEventEmitter.removeAllListeners('refreshListApprove');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     length: totalItems,

@@ -1,3 +1,4 @@
+/* eslint-disable no-catch-shadow */
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -74,6 +75,7 @@ export function useCreatePoViewModel() {
     isError,
     error,
   } = useInfiniteQuery<PageData, Error>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: currentQueryKey,
     queryFn: async ({ pageParam = 1 }) =>
       fetchListCreatePo(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
@@ -226,6 +228,7 @@ export function useCreatePoViewModel() {
       updateCacheAndTotal(item => item.id !== selectedIds[0], 1);
       setSelectedIds([]);
       showToast(t('CreatePo.success'), TYPE_TOAST.SUCCESS);
+      // eslint-disable-next-line @typescript-eslint/no-shadow
     } catch (error) {
       showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
     } finally {

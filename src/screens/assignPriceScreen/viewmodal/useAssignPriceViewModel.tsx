@@ -48,6 +48,7 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
     return () => {
       DeviceEventEmitter.removeAllListeners('refreshListAssignPrice');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const queryKey = useMemo(
@@ -74,6 +75,7 @@ export function useAssignPriceViewModel(initialFilters: AssignPriceFilters = {})
     isError,
     error,
   } = useInfiniteQuery<PageData, Error>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey,
     queryFn: async ({ pageParam = 1 }) =>
       fetchAssignPriceData(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),

@@ -204,6 +204,7 @@ export function useInformationItemsViewModel(id: number, prNo: string) {
       showToast(t('createPrice.rejectSuccess'), 'success');
       // Xoá các item có id nằm trong danh sách ids khỏi cache
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [id, showToast, t, textReason],
   );
 

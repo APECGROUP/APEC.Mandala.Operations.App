@@ -31,7 +31,7 @@ const PickStatusScreen = ({ navigation, route }: Props) => {
   const [data, setData] = useState<IItemStatus[]>([]);
   const [searchKey, setSearchKey] = useState<string>('');
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
-  const { flatData, isLoading, isRefetching, isFetchingNextPage, onRefresh, onLoadMore, onSearch } =
+  const { flatData, isLoading, isRefetching, isFetchingNextPage, onRefresh } =
     usePickStatusViewModel() as {
       flatData: IItemStatus[];
       isLoading: boolean;

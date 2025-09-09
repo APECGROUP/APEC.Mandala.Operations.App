@@ -57,6 +57,7 @@ export function useNotificationViewModel() {
     } else {
       setTotalItemsNoRead(0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.pages[0]?.pagination?.totalNoRead]);
 
   const flatData = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);

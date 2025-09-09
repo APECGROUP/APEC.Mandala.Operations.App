@@ -128,6 +128,7 @@ const MyTabs = () => {
           backgroundColor: light.backgroundScreenDefault,
         },
       }}
+      // eslint-disable-next-line react/no-unstable-nested-components
       tabBar={props => <MyTabBar {...props} />} // MyTabBar không cần tabConfigKey nữa
       initialRouteName={initialRouteName}>
       {availableTabs.map(tab => (

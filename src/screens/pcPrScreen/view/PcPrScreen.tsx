@@ -1,7 +1,6 @@
 import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
 import { View, ActivityIndicator, StatusBar } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 // useFocusEffect không cần thiết nếu logic dùng `applyFilters`
 
@@ -14,7 +13,6 @@ import { navigate } from '@/navigation/RootNavigation';
 import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
 import ToastContainer from '@/elements/toast/ToastContainer';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
@@ -25,7 +23,6 @@ import HeaderSearch from '@/components/headerSearch/HeaderSearch';
 import PcPrCard from './component/PcPrCard';
 
 export default function PcPrScreen() {
-  const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
 
   // ViewModel MVVM - không cần truyền activeFilters vào đây nữa,
@@ -47,7 +44,7 @@ export default function PcPrScreen() {
   } = usePcPrViewModel(); // Truyền một object rỗng, ViewModel sẽ khởi tạo internal state của nó
 
   const refToast = useRef<any>(null);
-  const flashListRef = useRef<FlashList<IItemPcPr> | null>(null);
+  const flashListRef = useRef<any>(null);
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
@@ -94,15 +91,10 @@ export default function PcPrScreen() {
     return null;
   }, [isFetchingNextPage]);
 
-  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
-  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
-
   const renderItem = useCallback(
     ({ item, index }: { item: IItemPcPr; index: number }) => <PcPrCard item={item} index={index} />,
     [],
   );
-
-  const { infoUser } = useInfoUser();
 
   // Xử lý lỗi ban đầu hoặc khi có lỗi API
   const [hasInitialLoadError, setHasInitialLoadError] = useState(false);
@@ -123,7 +115,6 @@ export default function PcPrScreen() {
   }, [onRefresh]);
 
   // Hiển thị FallbackComponent nếu có lỗi tải ban đầu và không có dữ liệu
-  const total = useMemo(() => flatData.length, [flatData.length]); // Có thể lấy từ meta data của API
   if (hasInitialLoadError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
@@ -182,7 +173,6 @@ export default function PcPrScreen() {
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent} // Chỉ hiện nếu data rỗng sau khi loading
             ListFooterComponent={listFooterComponent}
-            estimatedItemSize={100}
             contentContainerStyle={styles.listContent}
           />
         )}

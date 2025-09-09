@@ -3,7 +3,6 @@
 import React, { useRef, useCallback, useMemo, useEffect } from 'react';
 import { StyleSheet, View, ActivityIndicator, TouchableOpacity, StatusBar } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated from 'react-native-reanimated';
 import { s, vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +21,6 @@ import { AppText } from '@/elements/text/AppText';
 import { useApproveViewModel } from '../viewmodal/useApproveViewModel';
 import ToastContainer from '@/elements/toast/ToastContainer';
 import { Colors } from '@/theme/Config';
-import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import Footer from '@/screens/filterScreen/view/component/Footer';
@@ -33,7 +31,6 @@ import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal
 import HeaderSearch from '@/components/headerSearch/HeaderSearch';
 
 export default function ApprovePrScreen() {
-  const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
   const route = useRoute() as any;
@@ -56,7 +53,6 @@ export default function ApprovePrScreen() {
     selectedIds,
     setSelectedIds,
   } = useApproveViewModel();
-  const { infoUser } = useInfoUser();
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
   const flashListRef = useRef<FlashList<IApprove> | null>(null);
@@ -74,9 +70,6 @@ export default function ApprovePrScreen() {
       applyFilters(route.params.filters);
     }
   }, [route.params?.filters, applyFilters]);
-
-  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
-  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
 
   const reLoadData = useCallback(() => {
     onRefresh();

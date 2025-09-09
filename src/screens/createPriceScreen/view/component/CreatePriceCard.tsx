@@ -31,11 +31,19 @@ interface CreatePriceCardProps {
     onCancel?: () => void,
   ) => void;
   onUpdateItem: (i: IItemVendorPrice) => void;
-  canPick:boolean
+  canPick: boolean;
 }
 
 const CreatePriceCard = memo<CreatePriceCardProps>(
-  ({ item, isSelected, handleSelect, onUpdateItem, simultaneousGesture, handleDelete,canPick }) => {
+  ({
+    item,
+    isSelected,
+    handleSelect,
+    onUpdateItem,
+    simultaneousGesture,
+    handleDelete,
+    canPick,
+  }) => {
     const { t } = useTranslation();
     const swipeableRef = useRef<ReanimatedSwipeableRef>(null);
     // SharedValue để đồng bộ chiều cao cho delete button
@@ -102,6 +110,7 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
 
     const onEdit = useCallback(() => {
       navigate('EditPriceNCCScreen', { item, onUpdateItem });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [item]);
     return (
       <TouchableOpacity onPress={onEdit}>
@@ -112,12 +121,13 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
           onSwipe={onSwipe}>
           <View style={[styles.itemContainer, styles.itemExpanded]} onLayout={onItemLayout}>
             <View style={styles.headerItem}>
-              {canPick?
-              <AppBlockButton onPress={handleSelectPress} style={styles.left}>
-                {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
-              </AppBlockButton>
-              :<AppBlock width={PaddingHorizontal}/>
-              }
+              {canPick ? (
+                <AppBlockButton onPress={handleSelectPress} style={styles.left}>
+                  {isSelected ? <IconCheckBox /> : <IconUnCheckBox />}
+                </AppBlockButton>
+              ) : (
+                <AppBlock width={PaddingHorizontal} />
+              )}
 
               <View style={styles.center}>
                 <View style={styles.row}>

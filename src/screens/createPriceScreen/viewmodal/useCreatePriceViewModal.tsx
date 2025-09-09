@@ -244,6 +244,7 @@ export function useCreatePriceViewModel() {
     return () => {
       DeviceEventEmitter.removeAllListeners('refreshListCreatePo');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

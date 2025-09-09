@@ -69,7 +69,7 @@ const InformationItemsCard = ({
     });
   };
   console.log('render: ', ncc, item);
-  const onSetPrice = async (price: number) => {
+  const onSetPrice = async () => {
     // setIsEditPrice(false);
     // console.log('giá nè: ', price);
     // try {

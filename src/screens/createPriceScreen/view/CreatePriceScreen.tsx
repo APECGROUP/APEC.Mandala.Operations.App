@@ -4,7 +4,6 @@ import React, { useRef, useCallback, useMemo, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FlashList } from '@shopify/flash-list';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { vs } from 'react-native-size-matters';
 import { useTranslation } from 'react-i18next';
 import { useRoute } from '@react-navigation/native';
@@ -36,7 +35,6 @@ import HeaderSearch from '@/components/headerSearch/HeaderSearch';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 
 export default function CreatePriceScreen() {
-  const { top } = useSafeAreaInsets();
   const { t } = useTranslation();
   const { infoUser } = useInfoUser();
   const refToast = useRef<any>(null);
@@ -82,8 +80,6 @@ export default function CreatePriceScreen() {
     }
   }, [route.params?.filters, applyFilters]);
 
-  const goToNotification = useCallback(() => navigate('NotificationScreen'), []);
-  const goToAccount = useCallback(() => navigate('AccountScreen'), []);
   const onCreatePrice = useCallback(() => navigate('CreatePriceNccScreen'), []);
 
   const reLoadData = useCallback(() => {
@@ -217,7 +213,6 @@ export default function CreatePriceScreen() {
             scrollEventThrottle={16}
             ListEmptyComponent={listEmptyComponent}
             ListFooterComponent={listFooterComponent}
-            estimatedItemSize={100}
             contentContainerStyle={styles.listContent}
             style={styles.containerFlashList}
           />

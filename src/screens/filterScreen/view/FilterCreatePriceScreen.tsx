@@ -23,7 +23,6 @@ import { CreatePriceFilters } from '@/screens/createPriceScreen/modal/CreatePric
 
 const FilterCreatePriceScreen = ({
   route,
-  navigation,
 }: NativeStackScreenProps<MainParams, 'FilterCreatePriceScreen'>) => {
   const { t } = useTranslation();
 

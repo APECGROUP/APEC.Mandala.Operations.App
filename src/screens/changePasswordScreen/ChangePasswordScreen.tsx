@@ -21,7 +21,7 @@ import { checkChangePassword } from '../authScreen/modal/AuthModal';
 
 type Props = NativeStackScreenProps<RootStackParams, 'ChangePasswordScreen'>;
 
-const ChangePasswordScreen = ({ navigation, route }: Props) => {
+const ChangePasswordScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
   const { showToast } = useAlert();
@@ -31,7 +31,6 @@ const ChangePasswordScreen = ({ navigation, route }: Props) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [processing, setProcessing] = useState<boolean | undefined>(false);
-  const type = route.params.type;
   const refCurrent = useRef<TextInput>(null);
   const refNew = useRef<TextInput>(null);
   const refConfirm = useRef<TextInput>(null);
