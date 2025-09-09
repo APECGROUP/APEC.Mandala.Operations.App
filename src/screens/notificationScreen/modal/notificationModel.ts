@@ -1,6 +1,6 @@
 // models/notificationModel.ts
 
-import { IParams } from '@/screens/approvePrScreen/modal/ApproveModal';
+import { IApprove, IParams } from '@/screens/approvePrScreen/modal/ApproveModal';
 import { ENDPOINT } from '@/utils/Constans';
 import api from '@/utils/setup-axios';
 
@@ -18,6 +18,7 @@ export interface IItemNotification {
   message: string;
   title: string;
   isRead: boolean;
+  request: IApprove;
   readAt: null;
   userId: number;
   id: number;

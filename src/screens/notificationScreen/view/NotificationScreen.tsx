@@ -132,7 +132,7 @@ const NotificationScreen: React.FC<Props> = ({ navigation }) => {
 
   const goToDetail = async (item: IItemNotification) => {
     const { status, id } = item;
-    const newItem = { ...item, id: item.prId || item.id };
+    const newItem = { ...item, id: item.prId || item.id, requestDate: item?.request.requestDate };
     try {
       // Luồng 1: Cập nhật trạng thái thông báo
       // Gọi hàm để đánh dấu thông báo này là đã đọc, không ảnh hưởng đến luồng điều hướng

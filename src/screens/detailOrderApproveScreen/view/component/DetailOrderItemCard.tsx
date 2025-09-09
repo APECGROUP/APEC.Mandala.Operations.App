@@ -22,12 +22,14 @@ const DetailOrderItemCard = ({
   onUpdateQuantity,
   onUpdateNCC,
   onUpdatePrice,
+  requestDate,
 }: {
   item: IItemInDetailPr;
   index: number;
   onUpdateQuantity: (item: IItemInDetailPr) => void;
   onUpdateNCC: (id: number, vendor: IItemVendorPrice) => void;
   onUpdatePrice?: (id: number, price: number) => void;
+  requestDate: string;
 }) => {
   const { t } = useTranslation();
   const { infoUser } = useInfoUser();
@@ -66,12 +68,13 @@ const DetailOrderItemCard = ({
     } catch (error) {}
   };
   const onPickNcc = () => {
+    console.log('onPick:', item, requestDate);
     navigate('PickPriceFromNccScreen', {
       onSetNcc,
       ncc,
       itemCode: item.itemCode,
       onSetPrice,
-      requestDate: '',
+      requestDate: requestDate,
     });
   };
 

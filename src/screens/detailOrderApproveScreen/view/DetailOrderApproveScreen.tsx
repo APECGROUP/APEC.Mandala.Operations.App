@@ -36,7 +36,7 @@ const DetailOrderApproveScreen = ({
 }: NativeStackScreenProps<MainParams, 'DetailOrderApproveScreen'>) => {
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
-  const { prNo, id } = route.params.item;
+  const { prNo, id, requestDate } = route.params.item;
   const { onApproved } = route.params;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
@@ -102,9 +102,10 @@ const DetailOrderApproveScreen = ({
         onUpdatePrice={onUpdatePrice}
         item={item}
         index={index}
+        requestDate={requestDate}
       />
     ),
-    [onUpdateNCC, onUpdateQuantity, onUpdatePrice],
+    [onUpdateNCC, onUpdateQuantity, onUpdatePrice, requestDate],
   );
   const rightComponent = () => (
     <AppBlockButton
