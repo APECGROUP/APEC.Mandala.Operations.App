@@ -4,6 +4,7 @@ import Toast from 'react-native-toast-message';
 import ImagePicker from 'react-native-image-crop-picker';
 import isArray from 'lodash/isArray';
 import map from 'lodash/map';
+import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
 
 export default class Utilities {
   static isAndroid = () => Platform.OS === 'android';
@@ -45,6 +46,17 @@ export default class Utilities {
 
   static normalizeUri(uri: string) {
     return Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+  }
+
+  static removeVietnameseTones(str: string): string {
+    return str
+      .normalize('NFD') // Tách dấu ra khỏi chữ
+      .replace(/[\u0300-\u036f]/g, '') // Xoá các dấu
+      .replace(/đ/g, 'd') // Chuyển đ -> d
+      .replace(/Đ/g, 'D') // Chuyển Đ -> D
+      .replace(/[^a-zA-Z0-9 ]/g, '') // Bỏ ký tự đặc biệt
+      .replace(/\s+/g, ' ') // Replace multiple spaces with one
+      .trim(); // Bỏ khoảng trắng đầu cuối
   }
 
   static async requestContactsPermission(alertHandler: any) {
@@ -96,8 +108,8 @@ export default class Utilities {
     isUsingCamera?: boolean;
   }) => {
     const defaultOptions = {
-      width: 1000,
-      height: 700,
+      width: 500,
+      height: 500,
       multiple: true,
       mediaType: 'photo',
       includeBase64: false,
@@ -130,7 +142,6 @@ export default class Utilities {
       } else {
         images = await ImagePicker.openCamera(imageOptions!);
       }
-      console.log('image: ', images);
       if (isArray(images)) {
         map(images, image => {
           this.processPickedImage(image);
@@ -189,6 +200,21 @@ export default class Utilities {
       return Promise.reject(error);
     }
   };
+
+  static getStatusName(statusCode: string): string {
+    try {
+      // Truy cập Zustand trực tiếp
+      const { getState } = useStatusGlobal;
+      const { statusGlobal } = getState();
+
+      return (
+        statusGlobal.find(item => item.status.toUpperCase() === statusCode.toUpperCase())
+          ?.statusName ?? 'Không rõ trạng thái'
+      );
+    } catch (error) {
+      return 'Không rõ trạng thái';
+    }
+  }
 }
 
 export const isAndroid = () => Platform.OS === 'android';

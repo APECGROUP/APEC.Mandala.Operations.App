@@ -7,4 +7,6 @@ export default {
   IconBox: require('./iconBox.png'),
   IconApproved: require('./iconApprove.png'),
   BackgroundLogin: require('./backgroundLogin.png'),
+  IconPcPr: require('./iconPcPr.png'),
+  IconCreatePo: require('./iconCreatePo.png'),
 };

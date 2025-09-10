@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StatusBar, StyleSheet, Switch, View } from 'react-native';
 import { Colors } from '@/theme/Config';
 import AppBlockButton from '@/elements/button/AppBlockButton';
-import AppImage from '@/elements/appImage/AppImage';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 import { s, vs } from 'react-native-size-matters';
 import { AppText } from '@/elements/text/AppText';
@@ -20,36 +19,56 @@ import IconLogout from '@assets/icon/IconLogout';
 import IconVietNam from '@assets/icon/IconVietNam';
 import { useLanguage } from '@/hook/useLanguage';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { appVersion, useOtaUpdate } from '@/hook/useOtaUpdate';
+import { appVersion } from '@/hook/useOtaUpdate';
 import RightItemAccount from './RightItemAccount';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+import api from '@/utils/setup-axios';
+import { ENDPOINT } from '@/utils/Constans';
+import { TYPE_TOAST } from '@/elements/toast/Message';
+import { useQueryClient } from '@tanstack/react-query';
+import { checkTurnOnOffNotification } from '../authScreen/modal/AuthModal';
+import FastImage from 'react-native-fast-image';
 
 const AccountScreen = () => {
   const { t } = useTranslation();
-  const { infoUser } = useInfoUser();
+  const { infoUser, toggleTurnOnOffNotification } = useInfoUser();
   const { bottom } = useSafeAreaInsets();
-  const { showAlert } = useAlert();
+  const { showAlert, showToast, showLoading, hideLoading } = useAlert();
 
   const { toggleLanguage } = useLanguage();
   // const [isHasUpdate, setIsHasUpdate] = useState(false);
   // const { isHasUpdate, isCheckingUpdate, isDone, isSuccess, isError } = useCheckUpdate();
-  const { checkForOtaUpdate } = useOtaUpdate();
-  const [allowNotification, setAllowNotification] = useState(false);
+  // const { checkForOtaUpdate } = useOtaUpdate();
 
-  const toggleAllowNotification = () => {
-    if (!allowNotification) {
-      Toast.show({
-        text2: t('account.allowNotificationSubtitle'),
-        type: 'success',
-      });
-    } else {
-      Toast.show({
-        text2: t('account.allowNotificationSubtitle2'),
-        type: 'success',
-      });
+  const toggleAllowNotification = async () => {
+    try {
+      showLoading();
+      const { isSuccess, message } = await checkTurnOnOffNotification();
+      if (!isSuccess) {
+        showToast(message || t('error.subtitle'), 'error');
+        return;
+      }
+
+      if (!infoUser?.isNotification) {
+        showToast(t('account.allowNotificationSubtitle'), TYPE_TOAST.SUCCESS);
+        toggleTurnOnOffNotification(true);
+        // Toast.show({
+        //   text2: t('account.allowNotificationSubtitle'),
+        //   type: 'success',
+        // });
+      } else {
+        showToast(t('account.allowNotificationSubtitle2'), TYPE_TOAST.SUCCESS);
+        toggleTurnOnOffNotification(false);
+
+        // Toast.show({
+        //   text2: t('account.allowNotificationSubtitle2'),
+        //   type: 'success',
+        // });
+      }
+    } catch (error) {
+    } finally {
+      hideLoading();
     }
-    setAllowNotification(prev => !prev);
   };
 
   // const onCheckUpdate = () => {
@@ -58,13 +77,29 @@ const AccountScreen = () => {
   //     { text: t('account.confirm'), onPress: () => {} },
   //   ]);
   // };
+  const queryClient = useQueryClient();
 
   const goToChangePassword = () => navigate('ChangePasswordScreen', { type: 'change' });
-
+  const handleLogout = async () => {
+    try {
+      showLoading();
+      const response = await api.get(ENDPOINT.LOGOUT);
+      if (response.status !== 200) {
+        throw new Error('Logout failed');
+      } else if (response.data.isSuccess) {
+        await queryClient.clear();
+        await DataLocal.removeAll();
+      }
+    } catch (error) {
+      showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
+    } finally {
+      hideLoading();
+    }
+  };
   const onLogout = () => {
     showAlert(t('account.logout'), t('account.warningLogout'), [
       { text: t('account.profile.cancel'), style: 'cancel', onPress: () => {} },
-      { text: t('account.confirm'), onPress: () => DataLocal.removeAll() },
+      { text: t('account.confirm'), onPress: handleLogout },
     ]);
   };
 
@@ -73,16 +108,16 @@ const AccountScreen = () => {
   return (
     <ViewContainer>
       <View style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
         <View>
           <View>
             <AppBlockButton onPress={goToProfile} style={styles.centerAlign}>
               <View style={{ marginTop: vs(20) }}>
-                <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
+                <FastImage style={styles.avatar} source={{ uri: infoUser?.avatar }} />
                 <IconEditAvatar style={styles.editIcon} />
               </View>
               <AppText weight="700" size={18} mb={2}>
-                {infoUser?.profile?.fullName}
+                {infoUser?.displayName}
               </AppText>
               <AppText
                 pv={2}
@@ -117,15 +152,15 @@ const AccountScreen = () => {
               icon: <IconAllowNotification />,
               title: t('account.allowNotification'),
               onPress: toggleAllowNotification,
-              right: <Switch value={allowNotification} />,
+              right: <Switch value={infoUser?.isNotification} />,
             },
-            {
-              key: 'checkUpdate',
-              icon: <IconChangePassword />,
-              title: t('account.checkUpdate'),
-              onPress: checkForOtaUpdate,
-              right: <IconArrowRight />,
-            },
+            // {
+            //   key: 'checkUpdate',
+            //   icon: <IconChangePassword />,
+            //   title: t('account.checkUpdate'),
+            //   onPress: checkForOtaUpdate,
+            //   right: <IconArrowRight />,
+            // },
             {
               key: 'password',
               icon: <IconChangePassword />,

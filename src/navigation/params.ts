@@ -1,14 +1,22 @@
 import { Dispatch, SetStateAction } from 'react';
 import { ResponseImageElement } from '../interface/Verify.interface';
-import { typeHotel } from '../screens/authScreen/LoginScreen';
 import {
   AssignPriceFilters,
-  DataAssignPrice,
-  SelectedOption,
+  IItemAssignPrice,
 } from '@/screens/assignPriceScreen/modal/AssignPriceModal';
-import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
-import { TypePickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
-import { TypeApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
+import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { IApprove } from '@/screens/approvePrScreen/modal/ApproveModal';
+import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
+import { IItemPcPr, PcPrFilters } from '@/screens/pcPrScreen/modal/PcPrModal';
+import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
+import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
+import { IItemStatus } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import {
+  CreatePriceFilters,
+  IItemVendorPrice,
+} from '@/screens/createPriceScreen/modal/CreatePriceModal';
 
 // ─────────────────────────────────────────────────────────────
 // Bottom Tab Navigation
@@ -20,7 +28,7 @@ export type TabBarParams = {
   CreatePoScreen: undefined;
   PcLogScreen: undefined;
   PcPrScreen: undefined;
-  HomeScreen: undefined;
+  ApprovePrScreen: undefined;
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -37,26 +45,43 @@ export type MainParams = {
   ApprovePrScreen: undefined;
   CreatePriceNccScreen: undefined;
   AccountScreen: undefined;
+  EditPriceNCCScreen: { item: IItemVendorPrice; onUpdateItem: (item: IItemVendorPrice) => void };
   FilterAssignPriceScreen: {
     currentFilters: AssignPriceFilters;
     onApplyFilters: (filters: AssignPriceFilters) => void;
+  };
+  FilterCreatePoScreen: {
+    currentFilters: AssignPriceFilters;
+    onApplyFilters: (filters: AssignPriceFilters) => void;
+  };
+  FilterPcPrScreen: {
+    currentFilters: PcPrFilters;
+    onApplyFilters: (filters: PcPrFilters) => void;
   };
   FilterApproveScreen: {
     currentFilters: AssignPriceFilters;
     onApplyFilters: (filters: AssignPriceFilters) => void;
   };
   FilterCreatePriceScreen: {
-    currentFilters: AssignPriceFilters;
-    onApplyFilters: (filters: AssignPriceFilters) => void;
+    currentFilters: CreatePriceFilters;
+    onApplyFilters: (filters: CreatePriceFilters) => void;
   };
-  DetailAssignPriceCardScreen: { item: DataAssignPrice };
-  DetailApproveCardScreen: { item: TypeApprove };
-  InformationItemsScreen: { item: DataAssignPrice };
+  DetailAssignPriceCardScreen: { item: IItemPcPr };
+  DetailPcPrCardScreen: { item: IItemPcPr };
+  DetailNotificationScreen: { PrNo: string };
+  DetailApproveCardScreen: { item: IApprove };
+  InformationItemsAssignPrice:
+    | { item: IItemAssignPrice; updateCacheAndTotal: (v: number) => void }
+    | { item: { id: number; prNo: string }; updateCacheAndTotal: (v: number) => void };
+  InformationItemsPcPrScreen: { item: IItemPcPr } | { item: { id: number; prNo: string } };
   MyTabs: undefined;
   MyTabsHk: undefined;
   NotificationScreen: undefined;
   NotificationHkScreen: undefined;
-  DetailOrderApproveScreen: { item: DataAssignPrice };
+  DetailOrderApproveScreen: {
+    item: IItemAssignPrice | { id: number; prNo: string };
+    onApproved: (id: number, listData: IItemAssignPrice[]) => void;
+  };
 
   // Modals
   ModalPhotoOrCamera: {
@@ -84,31 +109,43 @@ export type MainParams = {
     type: 'verifyEmail';
   };
   PickNccScreen: {
-    setNcc: Dispatch<SetStateAction<ResponseNcc>>;
-    ncc: ResponseNcc;
+    setNcc: Dispatch<SetStateAction<IItemSupplier | undefined>> | ((i: IItemSupplier) => void);
+    ncc: IItemSupplier | undefined;
+  };
+  PickPriceFromNccScreen: {
+    onSetNcc: (i: IItemVendorPrice) => void;
+    ncc: IItemVendorPrice | undefined;
+    itemCode: string;
+    onSetPrice: (price: number) => void;
+    requestDate: string;
   };
   PickDepartmentScreen: {
-    setDepartment: Dispatch<SetStateAction<TypePickDepartment>>;
-    department: TypePickDepartment;
+    setDepartment: Dispatch<SetStateAction<IPickDepartment | undefined>>;
+    department: IPickDepartment | undefined;
   };
 
   PickItemScreen: {
-    setItem: (item: { id: string; name: string }) => void;
+    setItem: Dispatch<SetStateAction<IPickItem | undefined>> | ((i: IPickItem | undefined) => void);
   };
 
   PickRequesterScreen: {
-    setRequester: Dispatch<SetStateAction<SelectedOption>>;
-    requester: SelectedOption;
+    setRequester: Dispatch<SetStateAction<IPickRequester | undefined>>;
+    requester: IPickRequester | undefined;
+  };
+  PickStatusScreen: {
+    setStatus: Dispatch<SetStateAction<IItemStatus | undefined>>;
+    status: IItemStatus | undefined;
   };
   PickLocalScreen: {
-    setLocation: Dispatch<SetStateAction<SelectedOption>>;
-    location: SelectedOption;
+    setLocation: Dispatch<SetStateAction<IPickLocal | undefined>>;
+    location: IPickLocal | undefined;
   };
   ModalInputRejectAssign: {
-    id: string;
+    id: number;
+    prNo: string;
   };
   ModalInputRejectApprove: {
-    id: string;
+    id: string | number;
   };
 };
 
@@ -123,8 +160,8 @@ export type AuthParams = {
     type: 'reset' | 'change';
   };
   ModalPickHotel: {
-    setHotel: (hotel: typeHotel) => void;
-    hotel: typeHotel;
+    hotel: IDataListHotel | undefined;
+    setHotel: (i: IDataListHotel | undefined) => void;
   };
 };
 

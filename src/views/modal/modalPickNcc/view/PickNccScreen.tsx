@@ -15,7 +15,7 @@ import IconSelectHotel from '../../../../../assets/icon/IconSelectHotel';
 import { usePickNCCViewModel } from '../viewmodal/usePickNCCViewModel';
 import { SCREEN_HEIGHT } from '@/constants';
 import { FlashList } from '@shopify/flash-list';
-import { ResponseNcc } from '../modal/PickNccModal';
+import { IItemSupplier } from '../modal/PickNccModal';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
@@ -60,14 +60,14 @@ const PickNccScreen = ({ navigation, route }: Props) => {
       <View style={styles.emptyContainer}>
         <IconEmptyNcc />
         <AppText size={18} weight="700" mt={12}>
-          {t('Chưa có thông tin nhà cung cấp')}
+          {t('orderDetail.empty')}
         </AppText>
       </View>
     );
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: ResponseNcc; index: number }) => {
+    ({ item, index }: { item: IItemSupplier; index: number }) => {
       const isFocus = item?.id === ncc?.id;
       const onSelect = () => {
         setNcc(item);
@@ -78,7 +78,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
           key={index}
           onPress={onSelect}
           style={[isFocus ? styles.itemFocus : { padding: vs(10) }]}>
-          <AppText weight="500">{item.name}</AppText>
+          <AppText weight="500">{item.invoiceName}</AppText>
           {isFocus && <IconSelectHotel />}
         </AppBlockButton>
       );
@@ -103,7 +103,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
           alignItems="center"
           style={styles.width1}>
           <AppText size={20} weight="bold">
-            {t('Thông tin nhà cung cấp')}
+            {t('orderDetail.titleSearch')}
           </AppText>
           <TouchableOpacity onPress={goBack} style={{ padding: PaddingHorizontal }}>
             <IconClose />
@@ -112,7 +112,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
 
         <View style={{ paddingHorizontal: PaddingHorizontal }}>
           <AppText mt={10} mb={6} weight="700">
-            {t('Nhà cung cấp')}
+            {t('filter.supplier')}
           </AppText>
           <AppInputSearch
             fill={searchKey ? Colors.PRIMARY : '#BABABA'}
@@ -120,7 +120,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
             containerStyle={styles.conatinerInputSearch}
             value={searchKey}
             onChangeText={onSearch}
-            placeholder={t('Tìm kiếm')}
+            placeholder={t('filter.search')}
           />
         </View>
 

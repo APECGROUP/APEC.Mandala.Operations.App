@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { fetchNccData, ResponseNcc } from '../modal/PickNccModal';
+import { fetchNccData, IItemSupplier } from '../modal/PickNccModal';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;
@@ -20,9 +20,9 @@ export function usePickNCCViewModel() {
     fetchNextPage,
     hasNextPage,
     isRefetching,
-  } = useInfiniteQuery<ResponseNcc[], Error>({
+  } = useInfiniteQuery<IItemSupplier[], Error>({
     queryKey: ['listNcc', searchKey.trim(), searchKey],
-    queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
+    queryFn: async ({ pageParam }: { pageParam?: any }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
       return fetchNccData(page, ITEMS_PER_PAGE, searchKey);
     },
@@ -47,7 +47,6 @@ export function usePickNCCViewModel() {
 
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
-    console.log('onRefresh');
     if (isFetching || isRefetching || isLoading) {
       return;
     }
@@ -56,7 +55,6 @@ export function usePickNCCViewModel() {
 
   // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
-    console.log('loadMore');
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();
     }

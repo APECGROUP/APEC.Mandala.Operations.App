@@ -31,8 +31,9 @@ export const styles = StyleSheet.create({
   },
   dropdown: {
     flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+    width: '100%',
   },
   title: {
     marginVertical: vs(5),
@@ -46,7 +47,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textItem: {
-    flex: 1,
+    // flex: 1,
+    marginRight: s(10),
     fontSize: getFontSize(12),
     writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },

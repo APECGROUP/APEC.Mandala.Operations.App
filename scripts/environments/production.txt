@@ -1,5 +1,5 @@
 export const ENV = 'development';
-export const BASE_URL = 'product';
+export const BASE_URL = 'http://10.0.0.80:5708';
 export const DOMAIN_IMAGE =
   'https://api-gateway.dev.vinnet.vn/ewallet/api/user/commons/files/view?path=';
 

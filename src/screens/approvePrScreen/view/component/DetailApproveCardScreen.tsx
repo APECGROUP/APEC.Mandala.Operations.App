@@ -32,7 +32,7 @@ const RowItem: React.FC<RowItemProps> = ({ label, value, icon, onPress }) => (
     </AppText>
     <TouchableOpacity onPress={onPress} activeOpacity={1} style={styles.valueContainer}>
       {value && <AppText weight="700">{value}</AppText>}
-      {icon && <View style={styles.icon}>{icon}</View>}
+      {icon ? <View style={styles.icon}>{icon}</View> : <View style={{ height: vs(14) }} />}
     </TouchableOpacity>
   </View>
 );
@@ -42,14 +42,15 @@ const DetailApproveCardScreen = ({
 }: NativeStackScreenProps<MainParams, 'DetailApproveCardScreen'>) => {
   const { item } = route.params;
   const { t } = useTranslation();
-  const [dateCreate, setDateCreate] = useState<Date | undefined>(undefined);
-  const [dateEstimate, setDateEstimate] = useState<Date | undefined>(undefined);
+  const [dateCreate, setDateCreate] = useState<Date | undefined>(item.prDate);
+  const [dateEstimate, setDateEstimate] = useState<Date | undefined>(item.expectedDate);
   const { bottom } = useSafeAreaInsets();
   const [isCoppied, setIsCoppied] = useState(false);
 
   const onCopy = useCallback(() => {
     Clipboard.setString(item.prNo);
     setIsCoppied(true);
+    console.log('coppy thành công');
     setTimeout(() => {
       setIsCoppied(false);
     }, 2000);
@@ -68,9 +69,8 @@ const DetailApproveCardScreen = ({
       onSelectDate: setDateEstimate,
     });
   }, []);
-  console.log('item', item);
   const formatDate = useCallback((date: Date | undefined) => moment(date).format('DD/MM/YYYY'), []);
-
+  console.log('first', item);
   return (
     <View style={styles.container}>
       <FastImage source={Images.IconApproved} style={styles.itemIcon} />
@@ -88,25 +88,25 @@ const DetailApproveCardScreen = ({
           onPress={onPressDateCreate}
           label={t('orderInfo.createDate')}
           value={formatDate(dateCreate)}
-          icon={<IconCalendar fill={Colors.TEXT_SECONDARY} />}
+          icon={<IconCalendar />}
         />
         <RowItem
           onPress={onPressDateEstimate}
           label={t('orderInfo.estimateDate')}
           value={formatDate(dateEstimate)}
-          icon={<IconCalendar fill={Colors.TEXT_SECONDARY} />}
+          icon={<IconCalendar />}
         />
-        <RowItem label={t('orderInfo.department')} value={item.department?.name || ''} />
-        <RowItem label={t('orderInfo.location')} value={item.location?.name || ''} />
+        <RowItem label={t('orderInfo.department')} value={item?.departmentName || ''} />
+        <RowItem label={t('orderInfo.location')} value={item?.storedName || ''} />
         <RowItem
           label={t('orderInfo.requester')}
-          value={item.requester?.name || ''}
-          icon={<IconName />}
+          value={item.userRequest?.displayName || item.requestBy || ''}
+          icon={<IconName width={vs(14)} />}
         />
         <RowItem label={t('orderInfo.note')} />
         <View style={styles.noteContainer}>
           <AppText size={12} weight="500" color={Colors.TEXT_DEFAULT}>
-            {item.note}
+            {item.description}
           </AppText>
         </View>
       </View>

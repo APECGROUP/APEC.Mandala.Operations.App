@@ -8,82 +8,97 @@ import { ResponseImageElement } from '../../interface/Verify.interface';
 import { AppText } from '../../elements/text/AppText';
 import { useInfoUser } from '../../zustand/store/useInfoUser/useInfoUser';
 import { getFontSize } from '../../constants';
-import AppImage from '../../elements/appImage/AppImage';
 import IconTakeCamera from '@assets/icon/IconTakeCamera';
 import { Colors } from '@/theme/Config';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import Utilities from '@/utils/Utilities';
+import api from '@/utils/setup-axios';
+import { ENDPOINT } from '@/utils/Constans';
+import { useAlert } from '@/elements/alert/AlertProvider';
+import { TYPE_TOAST } from '@/elements/toast/Message';
+import { BASE_URL } from '@/env';
+import FastImage from 'react-native-fast-image';
 
 const ProfileScreen = ({ navigation }: NativeStackScreenProps<MainParams, 'ProfileScreen'>) => {
   const { t } = useTranslation();
   const { infoUser, updateAvatar } = useInfoUser();
-
-  // eslint-disable-next-line arrow-body-style, @typescript-eslint/no-unused-vars
+  const { showToast } = useAlert();
+  console.log('first,', infoUser);
   const onUploadAvatar = async (imageAvatar: ResponseImageElement) => {
-    return updateAvatar('https://i.pinimg.com/736x/9c/2e/5e/9c2e5e3d63454104bdee33258fca0a28.jpg');
-    // try {
-    //   const uri = imageAvatar?.path || imageAvatar?.sourceURL || imageAvatar?.uri;
-    //   let formData: any = new FormData();
-    //   formData.append('file', {
-    //     uri: Utilities.normalizeUri(uri || ''),
-    //     type: imageAvatar?.type ?? imageAvatar?.mime,
-    //     name: `avatar_${imageAvatar?.filename || uri}`,
-    //   });
-    //   formData.append('type', 'avatar');
-    //   const response = await api.post('user/commons/upload-file', formData, {
-    //     headers: {
-    //       'content-type': 'multipart/form-data',
-    //       Accept: 'application/json',
-    //     },
-    //   });
-    //   if (response.status !== 200 || response.data.status !== 0) {
-    //     throw new Error();
-    //   }
-    //   if (response.data.status === 0) {
-    //     updateAvatar(response.data.data.profile.avatar);
-    //   }
-    // } catch (error) {
-    //   Toast.show({
-    //     type: 'error',
-    //     text2: t(LanguageType.errorTryAgain),
-    //   });
-    // } finally {
-    // }
+    // return updateAvatar('https://i.pinimg.com/736x/9c/2e/5e/9c2e5e3d63454104bdee33258fca0a28.jpg');
+    try {
+      const uri = imageAvatar?.path || imageAvatar?.sourceURL || imageAvatar?.uri;
+      let formData: any = new FormData();
+      formData.append('file', {
+        uri: Utilities.normalizeUri(uri || ''),
+        type: imageAvatar?.type ?? imageAvatar?.mime,
+        name: `avatar_${imageAvatar?.filename || uri}`,
+      });
+      // formData.append('type', 'avatar');
+      const response = await api.post(ENDPOINT.UPLOAD_AVATAR, formData, {
+        headers: {
+          'content-type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+      });
+      if (response.status !== 200) {
+        throw new Error();
+      }
+      console.log('avatar: ', response.data);
+      if (!response.data.isSuccess) {
+        return showToast(response.data.errors[0].message, TYPE_TOAST.ERROR);
+      } else {
+        console.log(
+          'alo avatar: ',
+          response.data.data.url,
+          `${BASE_URL}/${response.data.data.url}`,
+        );
+        updateAvatar(`${response.data.data.url}`);
+        // updateAvatar(`${BASE_URL}/${response.data.data.url}`);
+      }
+    } catch (error) {
+      showToast(t('error.subtitle'), TYPE_TOAST.ERROR);
+    } finally {
+    }
   };
   const onUpdateAvatar = () => {
     navigation.navigate('ModalPhotoOrCamera', { setImageAvatar: onUploadAvatar });
   };
   const data = [
     {
+      label: t('account.profile.nameHotel'),
+      value: infoUser?.hotelName || '',
+    },
+    {
       label: t('account.profile.userName'),
       value: infoUser?.userName || '',
     },
     {
       label: t('account.profile.fullName'),
-      value: infoUser?.profile?.fullName || '',
+      value: infoUser?.displayName || '',
     },
     {
       label: t('account.profile.rank'),
-      value: infoUser?.profile?.jobPosition || '',
+      value: infoUser?.groups[0]?.groupName || '',
     },
     {
       label: t('account.profile.email'),
-      value: infoUser?.profile.email || '',
+      value: infoUser?.email || '',
     },
     {
       label: t('account.profile.department'),
-      value: infoUser?.profile?.jobPosition || '',
+      value: infoUser?.departments[0]?.departmentName || '',
     },
   ];
-  console.log('infoUser: ', infoUser);
 
   return (
     <ViewContainer>
       <View style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
 
         <ScrollView contentContainerStyle={styles.fg1}>
           <TouchableOpacity style={styles.avatar} activeOpacity={0.8} onPress={onUpdateAvatar}>
-            <AppImage style={styles.avatar} source={{ uri: infoUser?.profile?.avatar }} />
+            <FastImage style={styles.avatar} source={{ uri: infoUser?.avatar }} />
             <IconTakeCamera style={styles.editIcon} />
           </TouchableOpacity>
           <AppText style={styles.textTitle}>{t('account.profile.changePhoto')}</AppText>

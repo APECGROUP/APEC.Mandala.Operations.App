@@ -14,16 +14,15 @@ import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { MainParams } from '@/navigation/params';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  AssignPriceFilters,
-  SelectedOption,
-} from '@/screens/assignPriceScreen/modal/AssignPriceModal';
 import { AppText } from '@/elements/text/AppText';
 import { Colors } from '@/theme/Config';
+import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
+import { useStatusGlobal } from '@/zustand/store/useStatusGlobal/useStatusGlobal';
+import { CreatePriceFilters } from '@/screens/createPriceScreen/modal/CreatePriceModal';
 
 const FilterCreatePriceScreen = ({
   route,
-  navigation,
 }: NativeStackScreenProps<MainParams, 'FilterCreatePriceScreen'>) => {
   const { t } = useTranslation();
 
@@ -32,71 +31,66 @@ const FilterCreatePriceScreen = ({
 
   // Lấy các filter hiện tại từ params để khởi tạo state
   // Đảm bảo default values cho department và requester là { id: '', name: '' }
-  const initialFilters: AssignPriceFilters = route.params?.currentFilters || {};
+  const initialFilters: CreatePriceFilters = route.params?.currentFilters || {};
 
-  const [ncc, setNcc] = useState<SelectedOption>(
-    initialFilters.ncc && initialFilters.ncc.id !== '' ? initialFilters.ncc : { id: '', name: '' },
+  const [ncc, setNcc] = useState<IItemSupplier | undefined>(
+    initialFilters.ncc && initialFilters.ncc?.id ? initialFilters.ncc : undefined,
   );
-  const [status, setStatus] = useState<SelectedOption>(
-    initialFilters.status && initialFilters.status.id !== ''
-      ? initialFilters.status
-      : { id: '', name: '' },
-  );
-  const [product, setProduct] = useState<SelectedOption>(
-    initialFilters.product && initialFilters.product.id !== ''
-      ? initialFilters.product
-      : { id: '', name: '' },
+  const [status, setStatus] = useState<
+    { code: string; id: number | string; name: string } | undefined
+  >(initialFilters?.status && initialFilters.status.id ? initialFilters.status : undefined);
+  const [item, setItem] = useState<IPickItem | undefined>(
+    initialFilters.product && initialFilters.product.id ? initialFilters.product : undefined,
   );
   // --- Handlers cho việc chọn giá trị từ các Modal khác ---
 
   const onPressNcc = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickNccScreen', {
-      setNcc: (v: SelectedOption) => setNcc(v),
-      ncc: ncc, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      setNcc,
+      ncc, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [ncc]);
-  console.log('filter', initialFilters);
   const onPressNameItem = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickItemScreen', {
-      setItem: (_item: SelectedOption) => setProduct(_item),
-      item: product, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      setItem,
+      // item, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
-  }, [product]);
+  }, []);
 
   // --- Xử lý khi người dùng xác nhận bộ lọc ---
-  const onConfirm = useCallback(() => {
+  const onConfirm = useCallback(async () => {
     // Tạo object filters mới từ state cục bộ của FilterScreen
-    const newFilters: AssignPriceFilters = {
-      ncc: ncc.id ? ncc : undefined, // Nếu id rỗng thì là undefined
-      status: status.id ? status : undefined, // Nếu id rỗng thì là undefined
-      product: product.id ? product : undefined, // Nếu id rỗng thì là undefined
+    const newFilters: CreatePriceFilters = {
+      ncc: ncc?.id ? ncc : undefined, // Nếu id rỗng thì là undefined
+      status: status?.id ? status : undefined, // Nếu id rỗng thì là undefined
+      product: item?.id ? item : undefined, // Nếu id rỗng thì là undefined
     };
 
     // Gọi callback từ màn hình trước đó để áp dụng filter
     if (onApplyFiltersCallback) {
-      onApplyFiltersCallback(newFilters);
+      await onApplyFiltersCallback(newFilters);
     }
-    navigation.goBack();
-  }, [ncc, status, product, onApplyFiltersCallback, navigation]);
+    // navigation.goBack();
+  }, [ncc, status, item, onApplyFiltersCallback]);
 
   const onReset = useCallback(() => {
-    setNcc({ id: '', name: '' });
-    setStatus({ id: '', name: '' });
-    setProduct({ id: '', name: '' });
-  }, []);
-
+    setNcc(undefined);
+    setStatus({ id: '3', name: t('filter.statusFilter.waiting'), code: 'W' });
+    setItem(undefined);
+  }, [t]);
+  const { statusGlobal } = useStatusGlobal();
+  console.log('status', statusGlobal);
   const statusList = [
-    { id: '1', name: t('filter.statusFilter.approved') },
-    { id: '2', name: t('filter.statusFilter.rejected') },
-    { id: '3', name: t('filter.statusFilter.waiting') },
+    { id: '1', name: t('filter.statusFilter.approved'), code: 'A' },
+    { id: '3', name: t('filter.statusFilter.waiting'), code: 'W' },
   ];
 
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
 
         <View style={styles.form}>
           <AppBlockButton style={styles.width100} onPress={onPressNcc}>
@@ -106,7 +100,7 @@ const FilterCreatePriceScreen = ({
               label={t('filter.ncc')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={ncc?.name}
+              value={ncc?.invoiceName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
@@ -119,15 +113,15 @@ const FilterCreatePriceScreen = ({
               label={t('filter.nameItem')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={product?.name}
+              value={item?.iName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
           </AppBlockButton>
           <AppText style={[styles.label, styles.labelStatus]}>{t('filter.status')}</AppText>
           <View style={styles.statusContainer}>
-            {statusList.map((sub: { id: string; name: string }) => {
-              const isSelect = status.id === sub.id;
+            {statusList.map((sub: { id: string; name: string; code: string }) => {
+              const isSelect = String(status?.id) === String(sub.id);
               const onPress = () => {
                 setStatus(sub);
               };
@@ -202,7 +196,7 @@ const styles = StyleSheet.create({
     marginBottom: vs(12),
   },
   statusButton: {
-    width: '30%',
+    width: '45%',
     height: vs(34),
     borderRadius: vs(101),
     backgroundColor: Colors.GRAY_100,

@@ -1,27 +1,44 @@
-import axios from 'axios';
-import { ResponseNcc } from '../../modalPickNcc/modal/PickNccModal';
-import { fakeData } from '@/data/DataFake';
+import api from '@/utils/setup-axios';
+import { ENDPOINT } from '@/utils/Constans';
 
-export interface IPickItem {
-  id: string | undefined;
-  name: string | undefined;
-  ncc: string | undefined;
-  price: number | undefined;
-  time: string | undefined;
-  vat: string | undefined;
-  end: string | undefined;
-  dateFrom: string | undefined;
-  dateTo: string | undefined;
-  supplier: ResponseNcc;
+export interface IResponsePickItem {
+  data: IPickItem[];
+  pagination: Pagination;
+  isSuccess: boolean;
+  errors: Error[] | null;
 }
 
-/**
- * Tạo URL API lấy danh sách ảnh, có hỗ trợ search (giả lập).
- */
-function buildNccUrl(page: number, limit: number, key?: string): string {
-  let url = `https://picsum.photos/v2/list?page=${page}&limit=${limit}`;
-  if (key) url += `&search=${encodeURIComponent(key)}`;
-  return url;
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
+}
+
+export interface IPickItem {
+  iCode: string;
+  iName: string;
+  printName: string;
+  sgCode: string;
+  groupCode: string;
+  iUnit: number;
+  unitName: string;
+  maxRequest: number;
+  minRequest: number;
+  id: number;
+  createdBy: string;
+  createdDate: Date;
+  deletedDate: null;
+  deletedBy: null;
+  deleted: string;
+}
+
+export interface Pagination {
+  pageCurrent: number;
+  pageCount: number;
+  pageSize: number;
+  rowCount: number;
+  firstRowOnPage: number;
+  lastRowOnPage: number;
 }
 
 /**
@@ -32,25 +49,23 @@ export const fetchPickItemData = async (
   limit: number = 50,
   key: string = '',
 ): Promise<IPickItem[]> => {
-  const url = buildNccUrl(page, limit, key);
-  const { data } = await axios.get(url);
-
-  return data.map((item: any) => ({
-    id: item.id,
-    ncc: 'Công Ty TNHH XNK Thuận Phát',
-    supplier: {
-      id: '1',
-      name: 'Công Ty TNHH XNK Thuận Phát',
-      code: '1234567890',
-      address: '1234567890',
-      phone: '1234567890',
-    },
-    price: 100000,
-    time: '28/05/2025 - 30/05/2025',
-    vat: 'V8',
-    end: 'Chai',
-    dateFrom: '28/05/2025',
-    dateTo: '30/05/2025',
-    name: fakeData[Math.floor(Math.random() * 50)],
-  }));
+  try {
+    const params = {
+      pagination: {
+        pageIndex: page,
+        pageSize: limit,
+        isAll: false,
+      },
+      filter: {
+        textSearch: key.trim(),
+      },
+    };
+    const response = await api.post<IResponsePickItem>(ENDPOINT.GET_LIST_ITEM, params);
+    if (response.status !== 200 || !response.data.isSuccess) {
+      throw new Error('Failed to fetch data');
+    }
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
 };

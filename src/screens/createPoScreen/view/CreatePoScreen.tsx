@@ -1,48 +1,212 @@
-import { StatusBar, StyleSheet, View } from 'react-native';
-import React, { useLayoutEffect, useState } from 'react';
-import DevelopingAnimation from '@/views/animation/DevelopingAnimation';
-import SkeletonItem from '@/components/skeleton/SkeletonItem';
-import { PaddingHorizontal } from '@/utils/Constans';
+// views/AssignPriceScreen.tsx
 
-const CreatePoScreen = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  useLayoutEffect(() => {
-    StatusBar.setBarStyle('dark-content');
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timeout);
+import React, { useRef, useCallback, useMemo, useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { useTranslation } from 'react-i18next';
+import { useRoute } from '@react-navigation/native';
+
+import light from '@/theme/light';
+import AppBlockButton from '@/elements/button/AppBlockButton';
+
+import IconScrollBottom from '@assets/icon/IconScrollBottom';
+
+import { IItemCreatePo } from '../modal/CreatePoModal';
+import { navigate } from '@/navigation/RootNavigation';
+import { AppText } from '@/elements/text/AppText';
+import { useCreatePoViewModel } from '../viewmodal/useCreatePoViewModal';
+import ToastContainer from '@/elements/toast/ToastContainer';
+import { Colors } from '@/theme/Config';
+import SkeletonItem from '@/components/skeleton/SkeletonItem';
+import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
+import ViewContainer from '@/components/errorBoundary/ViewContainer';
+import { styles } from './style';
+import CreatePoCard from './component/CreatePoCard';
+import { AppButton } from '@/elements/button/AppButton';
+import HeaderSearch from '@/components/headerSearch/HeaderSearch';
+import EmptyDataAnimation from '@/views/animation/EmptyDataAnimation';
+
+export default function CreatePoScreen() {
+  const { t } = useTranslation();
+  const refToast = useRef<any>(null);
+
+  const route = useRoute() as any;
+  // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
+  const {
+    flatData,
+    isLoading,
+    isRefetching,
+    isFetchingNextPage,
+    currentPrNoInput, // Giá trị hiện tại trong ô input tìm kiếm (chưa debounce)
+    currentFilters, // Toàn bộ object filter mà UI đang hiển thị (có thể chưa debounce)
+    isError,
+    selectedIds,
+    length,
+    onSearch, // Đổi tên từ onSearchPrNo thành onSearch
+    onRefresh,
+    onLoadMore,
+    applyFilters,
+    handleSelect,
+    onCreatePo,
+    isLoadingCreatePo,
+  } = useCreatePoViewModel();
+
+  // ─── Refs và shared values Reanimated ───────────────────────────────────────
+  const flashListRef = useRef<any>(null);
+
+  // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
+  const scrollToTop = useCallback(() => {
+    flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
-  if (isLoading) {
+
+  useEffect(() => {
+    if (route.params?.filters) {
+      applyFilters(route.params.filters);
+    }
+  }, [route.params?.filters, applyFilters]);
+
+  const reLoadData = useCallback(() => {
+    onRefresh();
+  }, [onRefresh]);
+
+  const listEmptyComponent = useMemo(() => {
+    if (isLoading) {
+      return (
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator size="large" color={light.primary} />
+        </View>
+      );
+    }
+
     return (
-      <View style={styles.containerLoading}>
-        {new Array(6).fill(0).map((_, index) => (
-          <SkeletonItem key={index} />
-        ))}
+      <View style={styles.emptyContainer}>
+        <EmptyDataAnimation autoPlay />
+        <AppText style={styles.emptyText}>{t('CreatePo.empty')}</AppText>
       </View>
     );
-  }
-  return (
-    <View style={styles.container}>
-      <StatusBar barStyle={'default'} />
-      <DevelopingAnimation autoPlay={true} />
-    </View>
+  }, [isLoading, t]);
+
+  const listFooterComponent = useMemo(() => {
+    if (isFetchingNextPage) {
+      return (
+        <View style={styles.footerLoading}>
+          <ActivityIndicator size="small" color={light.primary} />
+        </View>
+      );
+    }
+    return null;
+  }, [isFetchingNextPage]);
+
+  const lengthPick = useMemo(() => selectedIds.length, [selectedIds]);
+  const renderItem = useCallback(
+    ({ item }: { item: IItemCreatePo; index: number }) => (
+      <CreatePoCard
+        item={item}
+        handleSelect={handleSelect}
+        isSelected={selectedIds.includes(item.id)}
+      />
+    ),
+    [handleSelect, selectedIds],
   );
-};
+  // console.log('render : ', length);
+  const goToFilterScreen = useCallback(() => {
+    navigate('FilterCreatePoScreen', {
+      onApplyFilters: applyFilters, // Callback để FilterScreen gọi khi confirm
+      currentFilters: currentFilters, // Filters hiện tại đang hiển thị trên màn hình A
+    });
+  }, [applyFilters, currentFilters]);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  containerLoading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: PaddingHorizontal,
-    marginTop: 100,
-  },
-});
+  // ...existing code...
+  // const navigation = useNavigation();
 
-export default CreatePoScreen;
+  // // Thêm useEffect để theo dõi length và update tabBar visibility
+  // useEffect(() => {
+  //   navigation.setOptions({
+  //     tabBarStyle: {
+  //       display: length > 0 ? 'none' : 'flex',
+  //       // Giữ lại các style khác của tabBar nếu có
+  //       backgroundColor: Colors.WHITE,
+  //       borderTopWidth: 0,
+  //       elevation: 0,
+  //       shadowOpacity: 0,
+  //     },
+  //   });
+  // }, [length, navigation]);
+  const lengthData = useMemo(() => flatData.length, [flatData.length]);
+  if (isError) {
+    return <FallbackComponent resetError={reLoadData} />;
+  }
+
+  return (
+    <ViewContainer>
+      <View style={styles.container}>
+        {/* ─── Background Image ─────────────────────────────────────────────── */}
+
+        <HeaderSearch
+          currentPrNoInput={currentPrNoInput}
+          onSearch={onSearch}
+          textPlaceholder={t('assignPrice.searchPlaceholder')}
+          goToFilterScreen={goToFilterScreen}
+        />
+        {/* ─── Title + Count Badge ───────────────────────────────────────────── */}
+        <View style={styles.titleContainer}>
+          <AppText style={styles.titleText}>{t('approve.listOfPurchaseOrder')}</AppText>
+          <View style={styles.countBadge}>
+            <AppText style={styles.countBadgeText}>{length}</AppText>
+          </View>
+        </View>
+        {/* ─── FlashList với Pagination, Loading, Empty State ───────────────── */}
+        {isLoading && flatData.length === 0 ? (
+          <View style={styles.listContent}>
+            {new Array(6).fill(0).map(
+              (
+                _,
+                index, // Giảm số lượng skeleton để demo
+              ) => (
+                <SkeletonItem key={index} />
+              ),
+            )}
+          </View>
+        ) : (
+          <FlashList
+            ref={flashListRef}
+            data={flatData || []}
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()}
+            onEndReached={onLoadMore}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.5}
+            removeClippedSubviews
+            refreshing={isRefetching}
+            nestedScrollEnabled={true}
+            onRefresh={onRefresh}
+            scrollEventThrottle={16}
+            ListEmptyComponent={listEmptyComponent}
+            ListFooterComponent={listFooterComponent}
+            estimatedItemSize={100}
+            contentContainerStyle={styles.listContent}
+            style={styles.containerFlashList}
+          />
+        )}
+
+        <ToastContainer ref={refToast} />
+        {/* ─── Scroll‐To‐Top Button (hiện khi scroll lên) ────────────────────── */}
+        <AppBlockButton onPress={scrollToTop} style={[styles.scrollButtonBase]}>
+          <IconScrollBottom style={styles.rotateIcon} />
+        </AppBlockButton>
+      </View>
+      {lengthPick > 0 && lengthData && (
+        <View style={styles.buttonCreate}>
+          <AppButton
+            processing={isLoadingCreatePo}
+            onPress={onCreatePo}
+            style={{ backgroundColor: Colors.PRIMARY }}>
+            <AppText weight="bold" color={Colors.WHITE}>
+              {t('myTabs.createPo')}
+            </AppText>
+          </AppButton>
+        </View>
+      )}
+    </ViewContainer>
+  );
+}

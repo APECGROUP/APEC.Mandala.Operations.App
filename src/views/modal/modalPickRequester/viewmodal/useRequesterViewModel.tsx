@@ -1,8 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { fetchRequesterData } from '../modal/PickRequesterModal';
-import { ResponseNcc } from '../../modalPickNcc/modal/PickNccModal';
+import { fetchRequesterData, IPickRequester } from '../modal/PickRequesterModal';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;
@@ -21,7 +20,7 @@ export function useRequesterViewModel() {
     fetchNextPage,
     hasNextPage,
     isRefetching,
-  } = useInfiniteQuery<ResponseNcc[], Error>({
+  } = useInfiniteQuery<IPickRequester[], Error>({
     queryKey: ['listRequester', searchKey.trim(), searchKey],
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
@@ -48,7 +47,6 @@ export function useRequesterViewModel() {
 
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
-    console.log('onRefresh');
     if (isFetching || isRefetching || isLoading) {
       return;
     }
@@ -57,7 +55,6 @@ export function useRequesterViewModel() {
 
   // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
-    console.log('loadMore');
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();
     }

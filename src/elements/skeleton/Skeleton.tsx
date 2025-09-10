@@ -1,15 +1,18 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  Animated,
-  Platform,
-  type StyleProp,
-  type ViewStyle,
-  StyleSheet,
-} from 'react-native';
+import React, { useEffect } from 'react';
+import { type StyleProp, type ViewStyle, StyleSheet } from 'react-native';
 
 import { useThemeContext } from '../../hook/contextHook';
 import { AppBlock } from '../block/Block';
 import type { AppBlockProps } from '../block/BlockProps';
+
+// Import Reanimated modules
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
+  interpolate,
+} from 'react-native-reanimated';
 
 export interface SkeletonProps extends AppBlockProps {
   /**
@@ -26,12 +29,13 @@ export interface SkeletonProps extends AppBlockProps {
   skeletonStyle?: StyleProp<ViewStyle>;
 }
 
-const AnimatedBlock = Animated.createAnimatedComponent(AppBlock);
+// Create an Animated version of AppBlock
+const AnimatedAppBlock = Animated.createAnimatedComponent(AppBlock);
 
-const Skeleton: React.FunctionComponent<SkeletonProps> = (props) => {
+const Skeleton: React.FunctionComponent<SkeletonProps> = props => {
   const {
     circle,
-    width = '100%',
+    width = '100%', // Default width
     height,
     animation = 'pulse',
     style,
@@ -39,73 +43,87 @@ const Skeleton: React.FunctionComponent<SkeletonProps> = (props) => {
   } = props;
   const { colors } = useThemeContext();
 
-  const animationRef = useRef(new Animated.Value(0));
-  const animationLoop = useRef<Animated.CompositeAnimation>();
-
-  const [layoutWidth, setLayoutWidth] = React.useState<number>(0);
+  // Use useSharedValue for animation progress and layout width
+  const animatedProgress = useSharedValue(0);
+  const sharedLayoutWidth = useSharedValue(0); // To store and animate based on layout width
 
   useEffect(() => {
-    animationLoop.current = Animated.timing(animationRef.current, {
-      toValue: 2,
-      delay: 400,
-      duration: 1500,
-      useNativeDriver: !!Platform.select({
-        web: false,
-        native: true,
-      }),
-    });
-    animationRef.current.setValue(0);
-    Animated.loop(animationLoop.current).start();
-  }, []);
+    if (animation === 'none') {
+      // If no animation, ensure the value is reset and stop any existing animation
+      animatedProgress.value = 0;
+      return;
+    }
 
-  const opacity = animationRef.current.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: [1, 0, 1],
+    // Start the animation loop when component mounts or animation type changes
+    // The animation goes from 0 to 2 over 1500ms (with 400ms delay), then repeats infinitely, reversing direction each time.
+    // This allows the interpolate function to map values from 0-2 (and 2-0 on reverse cycles)
+    // for both pulse (opacity: 1 -> 0 -> 1) and wave (translateX: -2L -> +2L -> -2L) effects.
+    animatedProgress.value = withRepeat(
+      withTiming(2, { duration: 1500, delay: 400 }),
+      -1, // Infinite repeats
+      true, // Reverse direction on alternate loops
+    );
+  }, [animation, animatedProgress]); // Depend on animation prop to re-trigger if changed
+
+  // Create animated styles based on animation type
+  const rSkeletonAnimatedStyle = useAnimatedStyle(() => {
+    if (animation === 'pulse') {
+      return {
+        // Opacity interpolates from 1 to 0 and back to 1 as animatedProgress goes from 0 to 2
+        opacity: interpolate(animatedProgress.value, [0, 1, 2], [1, 0, 1]),
+      };
+    } else if (animation === 'wave') {
+      return {
+        // translateX interpolates from -2*width to 2*width as animatedProgress goes from 0 to 2
+        transform: [
+          {
+            translateX: interpolate(
+              animatedProgress.value,
+              [0, 2],
+              [-sharedLayoutWidth.value * 2, sharedLayoutWidth.value * 2],
+            ),
+          },
+        ],
+      };
+    }
+    return {}; // Return empty object if animation is 'none' or unrecognized
   });
 
   return (
     <AppBlock
-      {...props}
+      {...props} // Pass all AppBlockProps
       accessibilityRole="none"
       accessibilityLabel="loading..."
       accessible={false}
       onLayout={({ nativeEvent }) => {
-        setLayoutWidth(nativeEvent.layout.width);
+        // Update sharedLayoutWidth when the layout of the container changes
+        sharedLayoutWidth.value = nativeEvent.layout.width;
       }}
       style={[
         styles.container,
         {
           backgroundColor: colors.skeleton,
+          width, // Apply width directly from props
+          height, // Apply height directly from props
         },
         circle && {
           ...styles.circle,
-          height: height || width,
+          height: height || width, // For circular shape, height should match width
         },
-        style,
-      ]}
-    >
-      {animation !== 'none' && (
-        <AnimatedBlock
+        style, // Custom style from props, applied last to allow overrides
+      ]}>
+      {animation !== 'none' && ( // Only render animated block if animation is not 'none'
+        <AnimatedAppBlock // Use the Reanimated version of AppBlock
           style={[
             styles.skeleton,
             {
               backgroundColor: colors.skeletonHighlight,
             },
-            animation === 'pulse' && {
-              ...styles.fullWidth,
-              opacity,
-            },
-            animation === 'wave' && {
-              transform: [
-                {
-                  translateX: animationRef.current.interpolate({
-                    inputRange: [0, 2],
-                    outputRange: [-layoutWidth * 2, layoutWidth * 2],
-                  }),
-                },
-              ],
-            },
-            skeletonStyle,
+            // Apply animation-specific styles generated by useAnimatedStyle
+            rSkeletonAnimatedStyle,
+            // Apply fullWidth style specifically for pulse animation
+            animation === 'pulse' && styles.fullWidth,
+            skeletonStyle, // Custom skeleton style from props
           ]}
         />
       )}
@@ -115,16 +133,16 @@ const Skeleton: React.FunctionComponent<SkeletonProps> = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    overflow: 'hidden',
+    overflow: 'hidden', // Ensures the animated content stays within bounds
   },
   skeleton: {
-    height: '100%',
+    height: '100%', // Skeleton animation fills the height of its container
   },
   circle: {
-    borderRadius: 50,
+    borderRadius: 50, // Makes the container circular
   },
   fullWidth: {
-    width: '100%',
+    width: '100%', // Ensures the animated element fills the width for pulse effect
   },
 });
 

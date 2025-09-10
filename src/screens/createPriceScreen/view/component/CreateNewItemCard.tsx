@@ -1,13 +1,11 @@
 import { AppText } from '@/elements/text/AppText';
-import { LayoutAnimation, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { LayoutAnimation, TextInput, TouchableOpacity, View } from 'react-native';
 import { s, vs } from 'react-native-size-matters';
-import { useCallback, useMemo, useState } from 'react';
-import { getFontSize } from '@/constants';
+import { useCallback, useMemo, useRef, useState } from 'react'; // Đã thêm useRef
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/theme/Config';
 import { navigate } from '@/navigation/RootNavigation';
-import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
-import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
+import { IItemSupplier } from '@/views/modal/modalPickNcc/modal/PickNccModal';
 import IconPenEdit from '@assets/icon/IconPenEdit';
 import IconCalendar from '@assets/icon/IconCalendar';
 import IconListPen from '@assets/icon/IconListPen';
@@ -16,32 +14,46 @@ import AppBlockButton from '@/elements/button/AppBlockButton';
 import moment from 'moment';
 import IconDropDown from '@assets/icon/IconDropDown';
 import AppDropdown from '@/elements/appDropdown/AppDropdown';
-import ReanimatedSwipeable from './ReanimatedSwipeable';
-import { AnimatedButton } from '../CreatePriceScreen';
+import ReanimatedSwipeable, { ReanimatedSwipeableRef } from './ReanimatedSwipeable';
 import IconTrashPrice from '@assets/icon/IconTrashPrice';
 import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useAlert } from '@/elements/alert/AlertProvider';
+import { IItemVat, IItemVendorPrice } from '../../modal/CreatePriceModal';
+import { IPickItem } from '@/views/modal/modalPickItem/modal/PickItemModal';
+import { styles } from './styleCreateNewItemCard';
+import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 
 const CreateNewItemCard = ({
   item,
+  listVat,
   onFocusComment,
   onUpdateItem,
   handleDelete,
   simultaneousGesture,
+  timeSystem,
 }: {
-  item: IPickItem;
+  listVat: IItemVat[];
+  item: IItemVendorPrice;
   index: number;
   onFocusComment: () => void;
-  onUpdateItem: (i: IPickItem) => void;
-  handleDelete: (id: string) => void;
+  onUpdateItem: (i: IItemVendorPrice) => void;
+  handleDelete: (id: number) => void;
   simultaneousGesture: any;
+  timeSystem: string;
 }) => {
   const { t } = useTranslation();
   const [isShow, setIsShow] = useState(true);
-  const [ncc, setNcc] = useState<ResponseNcc>(item.supplier);
-  const [price, setPrice] = useState(item.price);
-  const { showAlert } = useAlert();
+  const [ncc, setNcc] = useState<IItemSupplier>({} as IItemSupplier);
+  const [isEditPrice, setIsEditPrice] = useState(true);
+  const initialPrice = item.price > 0 ? item.price : ''; // Khởi tạo giá trị ban đầu
 
+  // Sửa: Dùng useRef thay vì useState cho price để tránh re-render khi gõ
+  const priceRef = useRef(initialPrice);
+  const inputRef = useRef<TextInput>(null);
+  const swipeableRef = useRef<ReanimatedSwipeableRef>(null);
+
+  const { showAlert } = useAlert();
+  console.log('list vat: ', listVat);
   const handleShowDetail = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setIsShow(i => !i);
@@ -49,60 +61,61 @@ const CreateNewItemCard = ({
 
   const onPickNcc = () => {
     navigate('PickNccScreen', {
-      setNcc: setNcc,
-      ncc: item.supplier,
+      setNcc: (i: IItemSupplier) => {
+        setNcc(i);
+        onUpdateItem({ ...item, vendorCode: String(i.code), vendorName: i.accountName });
+      },
+      ncc,
     });
   };
 
   const onBlur = async () => {
-    await onUpdateItem?.({ ...item, price });
+    // Sửa: Lấy giá trị từ priceRef
+    setIsEditPrice(false);
+    await onUpdateItem?.({ ...item, price: Number(priceRef.current || 0) });
   };
 
   const onPickItem = () => {
     navigate('PickItemScreen', {
-      setItem: (i: { id: string; name: string }) => {
-        onUpdateItem({ ...item, name: i.name, supplier: { id: i.id, name: i.name } });
+      setItem: (i: IPickItem | undefined) => {
+        onUpdateItem({
+          ...item,
+          itemName: i?.iName || '',
+          itemCode: String(i?.iCode),
+          unitName: i?.unitName || '',
+        });
       },
     });
   };
-
+  console.log('render new item card', item);
+  const parseDate = (str: string) => {
+    const [d, m, y] = str.split('/').map(Number);
+    return new Date(y, m - 1, d);
+  };
   const onPickTime = () => {
     navigate('ModalPickCalendar', {
       isSingleMode: false,
+      minDate: parseDate(timeSystem),
       onSelectRange: (start: any, end: any) => {
-        onUpdateItem({ ...item, dateFrom: start, dateTo: end });
+        onUpdateItem({ ...item, validFrom: start, validTo: end });
       },
     });
   };
 
-  const onChangeVat = (itemVat: { id: string; name: string }) => {
-    onUpdateItem({ ...item, vat: { id: itemVat.id, name: itemVat.name } });
+  const onChangeVat = (itemVat: IItemVat) => {
+    onUpdateItem({ ...item, vatCode: itemVat.code, vatId: itemVat.id });
   };
 
   const isError = useMemo(
     () =>
-      item.name === '' ||
-      item.price === 0 ||
-      item.supplier.name === '' ||
-      item.vat === '' ||
-      item.dateFrom === '' ||
-      item.dateTo === '',
+      item.vendorCode === '' ||
+      item.itemCode === '0' ||
+      !item.validFrom ||
+      !item.validTo ||
+      !item.price ||
+      item.vatCode === '',
     [item],
   );
-
-  const listVat = [
-    { id: '1', name: '10' },
-    { id: '2', name: '15' },
-    { id: '3', name: '20' },
-    { id: '4', name: '25' },
-    { id: '5', name: '30' },
-    { id: '6', name: '35' },
-    { id: '7', name: '40' },
-    { id: '8', name: '45' },
-    { id: '9', name: '50' },
-    { id: '10', name: '55' },
-    { id: '11', name: '60' },
-  ];
 
   // SharedValue để đồng bộ chiều cao cho delete button
   const heightAction = useSharedValue(0);
@@ -118,17 +131,20 @@ const CreateNewItemCard = ({
     heightAction.value = withTiming(height, { duration: 0 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const onDelete = useCallback((id: string) => {
+  const onCloseSwipe = useCallback(() => {
+    console.log('close swipe callback triggered');
+    swipeableRef.current?.closeSwipe();
+  }, []);
+  const onDelete = useCallback(() => {
     showAlert(t('createPrice.remove.title'), '', [
       {
         text: t('createPrice.remove.cancel'),
         style: 'cancel',
-        onPress: () => {},
+        onPress: onCloseSwipe,
       },
       {
         text: t('createPrice.remove.agree'),
-        onPress: async () => handleDelete(id),
+        onPress: async () => handleDelete(item.id),
       },
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -136,22 +152,30 @@ const CreateNewItemCard = ({
 
   // Phần render nút delete
   const renderRightActions = useCallback(
-    (id: string) => (
+    () => (
       <AnimatedButton
         activeOpacity={1}
-        style={[!isShow ? styles.deleteBtn : styles.deleteBtnExtend, animatedDeleteStyle]}
-        onPress={() => onDelete(id)}>
+        style={[styles.deleteBtn, animatedDeleteStyle]}
+        onPress={onDelete}>
         <IconTrashPrice />
       </AnimatedButton>
     ),
-    [animatedDeleteStyle, isShow, onDelete],
+    [animatedDeleteStyle, onDelete],
   );
+
+  // Sửa: Cập nhật cả priceRef và TextInput khi reset giá
+  const resetPrice = () => {
+    setIsEditPrice(true);
+    priceRef.current = '';
+    inputRef.current?.setNativeProps({ text: '' });
+  };
 
   return (
     <ReanimatedSwipeable
-      renderRightActions={() => renderRightActions(item.id!)}
+      ref={swipeableRef}
+      renderRightActions={renderRightActions}
       simultaneousGesture={simultaneousGesture}
-      onSwipe={() => {}}>
+      onSwipe={onDelete}>
       <View onLayout={onItemLayout} style={[isError && !isShow ? styles.cardError : styles.card]}>
         {/* Header Row */}
         <TouchableOpacity activeOpacity={1} onPress={handleShowDetail} style={styles.header}>
@@ -162,47 +186,62 @@ const CreateNewItemCard = ({
             <View style={styles.flex1}>
               <AppBlockButton onPress={onPickItem} style={styles.blockPickName}>
                 <AppText
-                  style={[item?.name ? styles.nccText : styles.placeholder]}
+                  style={[item?.itemName ? styles.nccText : styles.placeholder]}
                   numberOfLines={1}>
-                  {item?.name || t('createPrice.pickItem')}
+                  {item?.itemName || t('createPrice.pickItem')}
                 </AppText>
                 <IconDropDown width={vs(12)} fill={Colors.TEXT_SECONDARY} />
               </AppBlockButton>
               <View style={styles.priceRow}>
                 <AppText style={styles.priceLabel}>{t('createPrice.price')}:</AppText>
-                {item.price ? (
-                  <AppText style={styles.priceValue}>
-                    {moneyFormat(item.price, '.', '')}/{item.end || 'Kg'}
-                  </AppText>
+                {/* Sửa: Kiểm tra priceRef.current */}
+                {!isEditPrice ? (
+                  <AppBlockButton style={styles.rowCenter} onPress={resetPrice}>
+                    <AppText style={styles.priceValue}>
+                      {/* Sửa: Hiển thị giá trị từ priceRef */}
+                      {moneyFormat(priceRef.current, '.', '')}/{item.unitName}
+                    </AppText>
+                    <IconPenEdit style={{ marginLeft: s(6) }} />
+                  </AppBlockButton>
                 ) : (
-                  <TextInput
-                    // value={price?.toString()}
-                    onFocus={onFocusComment}
-                    onBlur={onBlur}
-                    onChangeText={text => setPrice(Number(text))}
-                    keyboardType="numeric"
-                    style={styles.priceInput}
-                    placeholder="0"
-                    placeholderTextColor="#999"
-                  />
+                  <View style={styles.rowCenter}>
+                    <TextInput
+                      // autoFocus
+                      ref={inputRef}
+                      defaultValue={String(priceRef.current)} // Sửa: Dùng defaultValue
+                      onFocus={onFocusComment}
+                      onBlur={onBlur}
+                      maxLength={9}
+                      onChangeText={text => {
+                        // Sửa: Cập nhật trực tiếp vào priceRef
+                        const parsed = parseFloat(text);
+                        if (!isNaN(parsed)) {
+                          priceRef.current = parsed;
+                        }
+                      }}
+                      keyboardType="numeric"
+                      style={styles.priceInput}
+                      placeholder=""
+                      placeholderTextColor="#999"
+                    />
+                    <IconPenEdit style={{ marginLeft: s(6) }} />
+                  </View>
                 )}
-                {/* <AppText style={styles.unitText}>/{item.end || 'Kg'}</AppText> */}
-                <IconPenEdit style={{ marginLeft: s(6) }} />
               </View>
               <View style={styles.nccRow}>
                 <AppText style={styles.priceLabel}>{t('NCC')}:</AppText>
                 <TouchableOpacity onPress={onPickNcc} style={styles.nccTouchable}>
                   <AppText
-                    style={[ncc?.name ? styles.nccText : styles.placeholder, styles.mw85]}
+                    style={[ncc?.accountName ? styles.nccText : styles.placeholder, styles.mw85]}
                     numberOfLines={2}>
-                    {ncc?.name || t('createPrice.pickNcc')}
+                    {ncc?.accountName || t('createPrice.pickNcc')}
                   </AppText>
                   <IconDropDown width={vs(12)} fill={Colors.TEXT_SECONDARY} />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-          <IconDropDown style={styles.IconExtend} />
+          <IconDropDown style={isShow ? styles.IconExtend : styles.IconNoExtend} />
         </TouchableOpacity>
 
         {/* Expanded Detail Section */}
@@ -217,16 +256,17 @@ const CreateNewItemCard = ({
                 <IconDropDown width={vs(12)} fill={Colors.TEXT_SECONDARY} />
               </TouchableOpacity>
             </View> */}
-            <View style={styles.detailRow}>
+            <View style={[styles.detailRow]}>
               <AppText style={styles.detailLabel}>{t('createPrice.vat')}</AppText>
               <AppDropdown
+                // showsVerticalScrollIndicator={true}
                 selectedTextStyle={styles.textSelected}
                 style={styles.dropdownStyle}
                 placeholderStyle={styles.placeholderStyle}
                 data={listVat}
-                containerStyle={{ height: vs(150), width: s(50) }}
+                containerStyle={{ height: vs(150) }}
                 placeholder="0"
-                value={item.vat}
+                value={item.vatId}
                 renderRightIcon={() => <IconDropDown width={vs(12)} fill={Colors.TEXT_SECONDARY} />}
                 onChange={onChangeVat}
                 labelField="name"
@@ -238,11 +278,11 @@ const CreateNewItemCard = ({
               <AppText style={styles.detailLabel}>{t('createPrice.timeFromTo')}</AppText>
               <TouchableOpacity style={styles.datePicker} onPress={onPickTime}>
                 <AppText
-                  style={[styles.placeholder, item.dateFrom && item.dateTo && styles.nccText]}>
-                  {item.dateFrom && item.dateTo
-                    ? `${moment(item.dateFrom).format('DD/MM/YYYY')} - ${moment(item.dateTo).format(
-                        'DD/MM/YYYY',
-                      )}`
+                  style={[styles.placeholder, item.validFrom && item.validTo && styles.nccText]}>
+                  {item.validFrom && item.validTo
+                    ? `${moment(item.validFrom).format('DD/MM/YYYY')} - ${moment(
+                        item.validTo,
+                      ).format('DD/MM/YYYY')}`
                     : t('createPrice.pickTime')}
                 </AppText>
                 <IconCalendar width={vs(12)} fill={Colors.TEXT_SECONDARY} />
@@ -257,164 +297,3 @@ const CreateNewItemCard = ({
 };
 
 export default CreateNewItemCard;
-
-const styles = StyleSheet.create({
-  mw85: { maxWidth: '85%' },
-  flex1: { flex: 1 },
-  blockPickName: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '75%',
-  },
-  dropdownStyle: {
-    paddingBottom: vs(6),
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F1F1',
-    width: s(40),
-  },
-  placeholderStyle: {
-    fontSize: getFontSize(12),
-    fontWeight: '500',
-    color: '#333',
-  },
-  textSelected: {
-    fontSize: getFontSize(12),
-    fontWeight: '500',
-    color: '#333',
-  },
-  IconExtend: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  deleteBtn: {
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: s(50),
-    borderRadius: s(8),
-    marginTop: vs(-12),
-  },
-  deleteBtnExtend: {
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: s(50),
-    borderRadius: s(8),
-    marginTop: vs(12),
-  },
-  error: {
-    color: Colors.ERROR_600,
-    fontSize: getFontSize(12),
-    fontWeight: '500',
-    marginTop: vs(8),
-    textAlign: 'right',
-  },
-  // touchableVat: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   paddingBottom: vs(12),
-  //   borderBottomWidth: 1,
-  //   borderBottomColor: '#F1F1F1',
-  //   // flexShrink: 1,
-  // },
-  card: {
-    marginTop: vs(12),
-    backgroundColor: '#fff',
-    borderRadius: s(8),
-    padding: s(12),
-  },
-  cardError: {
-    backgroundColor: '#fff',
-    // borderWidth: 1,
-    borderColor: Colors.ERROR_600,
-    borderRadius: s(8),
-    padding: s(12),
-    marginTop: vs(12),
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    flex: 1,
-  },
-  iconBox: {
-    width: s(42),
-    height: s(42),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: s(42),
-    marginRight: s(6),
-    backgroundColor: Colors.BUTTON_DISABLED,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: vs(6),
-  },
-  priceLabel: {
-    fontSize: getFontSize(12),
-    fontWeight: '500',
-    color: Colors.TEXT_SECONDARY,
-    marginRight: s(4),
-  },
-  priceValue: {
-    fontSize: getFontSize(14),
-    fontWeight: '700',
-    color: Colors.TEXT_DEFAULT,
-  },
-  priceInput: {
-    minWidth: s(60),
-    borderBottomWidth: 1,
-    borderBottomColor: '#BABABA',
-    paddingVertical: 0,
-    fontSize: getFontSize(12),
-    color: '#333',
-  },
-  nccRow: {
-    flexDirection: 'row',
-  },
-  nccTouchable: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-
-    alignItems: 'flex-start',
-    flexShrink: 1,
-    width: '100%',
-  },
-  nccText: {
-    fontSize: getFontSize(12),
-    fontWeight: '500',
-    marginRight: s(4),
-    color: '#333',
-  },
-  detailContainer: {
-    paddingTop: vs(12),
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  detailLabel: {
-    // width: s(200),
-    fontSize: getFontSize(12),
-    fontWeight: '500',
-    color: Colors.TEXT_SECONDARY,
-  },
-  datePicker: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: vs(12),
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F1F1',
-    gap: s(4),
-  },
-  placeholder: {
-    fontSize: getFontSize(12),
-    fontWeight: '500',
-    color: '#BABABA',
-  },
-});

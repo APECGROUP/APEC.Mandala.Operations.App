@@ -10,92 +10,54 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { s, vs } from 'react-native-size-matters';
 import { PaddingHorizontal } from '@/utils/Constans';
 import { Colors } from '@/theme/Config';
-import { useAlert } from '@/elements/alert/AlertProvider';
-import FastImage from 'react-native-fast-image';
-import Images from '@assets/image/Images';
-import { TYPE_TOAST } from '@/elements/toast/Message';
-import { goBack, navigate } from '@/navigation/RootNavigation';
+import { navigate } from '@/navigation/RootNavigation';
 
-const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) => {
+const FooterInformationItem = ({
+  onAutoAssign,
+  id,
+  prNo,
+  isLoadingAssign,
+  handleAssign,
+  onSaveDraft,
+}: {
+  id: number;
+  prNo: string;
+  onAutoAssign: () => void;
+  handleAssign: () => void;
+  onSaveDraft: () => void;
+  isLoadingAssign: boolean;
+}) => {
   const { t } = useTranslation();
   const [isLoadingReject, setIsLoadingReject] = useState(false);
-  const [isLoadingAssign, setIsLoadingAssign] = useState(false);
   const { bottom } = useSafeAreaInsets();
-  const { showAlert, showToast } = useAlert();
-
-  const onRejectSuccess = () => {
-    showAlert(
-      t('informationItem.rejectSuccess'),
-      '',
-      [
-        {
-          text: t('Trở về'),
-          onPress: goBack,
-        },
-      ],
-      <FastImage
-        source={Images.ModalApprovedError}
-        style={{ width: s(285), aspectRatio: 285 / 187 }}
-      />,
-    );
-  };
-
   const onReject = async () => {
     setIsLoadingReject(true);
     await new Promise(resolve => setTimeout(resolve, 300));
-    navigate('ModalInputRejectAssign', { id: '123', onRejectSuccess: onRejectSuccess });
+    navigate('ModalInputRejectAssign', { id, prNo });
     setIsLoadingReject(false);
   };
-  const onAssign = async () => {
-    setIsLoadingAssign(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
-    setIsLoadingAssign(false);
-    showAlert(
-      t('informationItem.assignSuccess'),
-      '',
-      [
-        {
-          text: t('Trở về'),
-          onPress: () => {
-            goBack();
-          },
-        },
-      ],
-      <FastImage
-        source={Images.ModalApprovedSuccess}
-        style={{ width: s(285), aspectRatio: 285 / 187 }}
-      />,
-      // <ConfettiAnimation
-      //   autoPlay={true}
-      //   loop={false}
-      //   style={{
-      //     position: 'absolute',
-      //     top: 0,
-      //     left: 0,
-      //   }}
-      // />,
-    );
-  };
 
-  const onPressAutoAssign = () => {
-    showToast(t('informationItem.autoAssignSuccess'), TYPE_TOAST.SUCCESS);
-    onAutoAssign();
-  };
+  // const onPressAutoAssign = () => {
+  //   showToast(t('informationItem.autoAssignSuccess'), TYPE_TOAST.SUCCESS);
+  //   onAutoAssign();
+  // };
 
-  const onSave = () => {
-    showToast(t('informationItem.saveDraftSuccess'), TYPE_TOAST.SUCCESS);
-  };
+  // const onPressSaveDraft = () => {
+  //   showToast(t('informationItem.saveDraftSuccess'), TYPE_TOAST.SUCCESS);
+
+  // };
+
   return (
     <View style={[styles.bottomContainer, { paddingBlock: bottom }]}>
       <View style={styles.footerContainer}>
-        <AppBlockButton onPress={onPressAutoAssign} style={styles.footerButton}>
+        <AppBlockButton onPress={onAutoAssign} style={styles.footerButton}>
           <IconAutoAssign />
           <AppText size={14} weight="700" color={Colors.BLACK_900} mt={4}>
             {t('informationItem.autoAssign')}
           </AppText>
         </AppBlockButton>
         <View style={styles.footerDivider} />
-        <AppBlockButton onPress={onSave} style={styles.footerButton}>
+        <AppBlockButton onPress={onSaveDraft} style={styles.footerButton}>
           <IconSaveTmp />
           <AppText size={14} weight="700" color={Colors.BLACK_900} mt={4}>
             {t('informationItem.saveDraft')}
@@ -117,7 +79,7 @@ const FooterInformationItem = ({ onAutoAssign }: { onAutoAssign: () => void }) =
         <View style={styles.blockButton}>
           <AppButton
             width={s(162)}
-            onPress={onAssign}
+            onPress={handleAssign}
             processing={isLoadingAssign}
             style={styles.buttonAssign}>
             <AppText size={14} weight="700" color={Colors.WHITE}>

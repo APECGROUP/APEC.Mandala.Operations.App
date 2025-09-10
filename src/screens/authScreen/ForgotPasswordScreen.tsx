@@ -1,5 +1,6 @@
+// screens/authScreen/ForgotPasswordScreen.tsx
 import { Keyboard, StatusBar, StyleSheet, View } from 'react-native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import light from '../../theme/light';
 import { s, vs } from 'react-native-size-matters';
 import { AppText } from '../../elements/text/AppText';
@@ -13,38 +14,36 @@ import { PaddingHorizontal } from '../../utils/Constans';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthParams } from '../../navigation/params';
 import { Colors } from '@/theme/Config';
-import { TYPE_TOAST } from '@/elements/toast/Message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { useAuthViewModel } from './viewmodel/AuthViewModel';
-import { useAlert } from '@/elements/alert/AlertProvider';
+import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
 
 const ForgotPasswordScreen = ({
   navigation,
 }: NativeStackScreenProps<AuthParams, 'ForgotPasswordScreen'>) => {
   const { t } = useTranslation();
   const { bottom } = useSafeAreaInsets();
-  const { showToast } = useAlert();
-  const { forgotPasswordForm, processing, setForgotPasswordForm, forgotPassword } =
-    useAuthViewModel();
+  const {
+    forgotPasswordForm,
+    processing,
+    setForgotPasswordForm,
+    forgotPassword,
+    handleBlurForgotPasswordUserName,
+  } = useAuthViewModel();
 
   const { userName, hotel } = forgotPasswordForm;
-  const disabled = !userName || !hotel.id;
+  const disabled = !userName || !hotel?.code;
 
-  const onBlurUserName = () => {
-    if (!userName.trim()) {
-      showToast(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
-    }
-  };
-
-  const onPickHotel = () => {
+  const onPickHotel = useCallback(() => {
     Keyboard.dismiss();
     navigation.navigate('ModalPickHotel', {
-      hotel,
-      setHotel: newHotel => setForgotPasswordForm({ hotel: newHotel }),
+      hotel: hotel,
+      setHotel: (newHotel: IDataListHotel | undefined) =>
+        setForgotPasswordForm({ hotel: newHotel }),
     });
-  };
+  }, [navigation, hotel, setForgotPasswordForm]);
 
   return (
     <ViewContainer>
@@ -62,13 +61,13 @@ const ForgotPasswordScreen = ({
           <AppTextInput
             required
             labelStyle={styles.labelPassword}
-            containerStyle={styles.bottom10}
+            containerStyle={styles.userNameInputContainer}
             label={t('auth.forgotPassword.userName')}
             value={userName}
             maxLength={20}
             inputStyle={styles.inputStyle}
-            onBlur={onBlurUserName}
-            onChangeText={text => setForgotPasswordForm({ userName: text })}
+            onBlur={handleBlurForgotPasswordUserName} // Gọi hàm onBlur từ ViewModel
+            onChangeText={text => setForgotPasswordForm({ userName: text })} // Chỉ cập nhật useRef, không re-render
             onSubmitEditing={onPickHotel}
             placeholder={t('auth.forgotPassword.inputUserName')}
           />
@@ -82,14 +81,9 @@ const ForgotPasswordScreen = ({
               noBorder
               value={hotel?.name?.toString()}
               placeholder={t('auth.forgotPassword.pickHotel')}
-              rightIcon={
-                <IconArrowRight stroke="#D8D8D8" style={{ transform: [{ rotate: '90deg' }] }} />
-              }
-              onPress={onPickHotel}
+              rightIcon={<IconArrowRight stroke="#D8D8D8" style={styles.hotelArrowIcon} />}
               inputStyle={styles.inputStyle}
-              containerStyle={{
-                width: SCREEN_WIDTH - PaddingHorizontal * 2,
-              }}
+              containerStyle={styles.hotelInputContainer}
             />
           </AppBlockButton>
         </AppBlock>
@@ -97,14 +91,14 @@ const ForgotPasswordScreen = ({
           width={SCREEN_WIDTH - s(32)}
           height={vs(45)}
           onPress={forgotPassword}
-          disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
+          disabledStyle={styles.disabledButton}
           disabled={disabled}
           primary
           textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
           processing={processing}
           textStyle={styles.textStyleButton}
           text={t('auth.forgotPassword.confirm')}
-          style={{ marginTop: vs(32) }}
+          style={styles.confirmButton}
         />
       </View>
     </ViewContainer>
@@ -119,6 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: light.white,
     paddingTop: vs(16),
+    alignItems: 'center',
   },
   labelPassword: {
     fontSize: getFontSize(14),
@@ -132,8 +127,21 @@ const styles = StyleSheet.create({
     borderRadius: vs(6),
     backgroundColor: light.backgroundTextInput,
   },
-  bottom10: {
+  userNameInputContainer: {
     marginBottom: vs(16),
+    marginTop: vs(32),
+    width: SCREEN_WIDTH - PaddingHorizontal * 2,
+  },
+  hotelInputContainer: {
+    width: SCREEN_WIDTH - PaddingHorizontal * 2,
+  },
+  hotelArrowIcon: {
+    transform: [{ rotate: '90deg' }],
+  },
+  disabledButton: {
+    backgroundColor: Colors.BUTTON_DISABLED,
+  },
+  confirmButton: {
     marginTop: vs(32),
   },
 });

@@ -10,16 +10,17 @@ import { navigate } from '@/navigation/RootNavigation';
 import { PaddingHorizontal } from '@/utils/Constans';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconCalendar from '@assets/icon/IconCalendar';
-import { vs, s } from 'react-native-size-matters'; // Import s
+import { vs, s } from 'react-native-size-matters';
 import Footer from './component/Footer';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { MainParams } from '@/navigation/params';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  AssignPriceFilters,
-  SelectedOption,
-} from '@/screens/assignPriceScreen/modal/AssignPriceModal';
+import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
+import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import { IApproveFilters } from '@/screens/approvePrScreen/modal/ApproveModal';
+import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { Colors } from '@/theme/Config';
 
 const FilterApproveScreen = ({
   route,
@@ -32,25 +33,21 @@ const FilterApproveScreen = ({
 
   // Lấy các filter hiện tại từ params để khởi tạo state
   // Đảm bảo default values cho department và requester là { id: '', name: '' }
-  const initialFilters: AssignPriceFilters = route.params?.currentFilters || {};
+  const initialFilters: IApproveFilters = route.params?.currentFilters || {};
 
-  const [prNo, setPrNo] = useState<string>(initialFilters.prNo || initialFilters?.searchKey || '');
-  const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.fromDate);
-  const [toDate, setToDate] = useState<Date | undefined>(initialFilters.toDate);
-  const [department, setDepartment] = useState<SelectedOption>(
-    initialFilters.department && initialFilters.department.id !== ''
+  const [prNo, setPrNo] = useState<string>(initialFilters.prNo || '');
+  const [fromDate, setFromDate] = useState<Date | undefined>(initialFilters.prDate);
+  const [toDate, setToDate] = useState<Date | undefined>(initialFilters.expectedDate);
+  const [department, setDepartment] = useState<IPickDepartment | undefined>(
+    initialFilters.department && initialFilters.department.id
       ? initialFilters.department
-      : { id: '', name: '' },
+      : undefined,
   );
-  const [location, setLocation] = useState<SelectedOption>(
-    initialFilters.location && initialFilters.location.id !== ''
-      ? initialFilters.location
-      : { id: '', name: '' },
+  const [location, setLocation] = useState<IPickLocal | undefined>(
+    initialFilters.store && initialFilters.store.id ? initialFilters.store : undefined,
   );
-  const [requester, setRequester] = useState<SelectedOption>(
-    initialFilters.requester && initialFilters.requester.id !== ''
-      ? initialFilters.requester
-      : { id: '', name: '' },
+  const [requester, setRequester] = useState<IPickRequester | undefined>(
+    initialFilters.requester && initialFilters.requester.id ? initialFilters.requester : undefined,
   );
 
   // Ref cho TextInput để quản lý focus (có thể không cần thiết nếu dùng AppTextInput đúng cách)
@@ -69,27 +66,25 @@ const FilterApproveScreen = ({
       initialEndDate: toDate,
     });
   }, [fromDate, toDate]);
-  console.log('filter', initialFilters);
 
   const onPressDepartment = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickDepartmentScreen', {
-      setDepartment: (dep: SelectedOption) => setDepartment(dep),
-      department: department, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      setDepartment,
+      department, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [department]);
   const onPressLocation = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickLocalScreen', {
-      setLocation: (loc: SelectedOption) => setLocation(loc),
-      location: location, // Truyền giá trị đã chọn để Modal có thể hiển thị
+      setLocation,
+      location, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [location]);
-  console.log('filter', initialFilters);
   const onPressRequester = useCallback(() => {
     Keyboard.dismiss(); // Ẩn bàn phím trước khi mở modal
     navigate('PickRequesterScreen', {
-      setRequester: (req: SelectedOption) => setRequester(req),
+      setRequester,
       requester: requester, // Truyền giá trị đã chọn để Modal có thể hiển thị
     });
   }, [requester]);
@@ -97,13 +92,13 @@ const FilterApproveScreen = ({
   // --- Xử lý khi người dùng xác nhận bộ lọc ---
   const onConfirm = useCallback(() => {
     // Tạo object filters mới từ state cục bộ của FilterScreen
-    const newFilters: AssignPriceFilters = {
+    const newFilters: IApproveFilters = {
       prNo: prNo.trim() || undefined, // Đảm bảo prNo rỗng thì thành undefined
-      fromDate,
-      toDate,
-      department: department.id ? department : undefined, // Nếu id rỗng thì là undefined
-      requester: requester.id ? requester : undefined, // Nếu id rỗng thì là undefined
-      location: location.id ? location : undefined, // Nếu id rỗng thì là undefined
+      prDate: fromDate,
+      expectedDate: toDate,
+      department: department?.id ? department : undefined, // Nếu id rỗng thì là undefined
+      requester: requester?.id ? requester : undefined, // Nếu id rỗng thì là undefined
+      store: location?.id ? location : undefined, // Nếu id rỗng thì là undefined
     };
 
     // Gọi callback từ màn hình trước đó để áp dụng filter
@@ -117,9 +112,9 @@ const FilterApproveScreen = ({
     setPrNo('');
     setFromDate(undefined);
     setToDate(undefined);
-    setDepartment({ id: '', name: '' });
-    setRequester({ id: '', name: '' });
-    setLocation({ id: '', name: '' });
+    setDepartment(undefined);
+    setRequester(undefined);
+    setLocation(undefined);
   }, []);
 
   const valueDate =
@@ -129,13 +124,13 @@ const FilterApproveScreen = ({
   return (
     <ViewContainer>
       <AppBlock style={styles.container}>
-        <StatusBar barStyle={'dark-content'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={Colors.TRANSPARENT} />
 
         <View style={styles.form}>
           <AppTextInput
             labelStyle={styles.label}
             label={t('filter.prNo')}
-            placeholder={t('filter.pick')}
+            placeholder={t('filter.input')}
             placeholderTextColor={light.placeholderTextColor}
             maxLength={20} // Tăng maxLength lên một chút nếu cần
             value={prNo}
@@ -165,7 +160,7 @@ const FilterApproveScreen = ({
               label={t('filter.department')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={department?.name}
+              value={department?.departmentName || ''}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
@@ -178,7 +173,7 @@ const FilterApproveScreen = ({
               label={t('filter.location')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={location?.name}
+              value={location?.storeName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />
@@ -191,7 +186,7 @@ const FilterApproveScreen = ({
               label={t('filter.requester')}
               placeholder={t('filter.pick')}
               placeholderTextColor={light.placeholderTextColor}
-              value={requester?.name}
+              value={requester?.displayName}
               inputStyle={styles.input}
               rightIcon={<IconArrowRight style={styles.rightArrowIcon} />}
             />

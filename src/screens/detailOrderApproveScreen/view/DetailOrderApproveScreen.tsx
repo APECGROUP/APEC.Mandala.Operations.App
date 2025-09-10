@@ -13,7 +13,6 @@ import light from '../../../theme/light';
 
 import IconScrollBottom from '../../../../assets/icon/IconScrollBottom';
 
-import { DetailOrderApprove } from '../modal/DetailOrderApproveModal';
 import EmptyDataAnimation from '../../../views/animation/EmptyDataAnimation';
 import { AppText } from '@/elements/text/AppText';
 import ToastContainer from '@/elements/toast/ToastContainer';
@@ -21,23 +20,24 @@ import { Colors } from '@/theme/Config';
 import Header from '@/screens/notificationScreen/view/component/Header';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '@/navigation/params';
-import { goBack, navigate } from '@/navigation/RootNavigation';
+import { navigate } from '@/navigation/RootNavigation';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import IconInfomation from '@assets/icon/IconInfomation';
-import { useDetailOrderApproveViewModel } from '../viewmodal/useDetailOrderApproveViewModel';
 import DetailOrderItemCard from './component/DetailOrderItemCard';
 import SkeletonItem from '@/components/skeleton/SkeletonItem';
 import FallbackComponent from '@/components/errorBoundary/FallbackComponent';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import Footer from '@/screens/filterScreen/view/component/Footer';
-import { useApproveViewModel } from '@/screens/approvePrScreen/viewmodal/useApproveViewModel';
+import { useInformationItemsViewModel } from '@/screens/InformationItemScreen/viewmodal/useInformationItemsViewModel';
+import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
 
 const DetailOrderApproveScreen = ({
   route,
 }: NativeStackScreenProps<MainParams, 'DetailOrderApproveScreen'>) => {
   const { t } = useTranslation();
   const refToast = useRef<any>(null);
-  const { content, id } = route.params.item;
+  const { prNo, id, requestDate } = route.params.item;
+  const { onApproved } = route.params;
 
   // ─── ViewModel MVVM ──────────────────────────────────────────────────────────
   const {
@@ -48,15 +48,17 @@ const DetailOrderApproveScreen = ({
     isFetchingNextPage,
     onRefresh,
     onLoadMore,
+    onUpdateQuantity,
+    onUpdateNCC,
+    onUpdatePrice,
     hasNextPage,
     isError,
-  } = useDetailOrderApproveViewModel(id);
-  const { onApproved } = useApproveViewModel();
+  } = useInformationItemsViewModel(id, prNo);
 
   // ─── Local state cho input tìm kiếm ─────────────────────────────────────────
 
   // ─── Refs và shared values Reanimated ───────────────────────────────────────
-  const flashListRef = useRef<FlashList<DetailOrderApprove> | null>(null);
+  const flashListRef = useRef<FlashList<IItemInDetailPr> | null>(null);
   const scrollToTop = () => {
     flashListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
@@ -77,7 +79,7 @@ const DetailOrderApproveScreen = ({
     return (
       <View style={styles.emptyContainer}>
         <EmptyDataAnimation autoPlay />
-        <AppText style={styles.emptyText}>{t('home.empty')}</AppText>
+        <AppText style={styles.emptyText}>{t('pcPr.empty')}</AppText>
       </View>
     );
   };
@@ -93,13 +95,18 @@ const DetailOrderApproveScreen = ({
   };
 
   const renderItem = useCallback(
-    ({ item, index }: { item: DetailOrderApprove; index: number }) => (
-      <DetailOrderItemCard item={item} index={index} />
+    ({ item, index }: { item: IItemInDetailPr; index: number }) => (
+      <DetailOrderItemCard
+        onUpdateNCC={onUpdateNCC}
+        onUpdateQuantity={onUpdateQuantity}
+        onUpdatePrice={onUpdatePrice}
+        item={item}
+        index={index}
+        requestDate={requestDate}
+      />
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [flatData],
+    [onUpdateNCC, onUpdateQuantity, onUpdatePrice, requestDate],
   );
-  console.log('data', flatData);
   const rightComponent = () => (
     <AppBlockButton
       style={styles.rightComponent}
@@ -116,7 +123,6 @@ const DetailOrderApproveScreen = ({
     onRefresh();
   }, [onRefresh]);
 
-  console.log('error:', isError);
   if (isError) {
     return <FallbackComponent resetError={reLoadData} />;
   }
@@ -124,7 +130,7 @@ const DetailOrderApproveScreen = ({
   return (
     <ViewContainer>
       <View style={styles.container}>
-        <Header primary title={content} rightComponent={rightComponent()} />
+        <Header primary title={prNo} rightComponent={rightComponent()} />
         <View style={styles.titleContainer}>
           <AppText style={styles.titleText}>{t('Thông tin các mặt hàng')}</AppText>
           <View style={styles.countBadge}>
@@ -172,8 +178,7 @@ const DetailOrderApproveScreen = ({
             navigate('ModalInputRejectApprove', { id });
           }}
           onRightAction={() => {
-            onApproved([id]);
-            goBack();
+            onApproved(id, flatData);
           }}
           leftButtonTitle={t('createPrice.reject')}
           rightButtonTitle={t('createPrice.approvedOrder')}

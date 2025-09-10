@@ -37,7 +37,6 @@ export function useDetailOrderApproveViewModel(orderId: string) {
 
   // Refresh (kéo xuống)
   const onRefresh = useCallback(() => {
-    console.log('onRefresh');
     if (isFetching || isRefetching || isLoading) {
       return;
     }
@@ -46,7 +45,6 @@ export function useDetailOrderApproveViewModel(orderId: string) {
 
   // Load more (cuộn cuối danh sách)
   const onLoadMore = useCallback(() => {
-    console.log('loadMore');
     if (hasNextPage && !isFetchingNextPage && !isLoading) {
       fetchNextPage();
     }

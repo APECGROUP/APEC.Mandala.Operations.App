@@ -1,33 +1,75 @@
-import { mockRequesters } from '@/data/DataFake';
-import axios from 'axios';
+import { ENDPOINT } from '@/utils/Constans';
+import api from '@/utils/setup-axios';
 
-export interface TypePickRequester {
-  id: string | undefined;
-  name: string | undefined;
+export interface IResponseListRequester {
+  data: IPickRequester[];
+  pagination: Pagination;
+  isSuccess: boolean;
+  errors: Error[] | null;
 }
 
-/**
- * Tạo URL API lấy danh sách ảnh, có hỗ trợ search (giả lập).
- */
-function buildNccUrl(page: number, limit: number, key?: string): string {
-  let url = `https://picsum.photos/v2/list?page=${page}&limit=${limit}`;
-  if (key) url += `&search=${encodeURIComponent(key)}`;
-  return url;
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
 }
 
-/**
- * Lấy danh sách DataAssignPrice từ API (giả lập).
- */
+export interface IPickRequester {
+  username: string;
+  displayName: string;
+  status: string;
+  supperUser: string;
+  ipAddress: null;
+  email: null;
+  caUsername: string;
+  description: null;
+  userType: string;
+  brid: null;
+  department: null;
+  language: null;
+  isNotification: null;
+  id: number;
+  createdBy: string;
+  createdDate: Date;
+  deletedDate: null;
+  deletedBy: null;
+  deleted: string;
+}
+
+export interface Pagination {
+  pageCurrent: number;
+  pageCount: number;
+  pageSize: number;
+  rowCount: number;
+  firstRowOnPage: number;
+  lastRowOnPage: number;
+}
+
 export const fetchRequesterData = async (
   page: number,
   limit: number = 50,
   key: string = '',
-): Promise<TypePickRequester[]> => {
-  const url = buildNccUrl(page, limit, key);
-  const { data } = await axios.get(url);
-
-  return data.map((item: any) => ({
-    id: item.id,
-    name: mockRequesters[Math.floor(Math.random() * mockRequesters.length)].name,
-  }));
+): Promise<IPickRequester> => {
+  try {
+    const params = {
+      pagination: {
+        pageIndex: page,
+        pageSize: limit,
+        isAll: false,
+      },
+      filter: {
+        textSearch: key.trim(),
+      },
+    };
+    const response = await api.post<IResponseListRequester, any>(
+      ENDPOINT.GET_LIST_REQUESTER,
+      params,
+    );
+    if (response.status !== 200 || !response.data.isSuccess) {
+      throw new Error('Failed to fetch data');
+    }
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
 };

@@ -22,15 +22,16 @@ import { Colors } from '@/theme/Config';
 import { AppButton } from '@/elements/button/AppButton';
 import { useInformationItemsViewModel } from '@/screens/InformationItemScreen/viewmodal/useInformationItemsViewModel';
 import { isAndroid } from '@/utils/Utilities';
+import { useAssignPriceViewModel } from '@/screens/assignPriceScreen/viewmodal/useAssignPriceViewModel';
 
 moment.locale('vi');
 
 type Props = NativeStackScreenProps<MainParams, 'ModalInputRejectAssign'>;
 
 const ModalInputRejectAssign = ({ route }: Props) => {
-  const { id } = route.params;
+  const { id, prNo } = route.params;
   const { onReject, isLoadingConfirm, textReason, setTextReason, isDisableButtonReject } =
-    useInformationItemsViewModel(id);
+    useInformationItemsViewModel(id, prNo);
   const { t } = useTranslation();
 
   const translateY = useSharedValue(800);
@@ -56,7 +57,7 @@ const ModalInputRejectAssign = ({ route }: Props) => {
     },
     [translateY],
   );
-
+  const { onRefresh } = useAssignPriceViewModel();
   const onGoBack = useCallback(() => {
     onClose(goBack);
   }, [onClose]);
@@ -64,11 +65,13 @@ const ModalInputRejectAssign = ({ route }: Props) => {
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
-
+  const onGoBackAndRefetch = useCallback(() => {
+    onGoBack();
+    onRefresh();
+  }, [onGoBack, onRefresh]);
   const onConfirm = useCallback(() => {
-    onReject(onGoBack);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    onReject(onGoBackAndRefetch);
+  }, [onGoBackAndRefetch, onReject]);
 
   return (
     <ViewContainer>

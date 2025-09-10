@@ -30,6 +30,7 @@ export const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'red',
   },
   avatar: {
     borderWidth: 1,
@@ -41,11 +42,11 @@ export const styles = StyleSheet.create({
   },
   greetingContainer: {
     height: vs(40),
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   greetingText: {
     fontSize: getFontSize(18),
-    fontWeight: '700',
   },
   headerRight: {
     flexDirection: 'row',
@@ -93,7 +94,7 @@ export const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: getFontSize(14), // Tăng fontSize để dễ đọc
+    fontSize: getFontSize(12), // Tăng fontSize để dễ đọc
     fontWeight: '500',
     paddingVertical: 0,
     paddingLeft: s(6),

@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "4990778105",
-    "project_id": "mandala-operations",
-    "storage_bucket": "mandala-operations.firebasestorage.app"
+    "project_number": "559693137785",
+    "project_id": "mandalaoperations-903c4",
+    "storage_bucket": "mandalaoperations-903c4.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:4990778105:android:9ae9f43068bbfe95610028",
+        "mobilesdk_app_id": "1:559693137785:android:e40bd8d75d6baf38e291a8",
         "android_client_info": {
-          "package_name": "com.fourier.mandala.operations"
+          "package_name": "vn.com.apec.smarthotel.smartpuchase"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDFaEWdhnLkAj_dD32Gs1YSiDT3ulpNn7U"
+          "current_key": "AIzaSyC9l4RUQ2gx83brAoXQngJv6CWcAHspgcA"
         }
       ],
       "services": {
@@ -26,15 +26,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:4990778105:android:e442ce15f8bafca7610028",
+        "mobilesdk_app_id": "1:559693137785:android:c911b10d5b1c477fe291a8",
         "android_client_info": {
-          "package_name": "vn.com.apec.mandala.operations"
+          "package_name": "vn.com.apec.smarthotel.spc"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDFaEWdhnLkAj_dD32Gs1YSiDT3ulpNn7U"
+          "current_key": "AIzaSyC9l4RUQ2gx83brAoXQngJv6CWcAHspgcA"
         }
       ],
       "services": {

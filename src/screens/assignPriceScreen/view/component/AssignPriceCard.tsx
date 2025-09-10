@@ -7,53 +7,52 @@ import IconNote from '../../../../../assets/icon/IconNote';
 import Images from '../../../../../assets/image/Images';
 import { memo, useCallback } from 'react';
 import { getFontSize } from '@/constants';
-import { useTranslation } from 'react-i18next';
 import AppBlockButton from '@/elements/button/AppBlockButton';
 import { navigate } from '@/navigation/RootNavigation';
-import { DataAssignPrice } from '../../modal/AssignPriceModal';
+import { IItemAssignPrice } from '../../modal/AssignPriceModal';
 import moment from 'moment';
+import BlockStatus from '@/components/blockStatus/BlockStatus';
 
 interface AssignPriceCardProps {
-  item: DataAssignPrice;
+  item: IItemAssignPrice;
   index: number;
+  updateCacheAndTotal: (i: number) => void;
 }
 
-const AssignPriceCard = memo<AssignPriceCardProps>(({ item }) => {
-  const { t } = useTranslation();
-
+const AssignPriceCard = memo<AssignPriceCardProps>(({ item, updateCacheAndTotal }) => {
   const handlePress = useCallback(() => {
-    navigate('InformationItemsScreen', { item });
-  }, [item]);
+    navigate('InformationItemsAssignPrice', { item, updateCacheAndTotal });
+  }, [item, updateCacheAndTotal]);
 
   const handleDetailPress = useCallback(() => {
     navigate('DetailAssignPriceCardScreen', { item });
   }, [item]);
-
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={styles.card}>
       <FastImage source={Images.IconAssignPrice} style={styles.itemIcon} />
       <View style={styles.itemInfo}>
         <View style={styles.itemInfoRow}>
           <AppText numberOfLines={1} style={styles.prCodeText}>
-            {item.content}
+            {item.prNo}
           </AppText>
           {/* <View style={styles.noteBadge}>
            <AppText style={styles.noteBadgeText}>{t('Ghi chú')}</AppText>
          </View> */}
-          <IconNote />
+          {item.description && <IconNote />}
           <AppBlockButton onPress={handleDetailPress}>
             <IconInfomation style={{ marginHorizontal: s(6) }} />
           </AppBlockButton>
         </View>
         <AppText style={styles.dateText}>
-          {moment(item.createdAt).format('DD/MM/YYYY')} -{' '}
-          {moment(item.estimateDate).format('DD/MM/YYYY')}
+          {moment(item.prDate).format('DD/MM/YYYY')} -{' '}
+          {moment(item.expectedDate).format('DD/MM/YYYY')}
         </AppText>
-        <View style={styles.blockWaiting}>
+        {/* <View style={styles.blockWaiting}>
           <AppText size={12} color={'#FF7009'} weight="500">
-            {t('notifications.status.waitingAssignPrice')}
+            {textTag}
           </AppText>
-        </View>
+        </View> */}
+        <BlockStatus code={item.status} />
       </View>
     </TouchableOpacity>
   );
@@ -78,7 +77,8 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   prCodeText: {
-    maxWidth: '70%',
+    maxWidth: s(230),
+
     fontSize: getFontSize(14),
     fontWeight: '700',
     color: '#333333',

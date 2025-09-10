@@ -122,44 +122,45 @@ const ModalPickCalendar = ({ navigation, route }: Props) => {
             <IconClose />
           </AppBlockButton>
         </View>
-
-        <CalendarPicker
-          startFromMonday
-          allowRangeSelection={!isSingleMode}
-          weekdays={['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']}
-          months={[
-            'Tháng 1',
-            'Tháng 2',
-            'Tháng 3',
-            'Tháng 4',
-            'Tháng 5',
-            'Tháng 6',
-            'Tháng 7',
-            'Tháng 8',
-            'Tháng 9',
-            'Tháng 10',
-            'Tháng 11',
-            'Tháng 12',
-          ]}
-          previousTitle="‹"
-          nextTitle="›"
-          selectedDayColor="#228b22"
-          selectedDayTextColor="#fff"
-          selectedRangeStartStyle={styles.rangeStart}
-          selectedRangeEndStyle={styles.rangeEnd}
-          selectedRangeStyle={styles.rangeBetween}
-          selectedStartDate={startDate}
-          selectedEndDate={endDate}
-          minDate={minDate || undefined}
-          maxDate={maxDate || undefined}
-          selectYearTitle="Chọn năm "
-          selectMonthTitle="Chọn tháng "
-          onDateChange={onDateChange}
-          dayLabelsWrapper={{
-            borderBottomWidth: 0,
-            borderTopWidth: 0,
-          }}
-        />
+        <TouchableOpacity activeOpacity={1} onPress={() => {}}>
+          <CalendarPicker
+            startFromMonday
+            allowRangeSelection={!isSingleMode}
+            weekdays={['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']}
+            months={[
+              'Tháng 1',
+              'Tháng 2',
+              'Tháng 3',
+              'Tháng 4',
+              'Tháng 5',
+              'Tháng 6',
+              'Tháng 7',
+              'Tháng 8',
+              'Tháng 9',
+              'Tháng 10',
+              'Tháng 11',
+              'Tháng 12',
+            ]}
+            previousTitle="‹"
+            nextTitle="›"
+            selectedDayColor="#228b22"
+            selectedDayTextColor="#fff"
+            selectedRangeStartStyle={styles.rangeStart}
+            selectedRangeEndStyle={styles.rangeEnd}
+            selectedRangeStyle={styles.rangeBetween}
+            selectedStartDate={startDate}
+            selectedEndDate={endDate}
+            minDate={minDate || undefined}
+            maxDate={maxDate || undefined}
+            selectYearTitle="Chọn năm "
+            selectMonthTitle="Chọn tháng "
+            onDateChange={onDateChange}
+            dayLabelsWrapper={{
+              borderBottomWidth: 0,
+              borderTopWidth: 0,
+            }}
+          />
+        </TouchableOpacity>
 
         {!isSingleMode && (
           <View style={styles.buttonsContainer}>

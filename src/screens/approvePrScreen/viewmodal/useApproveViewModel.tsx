@@ -1,8 +1,14 @@
-// views/viewmodal/useCreatePriceViewModal.ts
-
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { IApprove, IApproveFilters, fetchApprove } from '../modal/ApproveModal';
+import {
+  IApprove,
+  IApproveFilters,
+  checkApprovePrNoChange,
+  checkRejectPr,
+  fetchApprove,
+  Pagination,
+  checkApprovePr,
+} from '../modal/ApproveModal';
 import debounce from 'lodash/debounce';
 import { useAlert } from '@/elements/alert/AlertProvider';
 import { useTranslation } from 'react-i18next';
@@ -10,31 +16,30 @@ import FastImage from 'react-native-fast-image';
 import Images from '@assets/image/Images';
 import { s } from 'react-native-size-matters';
 import { goBack } from '@/navigation/RootNavigation';
+import { DeviceEventEmitter } from 'react-native';
 
 const ITEMS_PER_PAGE = 50;
-const DEBOUNCE_DELAY = 500; // Tăng thời gian debounce để hiệu quả hơn với nhiều filter
+const DEBOUNCE_DELAY = 500;
 
-// Giả định bạn đã cập nhật CreatePriceFilters trong CreatePriceModal.ts như sau:
-// export interface CreatePriceFilters {
-//   prNo?: string; // Đổi từ searchKey sang prNo
-//   fromDate?: Date;
-//   toDate?: Date;
-//   department?: { id: string; name: string };
-//   requester?: { id: string; name: string };
-// }
+interface PageData {
+  data: IApprove[];
+  pagination: Pagination;
+}
 
 export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { showToast, showAlert, showLoading, hideLoading } = useAlert();
 
-  const { showToast } = useAlert();
   const [effectiveFilters, setEffectiveFilters] = useState<IApproveFilters>(initialFilters);
   const [currentUiFilters, setCurrentUiFilters] = useState<IApproveFilters>(initialFilters);
-
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isLoadingConfirm, setIsLoadingConfirm] = useState(false);
-  const [textReason, setTextReason] = useState('');
-  const isDisableButtonReject = useMemo(() => textReason.trim() === '', [textReason]);
+  const [textReason, setTextReason] = useState<string>('');
+  const [totalItems, setTotalItems] = useState<number>(0);
+
+  const isDisableButtonReject = useMemo(() => textReason?.trim() === '', [textReason]);
+
   const debouncedSetEffectiveFiltersRef = useRef<ReturnType<
     typeof debounce<typeof setEffectiveFilters>
   > | null>(null);
@@ -52,16 +57,15 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     debouncedSetEffectiveFiltersRef.current?.(currentUiFilters);
   }, [currentUiFilters]);
 
-  // queryKey giờ sẽ dùng effectiveFilters.prNo
   const queryKey = useMemo(
     () => [
       'listApprove',
-      effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-      effectiveFilters.fromDate?.toISOString() || '',
-      effectiveFilters.toDate?.toISOString() || '',
+      effectiveFilters.prNo?.trim() || '',
+      effectiveFilters.prDate?.toISOString() || '',
+      effectiveFilters.expectedDate?.toISOString() || '',
       effectiveFilters.department?.id || '',
       effectiveFilters.requester?.id || '',
-      effectiveFilters.location?.id || '',
+      effectiveFilters.store?.id || '',
     ],
     [effectiveFilters],
   );
@@ -77,36 +81,43 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     isRefetching,
     isError,
     error,
-  } = useInfiniteQuery<IApprove[], Error>({
+  } = useInfiniteQuery<PageData, Error>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: queryKey,
     queryFn: async ({ pageParam = 1 }) =>
       fetchApprove(pageParam as number, ITEMS_PER_PAGE, effectiveFilters),
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length === ITEMS_PER_PAGE ? allPages.length + 1 : undefined,
+    getNextPageParam: lastPage => {
+      const nextPage = lastPage.pagination?.pageCurrent + 1;
+      return nextPage <= lastPage.pagination?.pageCount ? nextPage : undefined;
+    },
     initialPageParam: 1,
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 
-  const flatData = useMemo(() => data?.pages.flat() ?? [], [data]);
+  useEffect(() => {
+    if (data?.pages[0]?.pagination?.rowCount !== undefined) {
+      setTotalItems(data.pages[0].pagination.rowCount);
+    } else {
+      setTotalItems(0);
+    }
+  }, [data]);
+
+  const flatData = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data]);
 
   const onRefresh = useCallback(() => {
-    console.log('onRefresh called from ViewModel. Forcing refetch.');
     refetch();
   }, [refetch]);
 
   const onLoadMore = useCallback(() => {
-    console.log('onLoadMore called.');
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // onSearch bây giờ cập nhật prNo
   const onSearch = useCallback((val: string) => {
-    setCurrentUiFilters(prev => ({ ...prev, prNo: val })); // Thay searchKey bằng prNo
+    setCurrentUiFilters(prev => ({ ...prev, prNo: val }));
   }, []);
 
   const applyFilters = useCallback((newFilter: IApproveFilters) => {
@@ -115,33 +126,41 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     setEffectiveFilters(newFilter);
   }, []);
 
-  const { showAlert } = useAlert();
+  const updateCacheAndTotal = useCallback(
+    (action: (item: IApprove) => boolean, totalItem: number = 1) => {
+      queryClient.setQueryData(queryKey, (cachedData: InfiniteData<PageData> | undefined) => {
+        if (!cachedData) {
+          return undefined;
+        }
+
+        const newPages = cachedData.pages.map(page => ({
+          ...page,
+          data: page.data.filter(action),
+          pagination: {
+            ...page.pagination,
+            rowCount:
+              page.pagination.rowCount > totalItem ? page.pagination.rowCount - totalItem : 0,
+          },
+        }));
+
+        setTotalItems(prev => (prev > totalItem ? prev - totalItem : 0));
+
+        return { ...cachedData, pages: newPages };
+      });
+    },
+    [queryClient, queryKey],
+  );
+
   const onDelete = useCallback(
     async (id: string, onSuccess?: (deletedId: string) => void) => {
-      const currentQueryKey = [
-        'listApprove',
-        effectiveFilters.prNo?.trim() || '', // Thay searchKey bằng prNo
-        effectiveFilters.fromDate?.toISOString() || '',
-        effectiveFilters.toDate?.toISOString() || '',
-        effectiveFilters.department?.id || '',
-        effectiveFilters.requester?.id || '',
-        effectiveFilters.location?.id || '',
-      ];
-
-      const cached = queryClient.getQueryData<InfiniteData<IApprove[]>>(currentQueryKey);
+      const cached = queryClient.getQueryData<InfiniteData<PageData>>(queryKey);
       if (!cached) {
-        console.warn('🟥 No cache found for key:', currentQueryKey);
         return false;
       }
 
       try {
         if (Number(id) % 5 !== 0) {
-          console.log('✅ Deleting item successfully...');
-          queryClient.setQueryData(currentQueryKey, {
-            ...cached,
-            pages: cached.pages.map(page => page.filter(item => item.id !== id) || []),
-          });
-
+          updateCacheAndTotal(item => Number(item.id) !== Number(id), 1);
           onSuccess?.(id);
           return true;
         } else {
@@ -155,11 +174,10 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
           return false;
         }
       } catch (err) {
-        console.error('Error deleting item:', err);
         return false;
       }
     },
-    [queryClient, effectiveFilters, showAlert, t],
+    [queryClient, queryKey, showAlert, t, updateCacheAndTotal],
   );
 
   const handleDelete = useCallback(
@@ -173,10 +191,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
         {
           text: t('createPrice.remove.agree'),
           onPress: async () => {
-            const success = await onDelete(id, onSuccess);
-            if (!success) {
-              console.log('❌ Delete failed, no action needed');
-            }
+            await onDelete(id, onSuccess);
           },
         },
       ]);
@@ -184,40 +199,9 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     [showAlert, t, onDelete],
   );
 
-  const onApproved = useCallback(
-    async (ids: string[]) => {
-      // Xoá các item có id nằm trong danh sách ids khỏi cache
-      const currentQueryKey = [
-        'listApprove',
-        effectiveFilters.prNo?.trim() || '',
-        effectiveFilters.fromDate?.toISOString() || '',
-        effectiveFilters.toDate?.toISOString() || '',
-        effectiveFilters.department?.id || '',
-        effectiveFilters.requester?.id || '',
-        effectiveFilters.location?.id || '',
-      ];
-      const cached = queryClient.getQueryData(currentQueryKey);
-      console.log('cached:', cached);
-      if (cached && cached.pages) {
-        console.log('bấm on approved');
-        // Loại bỏ các item có id nằm trong ids khỏi từng page
-        const newPages = cached.pages.map((page: IApprove[]) =>
-          page.filter(item => !ids.includes(item.id)),
-        );
-        queryClient.setQueryData(currentQueryKey, {
-          ...cached,
-          pages: newPages,
-        });
-        setSelectedIds([]);
-      }
-      showToast(t('createPrice.approvedSuccess'), 'success');
-    },
-    [queryClient, effectiveFilters, t, showToast],
-  );
-
   const onRejectSuccess = () => {
     showAlert(
-      t('informationItem.rejectSuccess'),
+      t('orderDetail.rejectSuccess'),
       '',
       [
         {
@@ -232,62 +216,82 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     );
   };
 
-  const onReject = useCallback(
-    async (ids: string[], func?: () => void) => {
-      setIsLoadingConfirm(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const currentQueryKey = [
-        'listApprove',
-        effectiveFilters.prNo?.trim() || '',
-        effectiveFilters.fromDate?.toISOString() || '',
-        effectiveFilters.toDate?.toISOString() || '',
-        effectiveFilters.department?.id || '',
-        effectiveFilters.requester?.id || '',
-        effectiveFilters.location?.id || '',
-      ];
-      const cached = queryClient.getQueryData(currentQueryKey);
-      console.log('bấm reject');
-      if (cached && cached.pages) {
-        // Loại bỏ các item có id nằm trong ids khỏi từng page
-        console.log('có cache reject:', cached);
-        const newPages = cached.pages.map((page: IApprove[]) =>
-          page.filter(item => !ids.includes(item.id)),
-        );
-        queryClient.setQueryData(currentQueryKey, {
-          ...cached,
-          pages: newPages,
-        });
-        setSelectedIds([]);
-
-        setIsLoadingConfirm(false);
-        if (func) {
-          func();
-        }
-        onRejectSuccess();
+  const onApprovedNoChange = useCallback(
+    async (ids: number[]) => {
+      const { isSuccess, message } = await checkApprovePrNoChange(ids[0]);
+      if (!isSuccess) {
+        return showToast(message || t('createPrice.approvedFail'), 'error');
       }
-      showToast(t('createPrice.rejectSuccess'), 'success');
-      console.log('text: ', textReason);
-      // Xoá các item có id nằm trong danh sách ids khỏi cache
+
+      updateCacheAndTotal(item => !ids.includes(item.id), ids.length);
+      setSelectedIds([]);
+      showToast(t('createPrice.approvedSuccess'), 'success');
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      effectiveFilters.prNo,
-      effectiveFilters.fromDate,
-      effectiveFilters.toDate,
-      effectiveFilters.department?.id,
-      effectiveFilters.requester?.id,
-      effectiveFilters.location?.id,
-      queryClient,
-      showToast,
-      t,
-      textReason,
-    ],
+    [showToast, t, updateCacheAndTotal],
+  );
+  const onApproved = useCallback(
+    async (id: number, listData: IApprove[]) => {
+      try {
+        showLoading();
+        const { isSuccess, message } = await checkApprovePr(id, listData);
+        if (!isSuccess) {
+          return showToast(message || t('createPrice.approvedFail'), 'error');
+        }
+        goBack();
+        updateCacheAndTotal(item => id !== item.id, 1);
+        setSelectedIds(ids => ids.filter(itemId => itemId !== id));
+        showToast(t('createPrice.approvedSuccess'), 'success');
+        // eslint-disable-next-line no-catch-shadow, @typescript-eslint/no-shadow
+      } catch (error) {
+        console.log('❌ Approve error:', error);
+        showToast(t('createPrice.approvedFail'), 'error');
+      } finally {
+        hideLoading();
+      }
+    },
+    [hideLoading, showLoading, showToast, t, updateCacheAndTotal],
   );
 
+  const onReject = useCallback(
+    async (ids: number[], func?: () => void) => {
+      setIsLoadingConfirm(true);
+      const { isSuccess, message } = await checkRejectPr(ids[0], textReason || '');
+
+      if (!isSuccess) {
+        setIsLoadingConfirm(false);
+        return showToast(message || t('createPrice.rejectFail'), 'error');
+      }
+
+      updateCacheAndTotal(item => !ids.includes(item.id), ids.length);
+      setSelectedIds([]);
+
+      setIsLoadingConfirm(false);
+      if (func) {
+        func();
+      }
+      onRejectSuccess();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [textReason, showToast, t, updateCacheAndTotal],
+  );
+
+  useEffect(() => {
+    DeviceEventEmitter.addListener('refreshListApprove', () => {
+      console.log('refreshListApprove');
+      onRefresh();
+    });
+    return () => {
+      DeviceEventEmitter.removeAllListeners('refreshListApprove');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return {
+    length: totalItems,
     onReject,
     selectedIds,
     setSelectedIds,
+    onApprovedNoChange,
     onApproved,
     flatData,
     isLoading,
@@ -300,7 +304,7 @@ export function useApproveViewModel(initialFilters: IApproveFilters = {}) {
     onSearch,
     applyFilters,
     handleDelete,
-    currentPrNoInput: currentUiFilters.prNo || '', // Thay searchKey bằng prNo
+    currentPrNoInput: currentUiFilters.prNo || '',
     currentFilters: currentUiFilters,
     isError,
     error,

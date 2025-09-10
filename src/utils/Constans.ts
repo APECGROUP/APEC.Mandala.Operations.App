@@ -1,4 +1,45 @@
-import {s} from 'react-native-size-matters';
+import { s } from 'react-native-size-matters';
 
 export const PaddingHorizontal = s(16);
-export enum ENDPOINT {}
+export enum ENDPOINT {
+  LOGIN = '/api/spc/user/login',
+  LOGOUT = '/api/spc/user/logout',
+  REFRESH_TOKEN = '/api/spc/user/refresh-token',
+  FORGOT_PASSWORD = '/api/spc/user/forgot-password',
+  GET_LIST_HOTEL = '/api/spc/hotel/list',
+  GET_STATUS_GLOBAL = '/api/spc/hotel/list-status',
+  GET_LIST_SUPPLIER = '/api/spo/supplier/search',
+  GET_LIST_ITEM = '/api/spc/pc-item-list/search',
+  GET_LIST_DEPARTMENT = '/api/pms/department/search',
+  GET_LIST_LOCATION = '/api/spc/store/search',
+  GET_LIST_REQUESTER = '/api/spc/user/search',
+  GET_LIST_ASSIGN_PRICE = '/api/spc/request/search',
+  GET_LIST_APPOVE_PR = '/api/spc/request/search',
+  GET_LIST_CREATE_PO = '/api/spc/request/search',
+  GET_LIST_PC_PR = '/api/spc/purchase-request/search',
+  GET_LIST_VENDOR_PRICE = '/api/spc/vendor-price-list/search',
+  HANDLE_APPROVE_PR = '/api/spc/request/approve-pr/approve',
+  HANDLE_APPROVE_PR_NO_CHANGE = '/api/spc/request/approve-pr/approve-by-select',
+  HANDLE_REJECT_PR = '/api/spc/request/approve-pr/reject',
+  HANDLE_REJECT_PR_ASSIGN = '/api/spc/request/assign-price/reject',
+  HANDLE_ASSIGN_PR = '/api/spc/request/assign-price/approve',
+  AUTO_ASSIGN_PRICE = '/api/spc/request/assign-price/auto-assign-price',
+  SAVE_DRAFT = '/api/spc/request-detail/multi-update',
+  DETAIL_PR = '/api/spc/request-detail/search',
+  CREATE_PO = '/api/spc/request/create-po',
+  HANDLE_REJECT_CREATE_PRICE = '/api/spc/vendor-price-list/reject',
+  HANDLE_APPROVE_CREATE_PRICE = '/api/spc/vendor-price-list/approve',
+  HANDLE_DELETE_CREATE_PRICE = '/api/spc/vendor-price-list/delete',
+  CREATE_PRICE = '/api/spc/vendor-price-list/multi-create',
+  GET_LIST_VAT = '/api/spc/rgTax/search',
+  EDIT_CREATE_PRICE = '/api/spc/vendor-price-list/update',
+  GET_LIST_NOTIFICATION = '/api/spc/notification/search',
+  HANDLE_READ_NOTIFICATION = '/api/spc/notification/read',
+  HANDLE_READ_ALL_NOTIFICATION = '/api/spc/notification/read-all',
+
+  CHANGE_PASSWORD = '/api/spc/user/update-password',
+  UPLOAD_AVATAR = '/api/spc/static-file/update-avatar',
+  GET_TOTAL_NOTIFICATION_NO_READ = '/api/spc/notification/total-unread',
+  GET_TIME_SYSTEM = '/api/spc/sysvar/system-date',
+  TOGGLE_NOTIFICATION = '/api/spc/user/on-off-notification',
+}

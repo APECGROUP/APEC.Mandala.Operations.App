@@ -2,7 +2,6 @@ import { Alert, Platform, PermissionsAndroid } from 'react-native';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import Toast from 'react-native-toast-message';
 import { navigate } from '../src/navigation/RootNavigation';
-import { LanguageType } from '../src/languages/locales/type';
 import { AppState } from 'react-native';
 
 import {
@@ -16,7 +15,8 @@ import {
   AuthorizationStatus,
   registerDeviceForRemoteMessages,
 } from '@react-native-firebase/messaging';
-import Clipboard from '@react-native-clipboard/clipboard';
+// Không cần import useInfoUser ở đây nữa vì đây là hàm tiện ích
+// import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
 
 const messaging = getMessaging();
 
@@ -51,7 +51,11 @@ const requestAndroidNotificationPermission = async (): Promise<boolean> => {
 };
 
 // Lấy FCM token và gửi lên server
-export const getFCMTokenAndSendToServer = async (t: (key: string) => string) => {
+// Hàm này bây giờ nhận setDeviceToken làm một tham số
+export const getFCMTokenAndSendToServer = async (
+  t: (key: string) => string,
+  setDeviceToken: (token: string) => void, // <-- Thêm tham số này
+) => {
   try {
     await registerDeviceForRemoteMessages(messaging);
     const permissionGranted = await requestAndroidNotificationPermission();
@@ -64,7 +68,8 @@ export const getFCMTokenAndSendToServer = async (t: (key: string) => string) => 
     const token = await getToken(messaging);
 
     console.log('[FCM] 🎯 FCM Device Token:', token);
-    Clipboard.setString(token);
+    setDeviceToken(token); // <-- Gọi hàm được truyền từ bên ngoài
+    // Clipboard.setString(token);
 
     // Gửi token lên server (tuỳ chọn bật lại)
     // const resp = await api.post('notifications/app-push/register', {
@@ -77,7 +82,7 @@ export const getFCMTokenAndSendToServer = async (t: (key: string) => string) => 
     console.error('[FCM] ❌ Lỗi khi lấy token và gửi lên server:', error);
     Toast.show({
       type: 'error',
-      text2: t(LanguageType.errorTryAgain),
+      text2: '[FCM] ❌ Lỗi khi lấy token và gửi lên server:',
     });
   }
 };
@@ -207,6 +212,7 @@ const handleNotificationAction = (remoteMessage: any) => {
     navigate(screen);
     Alert.alert('Chuyển hướng', remoteMessage?.notification?.body || '');
   } else {
+    navigate('NotificationScreen');
     Alert.alert('Thông báo', remoteMessage?.notification?.body || '');
   }
 };

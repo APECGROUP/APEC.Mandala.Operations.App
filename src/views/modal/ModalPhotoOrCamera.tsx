@@ -29,11 +29,11 @@ const ModalPhotoOrCamera = ({ navigation, route }: Props) => {
       try {
         const value: any = await Utilities.showImagePicker({
           params: {
-            with: 300,
-            height: 300,
+            with: 500,
+            height: 500,
             multiple: false,
             forceJpg: true,
-            cropping: isCamera,
+            cropping: true,
           },
           isUsingCamera: isCamera,
         });
@@ -50,7 +50,6 @@ const ModalPhotoOrCamera = ({ navigation, route }: Props) => {
           setImageAvatar(imageCrop);
         }
       } catch (e) {
-        console.log('Image Picker Error:', e);
       } finally {
         goBack();
       }

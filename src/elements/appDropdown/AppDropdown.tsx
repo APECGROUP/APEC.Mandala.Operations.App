@@ -33,13 +33,13 @@ import {
 // import { useDetectDevice } from '../../toolkits';
 // import { useDeviceOrientation } from '../../useDeviceOrientation';
 // import CInput from '../TextInput';
-import {DropdownProps} from './model';
-import {styles} from './styles';
-import {useDeviceOrientation} from './useDeviceOrientation';
-import {isTablet} from 'react-native-device-info';
-import {vs} from 'react-native-size-matters';
+import { DropdownProps } from './model';
+import { styles } from './styles';
+import { useDeviceOrientation } from './useDeviceOrientation';
+import { isTablet } from 'react-native-device-info';
+import { vs } from 'react-native-size-matters';
 import AppTextInput from '../textInput/AppTextInput';
-import {AppText} from '../text/AppText';
+import { AppText } from '../text/AppText';
 
 // const { isTablet } = useDetectDevice;
 const ic_down = require('./down.png');
@@ -49,8 +49,8 @@ const statusBarHeight: number = StatusBar.currentHeight || 0;
 
 const AppDropdown: <T>(
   props: DropdownProps<T>,
-) => ReactElement<any, string | JSXElementConstructor<any>> | null =
-  React.forwardRef((props, currentRef) => {
+) => ReactElement<any, string | JSXElementConstructor<any>> | null = React.forwardRef(
+  (props, currentRef) => {
     const orientation = useDeviceOrientation();
     const {
       testID,
@@ -114,22 +114,29 @@ const AppDropdown: <T>(
     const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
     const [searchText, setSearchText] = useState('');
 
-    const {width: W, height: H} = Dimensions.get('window');
-    const styleContainerVertical: ViewStyle = useMemo(() => ({
+    const { width: W, height: H } = Dimensions.get('window');
+    const styleContainerVertical: ViewStyle = useMemo(
+      () => ({
         backgroundColor: 'rgba(0,0,0,0.1)',
         alignItems: 'center',
-      }), []);
-    const styleHorizontal: ViewStyle = useMemo(() => ({
+      }),
+      [],
+    );
+    const styleHorizontal: ViewStyle = useMemo(
+      () => ({
         width: orientation === 'LANDSCAPE' ? W / 2 : '100%',
         alignSelf: 'center',
-      }), [W, orientation]);
+      }),
+      [W, orientation],
+    );
 
-    useImperativeHandle(currentRef, () => ({open: eventOpen, close: eventClose}));
+    useImperativeHandle(currentRef, () => ({ open: eventOpen, close: eventClose }));
 
-    useEffect(() => 
-       eventClose
+    useEffect(
+      () => eventClose,
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    , []);
+      [],
+    );
 
     const excludeData = useCallback(
       (data: any[]) => {
@@ -196,9 +203,7 @@ const AppDropdown: <T>(
     const _measure = useCallback(() => {
       if (ref && ref?.current) {
         ref.current.measureInWindow((pageX, pageY, width, height) => {
-          let isFull = isTablet()
-            ? false
-            : mode === 'modal' || orientation === 'LANDSCAPE';
+          let isFull = isTablet() ? false : mode === 'modal' || orientation === 'LANDSCAPE';
 
           if (mode === 'auto') {
             isFull = false;
@@ -206,7 +211,20 @@ const AppDropdown: <T>(
 
           const top = isFull ? 20 : height + pageY + 2;
           const bottom = H - top + height;
-          const left = I18nManager.isRTL ? W - width - pageX : pageX;
+
+          // 💡 Đã chỉnh sửa logic tính toán vị trí left
+          let left;
+          if (I18nManager.isRTL) {
+            left = W - width - pageX;
+          } else {
+            // Kiểm tra nếu dropdown vượt quá lề phải, thì căn lề phải
+            const rightEdge = pageX + width;
+            if (rightEdge > W) {
+              left = W - width;
+            } else {
+              left = pageX;
+            }
+          }
 
           setPosition({
             isFull,
@@ -255,12 +273,9 @@ const AppDropdown: <T>(
     }, [onKeyboardDidHide, onKeyboardDidShow]);
 
     const getValue = useCallback(() => {
-      const defaultValue =
-        typeof value === 'object' ? _get(value, valueField) : value;
+      const defaultValue = typeof value === 'object' ? _get(value, valueField) : value;
 
-      const getItem = data.filter(e =>
-        _isEqual(defaultValue, _get(e, valueField)),
-      );
+      const getItem = data.filter(e => _isEqual(defaultValue, _get(e, valueField)));
 
       if (getItem.length > 0) {
         setCurrentValue(getItem[0]);
@@ -277,17 +292,10 @@ const AppDropdown: <T>(
       if (autoScroll && data?.length > 0 && listData?.length === data?.length) {
         setTimeout(() => {
           if (refList && refList?.current) {
-            const defaultValue =
-              typeof value === 'object' ? _get(value, valueField) : value;
+            const defaultValue = typeof value === 'object' ? _get(value, valueField) : value;
 
-            const index = _findIndex(listData, e =>
-              _isEqual(defaultValue, _get(e, valueField)),
-            );
-            if (
-              listData?.length > 0 &&
-              index > -1 &&
-              index <= listData?.length - 1
-            ) {
+            const index = _findIndex(listData, e => _isEqual(defaultValue, _get(e, valueField)));
+            if (listData?.length > 0 && index > -1 && index <= listData?.length - 1) {
               try {
                 refList.current.scrollToIndex({
                   index: index,
@@ -378,9 +386,7 @@ const AppDropdown: <T>(
             return searchQuery?.(text, labelText);
           };
 
-          const dataSearch = data.filter(
-            searchQuery ? propSearchFunction : defaultFilterFunction,
-          );
+          const dataSearch = data.filter(searchQuery ? propSearchFunction : defaultFilterFunction);
 
           if (excludeSearchItems.length > 0 || excludeItems.length > 0) {
             const excludeSearchData = _differenceWith(
@@ -451,25 +457,16 @@ const AppDropdown: <T>(
           <View style={styles.dropdown}>
             {renderLeftIcon?.(visible)}
             <AppText
-              style={[
-                styles.textItem,
-                isSelected !== null ? selectedTextStyle : placeholderStyle,
-              ]}
+              style={[styles.textItem, isSelected !== null ? selectedTextStyle : placeholderStyle]}
               {...selectedTextProps}>
-              {isSelected !== null
-                ? _get(currentValue, labelField)
-                : placeholder}
+              {isSelected !== null ? _get(currentValue, labelField) : placeholder}
             </AppText>
             {renderRightIcon ? (
               renderRightIcon(visible)
             ) : (
               <Image
                 source={ic_down}
-                style={StyleSheet.flatten([
-                  styles.icon,
-                  {tintColor: iconColor},
-                  iconStyle,
-                ])}
+                style={StyleSheet.flatten([styles.icon, { tintColor: iconColor }, iconStyle])}
               />
             )}
           </View>
@@ -478,25 +475,22 @@ const AppDropdown: <T>(
     };
 
     const _renderItem = useCallback(
-      ({item, index}: {item: any; index: number}) => {
+      ({ item, index }: { item: any; index: number }) => {
         const isSelected = currentValue && _get(currentValue, valueField);
         const selected = _isEqual(_get(item, valueField), isSelected);
-        _assign(item, {_index: index});
+        _assign(item, { _index: index });
         return (
           <TouchableHighlight
             key={index.toString()}
             testID={_get(item, itemTestIDField || labelField)}
             accessible={!!accessibilityLabel}
-            accessibilityLabel={_get(
-              item,
-              itemAccessibilityLabelField || labelField,
-            )}
+            accessibilityLabel={_get(item, itemAccessibilityLabelField || labelField)}
             underlayColor={activeColor}
             onPress={() => onSelect(item)}>
             <View
               style={StyleSheet.flatten([
                 itemContainerStyle,
-                {borderWidth: 0.5, borderColor: '#F5F5F5'},
+                { borderWidth: 0.5, borderColor: '#F5F5F5' },
                 // selected && {
                 //   backgroundColor: activeColor,
                 // },
@@ -567,7 +561,7 @@ const AppDropdown: <T>(
               }}
               placeholderTextColor={searchPlaceholderTextColor}
               showIcon
-              iconStyle={[{tintColor: iconColor}, iconStyle]}
+              iconStyle={[{ tintColor: iconColor }, iconStyle]}
             />
           );
         }
@@ -594,20 +588,20 @@ const AppDropdown: <T>(
         const isInverted = !inverted ? false : isTopPosition;
 
         const _renderListHelper = () => (
-            <FlatList
-              testID={testID + ' flatlist'}
-              accessibilityLabel={accessibilityLabel + ' flatlist'}
-              {...flatListProps}
-              keyboardShouldPersistTaps="handled"
-              ref={refList}
-              onScrollToIndexFailed={scrollIndex}
-              data={listData}
-              inverted={isTopPosition ? inverted : false}
-              renderItem={_renderItem}
-              keyExtractor={(_item, index) => index.toString()}
-              showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-            />
-          );
+          <FlatList
+            testID={testID + ' flatlist'}
+            accessibilityLabel={accessibilityLabel + ' flatlist'}
+            {...flatListProps}
+            keyboardShouldPersistTaps="handled"
+            ref={refList}
+            onScrollToIndexFailed={scrollIndex}
+            data={listData}
+            inverted={isTopPosition ? inverted : false}
+            renderItem={_renderItem}
+            keyExtractor={(_item, index) => index.toString()}
+            showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+          />
+        );
 
         return (
           <TouchableWithoutFeedback>
@@ -634,7 +628,7 @@ const AppDropdown: <T>(
 
     const _renderModal = useCallback(() => {
       if (visible && position) {
-        const {isFull, width, height, top, bottom, left} = position;
+        const { isFull, width, height, top, bottom, left } = position;
 
         const onAutoPosition = () => {
           if (keyboardHeight > 0) {
@@ -651,9 +645,7 @@ const AppDropdown: <T>(
             minHeight: minHeight,
           };
           const isTopPosition =
-            dropdownPosition === 'auto'
-              ? onAutoPosition()
-              : dropdownPosition === 'top';
+            dropdownPosition === 'auto' ? onAutoPosition() : dropdownPosition === 'top';
 
           let keyboardStyle: ViewStyle = {};
 
@@ -679,14 +671,14 @@ const AppDropdown: <T>(
                   style={StyleSheet.flatten([
                     styles.flex1,
                     isFull && styleContainerVertical,
-                    backgroundColor && {backgroundColor: backgroundColor},
+                    backgroundColor && { backgroundColor: backgroundColor },
                     keyboardStyle,
                   ])}>
                   <View
                     style={StyleSheet.flatten([
                       styles.flex1,
                       !isTopPosition
-                        ? {paddingTop: extendHeight}
+                        ? { paddingTop: extendHeight }
                         : {
                             justifyContent: 'flex-end',
                             paddingBottom: extendHeight,
@@ -731,14 +723,12 @@ const AppDropdown: <T>(
     ]);
 
     return (
-      <View
-        style={StyleSheet.flatten([styles.mainWrap, style])}
-        ref={ref}
-        onLayout={_measure}>
+      <View style={StyleSheet.flatten([styles.mainWrap, style])} ref={ref} onLayout={_measure}>
         {_renderDropdown()}
         {_renderModal()}
       </View>
     );
-  });
+  },
+);
 
 export default AppDropdown;

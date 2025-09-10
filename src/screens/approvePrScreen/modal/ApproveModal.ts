@@ -1,200 +1,257 @@
-// views/modal/ApproveModal.ts
+import { ENDPOINT } from '@/utils/Constans';
+import api from '@/utils/setup-axios';
+import { IPickDepartment } from '@/views/modal/modalPickDepartment/modal/PickDepartmentModal';
+import { IPickLocal } from '@/views/modal/modalPickLocal/modal/PickLocalModal';
+import { IPickRequester } from '@/views/modal/modalPickRequester/modal/PickRequesterModal';
+import moment from 'moment';
 
-import { fakeData, fakeEnd, fakeLocal, fakeNcc, fakeNote, fakeVat } from '@/data/DataFake';
-import axios from 'axios';
+export interface IApproveFilters {
+  prNo?: string;
+  prDate?: Date;
+  expectedDate?: Date;
+  department?: IPickDepartment | undefined;
+  requester?: IPickRequester | undefined;
+  store?: IPickLocal | undefined;
+}
 
 export interface IApprove {
   prNo: string;
-  id: string;
-  name: string;
-  price: string | number;
-  expanded?: boolean;
-  time?: string;
-  vat?: string;
-  ncc?: string;
-  end?: string;
-  createdAt?: string; // Giả sử là ISO string hoặc Date object
-  estimateDate?: string; // Giả sử là ISO string hoặc Date object
-  department?: SelectedOption;
-  requester?: SelectedOption;
-  note?: string;
-  location?: SelectedOption;
+  prDate: Date;
+  expectedDate: Date;
+  requestBy: string;
+  userRequest: IPickRequester;
+  departmentCode: string;
+  departmentName: string;
+  departmentShortName: string;
+  storeCode: string;
+  storedName: string;
+  approveBy: null;
+  approveLevel: null;
+  approveDate: null;
+  approveRemark: null;
+  cancelBy: null;
+  cancelDate: null;
+  cancelReason: null;
+  notAllowBy: null;
+  notAllowDate: null;
+  notAllowReason: null;
+  marketListId: null;
+  description: string;
+  status: string;
+  poNo: null;
+  requestDate: Date;
+  id: number;
+  createdBy: string;
+  createdDate: Date;
+  deletedDate: null;
+  deletedBy: null;
+  deleted: string;
 }
 
-export interface SelectedOption {
-  id: string;
-  name: string;
+export interface Pagination {
+  pageCurrent: number;
+  pageCount: number;
+  pageSize: number;
+  rowCount: number;
+  firstRowOnPage: number;
+  lastRowOnPage: number;
+  totalNoRead: number;
 }
 
-export interface IApproveFilters {
-  prNo?: string; // Tên cũ là prNo
-  fromDate?: Date;
-  toDate?: Date;
-  department?: SelectedOption;
-  requester?: SelectedOption;
-  location?: SelectedOption;
+export interface IResponseListApprove {
+  data: IApprove[];
+  pagination: Pagination;
+  isSuccess: boolean;
+  errors: Error[] | null;
 }
 
-/**
- * Hàm giả lập để tạo dữ liệu TypeCreatePrice.
- * Logic tạo dữ liệu ngẫu nhiên được tách ra để dễ quản lý.
- */
-function generateMockCreatePriceData(item: any, filters: IApproveFilters): IApprove {
-  // Lưu ý: Picsum Photos không hỗ trợ lọc, nên bạn vẫn sẽ nhận ảnh ngẫu nhiên.
-  // Đây là phần bạn sẽ thay thế bằng logic mapping từ API thật.
-
-  let contentName = fakeData[Math.floor(Math.random() * 50)];
-  let prNo = `PR20${Math.floor(Math.random() * 1000000)}#${Math.floor(Math.random() * 10000)}`;
-  // let prNo = 'PR20240624#0001';
-  let location = { id: '', name: '' };
-  // Nếu có searchKey, giả lập rằng tên sản phẩm được lọc theo searchKey
-  // (mặc dù API picsum không thực sự lọc)
-  if (filters.prNo && !contentName.toLowerCase().includes(filters.prNo.toLowerCase())) {
-    contentName = `${filters.prNo} - ${contentName}`; // Đảm bảo searchKey xuất hiện trong tên
-    prNo = `${filters.prNo} - ${prNo}`;
-  }
-
-  // Giả lập dữ liệu phòng ban và người yêu cầu
-  const mockDepartments = [
-    { id: 'dep1', name: 'Phòng Kế toán' },
-    { id: 'dep2', name: 'Phòng IT' },
-    { id: 'dep3', name: 'Phòng Kinh doanh' },
-    { id: 'dep4', name: 'Phòng Nhân sự' },
-    { id: 'dep5', name: 'Phòng Sản xuất' },
-  ];
-  const mockRequesters = [
-    { id: 'req1', name: 'Nguyễn Văn A' },
-    { id: 'req2', name: 'Trần Thị B' },
-    { id: 'req3', name: 'Lê Văn C' },
-    { id: 'req4', name: 'Phạm Thị D' },
-    { id: 'req5', name: 'Hoàng Văn E' },
-  ];
-
-  // Giả lập việc department/requester khớp với filter nếu có
-  let randomDepartment = mockDepartments[Math.floor(Math.random() * mockDepartments.length)];
-  if (filters.department?.id && !mockDepartments.some(d => d.id === filters.department?.id)) {
-    // Nếu filter có department nhưng mock ngẫu nhiên không khớp, chọn department theo filter
-    randomDepartment = filters.department;
-  }
-  if (filters.location?.id && !fakeLocal.some(l => l.id === filters.location?.id)) {
-    location = filters.location;
-  }
-
-  let randomRequester = mockRequesters[Math.floor(Math.random() * mockRequesters.length)];
-  if (filters.requester?.id && !mockRequesters.some(r => r.id === filters.requester?.id)) {
-    // Nếu filter có requester nhưng mock ngẫu nhiên không khớp, chọn requester theo filter
-    randomRequester = filters.requester;
-  }
-
-  // Giả lập ngày tháng khớp với filter nếu có
-  const createdAt = filters.fromDate ? filters.fromDate.toISOString() : new Date().toISOString();
-  const estimateDate = filters.toDate ? filters.toDate.toISOString() : new Date().toISOString();
-
-  return {
-    id: item.id,
-    name: contentName,
-    prNo: prNo,
-    price: (Math.floor(Math.random() * 100) + 1) * 1000, // Giá ngẫu nhiên
-    expanded: false,
-    time: '28/05/2025 - 30/05/2025', // Giả lập
-    createdAt: createdAt,
-    estimateDate: estimateDate,
-    location: location,
-
-    vat: fakeVat[Math.floor(Math.random() * 6)],
-    ncc: fakeNcc[Math.floor(Math.random() * 10)], // Giả lập
-    end: fakeEnd[Math.floor(Math.random() * 5)], // Giả lập
-    department: randomDepartment,
-    requester: randomRequester,
-    note: fakeNote[Math.floor(Math.random() * 10)],
-  };
+export interface Error {
+  id: null;
+  code: number;
+  message: string;
 }
 
-/**
- * Lấy danh sách TypeCreatePrice từ API (giả lập) và áp dụng bộ lọc.
- *
- * @param page Số trang cần lấy.
- * @param limit Số lượng item trên mỗi trang.
- * @param filters Đối tượng chứa tất cả các điều kiện lọc.
- * @returns Promise chứa mảng TypeCreatePrice.
- */
+export type PaginationParams = {
+  pageIndex: number;
+  pageSize: number;
+  isAll: boolean;
+};
+
+export type Filter = {
+  propertyValue: string | number | boolean;
+  propertyName: string;
+  propertyType?: 'string' | 'number' | 'boolean' | 'datetime' | 'date';
+  operator?:
+    | '=='
+    | '!='
+    | '>'
+    | '>='
+    | '<'
+    | '<='
+    | 'Contains'
+    | 'In'
+    | 'NotIn'
+    | 'StartsWith'
+    | 'EndsWith'
+    | 'Like';
+};
+
+export type FilterGroup = {
+  condition: 'And' | 'Or';
+  filters: Filter[];
+};
+
+export type FilterRequest = {
+  sort?: string;
+  textSearch?: string;
+  filterGroup?: FilterGroup[];
+  moreFilterGroup?: FilterGroup[];
+};
+
+export type IParams = {
+  pagination: PaginationParams;
+  filter?: FilterRequest;
+};
+
+// Sửa kiểu trả về của hàm fetchApprove để khớp với cấu trúc dữ liệu thực tế
 export const fetchApprove = async (
   page: number,
   limit: number = 50,
-  filters: IApproveFilters = {},
-): Promise<IApprove[]> => {
+  filters: IApproveFilters,
+): Promise<{ data: IApprove[]; pagination: Pagination }> => {
   try {
-    // --- Endpoint API thật của bạn ---
-    // THAY THẾ DÒNG NÀY BẰNG ENDPOINT API THẬT CỦA BẠN.
-    // Ví dụ: const apiUrl = `https://your-api.com/create-prices`;
-    const apiUrl = `https://picsum.photos/v2/list`;
-
-    // --- Chuẩn bị các tham số cho yêu cầu API ---
-    // Các tham số 'page' và 'limit' sẽ luôn được gửi.
-    // Các tham số lọc khác (filters) sẽ được thêm vào nếu chúng có giá trị.
-    const requestParams: any = {
-      page: page.toString(),
-      limit: limit.toString(),
-    };
-    if (filters?.prNo?.trim().toLowerCase() === 'empty') {
-      return [];
+    const filterList: Filter[] = [];
+    filterList.push({
+      propertyName: 'status',
+      propertyValue: 'PO',
+      propertyType: 'string',
+      operator: '!=',
+    });
+    filterList.push({
+      propertyName: 'status',
+      propertyValue: 'PP',
+      propertyType: 'string',
+      operator: '!=',
+    });
+    filterList.push({
+      propertyName: 'status',
+      propertyValue: 'AP',
+      propertyType: 'string',
+      operator: '!=',
+    });
+    if (filters.prDate) {
+      filterList.push({
+        propertyName: 'createdDate',
+        propertyValue: moment(filters.prDate).format('YYYY-MM-DD'),
+        propertyType: 'date',
+        operator: '>=',
+      });
     }
 
-    // --- ĐẦU CHỜ CHO CÁC THAM SỐ LỌC THẬT TẾ ---
-    // KHI BẠN CÓ API THẬT HỖ TRỢ LỌC, HÃY UNCOMMENT CÁC DÒNG DƯỚI ĐÂY
-    // VÀ ĐẢM BẢO TÊN THAM SỐ TRÙNG KHỚP VỚI API CỦA BẠN.
-    // Ví dụ: requestParams.productName = filters.searchKey;
-    // Ví dụ: requestParams.startDate = filters.fromDate.toISOString();
+    if (filters.expectedDate) {
+      filterList.push({
+        propertyName: 'expectedDate',
+        propertyValue: moment(filters.expectedDate).format('YYYY-MM-DD'),
+        propertyType: 'date',
+        operator: '<=',
+      });
+    }
 
-    // if (filters.prNo) {
-    //   requestParams.prNo = filters.prNo; // Đảm bảo tên param khớp với backend của bạn
-    // }
-    // if (filters.fromDate) {
-    //   requestParams.fromDate = filters.fromDate.toISOString();
-    // }
-    // if (filters.toDate) {
-    //   requestParams.toDate = filters.toDate.toISOString();
-    // }
-    // if (filters.department?.id) {
-    //   requestParams.departmentId = filters.department.id;
-    // }
-    // if (filters.requester?.id) {
-    //   requestParams.requesterId = filters.requester.id;
-    // }
+    if (filters.department?.departmentCode) {
+      filterList.push({
+        propertyName: 'departmentCode',
+        propertyValue: filters.department.departmentCode,
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
 
-    // Thực hiện cuộc gọi API bằng Axios
-    const { data } = await axios.get(apiUrl, { params: requestParams });
+    if (filters.requester?.id) {
+      filterList.push({
+        propertyName: 'requestBy',
+        propertyValue: filters.requester.username,
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
+    if (filters.store?.id) {
+      filterList.push({
+        propertyName: 'storeCode',
+        propertyValue: filters.store.storeCode,
+        propertyType: 'string',
+        operator: '==',
+      });
+    }
 
-    // Tạo dữ liệu mock từ phản hồi của API
-    // Vì bạn đang dùng Picsum Photos (API trả về list ảnh ngẫu nhiên),
-    // chúng ta vẫn cần generateMockCreatePriceData để tạo dữ liệu có cấu trúc TypeCreatePrice.
-    // Khi tích hợp với API thật, bạn sẽ thay thế phần này bằng cách map dữ liệu API thật
-    // sang cấu trúc TypeCreatePrice của bạn.
-    let processedData: IApprove[] = data.map(
-      (item: any) => generateMockCreatePriceData(item, filters), // Truyền toàn bộ filters để generateMock có thể giả lập lọc tốt hơn
-    );
+    const params: IParams = {
+      pagination: {
+        pageIndex: page,
+        pageSize: limit,
+        isAll: false,
+      },
+      filter: {
+        textSearch: filters?.prNo?.trim(),
+        ...(filterList.length > 0 && {
+          filterGroup: [
+            {
+              condition: 'And',
+              filters: filterList,
+            },
+          ],
+        }),
+      },
+    };
 
-    console.log('--- fetchCreatePrice: API call finished for filters:', filters, '---');
+    const response = await api.post<IResponseListApprove>(ENDPOINT.GET_LIST_APPOVE_PR, params);
+    if (response.status !== 200 || !response.data.isSuccess) {
+      throw new Error('Failed to fetch data');
+    }
 
-    return processedData;
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination,
+    };
   } catch (error) {
-    console.error('Lỗi khi lấy dữ liệu Create Price:', error);
-    throw error; // Ném lỗi để TanStack Query có thể bắt và xử lý
+    throw error;
   }
 };
 
-export const deleteApprove = async (id: string) => {
+export const checkApprovePrNoChange = async (id: number) => {
   try {
-    // Luôn trả về true để demo UI update, trong thực tế sẽ gọi API delete
-    return id;
-    // const response = await axios.delete(`/create-price/${id}`);
-    // if (response.status === 200) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
+    const response = await api.get(`${ENDPOINT.HANDLE_APPROVE_PR_NO_CHANGE}/${id}`);
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' };
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
   } catch (error) {
-    console.error('Error deleting item on backend:', error);
-    return false;
+    return { isSuccess: false, message: 'An error occurred while approving PR without changes.' };
+  }
+};
+export const checkApprovePr = async (id: number, data: IApprove[]) => {
+  try {
+    const response = await api.post(`${ENDPOINT.HANDLE_APPROVE_PR}/${id}`, data);
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' };
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: 'An error occurred while approving PR without changes.' };
+  }
+};
+export const checkRejectPr = async (id: number, textReason: string) => {
+  try {
+    const response = await api.post(`${ENDPOINT.HANDLE_REJECT_PR}/${id}`, textReason, {
+      rawStringBody: true,
+    });
+
+    if (response.status === 200 && response.data.isSuccess) {
+      return { isSuccess: true, message: '' };
+    } else {
+      return { isSuccess: false, message: response.data.errors[0].message };
+    }
+  } catch (error) {
+    return { isSuccess: false, message: '' };
   }
 };

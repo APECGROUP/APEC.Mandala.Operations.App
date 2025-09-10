@@ -1,111 +1,83 @@
 import { create } from 'zustand';
-import { TypeUser } from '../../../interface/Authen.interface';
+// Giữ nguyên TypeUser để tương thích với cấu trúc hiện có nếu IUser không phải là cùng một kiểu
 import api from '../../../utils/setup-axios';
 import Toast from 'react-native-toast-message';
 import { t } from 'i18next';
 import { LanguageType } from '../../../languages/locales/type';
 import { USER_KEY } from '../../../data/DataLocal';
 import { storage } from '../../../views/appProvider/AppProvider';
+import { IUser } from '@/screens/authScreen/modal/AuthModal';
 
-const fakeUser: TypeUser = {
-  isApprove: false,
-  id: 1,
-  userName: 'Tuan',
-  authId: 'auth_abc123xyz',
-  status: 'active',
-  profile: {
-    id: 101,
-    email: 'tuanphamnd99@gmail.com',
-    mobile: '0949328231',
-    firstName: 'Phạm',
-    lastName: 'Tuấn',
-    fullName: 'Phạm Văn Tuấn',
-    gender: 'male',
-    address: 'Xuân Kiên, Xuân Trường, Nam Định',
-    emailVerificationDate: null,
-    profileVerificationDate: new Date('2023-06-15T10:30:00Z'),
-    dob: '2000-01-20',
-    occupation: 'Software Engineer',
-    avatar:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1BQqwCLUL_IUt5_tm6kIhnfDXcQE-AX325yTtwdlgxxQJRng-aJkCDo8SCi5RTJShlOGyZlQpqqDpNGMRFO3sxA',
-    jobPosition: 'Senior Developer',
-    emailVerified: true,
-    verified: true,
-    pinSet: true,
-    ssn: '036200004079',
-    ssnIssueDate: new Date('2010-01-15T00:00:00Z'),
-    ssnIssuePlace: 'TP.HCM',
-    language: null,
-    district: null,
-    city: null,
-    country: 'Vietnam',
-    postalCode: null,
-    currency: null,
-    ssnType: null,
-  },
-};
-
-interface typeInfo {
-  infoUser: TypeUser;
-  saveInfoUser: (val: TypeUser) => void;
+// Đảm bảo interface `typeInfo` phản ánh đúng các hàm được triển khai
+export interface typeInfo {
+  infoUser: Partial<IUser> | undefined;
+  deviceToken?: string;
+  setDeviceToken: (v: string) => void;
+  saveInfoUser: (val: Partial<IUser>) => void;
   fetData: () => Promise<void>;
   updateAvatar: (source: string) => Promise<void>;
+  toggleTurnOnOffNotification: (status: boolean) => void;
 }
 
 export const useInfoUser = create<typeInfo>((set, get) => ({
-  infoUser: fakeUser as TypeUser,
+  infoUser: undefined,
+  deviceToken: undefined,
 
-  saveInfoUser: (val: TypeUser) => {
-    console.log('saveInfoUser', val);
-    // TODO:bỏ check điều kiện đi
-    if (val.id) {
-      set({ infoUser: val });
-    }
-    // try {
-    //   storage.set(USER_KEY, JSON.stringify(val));
-    // } catch (e) {
-    //   console.log('Lỗi khi lưu user bằng MMKV:', e);
-    // }
+  setDeviceToken: (val: string) => {
+    set({ deviceToken: val });
+  },
+
+  saveInfoUser: (val: Partial<IUser>) => {
+    set({ infoUser: val });
   },
 
   updateAvatar: async (source: string) => {
-    const newAvatar = source;
-    // const newAvatar = `${source}&v=${Date.now()}`;
-    const updatedUser: TypeUser = {
-      ...get().infoUser,
-      profile: {
-        ...get().infoUser.profile,
-        avatar: newAvatar,
-      },
+    // Tạo một bản sao của infoUser hiện có và cập nhật chỉ trường avatar trong profile
+    const prevUser = get().infoUser || {};
+    const updatedUser: IUser = {
+      ...(prevUser as IUser), // Đảm bảo infoUser tồn tại trước khi spread
+      avatar: source,
     };
-    console.log('xử lý update', updatedUser);
-    set({ infoUser: updatedUser });
+    set({ infoUser: updatedUser }); // Cập nhật state trong Zustand
     try {
-      storage.set(USER_KEY, JSON.stringify(updatedUser));
+      storage.set(USER_KEY, JSON.stringify(updatedUser)); // Lưu vào MMKV storage
     } catch (error) {
-      console.log('Lỗi khi lưu avatar bằng MMKV:', error);
+      console.error('Lỗi khi lưu người dùng vào MMKV:', error); // Log lỗi rõ ràng hơn
+    }
+  },
+  toggleTurnOnOffNotification: async (status: boolean) => {
+    // Tạo một bản sao của infoUser hiện có và cập nhật chỉ trường avatar trong profile
+    const prevUser = get().infoUser || {};
+    const updatedUser: IUser = {
+      ...(prevUser as IUser),
+      isNotification: status,
+    };
+    set({ infoUser: updatedUser }); // Cập nhật state trong Zustand
+    try {
+      storage.set(USER_KEY, JSON.stringify(updatedUser)); // Lưu vào MMKV storage
+    } catch (error) {
+      console.error('Lỗi khi lưu người dùng vào MMKV:', error); // Log lỗi rõ ràng hơn
     }
   },
 
   fetData: async () => {
     try {
-      console.log('fetData');
       const response = await api.get('user/profile');
       if (response.status === 200 && response.data.status === 0) {
-        const userData: TypeUser = response.data.data;
+        const userData: IUser = response.data.data; // Đảm bảo kiểu dữ liệu phù hợp
         if (userData) {
-          set({ infoUser: userData });
-          storage.set(USER_KEY, JSON.stringify(userData));
+          set({ infoUser: userData }); // Cập nhật state với dữ liệu đầy đủ từ API
+          storage.set(USER_KEY, JSON.stringify(userData)); // Lưu dữ liệu đầy đủ vào MMKV storage
         }
       } else {
-        throw new Error('API trả về lỗi');
+        throw new Error('API trả về lỗi hoặc trạng thái không thành công');
       }
     } catch (error) {
-      console.log('Lỗi fetData user:', error);
       Toast.show({
         type: 'error',
         text2: t(LanguageType.errorTryAgain),
       });
+      console.error('Lỗi khi lấy dữ liệu người dùng:', error); // Log lỗi rõ ràng hơn
     }
   },
 }));

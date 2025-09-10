@@ -3,36 +3,99 @@ import { LayoutAnimation, StyleSheet, TouchableOpacity, View } from 'react-nativ
 import FastImage from 'react-native-fast-image';
 import { s, vs } from 'react-native-size-matters';
 import Images from '../../../../../assets/image/Images';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getFontSize } from '@/constants';
 import { useTranslation } from 'react-i18next';
-import { DetailOrderApprove } from '../../modal/DetailOrderApproveModal';
 import { Colors } from '@/theme/Config';
 import IconArrowRight from '@assets/icon/IconArrowRight';
 import IconSub from '@assets/icon/IconSub';
 import IconPlus from '@assets/icon/IconPlus';
 import { moneyFormat } from '@/utils/Utilities';
 import { navigate } from '@/navigation/RootNavigation';
-import { ResponseNcc } from '@/views/modal/modalPickNcc/modal/PickNccModal';
+import { IItemInDetailPr } from '@/screens/InformationItemScreen/modal/InformationItemsModal';
+import { IItemVendorPrice } from '@/screens/createPriceScreen/modal/CreatePriceModal';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { GROUP_ROLES } from '@/screens/notificationScreen/view/NotificationScreen';
 
-const DetailOrderItemCard = ({ item }: { item: DetailOrderApprove; index: number }) => {
+const DetailOrderItemCard = ({
+  item,
+  onUpdateQuantity,
+  onUpdateNCC,
+  requestDate,
+}: {
+  item: IItemInDetailPr;
+  index: number;
+  onUpdateQuantity: (item: IItemInDetailPr) => void;
+  onUpdateNCC: (id: number, vendor: IItemVendorPrice) => void;
+  onUpdatePrice?: (id: number, price: number) => void;
+  requestDate: string;
+}) => {
   const { t } = useTranslation();
+  const { infoUser } = useInfoUser();
   const [isShow, setIsShow] = useState(false);
-  const [count, setCount] = useState(item.approvedQty);
-  const [ncc, setNcc] = useState<ResponseNcc>(item.supplier);
+
+  const [ncc, setNcc] = useState<IItemVendorPrice>({
+    vendorName: item.vendorName,
+  } as IItemVendorPrice);
 
   const handleShowDetail = () => {
-    console.log('onPress');
     setIsShow(i => !i);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
+  console.log('DetailOrderItemCard ', item);
+  // const onPickNcc = () => {
+  //   navigate('PickNccScreen', {
+  //     setNcc: (ncc: IItemSupplier) => {
+  //       onUpdateQuantity({ ...item, vendor: ncc.code, vendorName: ncc.accountName });
+  //     },
+  //     ncc: undefined,
+  //   });
+  // };
 
+  const onSetNcc = (i: IItemVendorPrice) => {
+    setNcc(i);
+    onUpdateNCC(item.id, {
+      ...i,
+      id: item.id,
+      vat: i.vatCode,
+      vendor: i.vendorCode,
+    } as IItemVendorPrice);
+  };
+  const onSetPrice = async () => {
+    try {
+      // await onUpdatePrice?.(item.id, Number(price || 0));
+    } catch (error) {}
+  };
   const onPickNcc = () => {
-    navigate('PickNccScreen', {
-      setNcc: setNcc,
-      ncc: item.supplier,
+    console.log('onPick:', item, requestDate);
+    navigate('PickPriceFromNccScreen', {
+      onSetNcc,
+      ncc,
+      itemCode: item.itemCode,
+      onSetPrice,
+      requestDate: requestDate,
     });
   };
+
+  const onAdd = () => {
+    // setCount(i => i + 1);
+    onUpdateQuantity({ ...item, approvedQuantity: Number(item.approvedQuantity) + 1 });
+  };
+  const onSub = () => {
+    if (item.approvedQuantity <= 0) {
+      return;
+    }
+    onUpdateQuantity({ ...item, approvedQuantity: Math.max(0, Number(item.approvedQuantity) - 1) });
+  };
+  const isDisable =
+    infoUser?.groups?.some(i => i.id === GROUP_ROLES.PR_APPROVER.TBP) &&
+    infoUser?.groups.length <= 4;
+  useEffect(() => {
+    if (!item.approvedQuantity && item.quantity) {
+      onUpdateQuantity({ ...item, approvedQuantity: item.quantity });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <View style={styles.card}>
@@ -42,13 +105,13 @@ const DetailOrderItemCard = ({ item }: { item: DetailOrderApprove; index: number
           <View style={styles.itemInfo}>
             <View style={styles.itemInfoRow}>
               <AppText numberOfLines={1} style={styles.prCodeText}>
-                {item.name}
+                {item.iName}
               </AppText>
             </View>
             <View style={styles.itemInfoRow}>
               <AppText style={styles.dateText}>{t('Giá')}: </AppText>
               <AppText style={styles.dateTextEnd}>
-                {`${moneyFormat(item?.price || 0, '.', ' ')} / ${item.end}`}
+                {`${moneyFormat(item?.price || 0, '.', ' ')} / ${item.unitName}`}
               </AppText>
             </View>
           </View>
@@ -69,24 +132,22 @@ const DetailOrderItemCard = ({ item }: { item: DetailOrderApprove; index: number
           <View style={styles.row}>
             <AppText style={styles.label}>{t('Số lượng duyệt')}</AppText>
             <View style={styles.quantityControl}>
-              <TouchableOpacity
-                onPress={() => setCount(i => (i > 0 ? i - 1 : 0))}
-                style={styles.buttonSub}>
+              <TouchableOpacity onPress={onSub} style={styles.buttonSub}>
                 <IconSub />
               </TouchableOpacity>
               <TouchableOpacity activeOpacity={1} disabled>
-                <AppText style={styles.qtyValue}>{count}</AppText>
+                <AppText style={styles.qtyValue}>{Number(item.approvedQuantity)}</AppText>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setCount(i => i + 1)} style={styles.buttonPlus}>
+              <TouchableOpacity onPress={onAdd} style={styles.buttonPlus}>
                 <IconPlus />
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.row}>
             <AppText style={styles.label}>{t('NCC')}</AppText>
-            <TouchableOpacity onPress={onPickNcc} style={styles.nccContainer}>
+            <TouchableOpacity disabled={isDisable} onPress={onPickNcc} style={styles.nccContainer}>
               <AppText style={[styles.nccText, { marginRight: s(6) }]} numberOfLines={1}>
-                {ncc.name}
+                {ncc.vendorName}
               </AppText>
               <IconArrowRight style={{ transform: [{ rotate: '90deg' }] }} />
             </TouchableOpacity>
@@ -94,14 +155,14 @@ const DetailOrderItemCard = ({ item }: { item: DetailOrderApprove; index: number
           <View style={styles.row}>
             <AppText style={styles.label}>{t('Số tiền duyệt')}</AppText>
             <AppText style={styles.approvedAmount}>
-              {moneyFormat(item.approvedAmount, '.', '')}
+              {moneyFormat(item.price * item.approvedQuantity, '.', '')}
             </AppText>
           </View>
           <View>
             <AppText style={styles.label}>{t('Ghi chú')}</AppText>
             <View style={styles.noteBox}>
               <AppText style={styles.noteText} numberOfLines={3}>
-                {item.note}
+                {item.remark}
               </AppText>
             </View>
           </View>

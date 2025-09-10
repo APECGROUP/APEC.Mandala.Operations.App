@@ -6,13 +6,14 @@ import LoginScreen from '../screens/authScreen/LoginScreen';
 import { s } from 'react-native-size-matters';
 import { getFontSize } from '../constants';
 import light from '../theme/light';
-import ModalPickHotel from '../views/modal/ModalPickHotel';
+import ModalPickHotel from '../views/modal/modalPickHotel/view/ModalPickHotel';
 import IconBack from '../../assets/icon/IconBack';
 import AppBlockButton from '../elements/button/AppBlockButton';
 import { goBack } from './RootNavigation';
 import { StyleSheet } from 'react-native';
 import { Colors } from '@/theme/Config';
 import ChangePasswordScreen from '@/screens/changePasswordScreen/ChangePasswordScreen';
+import { isAndroid } from '@/utils/Utilities';
 
 const { Navigator, Screen, Group } = createNativeStackNavigator<AuthParams>();
 export const HeaderLeft = () => (
@@ -30,12 +31,13 @@ export default function AuthNavigator() {
     <Navigator
       screenOptions={{
         // animation: 'simple_push',
+
         headerShown: false,
         headerTransparent: false,
         headerBackButtonDisplayMode: 'minimal',
         headerLeft: HeaderLeft,
         headerTitleStyle: {
-          fontSize: getFontSize(18),
+          fontSize: isAndroid() ? 18 : getFontSize(18),
           color: light.text,
           fontWeight: '700',
         },

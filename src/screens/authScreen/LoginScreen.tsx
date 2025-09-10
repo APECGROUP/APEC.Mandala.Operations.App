@@ -1,8 +1,8 @@
+// screens/authScreen/LoginScreen.tsx
 import { ImageBackground, Keyboard, StyleSheet, TextInput, View, StatusBar } from 'react-native';
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { s, vs } from 'react-native-size-matters';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import ToastContainer from '@/elements/toast/ToastContainer';
 import { Colors } from '@/theme/Config';
 import { SCREEN_WIDTH, getFontSize } from '@/constants';
 import AppBlockButton from '@/elements/button/AppBlockButton';
@@ -17,42 +17,33 @@ import IconCheckBox from '@assets/icon/IconCheckBox';
 import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import Images from '@assets/image/Images';
 import { useTranslation } from 'react-i18next';
-import { TYPE_TOAST } from '@/elements/toast/Message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAutoLogin } from '@/hook/useAutoLogin';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
 import { useAuthViewModel } from './viewmodel/AuthViewModel';
-
-export type typeHotel = {
-  id: number | string | undefined;
-  name: number | string | undefined;
-};
-
-export type typeNcc = {
-  id: string | undefined;
-  name: string | undefined;
-};
-
-// Hàm loại bỏ dấu tiếng Việt
-export const removeVietnameseTones = (str: string) =>
-  str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D');
+import { IDataListHotel } from '@/views/modal/modalPickHotel/modal/PickHotelModal';
+import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
+import { getFCMTokenAndSendToServer } from '../../../firebase/fcmService';
 
 const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginScreen'>) => {
   const { t } = useTranslation();
-  const refToast = useRef<any>(null);
+  const { setDeviceToken } = useInfoUser();
   const refPassword = useRef<TextInput>(null);
   const { credentials, loading: loadingCredentials } = useAutoLogin();
   const { bottom } = useSafeAreaInsets();
 
-  const { loginForm, processing, setLoginForm, login, toggleRememberLogin } = useAuthViewModel();
+  const {
+    loginForm,
+    processing,
+    setLoginForm,
+    login,
+    toggleRememberLogin,
+    handleBlurLoginUserName, // Nhận hàm onBlur từ ViewModel
+    handleBlurLoginPassword, // Nhận hàm onBlur từ ViewModel
+  } = useAuthViewModel();
 
   const { userName, password, hotel, isRememberLogin } = loginForm;
 
-  // Tự động điền thông tin đăng nhập nếu có
   useEffect(() => {
     if (credentials && !loadingCredentials) {
       setLoginForm({
@@ -61,38 +52,32 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
         hotel: credentials.hotel,
         isRememberLogin: true,
       });
+      // Gọi forceUpdate từ ViewModel để đảm bảo UI hiển thị thông tin auto-fill
+      // Tuy nhiên, setLoginForm đã có logic forceUpdate khi hotel/isRememberLogin thay đổi
+      // nên không cần gọi thêm ở đây nếu credentials có đủ các trường đó
     }
   }, [credentials, loadingCredentials, setLoginForm]);
 
-  const disabled = !userName || !password || !hotel.id;
+  useEffect(() => {
+    getFCMTokenAndSendToServer(t, setDeviceToken);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const disabled = !userName || !password || !hotel?.code;
 
-  const onBlurUserName = () => {
-    if (!userName.trim()) {
-      refToast.current?.show(t('auth.login.emptyUserName'), TYPE_TOAST.ERROR);
-    }
-  };
-
-  const onBlurPassword = () => {
-    if (!password.trim()) {
-      refToast.current?.show(t('auth.login.emptyPassword'), TYPE_TOAST.ERROR);
-    }
-  };
-
-  const onPickHotel = () => {
+  const onPickHotel = useCallback(() => {
     Keyboard.dismiss();
     navigation.navigate('ModalPickHotel', {
-      hotel,
-      setHotel: (newHotel: typeHotel) => setLoginForm({ hotel: newHotel }),
+      hotel: hotel,
+      setHotel: (newHotel: IDataListHotel | undefined) => setLoginForm({ hotel: newHotel }),
     });
-  };
-
-  const onForgotPassword = () => {
+  }, [navigation, hotel, setLoginForm]);
+  const onForgotPassword = useCallback(() => {
     navigation.navigate('ForgotPasswordScreen');
-  };
+  }, [navigation]);
 
   return (
     <>
-      <StatusBar barStyle="light-content" backgroundColor="white" />
+      <StatusBar barStyle="light-content" />
       <ViewContainer>
         <View style={[styles.container, { paddingBottom: bottom }]}>
           <View style={styles.center}>
@@ -112,15 +97,12 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
               placeholderTextColor={light.placeholderTextColor}
               value={userName}
               maxLength={20}
-              onChangeText={text => setLoginForm({ userName: text })}
-              onBlur={onBlurUserName}
+              onChangeText={text => setLoginForm({ userName: text })} // Chỉ cập nhật useRef, không re-render
+              onBlur={handleBlurLoginUserName} // Gọi hàm onBlur từ ViewModel
               placeholder={t('auth.login.inputUserName')}
               onSubmitEditing={() => refPassword.current?.focus()}
               inputStyle={styles.inputStyle}
-              containerStyle={{
-                marginBottom: vs(18),
-                width: SCREEN_WIDTH - PaddingHorizontal * 2,
-              }}
+              containerStyle={styles.userNameInputContainer}
             />
 
             <AppTextInput
@@ -131,14 +113,11 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
               secureTextEntry
               value={password}
               maxLength={20}
-              onChangeText={text => setLoginForm({ password: text })}
-              onBlur={onBlurPassword}
+              onChangeText={text => setLoginForm({ password: text })} // Chỉ cập nhật useRef, không re-render
+              onBlur={handleBlurLoginPassword} // Gọi hàm onBlur từ ViewModel
               placeholder={t('auth.login.inputPassword')}
               inputStyle={styles.inputStyle}
-              containerStyle={{
-                marginBottom: vs(18),
-                width: SCREEN_WIDTH - PaddingHorizontal * 2,
-              }}
+              containerStyle={styles.passwordInputContainer}
             />
             <AppBlockButton onPress={onPickHotel}>
               <AppTextInput
@@ -151,25 +130,18 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
                 value={hotel?.name?.toString()}
                 placeholder={t('auth.login.pickHotel')}
                 rightIcon={
-                  <IconArrowRight
-                    stroke={Colors.ICON_SECONDARY}
-                    style={{ transform: [{ rotate: '90deg' }], marginRight: s(2) }}
-                  />
+                  <IconArrowRight stroke={Colors.ICON_SECONDARY} style={styles.hotelArrowIcon} />
                 }
                 inputStyle={styles.inputStyle}
-                containerStyle={{
-                  width: SCREEN_WIDTH - PaddingHorizontal * 2,
-                }}
+                containerStyle={styles.hotelInputContainer}
               />
             </AppBlockButton>
             <AppBlockButton onPress={toggleRememberLogin} style={styles.buttonSave}>
               {isRememberLogin ? <IconCheckBox /> : <IconUnCheckBox />}
-
               <AppText ml={s(5)} size={12} weight="500">
                 {t('auth.login.saveInfoLogin')}
               </AppText>
             </AppBlockButton>
-            <ToastContainer ref={refToast} />
           </View>
           <View>
             <AppButton
@@ -177,7 +149,7 @@ const LoginScreen = ({ navigation }: NativeStackScreenProps<AuthParams, 'LoginSc
               height={vs(45)}
               onPress={login}
               mt={vs(16)}
-              disabledStyle={{ backgroundColor: Colors.BUTTON_DISABLED }}
+              disabledStyle={styles.disabledButton}
               disabled={disabled}
               primary
               textColor={disabled ? Colors.TEXT_DEFAULT : Colors.WHITE}
@@ -237,5 +209,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+  },
+  userNameInputContainer: {
+    marginBottom: vs(18),
+    width: SCREEN_WIDTH - PaddingHorizontal * 2,
+  },
+  passwordInputContainer: {
+    marginBottom: vs(18),
+    width: SCREEN_WIDTH - PaddingHorizontal * 2,
+  },
+  hotelInputContainer: {
+    width: SCREEN_WIDTH - PaddingHorizontal * 2,
+  },
+  hotelArrowIcon: {
+    transform: [{ rotate: '90deg' }],
+    marginRight: s(2),
+  },
+  disabledButton: {
+    backgroundColor: Colors.BUTTON_DISABLED,
   },
 });

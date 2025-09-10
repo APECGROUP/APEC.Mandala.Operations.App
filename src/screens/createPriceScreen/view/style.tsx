@@ -88,11 +88,10 @@ export const styles = StyleSheet.create({
   },
   greetingContainer: {
     height: vs(40),
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   greetingText: {
     fontSize: getFontSize(18),
-    fontWeight: '700',
   },
   headerRight: {
     flexDirection: 'row',

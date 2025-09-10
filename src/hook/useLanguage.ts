@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import DataLocal from '../data/DataLocal';
+import { getDeviceLanguage } from '@/languages/i18n';
 
 export const useLanguage = () => {
-  const [currentLanguage, setCurrentLanguage] = useState<string>('vi');
+  const [currentLanguage, setCurrentLanguage] = useState<string>(getDeviceLanguage());
 
   useEffect(() => {
     // Load ngôn ngữ hiện tại khi hook được khởi tạo
     const loadCurrentLanguage = () => {
       const language = DataLocal.getLanguage();
-      setCurrentLanguage(language);
+      if (language && language !== '') {
+        setCurrentLanguage(language);
+      }
     };
 
     loadCurrentLanguage();
