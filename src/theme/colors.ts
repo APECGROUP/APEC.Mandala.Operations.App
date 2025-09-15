@@ -1,6 +1,7 @@
 export enum COLORS_DEFAULT {
   //PRIMARY
   PRIMARY = '#1E6F2F',
+  PRIMARYLIGHT = '#EFFCE9',
   PRIMARY_50 = '#fc681c',
   PRIMARY_100 = '#ffeee6',
   PRIMARY_200 = '#feddcd',
@@ -133,6 +134,7 @@ export enum COLORS_DEFAULT {
 export enum COLORS_DARK {
   //PRIMARY
   PRIMARY = '#1E6F2F',
+  PRIMARYLIGHT = '#EFFCE9',
 
   PRIMARY_50 = '#fc681c',
   PRIMARY_100 = '#ffeee6',

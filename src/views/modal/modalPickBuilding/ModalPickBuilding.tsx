@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,44 +10,46 @@ import { MainParams } from '@/navigation/params';
 import light from '@/theme/light';
 import IconClose from '@assets/icon/IconClose';
 import ViewContainer from '@/components/errorBoundary/ViewContainer';
-import { goBack, push } from '@/navigation/RootNavigation';
+import { goBack } from '@/navigation/RootNavigation';
 import { getFontSize } from '@/constants';
-import IconArrowTopRight from '@assets/icon/IconArrowTopRight';
 import { PaddingHorizontal } from '@/utils/Constans';
-import RenderStatusComponent from './component/RenderStatusComponent';
 import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
-import { useAlert } from '@/elements/alert/AlertProvider';
+import AppBlockButton from '@/elements/button/AppBlockButton';
+import { Colors } from '@/theme/Config';
+import { AppButton } from '@/elements/button/AppButton';
+import { AppBlock } from '@/elements/block/Block';
 
 moment.locale('vi');
+const fakeDataBuilding = [
+  { name: 'A', id: 'A' },
+  { name: 'B', id: 'B' },
+  { name: 'C', id: 'C' },
+  { name: 'D', id: 'D' },
+  { name: 'E', id: 'E' },
+];
+type Props = NativeStackScreenProps<MainParams, 'ModalPickBuilding'>;
 
-type Props = NativeStackScreenProps<MainParams, 'InformationRoomScreen'>;
-
-const InformationRoomScreen = ({ navigation, route }: Props) => {
-  const { id } = route.params;
+const ModalPickBuilding = ({ route }: Props) => {
+  const { building, setBuilding } = route.params;
+  const [selectedBuilding, setSelectedBuilding] = useState(building);
   const { bottom } = useSafeAreaInsets();
-  const { showAlert } = useAlert();
   const translateY = useSharedValue(500);
 
   React.useEffect(() => {
-    onShow();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const onShow = useCallback(() => {
     translateY.value = withTiming(0, {
       duration: 200,
     });
   }, [translateY]);
 
-  const onHidden = useCallback(
-    (func?: () => void) => {
+  const onClose = useCallback(
+    (func: () => void) => {
       translateY.value = withTiming(
         500,
         {
           duration: 200,
         },
         finished => {
-          if (finished && func) {
+          if (finished) {
             runOnJS(func)();
           }
         },
@@ -57,39 +59,16 @@ const InformationRoomScreen = ({ navigation, route }: Props) => {
   );
 
   const onGoBack = useCallback(() => {
-    onHidden(goBack);
-  }, [onHidden]);
+    onClose(goBack);
+  }, [onClose]);
+  const onSubmit = useCallback(() => {
+    setBuilding(selectedBuilding);
+    onClose(goBack);
+  }, [onClose, selectedBuilding, setBuilding]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
-  const onSeeDetail = useCallback(() => {
-    navigation.replace('DetailRoomScreen', { id });
-  }, [navigation, id]);
-
-  const renderMainButton = (title: string, onPress: () => void) => (
-    <TouchableOpacity style={styles.mainButton} onPress={onPress}>
-      <AppText style={styles.mainButtonText}>{title}</AppText>
-      <IconArrowTopRight />
-    </TouchableOpacity>
-  );
-
-  const onCheckOut = useCallback(async () => {
-    onGoBack();
-    showAlert('Đổi trạng thái', `Bạn có chắc chắn muốn đổi từ check out phòng ${id} không?`, [
-      {
-        text: 'Hủy bỏ',
-        onPress: () => push('InformationRoomScreen', { id }),
-        style: 'cancel',
-      },
-      {
-        text: 'Tôi chắc chắn',
-        onPress: () => {
-          push('InformationRoomScreen', { id });
-        },
-      },
-    ]);
-  }, [id, onGoBack, showAlert]);
 
   return (
     <ViewContainer>
@@ -105,48 +84,39 @@ const InformationRoomScreen = ({ navigation, route }: Props) => {
             animatedStyle,
           ]}>
           <View style={styles.header}>
-            <AppText style={styles.title}>Phòng: {id}</AppText>
+            <AppText style={styles.title}>Chọn tòa</AppText>
             <TouchableOpacity onPress={onGoBack} style={{ paddingHorizontal: PaddingHorizontal }}>
               <IconClose />
             </TouchableOpacity>
           </View>
-
-          <AppText color={'#8F8F8F'} mv={8} pl={16}>
-            Chọn một trong các chức năng dưới đây
-          </AppText>
-
-          {renderMainButton('XEM CHI TIẾT', onSeeDetail)}
-          {renderMainButton('XÁC NHẬN CHECK OUT', onCheckOut)}
-
-          <RenderStatusComponent onGoBack={onGoBack} id={id} />
-
-          <TouchableOpacity activeOpacity={1} style={[styles.section]} onPress={() => {}}>
-            <AppText style={styles.sectionTitle}>CHỨC NĂNG</AppText>
-            <View style={styles.functionContainer}>
-              <TouchableOpacity style={styles.functionButton}>
-                <AppText style={styles.functionText}>Post Minibar</AppText>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.functionButton}>
-                <AppText style={styles.functionText}>Đổ vỡ</AppText>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.functionButton}>
-                <AppText style={styles.functionText}>Khóa phòng</AppText>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.functionButton}>
-                <AppText style={styles.functionText}>Đổ thất lạc</AppText>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.functionButton}>
-                <AppText style={styles.functionText}>Post giặt là</AppText>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
+          <AppBlock pv={16}>
+            {fakeDataBuilding.map(item => {
+              const isSelected = selectedBuilding?.id === item.id;
+              return (
+                <AppBlockButton
+                  onPress={() => setSelectedBuilding(item)}
+                  style={[
+                    {
+                      paddingVertical: vs(8),
+                      paddingHorizontal: s(12),
+                      marginHorizontal: PaddingHorizontal,
+                    },
+                    isSelected && { backgroundColor: Colors.PRIMARYLIGHT },
+                  ]}
+                  key={item.id}>
+                  <AppText weight="600">{item.name}</AppText>
+                </AppBlockButton>
+              );
+            })}
+          </AppBlock>
+          <AppButton onPress={onSubmit} style={styles.center} text="Xác nhận" primary />
         </AnimatedButton>
       </TouchableOpacity>
     </ViewContainer>
   );
 };
 
-export default InformationRoomScreen;
+export default ModalPickBuilding;
 
 const styles = ScaledSheet.create({
   overlay: {
@@ -238,4 +208,5 @@ const styles = ScaledSheet.create({
     fontWeight: '600',
     textDecorationLine: 'underline',
   },
+  center: { alignSelf: 'center' },
 });

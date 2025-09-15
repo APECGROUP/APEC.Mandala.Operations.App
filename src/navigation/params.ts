@@ -140,6 +140,15 @@ export type MainParams = {
     setLocation: Dispatch<SetStateAction<IPickLocal | undefined>>;
     location: IPickLocal | undefined;
   };
+  ModalPickBuilding: {
+    building: { name: string; id: string } | undefined;
+    setBuilding: Dispatch<SetStateAction<{ name: string; id: string } | undefined>>;
+  };
+  FilterHkScreen: undefined;
+  ModalPickFloor: {
+    floor: { name: string; id: string }[] | undefined;
+    setFloor: Dispatch<SetStateAction<{ name: string; id: string }[] | undefined>>;
+  };
   ModalInputRejectAssign: {
     id: number;
     prNo: string;

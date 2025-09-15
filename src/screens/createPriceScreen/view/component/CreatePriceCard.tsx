@@ -12,7 +12,7 @@ import IconUnCheckBox from '@assets/icon/IconUnCheckBox';
 import ReanimatedSwipeable, { ReanimatedSwipeableRef } from './ReanimatedSwipeable';
 import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { Colors } from '@/theme/Config';
-import { moneyFormat } from '@/utils/Utilities';
+import { isAndroid, moneyFormat } from '@/utils/Utilities';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
@@ -113,7 +113,7 @@ const CreatePriceCard = memo<CreatePriceCardProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [item]);
     return (
-      <TouchableOpacity onPress={onEdit}>
+      <TouchableOpacity activeOpacity={isAndroid() ? 1 : 0} onPress={onEdit}>
         <ReanimatedSwipeable
           ref={swipeableRef}
           renderRightActions={renderRightActions}

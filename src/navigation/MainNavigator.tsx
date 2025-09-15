@@ -46,6 +46,9 @@ import FilterCreatePoScreen from '@/screens/filterScreen/view/FilterCreatePoScre
 import EditPriceNCCScreen from '@/screens/createPriceScreen/view/component/EditPriceNCCScreen';
 import InformationItemsAssignPrice from '@/screens/InformationItemScreen/view/InformationItemsAssignPrice';
 import PickPriceFromNccScreen from '@/views/modal/modalPickPriceFromNcc/view/PickPriceFromNccScreen';
+import ModalPickBuilding from '@/views/modal/modalPickBuilding/ModalPickBuilding';
+import ModalPickFloor from '@/views/modal/modalPickFloor/ModalPickFloor';
+import FilterHkScreen from '@/screens/routerHk/homeScreen/view/component/FilterHkScreen';
 export default function MainNavigator() {
   const { Navigator, Group, Screen } = createNativeStackNavigator<MainParams>();
   const { t } = useTranslation();
@@ -63,8 +66,8 @@ export default function MainNavigator() {
   }, []);
   return (
     <Navigator
-      initialRouteName={'MyTabsHk'}
-      // initialRouteName={'MyTabs'}
+      // initialRouteName={'MyTabsHk'}
+      initialRouteName={'MyTabs'}
       // initialRouteName={'ApprovePrScreen'}
       // initialRouteName={!infoUser?.isApprove ? 'MyTabs' : 'ApprovePrScreen'}
       screenOptions={{
@@ -335,7 +338,10 @@ export default function MainNavigator() {
         <Screen name={'PickStatusScreen'} component={PickStatusScreen} />
         <Screen name={'ModalInputRejectAssign'} component={ModalInputRejectAssign} />
         <Screen name={'ModalInputRejectApprove'} component={ModalInputRejectApprove} />
+        <Screen name={'ModalPickBuilding'} component={ModalPickBuilding} />
+        <Screen name={'ModalPickFloor'} component={ModalPickFloor} />
         <Screen name={'NoteScreen'} component={NoteScreen} />
+        <Screen name={'FilterHkScreen'} component={FilterHkScreen} />
       </Group>
     </Navigator>
   );

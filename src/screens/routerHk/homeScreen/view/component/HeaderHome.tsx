@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import React from 'react';
 import { s, vs } from 'react-native-size-matters';
 import { useInfoUser } from '@/zustand/store/useInfoUser/useInfoUser';
@@ -12,13 +12,31 @@ import IconNoteHk from '@assets/icon/IconNoteHk';
 import IconNotificationHk from '@assets/icon/IconNotificationHk';
 import FastImage from 'react-native-fast-image';
 import { Colors } from '@/theme/Config';
-import { useHomeViewModal } from '../../viewmodal/useHomeViewModal';
 import { navigate } from '@/navigation/RootNavigation';
-
+import { useTranslation } from 'react-i18next';
+import IconRemoveHk from '@assets/icon/IconRemoveHk';
+import IconClose from '@assets/icon/IconClose';
+import IconFilterHk from '@assets/icon/IconFilterHk';
+import { useHk } from '@/zustand/store/useHk/useHk';
 const HeaderHome = () => {
   const { infoUser } = useInfoUser();
-  const { onPressBuilding, onPressLocation, onPressAll, onPressPriority, isAll } =
-    useHomeViewModal();
+  const {
+    buildingSelected,
+    floorSelected,
+    isAll,
+    onPressBuilding,
+    setFloorSelected,
+    onPressLocation,
+    onPressAll,
+    onPressPriority,
+  } = useHk();
+  const { t } = useTranslation();
+  const onRemoveAll = () => {
+    setFloorSelected([]);
+  };
+  const onPickFloor = () => {
+    buildingSelected?.id ? onPressLocation() : onPressBuilding();
+  };
   return (
     <View>
       {/* Header Section */}
@@ -27,15 +45,17 @@ const HeaderHome = () => {
         <View style={styles.userInfo}>
           <View style={styles.avatarContainer}>
             <FastImage
-              source={{ uri: infoUser?.profile.avatar }}
+              source={{ uri: infoUser?.avatar }}
               style={styles.avatar}
               resizeMode={FastImage.resizeMode.cover}
             />
           </View>
           <View style={styles.greetingContainer}>
-            <AppText color={Colors.TEXT_NEUTRAL}>Xin chào,</AppText>
             <AppText color={Colors.TEXT_DEFAULT} size={16} weight="600">
-              {infoUser?.profile.fullName}
+              {t('createPrice.title')}! - {infoUser?.userName}
+            </AppText>
+            <AppText size={18} weight="700" numberOfLines={1}>
+              {infoUser?.displayName}
             </AppText>
           </View>
         </View>
@@ -50,6 +70,9 @@ const HeaderHome = () => {
           <AppBlockButton style={styles.iconButton} onPress={() => navigate('NoteScreen')}>
             <IconNoteHk />
           </AppBlockButton>
+          <AppBlockButton style={styles.iconButton} onPress={() => navigate('FilterHkScreen')}>
+            <IconFilterHk />
+          </AppBlockButton>
         </View>
       </View>
       {/* Filter Section */}
@@ -60,14 +83,14 @@ const HeaderHome = () => {
           <AppBlockButton onPress={onPressBuilding} style={styles.filterButton}>
             <View style={styles.filterContent}>
               <IconBuilding />
-              <AppText style={styles.filterText}>D</AppText>
+              <AppText style={styles.filterText}>{buildingSelected?.name}</AppText>
               <IconDropDown width={s(16)} />
             </View>
           </AppBlockButton>
           {/* Space between filters */}
           <View style={{ width: s(16) }} /> {/* Explicit spacing */}
           {/* Location Filter */}
-          <AppBlockButton onPress={onPressLocation} style={styles.filterButton}>
+          <AppBlockButton onPress={onPickFloor} style={styles.filterButton}>
             <View style={styles.filterContent}>
               <IconLocalHk />
               <AppText style={[styles.filterText, styles.filterTextMinwidth]}>Chọn</AppText>
@@ -123,6 +146,31 @@ const HeaderHome = () => {
           </AppBlockButton>
         </View>
       </View>
+      {floorSelected && floorSelected.length > 0 && (
+        <View style={styles.blockFloor}>
+          <AppBlockButton onPress={onRemoveAll} style={{ padding: vs(10) }}>
+            <IconRemoveHk />
+          </AppBlockButton>
+          <View style={styles.blockSpace} />
+          {
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {floorSelected.map((item, index) => {
+                const onPressRemove = () => {
+                  setFloorSelected(prev => prev?.filter(f => f.id !== item.id));
+                };
+                return (
+                  <AppBlockButton onPress={onPressRemove} style={styles.buttonRemove} key={index}>
+                    <AppText size={14} mr={4}>
+                      {item.name}
+                    </AppText>
+                    <IconClose />
+                  </AppBlockButton>
+                );
+              })}
+            </ScrollView>
+          }
+        </View>
+      )}
     </View>
   );
 };
@@ -130,6 +178,17 @@ const HeaderHome = () => {
 export default HeaderHome;
 
 const styles = StyleSheet.create({
+  blockFloor: { flexDirection: 'row', alignItems: 'center', marginLeft: s(8) },
+  blockSpace: { backgroundColor: Colors.BLACK_400, width: 1, height: vs(16) },
+  buttonRemove: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: s(8),
+    paddingHorizontal: s(8),
+    paddingVertical: vs(4),
+    backgroundColor: Colors.BLACK_100,
+    borderRadius: s(8),
+  },
   appBlockButtonStyle: { backgroundColor: Colors.WHITE, padding: 2, borderRadius: s(8) },
   header: {
     flexDirection: 'row',

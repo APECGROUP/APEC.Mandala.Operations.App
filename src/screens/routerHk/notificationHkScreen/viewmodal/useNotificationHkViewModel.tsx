@@ -6,6 +6,7 @@ import {
   ContentNotificationHk,
   fetchNotificationData,
 } from '../modal/notificationModel';
+import { useAlert } from '@/elements/alert/AlertProvider';
 
 const ITEMS_PER_PAGE = 50;
 const DEBOUNCE_DELAY = 300;
@@ -14,7 +15,7 @@ export function useNotificationHkViewModel() {
   const [searchKey, setSearchKey] = useState<string>('');
   const debouncedSearchRef = useRef<ReturnType<typeof debounce> | null>(null);
   const queryClient = useQueryClient();
-
+  const { showAlert } = useAlert();
   // Infinite Query cho phân trang + search
   const {
     data,
@@ -104,9 +105,8 @@ export function useNotificationHkViewModel() {
       console.error('Error read item:', err);
     }
   };
-  const readAll = async () => {
+  const onHandleReadAll = async () => {
     const currentQueryKey = ['listNotificationHk', searchKey.trim()];
-
     const cached = queryClient.getQueryData<InfiniteData<ContentNotificationHk[]>>(currentQueryKey);
     if (!cached) {
       console.warn('🟥 No cache found for key:', currentQueryKey);
@@ -123,6 +123,19 @@ export function useNotificationHkViewModel() {
     } catch (err) {
       console.error('Error read item:', err);
     }
+  };
+  const readAll = async () => {
+    showAlert('Đọc tất cả', `Bạn có chắc chắn muốn đánh dấu tất cả thông báo là đã xem?`, [
+      {
+        text: 'Hủy bỏ',
+        onPress: () => {},
+        style: 'cancel',
+      },
+      {
+        text: 'Tôi chắc chắn',
+        onPress: onHandleReadAll,
+      },
+    ]);
   };
 
   return {

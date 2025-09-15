@@ -1,20 +1,36 @@
-import { useCallback, useMemo, useState } from 'react';
+// src/hooks/useHomeViewModal.ts
+import { useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import {
-  fetchPaginatedFloorData,
-  FloorData,
-  PaginatedFloorResponse,
-  RoomData,
-} from '../modal/HomeModal';
+import { fetchPaginatedFloorData, FloorData, PaginatedFloorResponse } from '../modal/HomeModal';
+import { useHk } from '@/zustand/store/useHk/useHk';
 
-const FLOORS_PER_PAGE = 20; // Số tầng mỗi trang, giống mặc định trong fetchPaginatedFloorData
+const FLOORS_PER_PAGE = 20;
 
 /**
- * Custom hook quản lý phân trang danh sách tầng/phòng Housekeeping.
- * Không có filter tìm kiếm, chỉ phân trang.
+ * Custom hook quản lý dữ liệu và logic cho màn hình Housekeeping Home.
  */
 export function useHomeViewModal() {
-  // Sử dụng useInfiniteQuery để lấy dữ liệu phân trang
+  // Lấy các state và actions từ Zustand store
+  const {
+    selectedRoom,
+    buildingSelected,
+    floorSelected,
+    isAll,
+    setSelectedRoom,
+    setBuildingSelected,
+    setFloorSelected,
+    setIsAll,
+    onPressBuilding,
+    onPressLocation,
+    onPressAll,
+    onPressPriority,
+    onPressMinibar,
+    onPressCo,
+    onPressBroken,
+    onPressLost,
+  } = useHk();
+
+  // useInfiniteQuery vẫn được giữ nguyên để xử lý fetching data
   const {
     data,
     isLoading,
@@ -27,68 +43,34 @@ export function useHomeViewModal() {
     isError,
     error,
   } = useInfiniteQuery<PaginatedFloorResponse, Error>({
-     
-    queryKey: ['listHome'],
+    queryKey: ['listHome', selectedRoom, buildingSelected, floorSelected, isAll],
     queryFn: async ({ pageParam = 1 }) =>
-      // pageParam mặc định là 1
       fetchPaginatedFloorData(pageParam as number, FLOORS_PER_PAGE),
     getNextPageParam: lastPage =>
       lastPage.currentPage === lastPage.totalPages ? undefined : lastPage.currentPage + 1,
     initialPageParam: 1,
-    staleTime: 60 * 1000, // Dữ liệu được coi là "stale" sau 1 phút
-    refetchOnWindowFocus: false, // Tắt re-fetch khi focus lại cửa sổ để tránh gọi API không cần thiết
-    refetchOnMount: false, // Tắt re-fetch khi component mount lần đầu
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
-  const [selectedRoom, setSelectedRoom] = useState<RoomData | null>(null);
-  const [isAll, setIsAll] = useState(true);
 
-  // Gộp tất cả các trang thành một mảng phẳng các tầng
   const flatFloors: FloorData[] = useMemo(() => {
     if (!data?.pages) return [];
     return data.pages.flatMap(page => page.data || []);
   }, [data]);
 
-  // Hàm làm mới lại dữ liệu (refetch lại từ đầu)
-  const onRefresh = useCallback(() => {
-    refetch();
-  }, [refetch]);
+  // Các hàm onRefresh và onLoadMore vẫn cần ở đây vì chúng tương tác trực tiếp với useInfiniteQuery
+  const onRefresh = () => refetch();
 
-  // Hàm tải thêm trang tiếp theo
-  const onLoadMore = useCallback(() => {
-    // console.log('onLoadMore', hasNextPage, isFetchingNextPage, hasNextPage && !isFetchingNextPage);
+  const onLoadMore = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  };
 
-  const onPressBuilding = () => {
-    console.log('onPressBuilding');
-  };
-  const onPressLocation = () => {
-    console.log('onPressLocation');
-  };
-  const onPressAll = () => {
-    console.log('onPressAll');
-    setIsAll(true);
-  };
-  const onPressPriority = () => {
-    console.log('onPressPriority');
-    setIsAll(false);
-  };
-  const onPressMinibar = () => {
-    console.log('onPressMinibar');
-  };
-  const onPressCo = () => {
-    console.log('onPressCo');
-  };
-  const onPressBroken = () => {
-    console.log('onPressBroken');
-  };
-  const onPressLost = () => {
-    console.log('onPressLost');
-  };
   return {
-    data: flatFloors, // Mảng các tầng đã lấy được
+    // Dữ liệu và trạng thái từ useInfiniteQuery
+    data: flatFloors,
     isLoading,
     isFetching,
     isFetchingNextPage,
@@ -98,6 +80,8 @@ export function useHomeViewModal() {
     hasNextPage,
     onRefresh,
     onLoadMore,
+
+    // Dữ liệu và hàm từ Zustand store
     selectedRoom,
     setSelectedRoom,
     isAll,
@@ -110,5 +94,9 @@ export function useHomeViewModal() {
     onPressCo,
     onPressBroken,
     onPressLost,
+    buildingSelected,
+    floorSelected,
+    setBuildingSelected,
+    setFloorSelected,
   };
 }

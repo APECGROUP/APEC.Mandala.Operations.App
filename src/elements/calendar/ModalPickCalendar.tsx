@@ -56,7 +56,7 @@ const ModalPickCalendar = ({ navigation, route }: Props) => {
 
   React.useEffect(() => {
     translateY.value = withTiming(0, {
-      duration: 500,
+      duration: 200,
     });
   }, [translateY]);
 
@@ -64,7 +64,7 @@ const ModalPickCalendar = ({ navigation, route }: Props) => {
     translateY.value = withTiming(
       500,
       {
-        duration: 500,
+        duration: 200,
       },
       finished => {
         if (finished) {

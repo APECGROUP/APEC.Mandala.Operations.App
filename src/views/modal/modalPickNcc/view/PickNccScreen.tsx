@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useLayoutEffect } from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainParams } from '../../../../navigation/params';
@@ -19,6 +19,9 @@ import { IItemSupplier } from '../modal/PickNccModal';
 import AppInputSearch from '@/elements/textInput/AppInputSearch';
 import { Colors } from '@/theme/Config';
 import IconEmptyNcc from '@assets/icon/IconEmptyNcc';
+import { goBack } from '@/navigation/RootNavigation';
+import { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 
 type Props = NativeStackScreenProps<MainParams, 'PickNccScreen'>;
 const PickNccScreen = ({ navigation, route }: Props) => {
@@ -86,15 +89,51 @@ const PickNccScreen = ({ navigation, route }: Props) => {
     [navigation, ncc?.id, setNcc],
   );
 
-  const goBack = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
+  const translateY = useSharedValue(700);
+
+  const onShow = useCallback(() => {
+    translateY.value = withTiming(0, {
+      duration: 200,
+    });
+  }, [translateY]);
+
+  const onHidden = useCallback(
+    (func?: () => void) => {
+      translateY.value = withTiming(
+        700,
+        {
+          duration: 200,
+        },
+        finished => {
+          if (finished && func) {
+            runOnJS(func)();
+          }
+        },
+      );
+    },
+    [translateY],
+  );
+  const onGoBack = useCallback(() => {
+    onHidden(goBack);
+  }, [onHidden]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+  useLayoutEffect(() => {
+    onShow();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
-      <View
+    <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={onGoBack}>
+      <AnimatedButton
+        activeOpacity={1}
+        onPress={() => {}}
         style={[
           styles.container,
           { paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7 },
+          animatedStyle,
         ]}>
         <AppBlock
           pl={PaddingHorizontal}
@@ -105,7 +144,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
           <AppText size={20} weight="bold">
             {t('orderDetail.titleSearch')}
           </AppText>
-          <TouchableOpacity onPress={goBack} style={{ padding: PaddingHorizontal }}>
+          <TouchableOpacity onPress={onGoBack} style={{ padding: PaddingHorizontal }}>
             <IconClose />
           </TouchableOpacity>
         </AppBlock>
@@ -143,7 +182,7 @@ const PickNccScreen = ({ navigation, route }: Props) => {
             paddingTop: vs(10),
           }}
         />
-      </View>
+      </AnimatedButton>
     </TouchableOpacity>
   );
 };

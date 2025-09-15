@@ -1,5 +1,22 @@
 {
   "translation": {
+    "hk": {
+      "filter": {
+        "title": "Bộ lọc",
+        "selectFloor": "Chọn tầng",
+        "selectBuilding": "Chọn tòa nhà",
+        "selectRoom": "Chọn phòng",
+        "building": "Tòa nhà",
+        "floor": "Tầng",
+        "room": "Phòng",
+        "checkin": "Nhận phòng",
+        "checkout": "Trả phòng",
+        "adults": "Người lớn",
+        "children": "Trẻ em",
+        "search": "Tìm kiếm",
+        "availableRooms": "Phòng trống"
+      }
+    },
     "auth": {
       "login": {
         "title": "Xin chào",

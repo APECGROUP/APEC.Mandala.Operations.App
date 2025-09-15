@@ -25,12 +25,16 @@ import {
 import { moneyFormat } from '@/utils/Utilities';
 import api from '@/utils/setup-axios';
 import { useAlert } from '@/elements/alert/AlertProvider';
+import { goBack } from '@/navigation/RootNavigation';
+import { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { AnimatedButton } from '@/screens/approvePrScreen/view/ApprovePrScreen';
 
 type Props = NativeStackScreenProps<MainParams, 'PickPriceFromNccScreen'>;
 const PickPriceFromNccScreen = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
   const { showToast } = useAlert();
   const [timeSystem, setTimeSystem] = useState('');
+  const translateY = useSharedValue(700);
 
   const { onSetNcc, ncc, itemCode, onSetPrice, requestDate } = route.params;
   const { bottom } = useSafeAreaInsets();
@@ -96,10 +100,37 @@ const PickPriceFromNccScreen = ({ navigation, route }: Props) => {
     },
     [navigation, ncc?.id, onSetNcc, onSetPrice],
   );
+
+  const onShow = useCallback(() => {
+    translateY.value = withTiming(0, {
+      duration: 200,
+    });
+  }, [translateY]);
+
+  const onHidden = useCallback(
+    (func?: () => void) => {
+      translateY.value = withTiming(
+        700,
+        {
+          duration: 200,
+        },
+        finished => {
+          if (finished && func) {
+            runOnJS(func)();
+          }
+        },
+      );
+    },
+    [translateY],
+  );
   console.log('data: ', flatData);
-  const goBack = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
+  const onGoBack = useCallback(() => {
+    onHidden(goBack);
+  }, [onHidden]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
   const getTimeSystem = async () => {
     try {
       const response = await api.get<IResponseListVat, any>(ENDPOINT.GET_TIME_SYSTEM);
@@ -111,19 +142,24 @@ const PickPriceFromNccScreen = ({ navigation, route }: Props) => {
       }
     } catch (error) {
       showToast(t('Lỗi khi lấy giờ hệ thông'), 'error');
-      goBack();
+      onGoBack();
     }
   };
   useEffect(() => {
+    onShow();
+
     getTimeSystem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={goBack}>
-      <View
+    <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={onGoBack}>
+      <AnimatedButton
+        activeOpacity={1}
+        onPress={() => {}}
         style={[
           styles.container,
           { paddingBottom: bottom || vs(10), height: SCREEN_HEIGHT * 0.7 },
+          animatedStyle,
         ]}>
         <AppBlock
           pl={PaddingHorizontal}
@@ -134,7 +170,7 @@ const PickPriceFromNccScreen = ({ navigation, route }: Props) => {
           <AppText size={20} weight="bold">
             {t('orderDetail.titleSearch')}
           </AppText>
-          <TouchableOpacity onPress={goBack} style={{ padding: PaddingHorizontal }}>
+          <TouchableOpacity onPress={onGoBack} style={{ padding: PaddingHorizontal }}>
             <IconClose />
           </TouchableOpacity>
         </AppBlock>
@@ -172,7 +208,7 @@ const PickPriceFromNccScreen = ({ navigation, route }: Props) => {
             paddingTop: vs(10),
           }}
         />
-      </View>
+      </AnimatedButton>
     </TouchableOpacity>
   );
 };

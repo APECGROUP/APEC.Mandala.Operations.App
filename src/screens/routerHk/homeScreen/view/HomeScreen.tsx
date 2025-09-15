@@ -19,7 +19,7 @@ import SkeletonItemHome from './component/SkeletonItemHome';
 const HomeScreen = () => {
   const { data, isLoading, isRefetching, onLoadMore, onRefresh, isFetchingNextPage } =
     useHomeViewModal();
-  const flashListRef = useRef<FlashList<FloorData> | null>(null);
+  const flashListRef = useRef<any>(null);
 
   // ─── Hàm scrollToTop và scrollToBottom ───────────────────────────────────
   const scrollToTop = useCallback(() => {
@@ -76,7 +76,7 @@ const HomeScreen = () => {
             ref={flashListRef}
             data={data} // Sử dụng flatData từ ViewModel
             renderItem={renderItem as any}
-            keyExtractor={item => item?.id} // Chỉ cần item.id là đủ cho key
+            keyExtractor={item => item?.floorNumber.toLocaleString()} // Chỉ cần item.id là đủ cho key
             onEndReached={onLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}
@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
 
   listContent: {
     paddingBottom: vs(100),
+    marginTop: vs(8),
   },
   emptyContainer: {
     flex: 1,
