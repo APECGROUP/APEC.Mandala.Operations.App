@@ -265,6 +265,27 @@ const DataLocal = {
       });
     }
   },
+  removeFrom401: async (): Promise<void> => {
+    try {
+      DataLocal.token = null;
+      DataLocal.user = null;
+
+      // Xóa token từ MMKV
+      storage.delete(TOKEN_KEY);
+
+      // Xóa user từ storage
+      storage.delete(USER_KEY);
+
+      await useInfoUser.getState().saveInfoUser({} as IUser);
+      console.log('remove from 401');
+      DataLocal.setAuthStatus('unauthenticated');
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text2: Strings('Đã có lỗi xảy ra, vui lòng khởi động lại ứng dụng'),
+      });
+    }
+  },
 
   // ✅ Lưu token và user sau khi login thành công
   saveAll: async (
@@ -279,9 +300,17 @@ const DataLocal = {
       await DataLocal.saveToken(
         res.data.accessToken,
         res.data.refreshToken,
-        res.data.expiresAt,
-        res.data.refreshExpiresAt,
+        moment().add(10, 'seconds').toISOString(), // Giả sử token hết hạn sau 10 giây
+        moment().add(10, 'seconds').toISOString(), // Giả sử refresh token hết hạn sau 7 ngày
+        // res.data.expiresAt,
+        // res.data.refreshExpiresAt,
       );
+      // await DataLocal.saveToken(
+      //   res.data.accessToken,
+      //   res.data.refreshToken,
+      //   res.data.expiresAt,
+      //   res.data.refreshExpiresAt,
+      // );
     } catch (error) {
       Toast.show({ type: 'error', text2: 'Lưu dữ liệu thất bại' });
     }

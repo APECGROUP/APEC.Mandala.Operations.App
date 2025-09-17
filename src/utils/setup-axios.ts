@@ -131,7 +131,7 @@ api.interceptors.response.use(
       // 🚫 Nếu không có refresh token → đăng xuất người dùng
       if (!DataLocal.token?.refreshToken) {
         Toast.show({ type: 'error', text2: 'Không có refresh token, vui lòng đăng nhập lại.' });
-        DataLocal.removeAll(); // Xóa tất cả dữ liệu và đăng xuất
+        DataLocal.removeFrom401(); // Xóa tất cả dữ liệu và đăng xuất
         DeviceEventEmitter.emit('logout'); // Gửi sự kiện đăng xuất
         return Promise.reject(error);
       }
@@ -195,7 +195,7 @@ api.interceptors.response.use(
             type: 'error',
             text2: 'Refresh token thất bại, đang đăng xuất...',
           });
-          DataLocal.removeAll(); // Đăng xuất nếu refresh token thất bại
+          DataLocal.removeFrom401(); // Đăng xuất nếu refresh token thất bại
           DeviceEventEmitter.emit('logout'); // Gửi sự kiện đăng xuất
           return Promise.reject(refreshError);
         }
