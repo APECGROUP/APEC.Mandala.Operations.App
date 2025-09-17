@@ -297,20 +297,18 @@ const DataLocal = {
     try {
       await DataLocal.saveUser({ ...res.data?.user, hotelCode, hotelName, deviceToken });
       // Truyền expiresAt và refreshExpiresAt trực tiếp dưới dạng chuỗi
-      await DataLocal.saveToken(
-        res.data.accessToken,
-        res.data.refreshToken,
-        moment().add(10, 'seconds').toISOString(), // Giả sử token hết hạn sau 10 giây
-        moment().add(10, 'seconds').toISOString(), // Giả sử refresh token hết hạn sau 7 ngày
-        // res.data.expiresAt,
-        // res.data.refreshExpiresAt,
-      );
       // await DataLocal.saveToken(
       //   res.data.accessToken,
       //   res.data.refreshToken,
-      //   res.data.expiresAt,
-      //   res.data.refreshExpiresAt,
+      //   moment().add(10, 'seconds').toISOString(), // Giả sử token hết hạn sau 10 giây
+      //   moment().add(10, 'seconds').toISOString(), // Giả sử refresh token hết hạn sau 7 ngày
       // );
+      await DataLocal.saveToken(
+        res.data.accessToken,
+        res.data.refreshToken,
+        res.data.expiresAt,
+        res.data.refreshExpiresAt,
+      );
     } catch (error) {
       Toast.show({ type: 'error', text2: 'Lưu dữ liệu thất bại' });
     }

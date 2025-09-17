@@ -10,9 +10,9 @@ ANDROID_BUILD_GRADLE="android/app/build.gradle"
 STRINGS_XML="android/app/src/main/res/values/strings.xml"
 
 # Version và build number
-VERSION_NAME="1.0.3"
-VERSION_CODE_IOS="1"
-VERSION_CODE_ANDROID="12" # Phải là số nguyên (dành cho Android)
+VERSION_NAME="1.0.4"
+VERSION_CODE_IOS="3"
+VERSION_CODE_ANDROID="13" # Phải là số nguyên (dành cho Android)
 
 ENV=$1
 
