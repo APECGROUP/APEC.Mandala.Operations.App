@@ -90,12 +90,14 @@ const DetailOrderItemCard = ({
   const isDisable =
     infoUser?.groups?.some(i => i.id === GROUP_ROLES.PR_APPROVER.TBP) &&
     infoUser?.groups.length <= 4;
-  useEffect(() => {
-    if (!item.approvedQuantity && item.quantity) {
-      onUpdateQuantity({ ...item, approvedQuantity: item.quantity });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   if (!item.approvedQuantity && item.quantity) {
+  //     onUpdateQuantity({ ...item, approvedQuantity: item.quantity });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
+  console.log('item: ', item, item.approvedQuantity);
 
   return (
     <View style={styles.card}>
@@ -136,7 +138,7 @@ const DetailOrderItemCard = ({
                 <IconSub />
               </TouchableOpacity>
               <TouchableOpacity activeOpacity={1} disabled>
-                <AppText style={styles.qtyValue}>{Number(item.approvedQuantity)}</AppText>
+                <AppText style={styles.qtyValue}>{Number(item.approvedQuantity || 0)}</AppText>
               </TouchableOpacity>
               <TouchableOpacity onPress={onAdd} style={styles.buttonPlus}>
                 <IconPlus />

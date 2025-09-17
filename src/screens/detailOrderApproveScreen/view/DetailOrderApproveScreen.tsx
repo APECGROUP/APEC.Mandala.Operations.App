@@ -150,7 +150,7 @@ const DetailOrderApproveScreen = ({
             // data={[]}
             data={flatData || []}
             renderItem={renderItem}
-            keyExtractor={item => `${item.id}-${item.price}`}
+            keyExtractor={item => `${item.id}-${item.price}_${item.approvedQuantity}`}
             // onEndReached={onEndReached}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.5}

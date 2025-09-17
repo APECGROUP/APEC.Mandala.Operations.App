@@ -11,7 +11,7 @@ STRINGS_XML="android/app/src/main/res/values/strings.xml"
 
 # Version và build number
 VERSION_NAME="1.0.4"
-VERSION_CODE_IOS="3"
+VERSION_CODE_IOS="4"
 VERSION_CODE_ANDROID="13" # Phải là số nguyên (dành cho Android)
 
 ENV=$1
